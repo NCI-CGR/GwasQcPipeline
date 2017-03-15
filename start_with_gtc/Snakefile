@@ -23,6 +23,9 @@ from snakemake.utils import R
 
 configfile: "config.yaml"
 
+
+
+
 snp_cr_1 = config['snp_cr_1']
 samp_cr_1 = config['samp_cr_1']
 snp_cr_2 = config['snp_cr_2']
@@ -33,9 +36,7 @@ sample_sheet = 'IlluminaSampleSheet.csv'
 subject_id_to_use = config['subject_id_to_use']
 ibd_pi_hat_cutoff = config['ibd_pi_hat_cutoff']
 dup_concordance_cutoff = config['dup_concordance_cutoff']
-project_id = config['project_id']
 illumina_manifest_file = config['illumina_manifest_file']
-project_directory = config['project_directory']
 expected_sex_col_name = config['expected_sex_col_name']
 lims_output_dir = config['lims_output_dir']
 
@@ -182,6 +183,10 @@ def makeAncestryDict(snpWeightsFile):
     return ancestryDict
 
 
+
+idats = []
+SAMPLE_IDS = []
+gtcFiles = []
 def makeChipIdToSampDict(SampleSheet):
     chipIdToSampDict = {}
     with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
