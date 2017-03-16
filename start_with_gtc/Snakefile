@@ -614,6 +614,7 @@ rule sample_qc_report:
                             ancestry = 'ADMIXED'
                     contam = contamDict[samp]
                     out.write(','.join([samp, cgrId, proj, subId, expectedSex, snpsex, sexMatch, str(het), str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
+                    line = f.readline()
 
 
 
