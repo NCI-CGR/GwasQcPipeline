@@ -36,24 +36,25 @@ def runQsub(qsubFile, proj, queue):
 
 
 
-def getNumSamps(plinkPedOrFam, gtcProjDir):
-    if not plinkPedOrFam and not gtcProjDir:
-        print('Need either plink file or gtc directory to get number of samples.')
-        sys.exit(1)
-    elif plinkPedOrFam:
-        samps = 0
-        with open(plinkPedOrFam) as f:
-            for line in f:
-                samps += 1
-    else:
-        gtcFiles = glob.glob(gtcProjDir + '/*/*.gtc')
-        samps = len(gtcFiles)
+def getNumSamps(sampleSheet):
+    samps = 0
+    with open(sampleSheet) as f:
+        head = f.readline()
+        while 'SentrixBarcode_A' not in head and head != '':
+            head = f.readline()
+        if 'SentrixBarcode_A' not in head:
+            print('Sample sheet not formatted correctly')
+            sys.exit(1)
+        line = f.readline()
+        while line != '':
+            samps += 1
+            line = f.readline()
     return samps
 
 
 
-def makeConfig(outDir, plink_genotype_file, gtcProjDir, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
-               subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, project_id, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir):
+def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
+               subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir):
     '''
     (str, str, str) -> None
     '''
@@ -67,7 +68,6 @@ def makeConfig(outDir, plink_genotype_file, gtcProjDir, snp_cr_1, samp_cr_1, snp
         if plink_genotype_file:
             output.write('plink_genotype_file: ' + plink_genotype_file + '\n')
         else:
-            output.write('project_directory: ' + gtcProjDir + '\n')
             output.write('illumina_manifest_file: ' + illumina_manifest_file + '\n')
         output.write('snp_cr_1: ' + str(snp_cr_1) + '\n')
         output.write('samp_cr_1: ' + str(samp_cr_1) + '\n')
@@ -79,7 +79,6 @@ def makeConfig(outDir, plink_genotype_file, gtcProjDir, snp_cr_1, samp_cr_1, snp
         output.write('subject_id_to_use: ' + subject_id_to_use + '\n')
         output.write('ibd_pi_hat_cutoff: ' + str(ibd_pi_hat_cutoff) + '\n')
         output.write('dup_concordance_cutoff: ' + str(dup_concordance_cutoff) + '\n')
-        output.write('project_id: ' + project_id + '\n')
         output.write('expected_sex_col_name: ' + expected_sex_col_name + '\n')
         output.write('num_samples: ' + str(numSamps) + '\n')
         output.write('lims_output_dir: ' + lims_output_dir + '\n')
@@ -105,9 +104,6 @@ def get_args():
     requiredWithDefaults = parser.add_argument_group('Required arguments with default settings')
     oneOfTheseRequired.add_argument('-p', '--path_to_plink_file', type=str, required=False, help='Full path to either PLINK ped or bed to use as input.\n\
                         need either this or gtc file project directory -g')
-    oneOfTheseRequired.add_argument('-g', '--gtc_project_dir', type=str, required=False, help='Full path to project directory where gtc files are stored.\n\
-                        -i argument is required with this.\n\
-                        for example -g /DCEG/CGF/Infinium/ScanData/CGF/ByProject/GP0446-IN2/ -i /DCEG/Manifests/illumina.bpm')
     requiredArgs.add_argument('-d', '--directory_for_output', type=str, required=True, help='REQUIRED. Full path to the base directory for the Gwas QC pipeline output')
     requiredWithDefaults.add_argument('--snp_cr_1', type=float, default= 0.80, help='REQUIRED. SNP call rate filter 1.  default= 0.80')
     requiredWithDefaults.add_argument('--samp_cr_1', type=float, default= 0.80, help='REQUIRED. Sample call rate filter 1.  default= 0.80')
@@ -120,7 +116,6 @@ def get_args():
     requiredWithDefaults.add_argument('--ibd_pi_hat_cutoff', type=float, default= 0.95, help='REQUIRED. PI_HAT cutoff to call samples replicates.  default= 0.95')##this can be deleted if just using SNP concordance
     requiredWithDefaults.add_argument('--dup_concordance_cutoff', type=float, default= 0.95, help='REQUIRED. SNP concordance cutoff to call samples replicates.  default= 0.95')
     requiredWithDefaults.add_argument('--lims_output_dir', type = str, default = '/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc', help='Directory to copy QC file to upload to LIMS')
-    requiredArgs.add_argument('--project_id', type=str, required=True, help='CGR Project ID.')##may be able to get this from either directory or sample sheet.
     parser.add_argument('-i', '--illumina_manifest_file',type=str, help='Full path to illimina .bpm manifest file. Required for gtc files.')
     requiredArgs.add_argument('--expected_sex_col_name', type=str, required=True, help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
     requiredWithDefaults.add_argument('-q', '--queue', type=str, default='all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q', help='OPTIONAL. Queue on cgemsiii to use to submit jobs.  Defaults to all of the seq queues and all.q if not supplied.  default="all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q"')
@@ -134,9 +129,6 @@ def get_args():
 def main():
     scriptDir = os.path.dirname(os.path.abspath(__file__))
     args = get_args()
-    if not args.path_to_plink_file and not args.gtc_project_dir:
-        print('You need to provide either -p path to plink file or -g gtc project directory.')
-        sys.exit(1)
     outDir = args.directory_for_output
     if outDir[0] != '/':
         print('-d argument must be full path to working directory.  Relative paths will not work.')
@@ -144,7 +136,7 @@ def main():
     paths = os.listdir(outDir)
     if 'logs' not in paths:
         os.mkdir(outDir + '/logs')
-    if args.gtc_project_dir:
+    if not args.path_to_plink_file:
         if not args.illumina_manifest_file:
             print('--illumina_manifest_file is required for gtc files.')
             sys.exit(1)
@@ -161,9 +153,9 @@ def main():
         else:
             print('Unrecognized PLINK file format.')
             sys.exit(1)
-    numSamps = getNumSamps(plinkPedOrFam, args.gtc_project_dir)
-    makeConfig(outDir, args.path_to_plink_file, args.gtc_project_dir, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
-               args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.project_id, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir)
+    numSamps = getNumSamps(args.sample_sheet)
+    makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
+               args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
     qsubTxt += 'module load python3/3.5.1\n'
@@ -176,7 +168,7 @@ def main():
     qsubTxt += 'snakemake --rerun-incomplete --cluster "qsub -q ' + args.queue + ' -pe by_node {threads} '
     qsubTxt += '-o ' + outDir + '/logs/ -e ' + outDir + '/logs/" --jobs 4000 --latency-wait 300\n'
     makeQsub(outDir + '/GwasQcPipeline.sh', qsubTxt)
-    runQsub(outDir + '/GwasQcPipeline.sh', args.project_id, 'seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q')
+    runQsub(outDir + '/GwasQcPipeline.sh', os.path.basename(outDir), 'seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q')
     print('GWAS QC Pipeline submitted.  You should receive an email when the pipeline starts and when it completes.')
     print('Your input project has ' + str(numSamps) + ' samples.')
 
