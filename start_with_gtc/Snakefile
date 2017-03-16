@@ -228,7 +228,6 @@ def makeChipIdToSampDict(SampleSheet):
 
 
 def getGtc(wildcards):
-    sampIdToGtcDict = makeSampIdToGtcDict()
     sampId = wildcards.sample_id
     return sampIdToGtcDict[sampId]
 
