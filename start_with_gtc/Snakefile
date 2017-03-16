@@ -19,10 +19,10 @@ import codecs
 from snakemake.utils import R
 
 
-
-
 configfile: "config.yaml"
 
+
+baseProjDir = '/DCEG/CGF/Infinium/ScanData/CGF/ByProject'
 snp_cr_1 = config['snp_cr_1']
 samp_cr_1 = config['samp_cr_1']
 snp_cr_2 = config['snp_cr_2']
@@ -33,9 +33,7 @@ sample_sheet = 'IlluminaSampleSheet.csv'
 subject_id_to_use = config['subject_id_to_use']
 ibd_pi_hat_cutoff = config['ibd_pi_hat_cutoff']
 dup_concordance_cutoff = config['dup_concordance_cutoff']
-project_id = config['project_id']
 illumina_manifest_file = config['illumina_manifest_file']
-project_directory = config['project_directory']
 expected_sex_col_name = config['expected_sex_col_name']
 lims_output_dir = config['lims_output_dir']
 
@@ -183,7 +181,12 @@ def makeAncestryDict(snpWeightsFile):
 
 
 def makeChipIdToSampDict(SampleSheet):
+    allSampleIds = []
+    idats = []
+    SAMPLE_IDS = []
+    gtcFiles = []
     chipIdToSampDict = {}
+    sampIdToGtcDict = {}
     with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
         head = f.readline()
         while 'SentrixBarcode_A' not in head and head != '':
@@ -191,40 +194,39 @@ def makeChipIdToSampDict(SampleSheet):
         if 'SentrixBarcode_A' not in head:
             print('Sample sheet not formatted correctly')
             sys.exit(1)
+        projCol = None
+        head_list = head.rstrip().split(',')
+        for i in range(len(head_list)):
+            if head_list[i] == 'Project':
+                projCol = i
+        if not projCol:
+            print('No column named "Project" found')
+            sys.exit(1)
         line = f.readline()
         while line != '':
             if line.strip():
                 line_list = line.rstrip().split(',')
                 sampId = line_list[0]
+                allSampleIds.append(sampId)
                 chipId = line_list[1] + '_' + line_list[2]
+                proj = line_list[projCol]
+                idatBase = baseProjDir + '/' + proj + '/' + line_list[1] + '/' + chipId
+                if os.path.isfile(idatBase + '.gtc'):
+                    gtcFiles.append(idatBase + '.gtc')
+                    SAMPLE_IDS.append(sampId)
+                    sampIdToGtcDict[sampId] = idatBase + '.gtc'
+                if os.path.isfile(idatBase + '_Red.idat') and os.path.isfile(idatBase + '_Grn.idat'):
+                    idats.append(idatBase)
                 chipIdToSampDict[chipId] = sampId
             line = f.readline()
-    return chipIdToSampDict
+    return (chipIdToSampDict, sampIdToGtcDict, allSampleIds, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict)
 
-def makeSampIdToGtcDict():
-    sampIdToGtcDict = {}
-    chipIdToSampDict = makeChipIdToSampDict(sample_sheet)
-    gtcFiles = glob.glob(project_directory + '/*/*.gtc')
-    for gtc in gtcFiles:
-        chipId = os.path.basename(gtc)[:-4]
-        sampId = chipIdToSampDict[chipId]
-        sampIdToGtcDict[sampId] = gtc
-    return sampIdToGtcDict
+(chipIdToSampDict, sampIdToGtcDict, allSampleIds, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict) = makeChipIdToSampDict(sample_sheet)
+
 
 def getGtc(wildcards):
-    sampIdToGtcDict = makeSampIdToGtcDict()
     sampId = wildcards.sample_id
     return sampIdToGtcDict[sampId]
-
-
-
-SAMPLE_IDS = []
-chipIdToSampDict = makeChipIdToSampDict(sample_sheet)
-gtcFiles = glob.glob(project_directory + '/*/*.gtc')
-for gtc in gtcFiles:
-    chipId = os.path.basename(gtc)[:-4]
-    sampId = chipIdToSampDict[chipId]
-    SAMPLE_IDS.append(sampId)
 
 
 rule all:
