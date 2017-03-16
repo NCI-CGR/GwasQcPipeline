@@ -19,10 +19,7 @@ import codecs
 from snakemake.utils import R
 
 
-
-
 configfile: "config.yaml"
-
 
 
 baseProjDir = '/DCEG/CGF/Infinium/ScanData/CGF/ByProject'
