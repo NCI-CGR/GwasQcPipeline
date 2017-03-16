@@ -21,7 +21,8 @@ from snakemake.utils import R
 
 configfile: "config.yaml"
 
-
+input_sample_sheet = config['sample_sheet']
+(outName, x, sampSheetDate) = os.path.basename(input_sample_sheet)[:-4].split('_')
 baseProjDir = '/DCEG/CGF/Infinium/ScanData/CGF/ByProject'
 snp_cr_1 = config['snp_cr_1']
 samp_cr_1 = config['samp_cr_1']
@@ -36,6 +37,35 @@ dup_concordance_cutoff = config['dup_concordance_cutoff']
 illumina_manifest_file = config['illumina_manifest_file']
 expected_sex_col_name = config['expected_sex_col_name']
 lims_output_dir = config['lims_output_dir']
+contam_threshold = config['contam_threshold']
+
+
+def makeRepDiscordantDict(knownConcordanceFile, thresh = dup_concordance_cutoff):
+    RepDiscordantDict = {}
+    with open(knownConcordanceFile) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            (Subject_ID,Sample_ID1,Sample_ID2,Concordance,PI_HAT) = line.rstrip().split(',')
+            if Concordance != 'NA' and float(Concordance) < thresh:
+                RepDiscordantDict[Sample_ID1] = 1
+                RepDiscordantDict[Sample_ID2] = 1
+            line = f.readline()
+    return RepDiscordantDict
+
+
+def makeUnexpectedRepDict(unknownRepFile):
+    UnexpectedRepDict = {}
+    with open(unknownRepFile) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            (Subject_ID1,Subject_ID2,Sample_ID1,Sample_ID2,Concordance,PI_HAT) = line.rstrip().split(',')
+            UnexpectedRepDict[Sample_ID1] = 1
+            UnexpectedRepDict[Sample_ID2] = 1
+            line = f.readline()
+    return UnexpectedRepDict
+
 
 
 def makeSubjectToSampListDict(SampleSheet):
@@ -522,9 +552,13 @@ rule sample_qc_report:
         freq = 'sample_qc_stats/samples.frq',
         hwe = 'sample_qc_stats/samples.hwe',
         contam = 'all_contam/contam.csv',
-        ancestry = 'snpweights/samples.snpweights'
+        ancestry = 'snpweights/samples.snpweights',
+        knownConcordance = 'concordance/KnownReplicates.csv',
+        unknownRep = 'concordance/UnknownReplicates.csv'
     output:
-        'all_sample_qc.csv'
+        allQc = 'all_sample_qc.csv',
+        lims = outName + '_LimsUpload_' + sampSheetDate + '.csv',
+        limsDirOut = lims_output_dir + '/' + outName + '_LimsUpload_' + sampSheetDate + '.csv'
     run:
         (SubToSampListDict, sampToSubIdDict) = makeSubjectToSampListDict(sample_sheet)
         ExpectedSexDict = makeSampToExpectedSexDict(sample_sheet)
@@ -534,8 +568,11 @@ rule sample_qc_report:
         sexDict = makeSexDict(input.sexcheck)
         contamDict = makeContamDict(input.contam)
         ancestryDict = makeAncestryDict(input.ancestry)
-        with open(input.sampSheet) as f, open(output[0], 'w') as out:
+        repDiscordantDict = makeRepDiscordantDict(input.knownConcordance)
+        unexpectedRepDict = makeUnexpectedRepDict(input.unknownRep)
+        with open(input.sampSheet) as f, open(output.allQc, 'w') as out, open(output.lims, 'w') as limsOut:
             out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Het,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
+            limsOut.write(subject_id_to_use + ',Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate\n')
             head = f.readline()
             while 'SentrixBarcode_A' not in head and head != '':
                 head = f.readline()
@@ -544,26 +581,29 @@ rule sample_qc_report:
                 sys.exit(1)
             head_list = head.rstrip().split(',')
             expectedSexCol = None
+            subjectIdCol = None
+            projCol = None
+            projSampIdCol = None
             for i in range(len(head_list)):
                 if head_list[i] == expected_sex_col_name:
                     expectedSexCol = i
+                elif head_list[i] == subject_id_to_use:
+                    subjectIdCol = i
+                elif head_list[i] == 'Project':
+                    projCol = i
+                elif head_list[i] == 'Project-Sample ID':
+                    projSampIdCol = i
             if expectedSexCol == None:
                 print('Expected Sex not found in sample sheet')
                 sys.exit(1)
-            subjectIdCol = None
-            for i in range(len(head_list)):
-                if head_list[i] == subject_id_to_use:
-                    subjectIdCol = i
             if subjectIdCol == None:
                 print('Subject ID not found in sample sheet')
                 sys.exit(1)
-            projCol = None
-            for i in range(len(head_list)):
-                if head_list[i] == 'Project':
-                    projCol = i
             if not projCol:
                 print('No column named "Project" found')
                 sys.exit(1)
+            if not projSampIdCol:
+                print('No column named "Project-Sample ID" found')
             line = f.readline()
             while line != '':
                 if line.strip():
@@ -573,6 +613,7 @@ rule sample_qc_report:
                     proj = line_list[projCol]
                     subId = line_list[subjectIdCol]
                     expectedSex = line_list[expectedSexCol]
+                    projSampId = line_list[projSampIdCol]
                     cgrId = samp.split('_')[0]
                     if not crDict1.get(samp):
                         cr1 = 'NA'
@@ -612,9 +653,36 @@ rule sample_qc_report:
                             ancestry = 'ASN'
                         else:
                             ancestry = 'ADMIXED'
-                    contam = contamDict[samp]
+                    if cr1 == 'NA' or cr2 == 'NA' or cr3 == 'NA':
+                        lowCR = 'TRUE'
+                    else:
+                        lowCR = 'FALSE'
+                    if not contamDict.get(samp):
+                        contam = 'NA'
+                    else:
+                        contam = contamDict[samp]
+                    if contam != 'NA' and float(contam) > contam_threshold:
+                        isContaminated = 'TRUE'
+                    else:
+                        isContaminated = 'FALSE'
+                    if sexMatch == 'U':
+                        sexDiscordant = 'NA'
+                    elif sexMatch == 'N':
+                        sexDiscordant = 'TRUE'
+                    else:
+                        sexDiscordant = 'FALSE'
+                    if repDiscordantDict.get(samp):
+                        expectedRepDisc = 'TRUE'
+                    else:
+                        expectedRepDisc= 'FALSE'
+                    if unexpectedRepDict.get(samp):
+                        unexpectedRep = 'TRUE'
+                    else:
+                        unexpectedRep = 'FALSE'
+                    limsOut.write(','.join([subId, samp, projSampId, str(cr1), lowCR, isContaminated, sexDiscordant, expectedRepDisc, unexpectedRep]) + '\n')
                     out.write(','.join([samp, cgrId, proj, subId, expectedSex, snpsex, sexMatch, str(het), str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
                     line = f.readline()
+        shell('cp {output.lims} {output.limsDirOut}')
 
 
 
