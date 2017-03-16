@@ -187,6 +187,7 @@ def makeChipIdToSampDict(SampleSheet):
     gtcFiles = []
     chipIdToSampDict = {}
     sampIdToGtcDict = {}
+    sampIdToProjDict = {}
     with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
         head = f.readline()
         while 'SentrixBarcode_A' not in head and head != '':
@@ -210,6 +211,7 @@ def makeChipIdToSampDict(SampleSheet):
                 allSampleIds.append(sampId)
                 chipId = line_list[1] + '_' + line_list[2]
                 proj = line_list[projCol]
+                sampIdToProjDict[sampId] = proj
                 idatBase = baseProjDir + '/' + proj + '/' + line_list[1] + '/' + chipId
                 if os.path.isfile(idatBase + '.gtc'):
                     gtcFiles.append(idatBase + '.gtc')
@@ -219,9 +221,9 @@ def makeChipIdToSampDict(SampleSheet):
                     idats.append(idatBase)
                 chipIdToSampDict[chipId] = sampId
             line = f.readline()
-    return (chipIdToSampDict, sampIdToGtcDict, allSampleIds, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict)
+    return (chipIdToSampDict, sampIdToGtcDict, sampIdToProjDict, allSampleIds, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict)
 
-(chipIdToSampDict, sampIdToGtcDict, allSampleIds, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict) = makeChipIdToSampDict(sample_sheet)
+(chipIdToSampDict, sampIdToGtcDict, allSampleIds, sampIdToProjDict, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict) = makeChipIdToSampDict(sample_sheet)
 
 
 def getGtc(wildcards):
@@ -532,52 +534,86 @@ rule sample_qc_report:
         sexDict = makeSexDict(input.sexcheck)
         contamDict = makeContamDict(input.contam)
         ancestryDict = makeAncestryDict(input.ancestry)
-        with open(output[0], 'w') as out:
+        with open(input.sampSheet) as f, open(output[0], 'w') as out:
             out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Het,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
-            for samp in sampToSubIdDict.keys():
-                subId = sampToSubIdDict[samp]
-                expectedSex = ExpectedSexDict[samp]
-                cgrId = samp.split('_')[0]
-                if not crDict1.get(samp):
-                    cr1 = 'NA'
-                else:
-                    cr1 = crDict1[samp]
-                if not crDict2.get(samp):
-                    filt1 = 'Y'
-                    cr2 = 'NA'
-                else:
-                    filt1 = 'N'
-                    cr2 = crDict2[samp]
-                if not crDict3.get(samp):
-                    filt2 = 'Y'
-                    cr3 = 'NA'
-                else:
-                    filt2 = 'N'
-                    cr3 = crDict3[samp]
-                if not sexDict.get(samp):
-                    (snpsex, het) = ['NA', 'NA']
-                else:
-                    (snpsex, het) = sexDict[samp]
-                if snpsex == 'U' or expectedSex == 'U':
-                    sexMatch = 'U'
-                elif snpsex != expectedSex:
-                    sexMatch = 'N'
-                else:
-                    sexMatch = 'Y'
-                if not ancestryDict.get(samp):
-                    (AFR, EUR, ASN, ancestry) = ['NA', 'NA', 'NA', 'NA']
-                else:
-                    (AFR, EUR, ASN) = ancestryDict[samp]
-                    if AFR > 0.8:
-                        ancestry = 'AFR'
-                    elif EUR > 0.8:
-                        ancestry = 'EUR'
-                    elif ASN > 0.8:
-                        ancestry = 'ASN'
+            head = f.readline()
+            while 'SentrixBarcode_A' not in head and head != '':
+                head = f.readline()
+            if 'SentrixBarcode_A' not in head:
+                print('Sample sheet not formatted correctly')
+                sys.exit(1)
+            head_list = head.rstrip().split(',')
+            expectedSexCol = None
+            for i in range(len(head_list)):
+                if head_list[i] == expected_sex_col_name:
+                    expectedSexCol = i
+            if expectedSexCol == None:
+                print('Expected Sex not found in sample sheet')
+                sys.exit(1)
+            subjectIdCol = None
+            for i in range(len(head_list)):
+                if head_list[i] == subject_id_to_use:
+                    subjectIdCol = i
+            if subjectIdCol == None:
+                print('Subject ID not found in sample sheet')
+                sys.exit(1)
+            projCol = None
+            for i in range(len(head_list)):
+                if head_list[i] == 'Project':
+                    projCol = i
+            if not projCol:
+                print('No column named "Project" found')
+                sys.exit(1)
+            line = f.readline()
+            while line != '':
+                if line.strip():
+                    line_list = line.rstrip().split(',')
+                    samp = line_list[0]
+                    chipId = line_list[1] + '_' + line_list[2]
+                    proj = line_list[projCol]
+                    subId = line_list[subjectIdCol]
+                    expectedSex = line_list[expectedSexCol]
+                    cgrId = samp.split('_')[0]
+                    if not crDict1.get(samp):
+                        cr1 = 'NA'
                     else:
-                        ancestry = 'ADMIXED'
-                contam = contamDict[samp]
-                out.write(','.join([samp, cgrId, project_id, subId, expectedSex, snpsex, sexMatch, str(het), str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
+                        cr1 = crDict1[samp]
+                    if not crDict2.get(samp):
+                        filt1 = 'Y'
+                        cr2 = 'NA'
+                    else:
+                        filt1 = 'N'
+                        cr2 = crDict2[samp]
+                    if not crDict3.get(samp):
+                        filt2 = 'Y'
+                        cr3 = 'NA'
+                    else:
+                        filt2 = 'N'
+                        cr3 = crDict3[samp]
+                    if not sexDict.get(samp):
+                        (snpsex, het) = ['NA', 'NA']
+                    else:
+                        (snpsex, het) = sexDict[samp]
+                    if snpsex == 'U' or expectedSex == 'U':
+                        sexMatch = 'U'
+                    elif snpsex != expectedSex:
+                        sexMatch = 'N'
+                    else:
+                        sexMatch = 'Y'
+                    if not ancestryDict.get(samp):
+                        (AFR, EUR, ASN, ancestry) = ['NA', 'NA', 'NA', 'NA']
+                    else:
+                        (AFR, EUR, ASN) = ancestryDict[samp]
+                        if AFR > 0.8:
+                            ancestry = 'AFR'
+                        elif EUR > 0.8:
+                            ancestry = 'EUR'
+                        elif ASN > 0.8:
+                            ancestry = 'ASN'
+                        else:
+                            ancestry = 'ADMIXED'
+                    contam = contamDict[samp]
+                    out.write(','.join([samp, cgrId, proj, subId, expectedSex, snpsex, sexMatch, str(het), str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
 
 
 
