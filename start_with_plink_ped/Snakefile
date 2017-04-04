@@ -34,7 +34,7 @@ sample_sheet = 'IlluminaSampleSheet.csv'
 subject_id_to_use = config['subject_id_to_use']
 ibd_pi_hat_cutoff = config['ibd_pi_hat_cutoff']
 dup_concordance_cutoff = config['dup_concordance_cutoff']
-project_id = config['project_id']
+#project_id = config['project_id']
 expected_sex_col_name = config['expected_sex_col_name']
 lims_output_dir = config['lims_output_dir']
 
