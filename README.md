@@ -5,7 +5,7 @@ QC pipeline for Illumina SNP Array data generated at CGR
 
 ## Running the pipeline with the wrapper script:
 
-```python
+```
 ./GwasQcWrapper.py -h
 usage: GwasQcWrapper.py [-h] [-p PATH_TO_PLINK_FILE] -d DIRECTORY_FOR_OUTPUT
                         [--snp_cr_1 SNP_CR_1] [--samp_cr_1 SAMP_CR_1]
