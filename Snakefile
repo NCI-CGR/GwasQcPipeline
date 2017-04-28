@@ -272,6 +272,9 @@ elif config['plink_genotype_file'][-4:] == '.bed':
     include: 'modules/Snakefile_bed_preprocess'
 
 
+include: 'modules/Snakefile_plink_stats_filters'
+
+
 rule all:
     input:
         'all_sample_qc.csv',
