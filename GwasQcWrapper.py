@@ -65,10 +65,8 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
     else:
         start = time.ctime()
     with open(outDir + '/config.yaml', 'w') as output:
-        if plink_genotype_file:
-            output.write('plink_genotype_file: ' + plink_genotype_file + '\n')
-        else:
-            output.write('illumina_manifest_file: ' + illumina_manifest_file + '\n')
+        output.write('plink_genotype_file: ' + str(plink_genotype_file) + '\n')
+        output.write('illumina_manifest_file: ' + str(illumina_manifest_file) + '\n')
         output.write('snp_cr_1: ' + str(snp_cr_1) + '\n')
         output.write('samp_cr_1: ' + str(samp_cr_1) + '\n')
         output.write('snp_cr_2: ' + str(snp_cr_2) + '\n')
@@ -142,19 +140,17 @@ def main():
         if not args.illumina_manifest_file:
             print('--illumina_manifest_file is required for gtc files.')
             sys.exit(1)
-        shutil.copy2(scriptDir + '/start_with_gtc/Snakefile', outDir + '/Snakefile')
         plinkPedOrFam = None
     else:
         plinkFile = args.path_to_plink_file
         if plinkFile[-4:] == '.ped':
-            shutil.copy2(scriptDir + '/start_with_plink_ped/Snakefile', outDir + '/Snakefile')
             plinkPedOrFam = plinkFile
         elif plinkFile[-4:] == '.bed':
-            shutil.copy2(scriptDir + '/start_with_plink_bed/Snakefile', outDir + '/Snakefile')
             plinkPedOrFam = plinkFile[:-4] + '.fam'
         else:
             print('Unrecognized PLINK file format.')
             sys.exit(1)
+    shutil.copy2(scriptDir + '/Snakefile', outDir + '/Snakefile')
     numSamps = getNumSamps(args.sample_sheet)
     makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold)
