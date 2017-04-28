@@ -274,6 +274,8 @@ elif config['plink_genotype_file'][-4:] == '.bed':
 
 include: 'modules/Snakefile_plink_stats_filters'
 include: 'modules/Snakefile_replicate_concordance'
+include: 'modules/Snakefile_sample_qc_report'
+
 
 rule all:
     input:
