@@ -153,7 +153,7 @@ def main():
             print('Unrecognized PLINK file format.')
             sys.exit(1)
     shutil.copy2(scriptDir + '/Snakefile', outDir + '/Snakefile')
-    moduleFiles = glob.glob(scriptDir + 'modules/*')
+    moduleFiles = glob.glob(scriptDir + '/modules/*')
     for f in moduleFiles:
         shutil.copy2(f, outDir + '/modules')
     numSamps = getNumSamps(args.sample_sheet)
