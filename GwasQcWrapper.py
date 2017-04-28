@@ -54,7 +54,7 @@ def getNumSamps(sampleSheet):
 
 
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
-               subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, contam_threshold):
+               subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, contam_threshold, adpc_file):
     '''
     (str, str, str) -> None
     '''
@@ -65,10 +65,8 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
     else:
         start = time.ctime()
     with open(outDir + '/config.yaml', 'w') as output:
-        if plink_genotype_file:
-            output.write('plink_genotype_file: ' + plink_genotype_file + '\n')
-        else:
-            output.write('illumina_manifest_file: ' + illumina_manifest_file + '\n')
+        output.write('plink_genotype_file: ' + str(plink_genotype_file) + '\n')
+        output.write('illumina_manifest_file: ' + str(illumina_manifest_file) + '\n')
         output.write('snp_cr_1: ' + str(snp_cr_1) + '\n')
         output.write('samp_cr_1: ' + str(samp_cr_1) + '\n')
         output.write('snp_cr_2: ' + str(snp_cr_2) + '\n')
@@ -83,6 +81,7 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
         output.write('num_samples: ' + str(numSamps) + '\n')
         output.write('lims_output_dir: ' + lims_output_dir + '\n')
         output.write('contam_threshold: ' + str(contam_threshold) + '\n')
+        output.write('adpc_file: ' + str(adpc_file) + '\n')
         output.write('start_time: ' + start + '\n')
 
 
@@ -119,6 +118,7 @@ def get_args():
     requiredWithDefaults.add_argument('--lims_output_dir', type = str, default = '/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc', help='Directory to copy QC file to upload to LIMS')
     requiredWithDefaults.add_argument('--contam_threshold', type=float, default= 0.10, help='REQUIRED. Cutoff to call a sample contaminated.  default= 0.10')
     parser.add_argument('-i', '--illumina_manifest_file',type=str, help='Full path to illimina .bpm manifest file. Required for gtc files.')
+    parser.add_argument('-a', '--adpc_file', type=str, help='Full path to adpc.bin file. Required for PLINK input.')
     requiredArgs.add_argument('--expected_sex_col_name', type=str, required=True, help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
     requiredWithDefaults.add_argument('-q', '--queue', type=str, default='all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q', help='OPTIONAL. Queue on cgemsiii to use to submit jobs.  Defaults to all of the seq queues and all.q if not supplied.  default="all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q"')
     parser.add_argument('-u', '--unlock_snakemake', action='store_true', help='OPTIONAL. If pipeline was killed unexpectedly you may need this flag to rerun')
@@ -138,26 +138,29 @@ def main():
     paths = os.listdir(outDir)
     if 'logs' not in paths:
         os.mkdir(outDir + '/logs')
+    if 'modules' not in paths:
+        os.mkdir(outDir + '/modules')
     if not args.path_to_plink_file:
         if not args.illumina_manifest_file:
             print('--illumina_manifest_file is required for gtc files.')
             sys.exit(1)
-        shutil.copy2(scriptDir + '/start_with_gtc/Snakefile', outDir + '/Snakefile')
         plinkPedOrFam = None
     else:
         plinkFile = args.path_to_plink_file
         if plinkFile[-4:] == '.ped':
-            shutil.copy2(scriptDir + '/start_with_plink_ped/Snakefile', outDir + '/Snakefile')
             plinkPedOrFam = plinkFile
         elif plinkFile[-4:] == '.bed':
-            shutil.copy2(scriptDir + '/start_with_plink_bed/Snakefile', outDir + '/Snakefile')
             plinkPedOrFam = plinkFile[:-4] + '.fam'
         else:
             print('Unrecognized PLINK file format.')
             sys.exit(1)
+    shutil.copy2(scriptDir + '/Snakefile', outDir + '/Snakefile')
+    moduleFiles = glob.glob(scriptDir + '/modules/*')
+    for f in moduleFiles:
+        shutil.copy2(f, outDir + '/modules')
     numSamps = getNumSamps(args.sample_sheet)
     makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
-               args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold)
+               args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold, args.adpc_file)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
     qsubTxt += 'module load python3/3.5.1\n'

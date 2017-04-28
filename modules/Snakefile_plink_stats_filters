@@ -1,0 +1,92 @@
+rule plink_sample_qc_stats:
+    input:
+        'plink_start/samples.bed',
+        'plink_start/samples.bim',
+        'plink_start/samples.fam'
+    params:
+        inProj = 'plink_start/samples',
+        outProj = 'sample_qc_stats/samples'
+    output:
+        'sample_qc_stats/samples.imiss',
+        'sample_qc_stats/samples.lmiss',
+        'sample_qc_stats/samples.sexcheck',
+        'sample_qc_stats/samples.frq',
+        'sample_qc_stats/samples.hwe'
+    shell:
+        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --out {params.outProj}'
+
+
+rule filter_call_rate_1:
+    input:
+        'plink_start/samples.bed',
+        'plink_start/samples.bim',
+        'plink_start/samples.fam'
+    params:
+        inProj = 'plink_start/samples',
+        outProj = 'plink_filter_call_rate_1/samples',
+        mind = str(1 - float(samp_cr_1)),
+        geno = str(1 - float(snp_cr_1))
+    output:
+        'plink_filter_call_rate_1/samples.bed',
+        'plink_filter_call_rate_1/samples.bim',
+        'plink_filter_call_rate_1/samples.fam'
+    shell:
+        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --mind {params.mind} --geno {params.geno} --make-bed --out {params.outProj}'
+
+rule qc_stats_after_filter_1:
+    input:
+        'plink_filter_call_rate_1/samples.bed',
+        'plink_filter_call_rate_1/samples.bim',
+        'plink_filter_call_rate_1/samples.fam'
+    params:
+        inProj = 'plink_filter_call_rate_1/samples',
+        outProj = 'plink_filter_call_rate_1/samples_filter1'
+    output:
+        'plink_filter_call_rate_1/samples_filter1.imiss',
+        'plink_filter_call_rate_1/samples_filter1.lmiss',
+        'plink_filter_call_rate_1/samples_filter1.sexcheck',
+        'plink_filter_call_rate_1/samples_filter1.frq',
+        'plink_filter_call_rate_1/samples_filter1.hwe'
+    shell:
+        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --out {params.outProj}'
+
+
+
+
+rule filter_call_rate_2:
+    input:
+        'plink_filter_call_rate_1/samples.bed',
+        'plink_filter_call_rate_1/samples.bim',
+        'plink_filter_call_rate_1/samples.fam'
+    params:
+        inProj = 'plink_filter_call_rate_1/samples',
+        outProj = 'plink_filter_call_rate_2/samples',
+        mind = str(1 - float(samp_cr_2)),
+        geno = str(1 - float(snp_cr_2))
+    output:
+        'plink_filter_call_rate_2/samples.bed',
+        'plink_filter_call_rate_2/samples.bim',
+        'plink_filter_call_rate_2/samples.fam'
+    shell:
+        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --mind {params.mind} --geno {params.geno} --make-bed --out {params.outProj}'
+
+
+
+rule qc_stats_after_filter_2:
+    input:
+        'plink_filter_call_rate_2/samples.bed',
+        'plink_filter_call_rate_2/samples.bim',
+        'plink_filter_call_rate_2/samples.fam'
+    params:
+        inProj = 'plink_filter_call_rate_2/samples',
+        outProj = 'plink_filter_call_rate_2/samples_filter2'
+    output:
+        'plink_filter_call_rate_2/samples_filter2.imiss',
+        'plink_filter_call_rate_2/samples_filter2.lmiss',
+        'plink_filter_call_rate_2/samples_filter2.sexcheck',
+        'plink_filter_call_rate_2/samples_filter2.frq',
+        'plink_filter_call_rate_2/samples_filter2.hwe'
+    shell:
+        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --out {params.outProj}'
+
+

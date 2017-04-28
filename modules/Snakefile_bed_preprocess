@@ -1,0 +1,14 @@
+rule plink_make_bed:
+    input:
+        plinkIn + '.bed',
+        plinkIn + '.bim',
+        plinkIn + '.fam'
+    params:
+        outProj = 'plink_start/samples'
+    output:
+        'plink_start/samples.bed',
+        'plink_start/samples.bim',
+        'plink_start/samples.fam'
+    shell:
+        'module load plink2/1.90b3.32;plink --bfile ' + plinkIn + ' --make-bed --out {params.outProj}'
+

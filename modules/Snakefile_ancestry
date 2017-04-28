@@ -1,0 +1,84 @@
+rule thousG_match:
+    input:
+        'ld_prune/samples.bim'
+    output:
+        bim = 'ld_prune/samples.vcfStrand.bim',
+        remove = 'ld_prune/thousG_rename.remove.txt'
+    shell:
+        'module load python/2.7.5;python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/thousGmatchAndRemoveDups.py {input} {output.remove}'
+
+rule remove_not_thousG:
+    input:
+        bim = 'ld_prune/samples.vcfStrand.bim',
+        bed = 'ld_prune/samples.bed',
+        fam = 'ld_prune/samples.fam',
+        remove = 'ld_prune/thousG_rename.remove.txt'
+    params:
+        outProj = 'plink_thousG_match/samples'
+    output:
+        'plink_thousG_match/samples.bed',
+        'plink_thousG_match/samples.bim',
+        'plink_thousG_match/samples.fam'
+    shell:
+        'module load plink2/1.90b3.32;plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --exclude {input.remove} --make-bed --out {params.outProj}'
+
+
+
+rule ped_for_snpweights:
+    input:
+        'plink_thousG_match/samples.bed',
+        'plink_thousG_match/samples.bim',
+        'plink_thousG_match/samples.fam'
+    params:
+        inProj = 'plink_thousG_match/samples',
+        outProj = 'snpweights/samples'
+    output:
+        'snpweights/samples.ped',
+        'snpweights/samples.map'
+    shell:
+        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --maf 0.05 --recode --out {params.outProj}'
+
+rule convert_eigen:
+    input:
+        ped = 'snpweights/samples.ped',
+        map = 'snpweights/samples.map'
+    output:
+        par = 'snpweights/convertEigen.par',
+        gen = 'snpweights/samples.eigenstratgeno',
+        snp = 'snpweights/samples.snp',
+        ind = 'snpweights/samples.ind'
+    run:
+        parTxt = 'genotypename: ' + input.ped + '\n'
+        parTxt += 'snpname: ' + input.map + '\n'
+        parTxt += 'indivname: ' + input.ped + '\n'
+        parTxt += 'outputformat: EIGENSTRAT\n'
+        parTxt += 'genooutfilename: ' + output.gen + '\n'
+        parTxt += 'snpoutfilename: ' + output.snp + '\n'
+        parTxt += 'indoutfilename: ' + output.ind + '\n'
+        parTxt += 'familynames: NO\n'
+        with open(output.par, 'w') as out:
+            out.write(parTxt)
+        shell('module load eigensoft/6.0.1;convertf -p {output.par}')
+
+
+rule snpweights:
+    input:
+        gen = 'snpweights/samples.eigenstratgeno',
+        snp = 'snpweights/samples.snp',
+        ind = 'snpweights/samples.ind'
+    params:
+        weight = '/DCEG/CGF/Bioinformatics/Production/Eric/software/SNPweights2.1/snpwt.CO',
+        software = '/DCEG/CGF/Bioinformatics/Production/Eric/software/SNPweights2.1/bin/inferanc'
+    output:
+        par = 'snpweights/SNPWEIGHTS.par',
+        predpcoutput = 'snpweights/samples.snpweights'
+    run:
+        parTxt = 'geno: ' + input.gen + '\n'
+        parTxt += 'snp: ' + input.snp + '\n'
+        parTxt += 'ind: ' + input.ind + '\n'
+        parTxt += 'snpwt: ' + params.weight + '\n'
+        parTxt += 'predpcoutput: ' + output.predpcoutput + '\n'
+        with open(output.par, 'w') as out:
+            out.write(parTxt)
+        shell('{params.software} -p {output.par}')
+

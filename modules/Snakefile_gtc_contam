@@ -1,0 +1,43 @@
+rule gtc_to_adpc:
+    input:
+        gtc = getGtc,
+        manifest = illumina_manifest_file
+    output:
+        adpc = 'contam/{sample_id}.adpc.bin',
+        txt = 'contam/{sample_id}.adpc.bin.numSnps.txt'
+    shell:
+        'module load python/2.7.5;python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2adpc.py {input.gtc} {input.manifest} {output.adpc}'
+
+
+rule contam_test:
+    input:
+        adpc = 'contam/{sample_id}.adpc.bin',
+        txt = 'contam/{sample_id}.adpc.bin.numSnps.txt'
+    params:
+        software = '/DCEG/CGF/Bioinformatics/Production/BZhu/verifyIDintensity/verifyIDintensity/verifyIDintensity'
+    output:
+        'contam/{sample_id}.contam.out'
+    run:
+        with open(input.txt) as f:
+            line = f.readline()
+        markers = line.strip()
+        shell('{params.software} -m ' + markers + ' -n 1 -v -p -i {input.adpc} > {output}')
+
+rule combine_contam:
+    input:
+        expand('contam/{sample_id}.contam.out', sample_id = SAMPLE_IDS)
+    output:
+        'all_contam/contam.csv'
+    run:
+        with open(output[0], 'w') as out:
+            out.write('ID,%Mix,LLK,LLK0\n')
+            for i in input:
+                samp = os.path.basename(i).split('.')[0]
+                with open(i) as f:
+                    head = f.readline()
+                    head = f.readline()
+                    line = f.readline()
+                    line_list = line.split()
+                    line_list[0] = samp
+                    out.write(','.join(line_list) + '\n')
+
