@@ -264,6 +264,7 @@ def getGtc(wildcards):
 
 if config['plink_genotype_file'] == 'None':
     include: 'modules/Snakefile_gtc_preprocess'
+    include: 'modules/Snakefile_gtc_contam'
 
 elif config['plink_genotype_file'][-4:] == '.ped':
     include: 'modules/Snakefile_ped_preprocess'
@@ -276,7 +277,6 @@ include: 'modules/Snakefile_plink_stats_filters'
 include: 'modules/Snakefile_replicate_concordance'
 include: 'modules/Snakefile_sample_qc_report'
 include: 'modules/Snakefile_ancestry'
-include: 'modules/Snakefile_gtc_contam'
 
 
 rule all:
