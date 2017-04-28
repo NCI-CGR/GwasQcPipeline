@@ -21,6 +21,9 @@ from snakemake.utils import R
 
 configfile: "config.yaml"
 
+
+plinkIn = config['plink_genotype_file'][:-4]
+
 input_sample_sheet = config['sample_sheet']
 (outName, x, sampSheetDate) = os.path.basename(input_sample_sheet)[:-4].split('_')
 baseProjDir = '/DCEG/CGF/Infinium/ScanData/CGF/ByProject'
