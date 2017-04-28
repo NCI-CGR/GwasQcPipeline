@@ -261,6 +261,17 @@ def getGtc(wildcards):
     return sampIdToGtcDict[sampId]
 
 
+
+if config['plink_genotype_file'] == 'None':
+    include: 'modules/Snakefile_gtc_preprocess'
+
+elif config['plink_genotype_file'][-4:] == '.ped':
+    include: 'modules/Snakefile_ped_preprocess'
+
+elif config['plink_genotype_file'][-4:] == '.bed':
+    include: 'modules/Snakefile_bed_preprocess'
+
+
 rule all:
     input:
         'all_sample_qc.csv',
@@ -268,41 +279,6 @@ rule all:
         'concordance/UnknownReplicates.csv',
         'snpweights/samples.snpweights',
         'all_contam/contam.csv'
-
-
-rule gtc_to_ped:
-    input:
-        gtc = getGtc,
-        manifest = illumina_manifest_file
-    output:
-        'per_sample_plink_files/{sample_id}.ped',
-        'per_sample_plink_files/{sample_id}.map',
-    shell:
-        'module load python/2.7.5;python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2plink.py {input.gtc} {input.manifest} {wildcards.sample_id} per_sample_plink_files'
-
-
-rule merge_sample_peds:
-    input:
-        expand('per_sample_plink_files/{sample_id}.ped', sample_id = SAMPLE_IDS)
-    output:
-        bed = 'plink_start/samples.bed',
-        bim = 'plink_start/samples.bim',
-        fam = 'plink_start/samples.fam',
-        mergeList = 'plink_start/mergeList.txt'
-    params:
-        outProj = 'plink_start/samples'
-    threads: 20
-    run:
-        inProj = input[0][:-4]
-        if len(input) == 1:
-            with open('plink_start/mergeList.txt', 'w') as out:
-                out.write('just one ped file found')
-            shell('module load plink2/1.90b3.32;plink --file ' + inProj + ' --make-bed --out {params}')
-        else:
-            with open('plink_start/mergeList.txt', 'w') as out:
-                for ped in input[1:]:
-                    out.write(ped + ' ' + ped[:-4] + '.map\n')
-            shell('module load plink2/1.90b3.32;plink --file ' + inProj + ' --merge-list {output.mergeList} --make-bed --out {params.outProj} --threads {threads}')
 
 
 rule plink_sample_qc_stats:
