@@ -272,9 +272,11 @@ if config['plink_genotype_file'] == 'None':
 
 elif config['plink_genotype_file'][-4:] == '.ped':
     include: 'modules/Snakefile_ped_preprocess'
+    include: 'modules/Snakefile_plink_contam'
 
 elif config['plink_genotype_file'][-4:] == '.bed':
     include: 'modules/Snakefile_bed_preprocess'
+    include: 'modules/Snakefile_plink_contam'
 
 
 include: 'modules/Snakefile_plink_stats_filters'

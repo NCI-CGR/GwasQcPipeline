@@ -1,0 +1,46 @@
+#!/usr/bin/python
+
+
+
+rule contam_test:
+    input:
+        adpc = adpc_file,
+        fam = 'plink_start/samples.fam',
+	bim = 'plink_start/samples.bim'
+    params:
+        software = '/DCEG/CGF/Bioinformatics/Production/BZhu/verifyIDintensity/verifyIDintensity/verifyIDintensity'
+    output:
+        'contam/contam.out'
+    run:
+        markers = 0
+	numSamps = 0
+        with open(input.bim) as f:
+            for line in f:
+	        markers += 1
+	with open(input.fam) as f:
+	    for line in f:
+	        numSamps += 1
+        shell('{params.software} -m ' + str(markers) + ' -n ' + str(numSamps) + ' -v -p -i {input.adpc} > {output}')
+
+rule combine_contam:
+    input:
+        contam = 'contam/contam.out',
+        fam = 'plink_start/samples.fam'
+    output:
+        'all_contam/contam.csv'
+    run:
+        with open(input.contam) as f, open(input.fam) as sampFile, open(output[0], 'w') as out:
+            out.write('ID,%Mix,LLK,LLK0\n')
+            head = f.readline()
+            head = f.readline()
+            line = f.readline()
+            sampLine = sampFile.readline()
+            while line != '':
+                line_list = line.split()
+                sampLine_list = sampLine.split()
+                samp = sampLine_list[1]
+                line_list[0] = samp
+                out.write(','.join(line_list) + '\n')
+                line = f.readline()
+                sampLine = sampFile.readline()
+
