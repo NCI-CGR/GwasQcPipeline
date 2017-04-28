@@ -6,20 +6,20 @@ rule contam_test:
     input:
         adpc = adpc_file,
         fam = 'plink_start/samples.fam',
-	bim = 'plink_start/samples.bim'
+        bim = 'plink_start/samples.bim'
     params:
         software = '/DCEG/CGF/Bioinformatics/Production/BZhu/verifyIDintensity/verifyIDintensity/verifyIDintensity'
     output:
         'contam/contam.out'
     run:
         markers = 0
-	numSamps = 0
+        numSamps = 0
         with open(input.bim) as f:
             for line in f:
-	        markers += 1
-	with open(input.fam) as f:
-	    for line in f:
-	        numSamps += 1
+                markers += 1
+        with open(input.fam) as f:
+            for line in f:
+                numSamps += 1
         shell('{params.software} -m ' + str(markers) + ' -n ' + str(numSamps) + ' -v -p -i {input.adpc} > {output}')
 
 rule combine_contam:
