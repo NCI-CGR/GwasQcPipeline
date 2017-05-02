@@ -52,6 +52,7 @@ rule contam_test:
         'contam/contam.out'
     run:
         with open(input.txt) as f:
+            head = f.readline()
             line = f.readline()
         (numSamps, numSnps) = line.split()
         shell('{params.software} -m ' + numSnps + ' -n ' + numSamps + ' -v -p -i {input.adpc} > {output}')
