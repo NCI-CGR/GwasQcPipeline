@@ -23,7 +23,7 @@ configfile: "config.yaml"
 
 
 plinkIn = config['plink_genotype_file'][:-4]
-
+gtc_dir = config['gtc_dir']
 input_sample_sheet = config['sample_sheet']
 (outName, x, sampSheetDate) = os.path.basename(input_sample_sheet)[:-4].split('_')
 baseProjDir = '/DCEG/CGF/Infinium/ScanData/CGF/ByProject'
@@ -213,11 +213,20 @@ def makeAncestryDict(snpWeightsFile):
     return ancestryDict
 
 
-def makeChipIdToSampDict(SampleSheet):
+def makeChipIdToSampDict(SampleSheet, gtc_dir):
     allSampleIds = []
     idats = []
     SAMPLE_IDS = []
-    gtcFiles = []
+    chipIdToGtcDict= {}
+    if gtc_dir == 'None':
+        gtcFiles = []
+    else:
+        gtcFiles = []
+        for filename in glob.iglob(gtc_dir + '/**/*.gtc', recursive=True):
+            gtcFiles.append(filename)
+        for gtc in gtcFiles:
+            chipId = os.path.basename(gtc)[:-4]
+            chipIdToGtcDict[chipId] = gtc
     chipIdToSampDict = {}
     sampIdToGtcDict = {}
     sampIdToProjDict = {}
@@ -246,17 +255,21 @@ def makeChipIdToSampDict(SampleSheet):
                 proj = line_list[projCol]
                 sampIdToProjDict[sampId] = proj
                 idatBase = baseProjDir + '/' + proj + '/' + line_list[1] + '/' + chipId
-                if os.path.isfile(idatBase + '.gtc'):
+                
+                if gtc_dir == 'None' and os.path.isfile(idatBase + '.gtc'):
                     gtcFiles.append(idatBase + '.gtc')
                     SAMPLE_IDS.append(sampId)
                     sampIdToGtcDict[sampId] = idatBase + '.gtc'
+                elif chipIdToGtcDict.get(chipId):
+                    SAMPLE_IDS.append(sampId)
+                    sampIdToGtcDict[sampId] = chipIdToGtcDict[chipId]
                 if os.path.isfile(idatBase + '_Red.idat') and os.path.isfile(idatBase + '_Grn.idat'):
                     idats.append(idatBase)
                 chipIdToSampDict[chipId] = sampId
             line = f.readline()
     return (chipIdToSampDict, sampIdToGtcDict, sampIdToProjDict, allSampleIds, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict)
 
-(chipIdToSampDict, sampIdToGtcDict, allSampleIds, sampIdToProjDict, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict) = makeChipIdToSampDict(sample_sheet)
+(chipIdToSampDict, sampIdToGtcDict, allSampleIds, sampIdToProjDict, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict) = makeChipIdToSampDict(sample_sheet, gtc_dir)
 
 
 def getGtc(wildcards):

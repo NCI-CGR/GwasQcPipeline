@@ -13,7 +13,7 @@ rule gtc_to_adpc:
 
 rule combine_adpc:
     input:
-        expand('contam/{sample_id}.contam.out', sample_id = SAMPLE_IDS)
+        expand('contam/{sample_id}.adpc.bin', sample_id = SAMPLE_IDS)
     output:
         adpc = 'all_contam/contam.adpc.bin',
         txt = 'all_contam/contam.adpc.bin.sampOrder.txt'
