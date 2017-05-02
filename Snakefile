@@ -180,9 +180,8 @@ def makeSexDict(sexCheckFile):
                 snpsex = 'F'
             else:
                 snpsex = 'U'
-            homozygosity = float(line_list[-1])
-            het = 1.0 - homozygosity
-            sexDict[samp] = (snpsex, het)
+            inbreed = line_list[-1]
+            sexDict[samp] = (snpsex, inbreed)
             line = f.readline()
     return sexDict
 
