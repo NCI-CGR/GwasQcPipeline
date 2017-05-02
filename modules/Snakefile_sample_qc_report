@@ -27,7 +27,7 @@ rule sample_qc_report:
         repDiscordantDict = makeRepDiscordantDict(input.knownConcordance)
         unexpectedRepDict = makeUnexpectedRepDict(input.unknownRep)
         with open(input.sampSheet) as f, open(output.allQc, 'w') as out, open(output.lims, 'w') as limsOut:
-            out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Het,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
+            out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
             limsOut.write(subject_id_to_use + ',Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate\n')
             head = f.readline()
             while 'SentrixBarcode_A' not in head and head != '':
@@ -88,9 +88,9 @@ rule sample_qc_report:
                         filt2 = 'N'
                         cr3 = crDict3[samp]
                     if not sexDict.get(samp):
-                        (snpsex, het) = ['NA', 'NA']
+                        (snpsex, inbreed) = ['NA', 'NA']
                     else:
-                        (snpsex, het) = sexDict[samp]
+                        (snpsex, inbreed) = sexDict[samp]
                     if snpsex == 'U' or expectedSex == 'U':
                         sexMatch = 'U'
                     elif snpsex != expectedSex:
@@ -136,7 +136,7 @@ rule sample_qc_report:
                     else:
                         unexpectedRep = 'FALSE'
                     limsOut.write(','.join([subId, samp, projSampId, str(cr1), lowCR, isContaminated, sexDiscordant, expectedRepDisc, unexpectedRep]) + '\n')
-                    out.write(','.join([samp, cgrId, proj, subId, expectedSex, snpsex, sexMatch, str(het), str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
+                    out.write(','.join([samp, cgrId, proj, subId, expectedSex, snpsex, sexMatch, inbreed, str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
                     line = f.readline()
         shell('cp {output.lims} {output.limsDirOut}')
 
