@@ -53,6 +53,26 @@ def getNumSamps(sampleSheet):
 
 
 
+
+def makeClusterConfig(outDir, queue):
+    q_list = queue.split(',')
+    new_q_list = []
+    for q in q_list:
+        if q != 'all.q':
+            new_q_list.append(q)
+    if not new_q_list:
+        print('There must be a queue other than all.q in your queue list')
+        sys.exit(1)
+    new_q = ','.join(new_q_list)
+    with open(outDir + '/cluster.yaml', 'w') as output:
+        output.write('__default__:\n')
+        output.write('    q: ' + queue + '\n')
+        output.write('contam_test:\n')
+        output.write('    q: ' + new_q + '\n')
+        output.write('merge_sample_peds:\n')
+        output.write('    q: ' + new_q + '\n')
+
+
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
                subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, contam_threshold, adpc_file, gtc_dir):
     '''
@@ -164,6 +184,7 @@ def main():
     makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold,
                args.adpc_file, args.gtc_dir)
+    makeClusterConfig(outDir, args.queue)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
     qsubTxt += 'module load python3/3.5.1\n'
@@ -173,8 +194,8 @@ def main():
         qsubTxt += 'snakemake --rulegraph | dot -Tsvg > rule.dag.svg\n'
     if args.unlock_snakemake:
         qsubTxt += 'snakemake --unlock\n'
-    qsubTxt += 'snakemake --rerun-incomplete --cluster "qsub -q ' + args.queue + ' -pe by_node {threads} '
-    qsubTxt += '-o ' + outDir + '/logs/ -e ' + outDir + '/logs/" --jobs 4000 --latency-wait 300\n'
+    qsubTxt += 'snakemake --rerun-incomplete --cluster "qsub -q {cluster.q} -pe by_node {threads} '
+    qsubTxt += '-o ' + outDir + '/logs/ -e ' + outDir + '/logs/" --jobs 4000 --cluster-config cluster.yaml --latency-wait 300\n'
     makeQsub(outDir + '/GwasQcPipeline.sh', qsubTxt)
     runQsub(outDir + '/GwasQcPipeline.sh', os.path.basename(outDir), 'seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q')
     print('GWAS QC Pipeline submitted.  You should receive an email when the pipeline starts and when it completes.')
