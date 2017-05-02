@@ -223,7 +223,7 @@ def makeChipIdToSampDict(SampleSheet, gtc_dir):
     else:
         gtcFiles = []
         for filename in glob.iglob(gtc_dir + '/**/*.gtc', recursive=True):
-            gtc_files.append(filename)
+            gtcFiles.append(filename)
         for gtc in gtcFiles:
             chipId = os.path.basename(gtc)[:-4]
             chipIdToGtcDict[chipId] = gtc
