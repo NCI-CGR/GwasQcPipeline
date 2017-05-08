@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-
+plinkDir = os.path.dirname(plinkIn)
 
 rule contam_test:
     input:
@@ -25,11 +25,11 @@ rule contam_test:
 rule combine_contam:
     input:
         contam = 'contam/contam.out',
-        fam = 'plink_start/samples.fam'
+        samp = plinkDir + '/sample_order.txt'
     output:
         'all_contam/contam.csv'
     run:
-        with open(input.contam) as f, open(input.fam) as sampFile, open(output[0], 'w') as out:
+        with open(input.contam) as f, open(input.samp) as sampFile, open(output[0], 'w') as out:
             out.write('ID,%Mix,LLK,LLK0\n')
             head = f.readline()
             head = f.readline()
@@ -37,8 +37,7 @@ rule combine_contam:
             sampLine = sampFile.readline()
             while line != '':
                 line_list = line.split()
-                sampLine_list = sampLine.split()
-                samp = sampLine_list[1]
+                samp = sampLine.strip()
                 line_list[0] = samp
                 out.write(','.join(line_list) + '\n')
                 line = f.readline()
