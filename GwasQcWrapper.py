@@ -169,6 +169,9 @@ def main():
         plinkPedOrFam = None
     else:
         plinkFile = args.path_to_plink_file
+        plinkDir = os.path.dirname(plinkFile)
+        if not args.adpc_file:
+            args.adpc_file = plinkDir + '/Data/adpc.bin'
         if plinkFile[-4:] == '.ped':
             plinkPedOrFam = plinkFile
         elif plinkFile[-4:] == '.bed':
