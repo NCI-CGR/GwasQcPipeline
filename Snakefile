@@ -216,6 +216,7 @@ def makeAncestryDict(snpWeightsFile):
 def makeChipIdToSampDict(SampleSheet, gtc_dir):
     allSampleIds = []
     idats = []
+    noIdats = []
     SAMPLE_IDS = []
     chipIdToGtcDict= {}
     if gtc_dir == 'None':
@@ -265,11 +266,13 @@ def makeChipIdToSampDict(SampleSheet, gtc_dir):
                     sampIdToGtcDict[sampId] = chipIdToGtcDict[chipId]
                 if os.path.isfile(idatBase + '_Red.idat') and os.path.isfile(idatBase + '_Grn.idat'):
                     idats.append(idatBase)
+                else:
+                    noIdats.append(idatBase)
                 chipIdToSampDict[chipId] = sampId
             line = f.readline()
-    return (chipIdToSampDict, sampIdToGtcDict, sampIdToProjDict, allSampleIds, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict)
+    return (chipIdToSampDict, sampIdToGtcDict, sampIdToProjDict, allSampleIds, idats, noIdats, SAMPLE_IDS, gtcFiles, chipIdToSampDict)
 
-(chipIdToSampDict, sampIdToGtcDict, allSampleIds, sampIdToProjDict, idats, SAMPLE_IDS, gtcFiles, chipIdToSampDict) = makeChipIdToSampDict(sample_sheet, gtc_dir)
+(chipIdToSampDict, sampIdToGtcDict, allSampleIds, sampIdToProjDict, idats, noIdats, SAMPLE_IDS, gtcFiles, chipIdToSampDict) = makeChipIdToSampDict(sample_sheet, gtc_dir)
 
 
 def getGtc(wildcards):

@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 rule sample_qc_report:
     input:
         sampSheet = sample_sheet,
@@ -16,6 +18,16 @@ rule sample_qc_report:
         lims = outName + '_LimsUpload_' + sampSheetDate + '.csv',
         limsDirOut = lims_output_dir + '/' + outName + '_LimsUpload_' + sampSheetDate + '.csv'
     run:
+        chipIdToSampDict, sampIdToGtcDict, sampIdToProjDict, allSampleIds, idats, noIdats
+        sampToFoundIdatDict = {}
+        for i in idats:
+            chipId = os.path.basename(i)
+            sampId = chipIdToSampDict[chipId]
+            sampToFoundIdatDict[sampId] = 'YES'
+        for i in noIdats:
+            chipId = os.path.basename(i)
+            sampId = chipIdToSampDict[chipId]
+            sampToFoundIdatDict[sampId] = 'NO'
         (SubToSampListDict, sampToSubIdDict) = makeSubjectToSampListDict(sample_sheet)
         ExpectedSexDict = makeSampToExpectedSexDict(sample_sheet)
         crDict1 = makeCallRateDict(input.imiss1)
@@ -27,7 +39,7 @@ rule sample_qc_report:
         repDiscordantDict = makeRepDiscordantDict(input.knownConcordance)
         unexpectedRepDict = makeUnexpectedRepDict(input.unknownRep)
         with open(input.sampSheet) as f, open(output.allQc, 'w') as out, open(output.lims, 'w') as limsOut:
-            out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
+            out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,IdatsInProjectDir,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
             limsOut.write(subject_id_to_use + ',Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate\n')
             head = f.readline()
             while 'SentrixBarcode_A' not in head and head != '':
@@ -65,6 +77,7 @@ rule sample_qc_report:
                 if line.strip():
                     line_list = line.rstrip().split(',')
                     samp = line_list[0]
+                    idatFound = sampToFoundIdatDict[samp]
                     chipId = line_list[1] + '_' + line_list[2]
                     proj = line_list[projCol]
                     subId = line_list[subjectIdCol]
@@ -136,7 +149,7 @@ rule sample_qc_report:
                     else:
                         unexpectedRep = 'FALSE'
                     limsOut.write(','.join([subId, samp, projSampId, str(cr1), lowCR, isContaminated, sexDiscordant, expectedRepDisc, unexpectedRep]) + '\n')
-                    out.write(','.join([samp, cgrId, proj, subId, expectedSex, snpsex, sexMatch, inbreed, str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
+                    out.write(','.join([samp, cgrId, proj, subId, idatFound, expectedSex, snpsex, sexMatch, inbreed, str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
                     line = f.readline()
         shell('cp {output.lims} {output.limsDirOut}')
 
