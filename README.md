@@ -3,7 +3,7 @@ QC pipeline for Illumina SNP Array data generated at CGR
 
 ![Snakemake Rules](figures/GwasQcPipelineWorkflow.png)
 
-## Running the pipeline with the wrapper script:
+## How to run the pipeline with the wrapper script:
 
 ```
 ./GwasQcWrapper.py -h
