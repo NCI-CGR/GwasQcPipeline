@@ -161,11 +161,29 @@ def getOutDir(sampleSheet, baseDir = '/DCEG/CGF/GWAS/Scans/GSA_Lab_QC/'):
         os.mkdir(srDir)
     if not os.path.isdir(srDir + '/builds'):
         os.mkdir(srDir + '/builds')
+    prevBuilds = glob.glob(srDir + '/builds/QC_v*')
+    buildVersions = []
+    for build in prevBuilds:
+        d = os.path.basename(build)
+        v = d.split('_')[1][1:]
+        if v.isdigit():
+            buildVersions.append(int(v))
+    if buildVersions:
+        vers = sorted(buildVersions)[-1]
+    else:
+        vers = 1
+    date = time.strftime("%m%d%Y")
+    outDir = srDir + '/builds/QC_v' + str(vers) + '_' + date
+    os.mkdir(outDir)
+    return outDir
+
 
 def main():
     scriptDir = os.path.dirname(os.path.abspath(__file__))
     args = get_args()
     outDir = args.directory_for_output
+    if not outDir:
+        outDir = getOutDir(args.sample_sheet)
     if outDir[0] != '/':
         print('-d argument must be full path to working directory.  Relative paths will not work.')
         sys.exit(1)
