@@ -125,7 +125,7 @@ def get_args():
     requiredWithDefaults = parser.add_argument_group('Required arguments with default settings')
     oneOfTheseRequired.add_argument('-p', '--path_to_plink_file', type=str, required=False, help='Full path to either PLINK ped or bed to use as input.\n\
                         need either this or gtc file project directory -g')
-    requiredArgs.add_argument('-d', '--directory_for_output', type=str, required=True, help='REQUIRED. Full path to the base directory for the Gwas QC pipeline output.  Defaults to /DCEG/CGF/GWAS/Scans/GSA_Lab_QC/SR#/builds/QC_v#_date')
+    requiredArgs.add_argument('-d', '--directory_for_output', type=str, help='REQUIRED. Full path to the base directory for the Gwas QC pipeline output.  Defaults to /DCEG/CGF/GWAS/Scans/GSA_Lab_QC/SR#/builds/QC_v#_date')
     requiredWithDefaults.add_argument('--snp_cr_1', type=float, default= 0.80, help='REQUIRED. SNP call rate filter 1.  default= 0.80')
     requiredWithDefaults.add_argument('--samp_cr_1', type=float, default= 0.80, help='REQUIRED. Sample call rate filter 1.  default= 0.80')
     requiredWithDefaults.add_argument('--snp_cr_2', type=float, default= 0.95, help='REQUIRED. SNP call rate filter 2.  default= 0.95')
@@ -149,6 +149,18 @@ def get_args():
 
 
 
+
+
+def getOutDir(sampleSheet, baseDir = '/DCEG/CGF/GWAS/Scans/GSA_Lab_QC/'):
+    '''
+    return the name of the output directory and make it if it doesn't exist
+    '''
+    sr = os.path.basename(sampleSheet).split('_')[0]
+    srDir = baseDir + sr
+    if not os.path.isdir(srDir):
+        os.mkdir(srDir)
+    if not os.path.isdir(srDir + '/builds'):
+        os.mkdir(srDir + '/builds')
 
 def main():
     scriptDir = os.path.dirname(os.path.abspath(__file__))
