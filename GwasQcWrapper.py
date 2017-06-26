@@ -169,12 +169,13 @@ def getOutDir(sampleSheet, baseDir = '/DCEG/CGF/GWAS/Scans/GSA_Lab_QC/'):
         if v.isdigit():
             buildVersions.append(int(v))
     if buildVersions:
-        vers = sorted(buildVersions)[-1]
+        vers = sorted(buildVersions)[-1] + 1
     else:
         vers = 1
     date = time.strftime("%m%d%Y")
     outDir = srDir + '/builds/QC_v' + str(vers) + '_' + date
-    os.mkdir(outDir)
+    if not os.path.isdir(outDir):
+        os.mkdir(outDir)
     return outDir
 
 
