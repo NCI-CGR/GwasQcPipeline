@@ -133,7 +133,7 @@ def get_args():
     requiredWithDefaults.add_argument('--ld_prune_r2', type=float, default= 0.10, help='REQUIRED. r-squared cutoff for ld pruning of SNPs to use for IBD and concordance.  default= 0.10')
     requiredWithDefaults.add_argument('--maf_for_ibd', type=float, default= 0.20, help='REQUIRED. MAF cutoff of SNPs to use for IBD and concordance.  default= 0.20')
     requiredArgs.add_argument('-s', '--sample_sheet', type=str, required=True, help='Full path to illimina style sample sheet csv file.')
-    requiredArgs.add_argument('--subject_id_to_use', type=str, required=True, default= 'LIMS_Individual_ID', help='Name of column in sample sheet that corresponds to subject ID to use.')##I should be able to add a default once this is available
+    requiredArgs.add_argument('--subject_id_to_use', type=str, default= 'LIMS_Individual_ID', help='Name of column in sample sheet that corresponds to subject ID to use.')##I should be able to add a default once this is available
     requiredWithDefaults.add_argument('--ibd_pi_hat_cutoff', type=float, default= 0.95, help='REQUIRED. PI_HAT cutoff to call samples replicates.  default= 0.95')##this can be deleted if just using SNP concordance
     requiredWithDefaults.add_argument('--dup_concordance_cutoff', type=float, default= 0.95, help='REQUIRED. SNP concordance cutoff to call samples replicates.  default= 0.95')
     requiredWithDefaults.add_argument('--lims_output_dir', type = str, default = '/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc', help='Directory to copy QC file to upload to LIMS')
@@ -141,7 +141,7 @@ def get_args():
     parser.add_argument('-i', '--illumina_manifest_file',type=str, default='/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm', help='Full path to illimina .bpm manifest file. Required for gtc files.')
     parser.add_argument('-a', '--adpc_file', type=str, help='Full path to adpc.bin file. Required for PLINK input.')
     parser.add_argument('-g', '--gtc_dir', type=str, help='Full path to gtc directory to use instead of project directory, which is the default.  Will recursively find gtc files in this directory.')
-    requiredArgs.add_argument('--expected_sex_col_name', type=str, required=True, default='Expected_Sex', help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
+    requiredArgs.add_argument('--expected_sex_col_name', type=str, default='Expected_Sex', help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
     requiredWithDefaults.add_argument('-q', '--queue', type=str, default='all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q', help='OPTIONAL. Queue on cgemsiii to use to submit jobs.  Defaults to all of the seq queues and all.q if not supplied.  default="all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q"')
     parser.add_argument('-u', '--unlock_snakemake', action='store_true', help='OPTIONAL. If pipeline was killed unexpectedly you may need this flag to rerun')
     args = parser.parse_args()
