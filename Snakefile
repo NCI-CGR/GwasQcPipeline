@@ -298,7 +298,7 @@ include: 'modules/Snakefile_plink_stats_filters'
 include: 'modules/Snakefile_replicate_concordance'
 include: 'modules/Snakefile_sample_qc_report'
 include: 'modules/Snakefile_ancestry'
-
+include: 'modules/Snakefile_for_lab'
 
 rule all:
     input:
@@ -306,4 +306,8 @@ rule all:
         'concordance/KnownReplicates.csv',
         'concordance/UnknownReplicates.csv',
         'snpweights/samples.snpweights',
-        'all_contam/contam.csv'
+        'all_contam/contam.csv',
+        'files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv',
+        'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',
+        'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',
+        'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv'
