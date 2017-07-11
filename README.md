@@ -1,30 +1,41 @@
 # GwasQcPipeline
 QC pipeline for Illumina SNP Array data generated at CGR
 
+A stable version of this repo exists on cgemsiii here:
+/DCEG/CGF/Bioinformatics/Production/software/GwasQcPipeline/
+
 ![Snakemake Rules](figures/GwasQcPipelineWorkflow.png)
 
 ## How to run the pipeline with the wrapper script:
 
 ```
 ./GwasQcWrapper.py -h
-usage: GwasQcWrapper.py [-h] [-p PATH_TO_PLINK_FILE] -d DIRECTORY_FOR_OUTPUT
+usage: GwasQcWrapper.py [-h] [-p PATH_TO_PLINK_FILE] [-d DIRECTORY_FOR_OUTPUT]
                         [--snp_cr_1 SNP_CR_1] [--samp_cr_1 SAMP_CR_1]
                         [--snp_cr_2 SNP_CR_2] [--samp_cr_2 SAMP_CR_2]
                         [--ld_prune_r2 LD_PRUNE_R2]
                         [--maf_for_ibd MAF_FOR_IBD] -s SAMPLE_SHEET
-                        --subject_id_to_use SUBJECT_ID_TO_USE
+                        [--subject_id_to_use SUBJECT_ID_TO_USE]
                         [--ibd_pi_hat_cutoff IBD_PI_HAT_CUTOFF]
                         [--dup_concordance_cutoff DUP_CONCORDANCE_CUTOFF]
                         [--lims_output_dir LIMS_OUTPUT_DIR]
                         [--contam_threshold CONTAM_THRESHOLD]
-                        [-i ILLUMINA_MANIFEST_FILE] --expected_sex_col_name
-                        EXPECTED_SEX_COL_NAME [-q QUEUE] [-u]
+                        [-i ILLUMINA_MANIFEST_FILE] [-a ADPC_FILE]
+                        [-g GTC_DIR]
+                        [--expected_sex_col_name EXPECTED_SEX_COL_NAME]
+                        [-q QUEUE] [-u]
 
 optional arguments:
   -h, --help            show this help message and exit
   -i ILLUMINA_MANIFEST_FILE, --illumina_manifest_file ILLUMINA_MANIFEST_FILE
                         Full path to illimina .bpm manifest file. Required for
                         gtc files.
+  -a ADPC_FILE, --adpc_file ADPC_FILE
+                        Full path to adpc.bin file. Required for PLINK input.
+  -g GTC_DIR, --gtc_dir GTC_DIR
+                        Full path to gtc directory to use instead of project
+                        directory, which is the default. Will recursively find
+                        gtc files in this directory.
   -u, --unlock_snakemake
                         OPTIONAL. If pipeline was killed unexpectedly you may
                         need this flag to rerun
@@ -32,7 +43,8 @@ optional arguments:
 Required Arguments:
   -d DIRECTORY_FOR_OUTPUT, --directory_for_output DIRECTORY_FOR_OUTPUT
                         REQUIRED. Full path to the base directory for the Gwas
-                        QC pipeline output
+                        QC pipeline output. Defaults to
+                        /DCEG/CGF/GWAS/Scans/GSA_Lab_QC/SR#/builds/QC_v#_date
   -s SAMPLE_SHEET, --sample_sheet SAMPLE_SHEET
                         Full path to illimina style sample sheet csv file.
   --subject_id_to_use SUBJECT_ID_TO_USE
