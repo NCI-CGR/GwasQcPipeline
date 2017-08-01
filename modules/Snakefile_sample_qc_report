@@ -52,6 +52,8 @@ rule sample_qc_report:
             subjectIdCol = None
             projCol = None
             projSampIdCol = None
+            sampleGroupCol = None
+            identSexCol = None
             for i in range(len(head_list)):
                 if head_list[i] == expected_sex_col_name:
                     expectedSexCol = i
@@ -61,6 +63,10 @@ rule sample_qc_report:
                     projCol = i
                 elif head_list[i] == 'Project-Sample ID':
                     projSampIdCol = i
+                elif head_list[i] == 'Sample_Group':
+                    sampleGroupCol = i
+                elif head_list[i] == 'Identifiler_Sex':
+                    identSexCol = i
             if expectedSexCol == None:
                 print('Expected Sex not found in sample sheet')
                 sys.exit(1)
@@ -81,7 +87,10 @@ rule sample_qc_report:
                     chipId = line_list[1] + '_' + line_list[2]
                     proj = line_list[projCol]
                     subId = line_list[subjectIdCol]
-                    expectedSex = line_list[expectedSexCol]
+                    if sampleGroupCol != None and identSexCol != None and line_list[sampleGroupCol] == 'sVALD-001':
+                        expectedSex = line_list[identSexCol]
+                    else:
+                        expectedSex = line_list[expectedSexCol]
                     projSampId = line_list[projSampIdCol]
                     cgrId = samp.split('_')[0]
                     if not crDict1.get(samp):
