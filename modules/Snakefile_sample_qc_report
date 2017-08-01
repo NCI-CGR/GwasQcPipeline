@@ -40,7 +40,7 @@ rule sample_qc_report:
         unexpectedRepDict = makeUnexpectedRepDict(input.unknownRep)
         with open(input.sampSheet) as f, open(output.allQc, 'w') as out, open(output.lims, 'w') as limsOut:
             out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,IdatsInProjectDir,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
-            limsOut.write(subject_id_to_use + ',Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate\n')
+            limsOut.write('SR_Subject_ID,LIMS_Individual_ID,Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate\n')
             head = f.readline()
             while 'SentrixBarcode_A' not in head and head != '':
                 head = f.readline()
@@ -54,6 +54,8 @@ rule sample_qc_report:
             projSampIdCol = None
             sampleGroupCol = None
             identSexCol = None
+            limsIdCol = None
+            SrIdCol = None
             for i in range(len(head_list)):
                 if head_list[i] == expected_sex_col_name:
                     expectedSexCol = i
@@ -65,18 +67,28 @@ rule sample_qc_report:
                     projSampIdCol = i
                 elif head_list[i] == 'Sample_Group':
                     sampleGroupCol = i
-                elif head_list[i] == 'Identifiler_Sex':
+                if head_list[i] == 'Identifiler_Sex':
                     identSexCol = i
+                elif head_list[i] == 'LIMS_Individual_ID':
+                    limsIdCol = i
+                elif head_list[i] == 'SR_Subject_ID':
+                    SrIdCol = i
             if expectedSexCol == None:
                 print('Expected Sex not found in sample sheet')
                 sys.exit(1)
             if subjectIdCol == None:
                 print('Subject ID not found in sample sheet')
                 sys.exit(1)
-            if not projCol:
+            if limsIdCol == None:
+                print('LIMS_Individual_ID not found in sample sheet')
+                sys.exit(1)
+            if SrIdCol == None:
+                print('SR_Subject_ID not found in sample sheet')
+                sys.exit(1)
+            if projCol == None:
                 print('No column named "Project" found')
                 sys.exit(1)
-            if not projSampIdCol:
+            if projSampIdCol == None:
                 print('No column named "Project-Sample ID" found')
             line = f.readline()
             while line != '':
@@ -87,6 +99,14 @@ rule sample_qc_report:
                     chipId = line_list[1] + '_' + line_list[2]
                     proj = line_list[projCol]
                     subId = line_list[subjectIdCol]
+                    if not subId.strip():
+                        subId = 'NA'
+                    limsSubId = line_list[limsIdCol]
+                    if not limsSubId.strip():
+                        limsSubId = 'NA'
+                    SrSubId = line_list[SrIdCol]
+                    if not SrSubId.strip():
+                        SrSubId = 'NA'
                     if sampleGroupCol != None and identSexCol != None and line_list[sampleGroupCol] == 'sVALD-001':
                         expectedSex = line_list[identSexCol]
                     else:
@@ -157,7 +177,7 @@ rule sample_qc_report:
                         unexpectedRep = 'TRUE'
                     else:
                         unexpectedRep = 'FALSE'
-                    limsOut.write(','.join([subId, samp, projSampId, str(cr1), lowCR, isContaminated, sexDiscordant, expectedRepDisc, unexpectedRep]) + '\n')
+                    limsOut.write(','.join([SrSubId, limsSubId, samp, projSampId, str(cr1), lowCR, isContaminated, sexDiscordant, expectedRepDisc, unexpectedRep]) + '\n')
                     out.write(','.join([samp, cgrId, proj, subId, idatFound, expectedSex, snpsex, sexMatch, inbreed, str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
                     line = f.readline()
         shell('cp {output.lims} {output.limsDirOut}')
