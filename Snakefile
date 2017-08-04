@@ -25,7 +25,7 @@ configfile: "config.yaml"
 plinkIn = config['plink_genotype_file'][:-4]
 gtc_dir = config['gtc_dir']
 input_sample_sheet = config['sample_sheet']
-(outName, x, sampSheetDate) = os.path.basename(input_sample_sheet)[:-4].split('_')
+(outName, sampSheetDate) = os.path.basename(input_sample_sheet)[:-4].split('_AnalysisManifest_')
 baseProjDir = '/DCEG/CGF/Infinium/ScanData/CGF/ByProject'
 snp_cr_1 = config['snp_cr_1']
 samp_cr_1 = config['samp_cr_1']
