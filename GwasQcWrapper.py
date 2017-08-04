@@ -79,7 +79,7 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
     (str, str, str) -> None
     '''
     paths = os.listdir(outDir)
-    shutil.copy2(sample_sheet, outDir + '/IlluminaSampleSheet.csv')
+    shutil.copyfile(sample_sheet, outDir + '/IlluminaSampleSheet.csv')
     if 'config.yaml' in paths:
         start = getStartTime(outDir + '/config.yaml')
     else:
