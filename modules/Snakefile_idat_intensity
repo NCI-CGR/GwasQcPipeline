@@ -5,11 +5,11 @@ rule idat_intensity:
         red = getRedIdat,
         green = getGreenIdat
     output:
-        'idat_intensity/{idatBase}.intensity.txt'
+        txt = 'idat_intensity/{idatBase}.intensity.txt',
+        R = 'idat_intensity/{idatBase}.intensity.R',
+        Rout = 'idat_intensity/{idatBase}.intensity.R.out'
     run:
-        shell('module load R')
-        
-        R("""
+        rTxt = '''
         medianIntensIdat <- function(redIdat, greenIdat){
         require(illuminaio)
         red <- readIDAT(redIdat)
@@ -18,13 +18,16 @@ rule idat_intensity:
         median(Intens)
         }
 
-        medIntens <- medianIntensIdat("{input.red}", "{input.green}")
-        write.table(medIntens, file = "{output}", quote = F, row.names = F, col.names = F) 
-        """)
+        medIntens <- medianIntensIdat("''' + input.red + '''", "''' + input.green + '''")
+        write.table(medIntens, file = "''' + output.txt + '''", quote = F, row.names = F, col.names = F) 
+        '''
+        with open(output.R, 'w') as Rout:
+            Rout.write(rTxt)
+        shell('module load R;R --vanilla < {output.R} > {output.Rout}')
 
 rule combine_idat_intensity:
     input:
-        expand('idat_intensity/{idatBase}.intensity.txt', idatBase = idats)
+        expand('idat_intensity/{idatBase}.intensity.txt', idatBase = idatBaseDict.keys())
     output:
         'all_sample_idat_intensity/idat_intensity.csv'
     run:
