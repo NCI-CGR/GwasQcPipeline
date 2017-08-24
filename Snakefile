@@ -280,6 +280,20 @@ def getGtc(wildcards):
     return sampIdToGtcDict[sampId]
 
 
+idatBaseDict = {}
+for i in idats:
+    idatBase = os.path.basename(i)
+    idatBaseDict[idatBase] = i
+
+def getRedIdat(wildcards):
+    idatBase = wildcards.idatBase
+    return idatBaseDict[idatBase] + '_Red.idat'
+
+
+def getGreenIdat(wildcards):
+    idatBase = wildcards.idatBase
+    return idatBaseDict[idatBase] + '_Grn.idat'
+
 
 if config['plink_genotype_file'] == 'None':
     include: 'modules/Snakefile_gtc_preprocess'
@@ -299,10 +313,13 @@ include: 'modules/Snakefile_replicate_concordance'
 include: 'modules/Snakefile_sample_qc_report'
 include: 'modules/Snakefile_ancestry'
 include: 'modules/Snakefile_for_lab'
+include: 'modules/Snakefile_idat_intensity'
+
 
 rule all:
     input:
         'all_sample_qc.csv',
+        'all_sample_idat_intensity/idat_intensity.csv',
         'concordance/KnownReplicates.csv',
         'concordance/UnknownReplicates.csv',
         'snpweights/samples.snpweights',

@@ -227,7 +227,7 @@ def main():
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
     qsubTxt += 'module load python3/3.5.1\n'
-    qsubTxt += 'module load R/3.3.0\n'
+    qsubTxt += 'module load R\n'
     if args.unlock_snakemake:
         qsubTxt += 'snakemake --unlock\n'
     qsubTxt += 'snakemake --rerun-incomplete --cluster "qsub -q {cluster.q} -pe by_node {threads} '
