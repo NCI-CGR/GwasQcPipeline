@@ -130,7 +130,7 @@ rule sample_qc_report:
                         filt2 = 'N'
                         cr3 = crDict3[samp]
                     if not sexDict.get(samp):
-                        (snpsex, inbreed) = ['NA', 'NA']
+                        (snpsex, inbreed) = ['U', 'NA']
                     else:
                         (snpsex, inbreed) = sexDict[samp]
                     if snpsex == 'U' or expectedSex == 'U':
