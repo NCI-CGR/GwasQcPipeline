@@ -6,7 +6,7 @@ rule sample_qc_report:
         imiss1 = 'sample_qc_stats/samples.imiss',
         imiss2 = 'plink_filter_call_rate_1/samples_filter1.imiss',
         imiss3 = 'plink_filter_call_rate_2/samples_filter2.imiss',
-        sexcheck = 'sample_qc_stats/samples.sexcheck',
+        sexcheck = 'plink_filter_call_rate_2/samples_filter2.sexcheck',
         freq = 'sample_qc_stats/samples.frq',
         hwe = 'sample_qc_stats/samples.hwe',
         contam = 'all_contam/contam.csv',
