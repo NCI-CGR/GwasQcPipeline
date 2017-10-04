@@ -10,72 +10,51 @@ rule gtc_to_adpc:
     shell:
         'module load python/2.7.5;python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2adpc.py {input.gtc} {input.manifest} {output.adpc}'
 
-
-rule combine_adpc:
+rule contam_test_GSA_1000g:
     input:
-        expand('contam/{sample_id}.adpc.bin', sample_id = SAMPLE_IDS)
-    output:
-        adpc = 'all_contam/contam.adpc.bin',
-        txt = 'all_contam/contam.adpc.bin.sampOrder.txt'
+        adpc = 'contam/{sample_id}.adpc.bin',
+        abf = '/DCEG/CGF/Bioinformatics/Production/Eric/refFiles/ThousG.AF.abf.txt'
     params:
-        adpc_dir = 'contam'
+        software = '/DCEG/CGF/Bioinformatics/Production/BZhu/verifyIDintensity/verifyIDintensity/verifyIDintensity',
+    output:
+        'one_samp_b_1000g_contam/{sample_id}.contam.out'
     shell:
-        'module load python/2.7.5;python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/combineAdpc.py {params.adpc_dir} {output.adpc}' 
+        '{params.software} -m 700078 -n 1 -b {input.abf} -v -p -i {input.adpc} > {output}'
 
-
-rule combine_contam_txt:
+rule combine_contam_one_samp_b_1000g:
     input:
-        expand('contam/{sample_id}.adpc.bin.numSnps.txt', sample_id = SAMPLE_IDS)
-    output:
-        'all_contam/contam.adpc.bin.numSnps.txt'
-    run:
-        snpCounts = []
-        for i in input:
-            with open(i) as f:
-                line = f.readline()
-                numSnps = line.strip()
-                snpCounts.append(numSnps)
-        numSamps = len(snpCounts)
-        if len(set(snpCounts)) > 1:
-            sys.exit(1)
-        with open(output[0], 'w') as out:
-            out.write('NumSamps\tNumSnps\n')
-            out.write(str(numSamps) + '\t' + snpCounts[0] + '\n')
-
-rule contam_test:
-    input:
-        adpc = 'all_contam/contam.adpc.bin',
-        txt = 'all_contam/contam.adpc.bin.numSnps.txt'
+        contam = expand('one_samp_b_1000g_contam/{sample_id}.contam.out', sample_id = SAMPLE_IDS),
+        intens = 'all_sample_idat_intensity/idat_intensity.csv'
     params:
-        software = '/DCEG/CGF/Bioinformatics/Production/BZhu/verifyIDintensity/verifyIDintensity/verifyIDintensity'
-    output:
-        'contam/contam.out'
-    run:
-        with open(input.txt) as f:
-            head = f.readline()
-            line = f.readline()
-        (numSamps, numSnps) = line.split()
-        shell('{params.software} -m ' + numSnps + ' -n ' + numSamps + ' -v -p -i {input.adpc} > {output}')
-
-
-rule combine_contam:
-    input:
-        contam = 'contam/contam.out',
-        txt = 'all_contam/contam.adpc.bin.sampOrder.txt'
+        intensThresh = 2000
     output:
         'all_contam/contam.csv'
     run:
-        with open(input.contam) as f, open(input.txt) as sampFile, open(output[0], 'w') as out:
-            out.write('ID,%Mix,LLK,LLK0\n')
-            head = f.readline()
+        intensDict = {}
+        with open(input.intens) as f:
             head = f.readline()
             line = f.readline()
-            sampLine = sampFile.readline()
             while line != '':
-                line_list = line.split()
-                samp = sampLine.strip()
-                line_list[0] = samp
-                out.write(','.join(line_list) + '\n')
+                (samp, chipId, intensity) = line.rstrip().split(',')
+                intensDict[samp] = int(intensity)
                 line = f.readline()
-                sampLine = sampFile.readline()
+        with open(output[0], 'w') as out:
+            out.write('ID,%Mix,LLK,LLK0\n')
+            for i in input.contam:
+                samp = os.path.basename(i).split('.')[0]
+                intens = intensDict[samp]
+                with open(i) as f:
+                    head = f.readline()
+                    while '%Mix' not in head and head != '':
+                        head = f.readline()
+                    if head == '':
+                        print('strange file format: ' + i)
+                        sys.exit(1)
+                    head = f.readline()
+                    line = f.readline()
+                    line_list = line.split()
+                    line_list[0] = samp
+                    if intens < params.intensThresh:
+                        line_list[1] = 'NA'
+                    out.write(','.join(line_list) + '\n')
 
