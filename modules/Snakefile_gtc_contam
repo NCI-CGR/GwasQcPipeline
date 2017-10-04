@@ -36,7 +36,7 @@ rule combine_contam_one_samp_b_1000g:
             line = f.readline()
             while line != '':
                 (samp, chipId, intensity) = line.rstrip().split(',')
-                intensDict[samp] = int(intensity)
+                intensDict[samp] = float(intensity)
                 line = f.readline()
         with open(output[0], 'w') as out:
             out.write('ID,%Mix,LLK,LLK0\n')
