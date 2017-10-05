@@ -155,8 +155,8 @@ def getOutDir(sampleSheet, baseDir = '/DCEG/CGF/GWAS/Scans/GSA_Lab_QC/'):
     '''
     return the name of the output directory and make it if it doesn't exist
     '''
-    sr = os.path.basename(sampleSheet).split('_AnalysisManifest_')[0]
-    srDir = baseDir + sr
+    (sr, sampSheetDate) = os.path.basename(sampleSheet)[:-4].split('_AnalysisManifest_')
+    srDir = baseDir + sr + '_' + sampSheetDate
     if not os.path.isdir(srDir):
         os.mkdir(srDir)
     if not os.path.isdir(srDir + '/builds'):
