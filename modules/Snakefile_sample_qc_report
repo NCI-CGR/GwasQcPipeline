@@ -182,3 +182,30 @@ rule sample_qc_report:
                     line = f.readline()
         shell('cp {output.lims} {output.limsDirOut}')
 
+
+
+rule summary_stats:
+    input:
+        'all_sample_qc.csv'
+    output:
+        'summary_stats.txt'
+    run:
+        R("""
+        data <- read.csv("{input}")
+        write("The pipeline is complete and the summary files can be found here:\n", file = "{output}")
+        labDir <- paste(getwd, "/files_for_lab", sep = "")
+        write(paste(labDir, "\n\n", sep = ""), file = "{output}", append = T)
+        numSamps <- dim(data)[1]
+        noGTC <- data$Sample_ID[is.na(data$Call_Rate_Initial)]
+        write(paste("Of the ", numSamps, " samples ", length(noGTC), " did not have gtc files:\n", sep = ""), file = "{output}", append = T)
+        write(noGTC, file = "{output}", append = T)
+        write("Are the idat files in the project directory?\n", file = "{output}", append = T)
+        write(table(data$IdatsInProjectDir), file = "{output}", append = T)
+        write("Initial call rate:\n", file = "{output}", append = T)
+        write(summary(data$Call_Rate_Initial), file = "{output}", append = T)
+        write("Contamination Rate:\n", file = "{output}", append = T)
+        summary(data$Contamination_Rate)
+        write("Fail contamination rate:\n", file = "{output}", append = T)
+        write(table(data$Contamination_Rate > .1, useNA = "ifany"), file = "{output}", append = T)
+        """)
+

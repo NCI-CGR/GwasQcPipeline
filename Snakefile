@@ -316,9 +316,12 @@ include: 'modules/Snakefile_for_lab'
 include: 'modules/Snakefile_idat_intensity'
 
 
+localrules: summary_stats
+
 rule all:
     input:
         'all_sample_qc.csv',
+        'summary_stats.txt',
         'all_sample_idat_intensity/idat_intensity.csv',
         'concordance/KnownReplicates.csv',
         'concordance/UnknownReplicates.csv',
