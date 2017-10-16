@@ -193,7 +193,7 @@ rule summary_stats:
         R("""
         data <- read.csv("{input}")
         write("The pipeline is complete and the summary files can be found here:\n", file = "{output}")
-        labDir <- paste(getwd, "/files_for_lab", sep = "")
+        labDir <- paste(getwd(), "/files_for_lab", sep = "")
         write(paste(labDir, "\n\n", sep = ""), file = "{output}", append = T)
         numSamps <- dim(data)[1]
         noGTC <- data$Sample_ID[is.na(data$Call_Rate_Initial)]
