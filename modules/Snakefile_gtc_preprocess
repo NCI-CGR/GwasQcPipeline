@@ -12,7 +12,7 @@ rule gtc_to_ped:
         'per_sample_plink_files/{sample_id}.ped',
         'per_sample_plink_files/{sample_id}.map',
     shell:
-        'module load python/2.7.5;python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2plink.py {input.gtc} {input.manifest} {wildcards.sample_id} per_sample_plink_files'
+        'python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2plink.py {input.gtc} {input.manifest} {wildcards.sample_id} per_sample_plink_files'
 
 
 rule merge_sample_peds:
@@ -31,10 +31,9 @@ rule merge_sample_peds:
         if len(input) == 1:
             with open('plink_start/mergeList.txt', 'w') as out:
                 out.write('just one ped file found')
-            shell('module load plink2/1.90b3.32;plink --file ' + inProj + ' --make-bed --out {params}')
+            shell('plink --file ' + inProj + ' --make-bed --out {params}')
         else:
             with open('plink_start/mergeList.txt', 'w') as out:
                 for ped in input[1:]:
                     out.write(ped + ' ' + ped[:-4] + '.map\n')
-            shell('module load plink2/1.90b3.32;plink --file ' + inProj + ' --merge-list {output.mergeList} --make-bed --out {params.outProj} --threads {threads}')
-
+            shell('plink --file ' + inProj + ' --merge-list {output.mergeList} --make-bed --out {params.outProj} --threads {threads} --memory 240000')

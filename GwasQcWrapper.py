@@ -228,9 +228,12 @@ def main():
     qsubTxt += 'module load sge\n'
     qsubTxt += 'module load python3/3.5.1\n'
     qsubTxt += 'module load R\n'
+    qsubTxt += 'module load plink2/1.90b5\n'
+    qsubTxt += 'module load python/2.7.5\n'
+    qsubTxt += 'module load eigensoft/6.0.1\n'
     if args.unlock_snakemake:
         qsubTxt += 'snakemake --unlock\n'
-    qsubTxt += 'snakemake --rerun-incomplete --cluster "qsub -q {cluster.q} -pe by_node {threads} '
+    qsubTxt += 'snakemake --rerun-incomplete --cluster "qsub -V -q {cluster.q} -pe by_node {threads} '
     qsubTxt += '-o ' + outDir + '/logs/ -e ' + outDir + '/logs/" --jobs 4000 --cluster-config cluster.yaml --latency-wait 300\n'
     makeQsub(outDir + '/GwasQcPipeline.sh', qsubTxt)
     runQsub(outDir + '/GwasQcPipeline.sh', os.path.basename(outDir), 'seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q')
