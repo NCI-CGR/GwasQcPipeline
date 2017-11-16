@@ -12,7 +12,7 @@ rule plink_ld_prune:
         'ld_prune/ldPruneList.prune.in',
         'ld_prune/ldPruneList.prune.out'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --out {params.outProj}'
+        'plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --memory 10000 --out {params.outProj}'
 
 
 rule extract_ld_prune:
@@ -29,7 +29,7 @@ rule extract_ld_prune:
         'ld_prune/samples.bim',
         'ld_prune/samples.fam'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --extract {input.prune} --make-bed --out {params.outProj}'
+        'plink --bfile {params.inProj} --extract {input.prune} --make-bed --memory 10000 --out {params.outProj}'
 
 
 rule plink_ibd:
@@ -43,7 +43,7 @@ rule plink_ibd:
     output:
         'ibd/samples.genome'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --genome full --min 0.05 --out {params.outProj}'
+        'plink --bfile {params.inProj} --genome full --min 0.05 --memory 10000 --out {params.outProj}'
 
 rule output_replicates:
     input:
@@ -116,5 +116,3 @@ rule output_replicates:
                     subId2 = sampToSubIdDict[samp2]
                     if subId1 != subId2 and crDict.get(samp1) and crDict.get(samp2):
                         outUn.write(','.join([subId1, subId2, samp1, samp2, str(concordance), str(piHat)]) + '\n')
-
-
