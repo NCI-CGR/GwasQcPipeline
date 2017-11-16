@@ -23,7 +23,7 @@ rule idat_intensity:
         '''
         with open(output.R, 'w') as Rout:
             Rout.write(rTxt)
-        shell('module load R;R --vanilla < {output.R} > {output.Rout}')
+        shell('R --vanilla < {output.R} > {output.Rout}')
 
 rule combine_idat_intensity:
     input:
@@ -40,4 +40,3 @@ rule combine_idat_intensity:
                     line = f.readline()
                 medIntens = line.strip()
                 out.write(','.join([sampId, chipId, medIntens]) + '\n')
-
