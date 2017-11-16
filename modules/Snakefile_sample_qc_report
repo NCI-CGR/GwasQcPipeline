@@ -12,7 +12,8 @@ rule sample_qc_report:
         contam = 'all_contam/contam.csv',
         ancestry = 'snpweights/samples.snpweights',
         knownConcordance = 'concordance/KnownReplicates.csv',
-        unknownRep = 'concordance/UnknownReplicates.csv'
+        unknownRep = 'concordance/UnknownReplicates.csv',
+        intensity = 'all_sample_idat_intensity/idat_intensity.csv'
     output:
         allQc = 'all_sample_qc.csv',
         lims = outName + '_LimsUpload_' + sampSheetDate + '.csv',
@@ -35,11 +36,12 @@ rule sample_qc_report:
         crDict3 = makeCallRateDict(input.imiss3)
         sexDict = makeSexDict(input.sexcheck)
         contamDict = makeContamDict(input.contam)
+        intensityDict = makeIdatIntensDict(input.intensity)
         ancestryDict = makeAncestryDict(input.ancestry)
         repDiscordantDict = makeRepDiscordantDict(input.knownConcordance)
         unexpectedRepDict = makeUnexpectedRepDict(input.unknownRep)
         with open(input.sampSheet) as f, open(output.allQc, 'w') as out, open(output.lims, 'w') as limsOut:
-            out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,IdatsInProjectDir,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
+            out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,IdatsInProjectDir,IdatIntensity,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
             limsOut.write('SR_Subject_ID,LIMS_Individual_ID,Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate\n')
             head = f.readline()
             while 'SentrixBarcode_A' not in head and head != '':
@@ -163,6 +165,10 @@ rule sample_qc_report:
                         isContaminated = 'TRUE'
                     else:
                         isContaminated = 'FALSE'
+                    if not intensityDict.get(samp):
+                        intensity = 'NA'
+                    else:
+                        intensity = intensityDict[samp]
                     if sexMatch == 'U':
                         sexDiscordant = 'NA'
                     elif sexMatch == 'N':
@@ -178,7 +184,7 @@ rule sample_qc_report:
                     else:
                         unexpectedRep = 'FALSE'
                     limsOut.write(','.join([SrSubId, limsSubId, samp, projSampId, str(cr1), lowCR, isContaminated, sexDiscordant, expectedRepDisc, unexpectedRep]) + '\n')
-                    out.write(','.join([samp, cgrId, proj, subId, idatFound, expectedSex, snpsex, sexMatch, inbreed, str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
+                    out.write(','.join([samp, cgrId, proj, subId, idatFound, intensity, expectedSex, snpsex, sexMatch, inbreed, str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
                     line = f.readline()
         shell('cp {output.lims} {output.limsDirOut}')
 
@@ -205,6 +211,8 @@ rule summary_stats:
         capture.output(summary(data$Call_Rate_Initial), file = "{output}", append = T)
         write("\nContamination Rate:\n", file = "{output}", append = T)
         capture.output(summary(data$Contamination_Rate), file = "{output}", append = T)
+        write("\nidat intensity:\n", file = "{output}", append = T)                                                                                                    
+        capture.output(summary(data$IdatIntensity), file = "{output}", append = T)
         write("\nFail contamination rate:", file = "{output}", append = T)
         capture.output(table(data$Contamination_Rate > .1, useNA = "ifany"), file = "{output}", append = T)
         """)

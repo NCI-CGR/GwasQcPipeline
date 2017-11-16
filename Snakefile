@@ -202,6 +202,21 @@ def makeContamDict(ContamFile):
 
 
 
+def makeIdatIntensDict(intensFile):
+    intensDict = {}
+    with open(ContamFile) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            line_list = line.split(',')
+            samp = line_list[0]
+            intens = line_list[2]
+            intensDict[samp] = intens
+            line = f.readline()
+    return intensDict
+
+
+
 def makeAncestryDict(snpWeightsFile):
     ancestryDict = {}
     with open(snpWeightsFile) as f:
