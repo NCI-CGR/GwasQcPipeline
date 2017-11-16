@@ -5,7 +5,7 @@ rule thousG_match:
         bim = 'ld_prune/samples.vcfStrand.bim',
         remove = 'ld_prune/thousG_rename.remove.txt'
     shell:
-        'module load python/2.7.5;python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/thousGmatchAndRemoveDups.py {input} {output.remove}'
+        'python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/thousGmatchAndRemoveDups.py {input} {output.remove}'
 
 rule remove_not_thousG:
     input:
@@ -20,7 +20,7 @@ rule remove_not_thousG:
         'plink_thousG_match/samples.bim',
         'plink_thousG_match/samples.fam'
     shell:
-        'module load plink2/1.90b3.32;plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --exclude {input.remove} --make-bed --out {params.outProj}'
+        'plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --exclude {input.remove} --memory 10000 --make-bed --out {params.outProj}'
 
 
 
@@ -36,7 +36,7 @@ rule ped_for_snpweights:
         'snpweights/samples.ped',
         'snpweights/samples.map'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --maf 0.05 --recode --out {params.outProj}'
+        'plink --bfile {params.inProj} --maf 0.05 --recode --memory 10000 --out {params.outProj}'
 
 rule convert_eigen:
     input:
@@ -58,7 +58,7 @@ rule convert_eigen:
         parTxt += 'familynames: NO\n'
         with open(output.par, 'w') as out:
             out.write(parTxt)
-        shell('module load eigensoft/6.0.1;convertf -p {output.par}')
+        shell('convertf -p {output.par}')
 
 
 rule snpweights:
@@ -81,4 +81,3 @@ rule snpweights:
         with open(output.par, 'w') as out:
             out.write(parTxt)
         shell('{params.software} -p {output.par}')
-
