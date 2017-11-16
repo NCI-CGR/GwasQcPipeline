@@ -13,7 +13,7 @@ rule plink_sample_qc_stats:
         'sample_qc_stats/samples.frq',
         'sample_qc_stats/samples.hwe'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --out {params.outProj}'
+        'plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --memory 10000 --out {params.outProj}'
 
 
 rule filter_call_rate_1:
@@ -31,7 +31,7 @@ rule filter_call_rate_1:
         'plink_filter_call_rate_1/samples.bim',
         'plink_filter_call_rate_1/samples.fam'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --mind {params.mind} --geno {params.geno} --make-bed --out {params.outProj}'
+        'plink --bfile {params.inProj} --mind {params.mind} --geno {params.geno} --make-bed --memory 10000 --out {params.outProj}'
 
 rule qc_stats_after_filter_1:
     input:
@@ -48,7 +48,7 @@ rule qc_stats_after_filter_1:
         'plink_filter_call_rate_1/samples_filter1.frq',
         'plink_filter_call_rate_1/samples_filter1.hwe'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --out {params.outProj}'
+        'plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --memory 10000 --out {params.outProj}'
 
 
 
@@ -68,7 +68,7 @@ rule filter_call_rate_2:
         'plink_filter_call_rate_2/samples.bim',
         'plink_filter_call_rate_2/samples.fam'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --mind {params.mind} --geno {params.geno} --make-bed --out {params.outProj}'
+        'plink --bfile {params.inProj} --mind {params.mind} --geno {params.geno} --memory 10000 --make-bed --out {params.outProj}'
 
 
 
@@ -87,6 +87,4 @@ rule qc_stats_after_filter_2:
         'plink_filter_call_rate_2/samples_filter2.frq',
         'plink_filter_call_rate_2/samples_filter2.hwe'
     shell:
-        'module load plink2/1.90b3.32;plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --out {params.outProj}'
-
-
+        'plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --memory 10000 --out {params.outProj}'
