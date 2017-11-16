@@ -8,7 +8,7 @@ rule gtc_to_adpc:
         adpc = 'contam/{sample_id}.adpc.bin',
         txt = 'contam/{sample_id}.adpc.bin.numSnps.txt'
     shell:
-        'module load python/2.7.5;python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2adpc.py {input.gtc} {input.manifest} {output.adpc}'
+        'python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2adpc.py {input.gtc} {input.manifest} {output.adpc}'
 
 rule contam_test_GSA_1000g:
     input:
@@ -57,4 +57,3 @@ rule combine_contam_one_samp_b_1000g:
                     if intens < params.intensThresh:
                         line_list[1] = 'NA'
                     out.write(','.join(line_list) + '\n')
-
