@@ -208,7 +208,7 @@ def makeIdatIntensDict(intensFile):
         head = f.readline()
         line = f.readline()
         while line != '':
-            line_list = line.split(',')
+            line_list = line.rstrip().split(',')
             samp = line_list[0]
             intens = line_list[2]
             intensDict[samp] = intens
