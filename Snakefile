@@ -204,7 +204,7 @@ def makeContamDict(ContamFile):
 
 def makeIdatIntensDict(intensFile):
     intensDict = {}
-    with open(ContamFile) as f:
+    with open(intensFile) as f:
         head = f.readline()
         line = f.readline()
         while line != '':
