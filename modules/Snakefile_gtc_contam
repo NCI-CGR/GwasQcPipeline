@@ -24,12 +24,14 @@ rule contam_test_GSA_1000g:
 rule combine_contam_one_samp_b_1000g:
     input:
         contam = expand('one_samp_b_1000g_contam/{sample_id}.contam.out', sample_id = SAMPLE_IDS),
-        intens = 'all_sample_idat_intensity/idat_intensity.csv'
+        intens = 'all_sample_idat_intensity/idat_intensity.csv',
+        imiss3 = 'plink_filter_call_rate_2/samples_filter2.imiss'
     params:
-        intensThresh = 2000
+        intensThresh = 6000
     output:
         'all_contam/contam.csv'
     run:
+        crDict3 = makeCallRateDict(input.imiss3)
         intensDict = {}
         with open(input.intens) as f:
             head = f.readline()
@@ -54,6 +56,6 @@ rule combine_contam_one_samp_b_1000g:
                     line = f.readline()
                     line_list = line.split()
                     line_list[0] = samp
-                    if intens < params.intensThresh:
+                    if intens < params.intensThresh and not crDict3.get(samp):
                         line_list[1] = 'NA'
                     out.write(','.join(line_list) + '\n')
