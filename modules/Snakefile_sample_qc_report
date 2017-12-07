@@ -134,7 +134,11 @@ rule sample_qc_report:
                     if not sexDict.get(samp):
                         (snpsex, inbreed) = ['U', 'NA']
                     else:
-                        (snpsex, inbreed) = sexDict[samp]
+                        (defSex, inbreed) = sexDict[samp]
+                        if float(inbreed) < .5:
+                            snpsex = 'F'
+                        else:
+                            snpsex = 'M'
                     if snpsex == 'U' or expectedSex == 'U':
                         sexMatch = 'U'
                     elif snpsex != expectedSex:
