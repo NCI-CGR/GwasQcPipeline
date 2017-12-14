@@ -329,7 +329,7 @@ include: 'modules/Snakefile_sample_qc_report'
 include: 'modules/Snakefile_ancestry'
 include: 'modules/Snakefile_for_lab'
 include: 'modules/Snakefile_idat_intensity'
-
+include: 'modules/Snakefile_remove_qc_failures'
 
 localrules: summary_stats
 
@@ -342,6 +342,7 @@ rule all:
         'concordance/UnknownReplicates.csv',
         'snpweights/samples.snpweights',
         'all_contam/contam.csv',
+        'remove_qc_fail/samples_remove_failures.imiss',
         'files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',

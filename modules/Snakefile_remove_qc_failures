@@ -13,13 +13,13 @@ rule qc_fail_samp_list:
             while line != '':
                 line_list = line.rstrip().split(',')
                 samp = line_list[2]
-                failures = line_list[6:]
+                failures = line_list[5:]
                 sampFail = False
                 for fail in failures:
                     if fail == 'TRUE':
                         sampFail = True
                 if sampFail == True:
-                    output.write(samp + ' ' + samp + '\n')
+                    out.write(samp + ' ' + samp + '\n')
                 line = f.readline()
 
 rule remove_failures:
