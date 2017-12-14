@@ -1,0 +1,33 @@
+#!/usr/bin/python
+
+#if multiple samples from the same subject the sample with the highest call rate will be kept
+
+rule sample_to_keep:
+    input:
+        sampSheet = sample_sheet,
+        imiss4 = 'remove_qc_fail/samples_remove_failures.imiss'
+    output:
+        keep = 'subject_level/sampsToKeep.txt',
+        track = 'subject_level/SampleUsedforSubject.csv'
+    run:
+        (SubToSampListDict, sampToSubIdDict) = makeSubjectToSampListDict(sample_sheet)
+        crDict = makeCallRateDict(input.imiss4)
+        controlDict = makeControlDict(sample_sheet)
+        with open(output.keep, 'w') as out1, open(output.track, 'w') as out2:
+            out2.write('Subject_ID,Sample_ID\n')
+            for sub in SubToSampListDict.keys():
+                if not controlDict.get(sub):
+                    sampList = SubToSampListDict[sub]
+                    crList = []
+                    for s in sampList:
+                        if not crDict.get(s):
+                            crList.append(None)
+                        else:
+                            crList.append(crDict[s])
+                    bestSamp = getBestSamp(sampList, crList)
+                    if bestSamp == '':
+                        out2.write(','.join(sub, 'NA') + '\n')
+                    else:
+                        out2.write(','.join(sub, bestSamp) + '\n')
+                        out1.write(bestSamp + ' ' + bestSamp + '\n')
+

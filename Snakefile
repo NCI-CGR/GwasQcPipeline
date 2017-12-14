@@ -44,6 +44,48 @@ contam_threshold = config['contam_threshold']
 adpc_file = config['adpc_file']
 
 
+
+
+
+def makeControlDict(SampleSheet):
+    controlDict = {}
+    with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
+        head = f.readline()
+        while 'SentrixBarcode_A' not in head and head != '':
+            head = f.readline()
+        if 'SentrixBarcode_A' not in head:
+            print('Sample sheet not formatted correctly')
+            sys.exit(1)
+        head_list = head.rstrip().split(',')
+        sampGroupCol = None
+        subjectIdCol = None
+        for i in range(len(head_list)):
+            if head_list[i] == 'Sample_Group':
+                sampGroupCol = i
+            elif head_list[i] == subject_id_to_use:
+                subjectIdCol = i
+        if sampGroupCol == None:
+            print('Sample_Group not found in sample sheet')
+            sys.exit(1)
+        if subjectIdCol == None:
+            print('subject ID col not found in sample sheet')
+            sys.exit(1)
+        line = f.readline()
+        while line != '':
+            if line.strip():
+                line_list = line.rstrip().split(',')
+                sampId = line_list[0]
+                subId = line_list[subjectIdCol]
+                sampGroup = line_list[sampGroupCol]
+                if sampGroup == 'sVALD-001':
+                    controlDict[subId] = 1
+            line = f.readline()
+    return controlDict
+
+
+
+
+
 def makeRepDiscordantDict(knownConcordanceFile, thresh = dup_concordance_cutoff):
     RepDiscordantDict = {}
     with open(knownConcordanceFile) as f:
