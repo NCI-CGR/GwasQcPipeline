@@ -44,7 +44,18 @@ contam_threshold = config['contam_threshold']
 adpc_file = config['adpc_file']
 
 
-
+def getBestSamp(CrSampList, crList):
+    if len(CrSampList) == 1:
+        return CrSampList[0]
+    maxCr = 0.0
+    maxSamp = 'NA'
+    for i in range(len(CrSampList)):
+        samp = CrSampList[i]
+        CR = float(crList[i])
+        if CR > maxCr:
+            maxCr = CR
+            maxSamp = samp
+    return maxSamp
 
 
 def makeControlDict(SampleSheet):

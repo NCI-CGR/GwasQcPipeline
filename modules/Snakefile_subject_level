@@ -19,15 +19,14 @@ rule sample_to_keep:
                 if not controlDict.get(sub):
                     sampList = SubToSampListDict[sub]
                     crList = []
+                    CrSampList = []
                     for s in sampList:
-                        if not crDict.get(s):
-                            crList.append(None)
-                        else:
+                        if crDict.get(s):
                             crList.append(crDict[s])
-                    bestSamp = getBestSamp(sampList, crList)
-                    if bestSamp == '':
-                        out2.write(','.join(sub, 'NA') + '\n')
-                    else:
+                            CrSampList.append(s)
+                    if len(crList) > 0:
+                        bestSamp = getBestSamp(CrSampList, crList)
                         out2.write(','.join(sub, bestSamp) + '\n')
                         out1.write(bestSamp + ' ' + bestSamp + '\n')
-
+                    else:
+                        out2.write(','.join(sub, 'NA') + '\n')
