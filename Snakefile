@@ -394,7 +394,7 @@ rule all:
         'all_sample_idat_intensity/idat_intensity.csv',
         'concordance/KnownReplicates.csv',
         'concordance/UnknownReplicates.csv',
-        'snpweights/samples.snpweights',
+        'snpweights/samples.snpweights.csv',
         'all_contam/contam.csv',
         'remove_qc_fail/samples_remove_failures.imiss',
         'files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv',

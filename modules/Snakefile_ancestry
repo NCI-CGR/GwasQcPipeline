@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 rule thousG_match:
     input:
         'ld_prune/samples.bim'
@@ -81,3 +83,15 @@ rule snpweights:
         with open(output.par, 'w') as out:
             out.write(parTxt)
         shell('{params.software} -p {output.par}')
+
+rule snpweights_csv:
+    input:
+        'snpweights/samples.snpweights'
+    output:
+        'snpweights/samples.snpweights.csv'
+    run:
+        with open(input[0]) as f, open(output[0], 'w') as out:
+            out.write('ID,Pop,SNPs,EV1,EV2,AFR,EUR,ASN\n')
+            for line in f:
+                line_list = line.split()
+                out.write(','.join(line_list) + '\n')
