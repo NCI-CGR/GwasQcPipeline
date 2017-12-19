@@ -144,6 +144,7 @@ def get_args():
     requiredArgs.add_argument('--expected_sex_col_name', type=str, default='Expected_Sex', help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
     requiredWithDefaults.add_argument('-q', '--queue', type=str, default='all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q', help='OPTIONAL. Queue on cgemsiii to use to submit jobs.  Defaults to all of the seq queues and all.q if not supplied.  default="all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q"')
     parser.add_argument('-u', '--unlock_snakemake', action='store_true', help='OPTIONAL. If pipeline was killed unexpectedly you may need this flag to rerun')
+    parser.add_argument('-f', '--finish', action='store_true', help='OPTIONAL. Use with -d option to restart pipeline or update with new features without making new config file, etc.')
     args = parser.parse_args()
     return args
 
@@ -184,6 +185,9 @@ def main():
     args = get_args()
     outDir = args.directory_for_output
     if not outDir:
+        if args.finish:
+            print('you need to use the -d option if using the -f option.')
+            sys.exit(1)
         outDir = getOutDir(args.sample_sheet)
     if outDir[0] != '/':
         print('-d argument must be full path to working directory.  Relative paths will not work.')
@@ -219,11 +223,14 @@ def main():
     figFiles = glob.glob(scriptDir + '/figures/*')
     for f in figFiles:
         shutil.copy2(f, outDir + '/figures')
-    numSamps = getNumSamps(args.sample_sheet)
-    makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
+    if args.finish:
+        numSamps = getNumSamps(outDir + '/IlluminaSampleSheet.csv')
+    if not args.finish:
+        numSamps = getNumSamps(args.sample_sheet)
+        makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold,
                args.adpc_file, args.gtc_dir)
-    makeClusterConfig(outDir, args.queue)
+        makeClusterConfig(outDir, args.queue)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
     qsubTxt += 'module load python3/3.5.1\n'
