@@ -383,6 +383,7 @@ include: 'modules/Snakefile_ancestry'
 include: 'modules/Snakefile_for_lab'
 include: 'modules/Snakefile_idat_intensity'
 include: 'modules/Snakefile_remove_qc_failures'
+include: 'modules/Snakefile_subject_level'
 
 localrules: summary_stats
 
@@ -399,4 +400,6 @@ rule all:
         'files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',
-        'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv'
+        'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
+        'subject_level/subjects_qc.imiss'
+
