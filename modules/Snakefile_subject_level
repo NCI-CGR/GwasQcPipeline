@@ -27,11 +27,11 @@ rule sample_to_keep:
                             CrSampList.append(s)
                     if len(crList) > 0:
                         bestSamp = getBestSamp(CrSampList, crList)
-                        out2.write(','.join(sub, bestSamp) + '\n')
+                        out2.write(','.join([sub, bestSamp]) + '\n')
                         out1.write(bestSamp + ' ' + bestSamp + '\n')
                         out3.write(' '.join([bestSamp, bestSamp, sub, sub]) + '\n')
                     else:
-                        out2.write(','.join(sub, 'NA') + '\n')
+                        out2.write(','.join([sub, 'NA']) + '\n')
 
 
 rule plink_make_subject_level:
