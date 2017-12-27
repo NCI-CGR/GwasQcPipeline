@@ -71,6 +71,8 @@ def makeClusterConfig(outDir, queue):
         output.write('    q: ' + new_q + '\n')
         output.write('merge_sample_peds:\n')
         output.write('    q: ' + new_q + '\n')
+        output.write('plink_ibd:\n')
+        output.write('    q: ' + new_q + '\n')
 
 
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,

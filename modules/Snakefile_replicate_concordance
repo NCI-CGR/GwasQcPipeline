@@ -42,8 +42,9 @@ rule plink_ibd:
         outProj = 'ibd/samples'
     output:
         'ibd/samples.genome'
+    threads: 20
     shell:
-        'plink --bfile {params.inProj} --genome full --min 0.05 --memory 10000 --out {params.outProj}'
+        'plink --bfile {params.inProj} --genome full --min 0.05 --memory 240000 --threads {threads} --out {params.outProj}'
 
 rule output_replicates:
     input:
