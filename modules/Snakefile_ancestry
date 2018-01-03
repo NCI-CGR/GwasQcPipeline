@@ -89,9 +89,15 @@ rule snpweights_csv:
         'snpweights/samples.snpweights'
     output:
         'snpweights/samples.snpweights.csv'
+    params:
+        threshold = 0.8
     run:
         with open(input[0]) as f, open(output[0], 'w') as out:
-            out.write('ID,Pop,SNPs,EV1,EV2,AFR,EUR,ASN\n')
+            out.write('ID,Pop,SNPs,EV1,EV2,AFR,EUR,ASN,Ancestry\n')
+            labels = 'AFR,EUR,ASN'.split(',')
             for line in f:
                 line_list = line.split()
+                x = line_list[-3:]
+                ancestry = classify_ancestry(labels, x, float(params.threshold))
+                line_list.append(ancestry)
                 out.write(','.join(line_list) + '\n')

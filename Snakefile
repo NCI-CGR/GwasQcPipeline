@@ -44,6 +44,39 @@ contam_threshold = config['contam_threshold']
 adpc_file = config['adpc_file']
 
 
+
+def classify_ancestry(labels,x,threshold):
+    '''
+    This code is modified from GLU admix.py
+    https://github.com/bioinformed/glu-genetics/blob/master/glu/modules/struct/admix.py#L345
+    An individual is considered of a given ancestry based on the supplied
+    labels and estimated admixture coefficients if their coefficient is
+    greater than a given threshold.
+    Otherwise, an individual who has no single estimated admixture coefficient
+    that meets the specified threshold then one of two behaviors result.  If
+    only one population group exceeds 1-threshold then the ancestry is deemed
+    'ADMIXED' for that population.  Otherwise, a list of populations with
+    estimated admixture above 1-threshold is returned.
+    '''
+    if len(labels) != len(x):
+        print('for classify_ancestry labels and x need to be same length')
+        sys.exit(1)
+    popset = set()
+    cmax = -1
+    for i in range(len(labels)):
+        pop = labels[i]
+        coeff = float(x[i])
+        if coeff >= 1 - threshold:
+            popset.add(pop)
+            cmax = max(cmax,coeff)
+    if len(popset) == 1 and cmax < threshold:
+        ipop = 'ADMIXED_%s' % popset.pop()
+    else:
+        ipop = '_'.join(sorted(popset))
+    return ipop
+
+
+
 def getBestSamp(CrSampList, crList):
     if len(CrSampList) == 1:
         return CrSampList[0]
