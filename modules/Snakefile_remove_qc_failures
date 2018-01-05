@@ -5,22 +5,64 @@ rule qc_fail_samp_list:
     input:
         outName + '_LimsUpload_' + sampSheetDate + '.csv'
     output:
-        'remove_qc_fail/sampleFailures.txt'
+        lowCR = 'remove_qc_fail/LowCR.txt',
+        contam = 'remove_qc_fail/contaminated.txt',
+        sex = 'remove_qc_fail/SexDiscordant.txt',
+        repDisc = 'remove_qc_fail/ExpectedRepDiscordant.txt',
+        unexpectRep = 'remove_qc_fail/UnexpectedReplicate.txt'
     run:
-        with open(input[0]) as f, open(output[0], 'w') as out:
+        with open(input[0]) as f, open(output.lowCR, 'w') as lowCrOut, open(output.contam, 'w') as contamOut, open(output.sex, 'w') as sexOut, open(output.repDisc, 'w') as repDiscOut, open(output.unexpectRep, 'w') as unexpectRepOut:
             head = f.readline()
             line = f.readline()
             while line != '':
                 line_list = line.rstrip().split(',')
                 samp = line_list[2]
-                failures = line_list[5:]
-                sampFail = False
-                for fail in failures:
-                    if fail == 'TRUE':
-                        sampFail = True
-                if sampFail == True:
-                    out.write(samp + ' ' + samp + '\n')
+                (lowCR, contam, sex, repDisc, unexpectRep) = line_list[5:]
+                if lowCR == 'TRUE':
+                    lowCrOut.write(samp + ' ' + samp + '\n')
+                if contam == 'TRUE':
+                    contamOut.write(samp + ' ' + samp + '\n')
+                if sex == 'TRUE':
+                    sexOut.write(samp + ' ' + samp + '\n')
+                if repDisc == 'TRUE':
+                    repDiscOut.write(samp + ' ' + samp + '\n')
+                if unexpectRep == 'TRUE':
+                    unexpectRepOut.write(samp + ' ' + samp + '\n')
                 line = f.readline()
+
+
+rule combine_fail_lists:
+    input:
+        contam = 'remove_qc_fail/contaminated.txt',
+        sex = 'remove_qc_fail/SexDiscordant.txt',
+        repDisc = 'remove_qc_fail/ExpectedRepDiscordant.txt',
+        unexpectRep = 'remove_qc_fail/UnexpectedReplicate.txt'
+    params:
+        contam = config['remove_contam'],
+        sex = config['remove_sex_discordant'],
+        repDisc = config['remove_rep_discordant'],
+        unexpectRep = config['remove_unexpected_rep']
+    output:
+        'remove_qc_fail/sampleFailures.txt'
+    run:
+        with open(output[0], 'w') as out:
+            if params.contam == 'YES':
+                with open(input.contam) as f:
+                    for line in f:
+                        out.write(line)
+            if params.sex == 'YES':
+                with open(input.sex) as f:
+                    for line in f:
+                        out.write(line)
+            if params.repDisc == 'YES':
+                with open(input.repDisc) as f:
+                    for line in f:
+                        out.write(line)
+            if params.unexpectRep == 'YES':
+                with open(input.repDisc) as f:
+                    for line in f:
+                        out.write(line)
+
 
 rule remove_failures:
     input:
