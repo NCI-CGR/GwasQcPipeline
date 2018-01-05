@@ -1,0 +1,92 @@
+#!/usr/bin/python
+
+rule make_related_list:
+    input:
+        track = 'subject_level/SampleUsedforSubject.csv',
+        ibd = 'ibd/samples.genome'
+    output:
+        'remove_related/subjects_to_remove.txt'
+    run:
+        relatedDict = MakeRelatedDict(input.ibd, input.track)
+        with open(output[0], 'w') as out:
+            while len(relatedDict.keys()) > 0:
+                maxLenList = 0
+                maxRelatedSamp = 'NA'
+                for samp in list(relatedDict):
+                    lenList = len(relatedDict[samp])
+                    if lenList > maxLenList:
+                        maxRelatedSamp = samp
+                out.write(maxRelatedSamp + ' ' + maxRelatedSamp + '\n')
+                for samp in list(relatedDict):
+                    if maxRelatedSamp in relatedDict[samp]:
+                        relatedDict[samp].remove(maxRelatedSamp)
+                        if len(relatedDict[samp]) == 0:
+                            del relatedDict[samp]
+                del relatedDict[maxRelatedSamp]
+
+
+rule plink_remove_related:
+    input:
+        bed = 'subject_level/subjects.bed',
+        bim = 'subject_level/subjects.bim',
+        fam = 'subject_level/subjects.fam',
+        remove = 'remove_related/subjects_to_remove.txt'
+    params:
+        inProj = 'subject_level/subjects',
+        outProj = 'remove_related/subjects'
+    output:
+        'remove_related/subjects.bed',
+        'remove_related/subjects.bim',
+        'remove_related/subjects.fam'
+    shell:
+        'plink --bfile {params.inProj} --remove {input.remove} --memory 10000 --make-bed --out {params.outProj}'
+
+
+rule plink_ld_prune_unrelated:
+    input:
+        'remove_related/subjects.bed',
+        'remove_related/subjects.bim',
+        'remove_related/subjects.fam'
+    params:
+        inProj = 'remove_related/subjects',
+        outProj = 'remove_related/ldPruneList',
+        r2 = ld_prune_r2,
+        maf = maf_for_ibd
+    output:
+        'remove_related/ldPruneList.prune.in',
+        'remove_related/ldPruneList.prune.out'
+    shell:
+        'plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --memory 10000 --out {params.outProj}'
+
+
+rule extract_ld_prune_unrelated:
+    input:
+        bed = 'remove_related/subjects.bed',
+        bim = 'remove_related/subjects.bim',
+        fam = 'remove_related/subjects.fam',
+        prune = 'remove_related/ldPruneList.prune.in'
+    params:
+        inProj = 'remove_related/subjects',
+        outProj = 'remove_related/subjects_ld_prune'
+    output:
+        'remove_related/subjects_ld_prune.bed',
+        'remove_related/subjects_ld_prune.bim',
+        'remove_related/subjects_ld_prune.fam'
+    shell:
+        'plink --bfile {params.inProj} --extract {input.prune} --make-bed --memory 10000 --out {params.outProj}'
+
+
+rule plink_ibd_unrelated:
+    input:
+        'remove_related/subjects_ld_prune.bed',
+        'remove_related/subjects_ld_prune.bim',
+        'remove_related/subjects_ld_prune.fam'
+    params:
+        inProj = 'remove_related/subjects_ld_prune',
+        outProj = 'ibd/unrelated_subjects'
+    output:
+        'ibd/unrelated_subjects.genome'
+    threads: 20
+    shell:
+        'plink --bfile {params.inProj} --genome full --min 0.05 --memory 240000 --threads {threads} --out {params.outProj}'
+

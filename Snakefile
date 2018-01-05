@@ -45,6 +45,44 @@ adpc_file = config['adpc_file']
 
 
 
+def MakeSampToSubDict(sample_to_sub_file):
+    sampToSubDict = {}
+    with open(sample_to_sub_file) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            (sub, samp) = line.rstrip().split(',')
+            if samp != 'NA':
+                sampToSubDict[samp] = sub
+            line = f.readline()
+    return sampToSubDict
+
+def MakeRelatedDict(ibd_file, sample_to_sub_file, relatedThresh = float(config['pi_hat_threshold'])):
+    sampToSubDict = MakeSampToSubDict(sample_to_sub_file)
+    relatedDict = {}
+    with open(ibd_file) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            line_list = line.split()
+            samp1 = line_list[1]
+            samp2 = line_list[3]
+            piHat = float(line_list[9])
+            if sampToSubDict.get(samp1) and sampToSubDict.get(samp2) and piHat > relatedThresh:
+                sub1 = sampToSubDict[samp1]
+                sub2 = sampToSubDict[samp2]
+                if not relatedDict.get(sub1):
+                    relatedDict[sub1] = [sub2]
+                else:
+                    relatedDict[sub1].append(sub2)
+                if not relatedDict.get(sub2):
+                    relatedDict[sub2] = [sub1]
+                else:
+                    relatedDict[sub2].append(sub1)
+            line = f.readline()
+    return relatedDict
+
+
 def classify_ancestry(labels,x,threshold):
     '''
     This code is modified from GLU admix.py
@@ -434,5 +472,6 @@ rule all:
         'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
-        'subject_level/subjects_qc.imiss'
+        'subject_level/subjects_qc.imiss',
+        'ibd/unrelated_subjects.genome'
 
