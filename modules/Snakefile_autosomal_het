@@ -7,9 +7,9 @@ rule pop_autosomal_het:
         fam = 'split_by_pop/{pop}_subjects.fam'
     params:
         inProj = 'split_by_pop/{pop}_subjects',
-        outProj = 'autosomal_heterozygosity/{pop}_subjects'
+        outProj = 'autosomal_heterozygosity/{pop}_subjects_qc'
     output:
-        'autosomal_heterozygosity/{pop}_subjects.het'
+        'autosomal_heterozygosity/{pop}_subjects_qc.het'
     run:
         with open(input.fam) as f:
             line = f.readline()
@@ -19,4 +19,47 @@ rule pop_autosomal_het:
         else:
             shell('plink --bfile {params.inProj} --het --memory 10000 --out {params.outProj}')
 
+
+rule autosomal_het_fail_list:
+    input:
+        'autosomal_heterozygosity/{pop}_subjects.het'
+    output:
+        'autosomal_heterozygosity/{pop}_subjects_het_fail.txt'
+    run:
+        with open(input[0]) as f, open(output[0], 'w') as out:
+            head = f.readline()
+            if head == 'Too few subjects to process pop\n':
+                out.write('Too few subjects to process pop\n')
+            else:
+                line = f.readline()
+                while line != '':
+                    line_list = line.split()
+                    sub = line_list[1]
+                    F = float(line_list[-1])
+                    if abs(F) > float(config['autosomal_het_thresh']):
+                        out.write(sub + ' ' + sub + '\n')
+                    line = f.readline()
+
+rule plink_remove_het_fail:
+    input:
+        bed = 'split_by_pop/{pop}_subjects.bed',
+        bim = 'split_by_pop/{pop}_subjects.bim',
+        fam = 'split_by_pop/{pop}_subjects.fam',
+        remove = 'autosomal_heterozygosity/{pop}_subjects_het_fail.txt'
+    params:
+        inProj = 'split_by_pop/{pop}_subjects',
+        outProj = 'final_qc_subject_level/{pop}_subjects'
+    output:
+        'final_qc_subject_level/{pop}_subjects.bed',
+        'final_qc_subject_level/{pop}_subjects.bim',
+        'final_qc_subject_level/{pop}_subjects.fam'
+    run:
+        with open(input.remove) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            for x in output:
+                with open(x, 'w') as out:
+                    out.write('Too few subjects to process pop\n')
+        else:
+            shell('plink --bfile {params.inProj} --remove {input.remove} --memory 10000 --make-bed --out {params.outProj}')
 
