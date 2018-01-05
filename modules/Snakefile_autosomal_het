@@ -1,0 +1,22 @@
+#!/usr/bin/python
+
+rule pop_autosomal_het:
+    input:
+        bed = 'split_by_pop/{pop}_subjects.bed',
+        bim = 'split_by_pop/{pop}_subjects.bim',
+        fam = 'split_by_pop/{pop}_subjects.fam'
+    params:
+        inProj = 'split_by_pop/{pop}_subjects',
+        outProj = 'autosomal_heterozygosity/{pop}_subjects'
+    output:
+        'autosomal_heterozygosity/{pop}_subjects.het'
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            with open(output[0], 'w') as out:
+                out.write('Too few subjects to process pop\n')
+        else:
+            shell('plink --bfile {params.inProj} --het --memory 10000 --out {params.outProj}')
+
+

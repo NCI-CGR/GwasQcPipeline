@@ -1,0 +1,47 @@
+#!/usr/bin/python
+
+rule make_pop_list:
+    input:
+        snpweights = 'snpweights/samples.snpweights.csv',
+        samp_to_sub = 'subject_level/SampleUsedforSubject.csv'
+    output:
+        'split_by_pop/{pop}.keep.txt'
+    run:
+        sampToSubDict = MakeSampToSubDict(input.samp_to_sub)
+        with open(input.snpweights) as f, open(output[0], 'w') as out:
+            head = f.readline()
+            line = f.readline()
+            while line != '':
+                line_list = line.rstrip().split(',')
+                samp = line_list[0]
+                ancestry = line_list[-1]
+                if sampToSubDict.get(samp) and ancestry == wildcards.pop:
+                    sub = sampToSubDict[samp]
+                    output.write(sub + ' ' + sub + '\n')
+                line = f.readline()
+
+rule plink_subset_pop:
+    input:
+        bed = 'remove_related/subjects.bed',
+        bim = 'remove_related/subjects.bim',
+        fam = 'remove_related/subjects.fam',
+        keep = 'split_by_pop/{pop}.keep.txt'
+    params:
+        inProj = 'remove_related/subjects',
+        outProj = 'split_by_pop/{pop}_subjects'
+    output:
+        'split_by_pop/{pop}_subjects.bed',
+        'split_by_pop/{pop}_subjects.bim',
+        'split_by_pop/{pop}_subjects.fam'
+    run:
+        c = 0
+        with open(input.keep) as f:
+            for line in f:
+                c += 1
+        if c < int(config['minimum_pop_subjects']):
+            for x in output:
+                with open(x, 'w') as out:
+                    out.write('Too few subjects to process pop\n')
+        else:
+            shell('plink --bfile {params.inProj} --keep {input.keep} --memory 10000 --make-bed --out {params.outProj}')
+

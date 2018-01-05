@@ -45,6 +45,9 @@ adpc_file = config['adpc_file']
 
 
 
+POPS = ['ADMIXED_EUR', 'ADMIXED_ASN', 'ADMIXED_AFR', 'ASN_EUR', 'AFR_EUR', 'AFR_ASN', 'AFR_ASN_EUR', 'EUR', 'ASN', 'AFR']
+
+
 def MakeSampToSubDict(sample_to_sub_file):
     sampToSubDict = {}
     with open(sample_to_sub_file) as f:
