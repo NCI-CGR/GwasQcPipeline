@@ -1,0 +1,32 @@
+#!/usr/bin/python
+
+rule subject_ancestry_csv:
+    input:
+        ancestry = 'snpweights/samples.snpweights.csv',
+        track = 'subject_level/SampleUsedforSubject.csv',
+        subjects = 'final_qc_subject_level/{pop}_subjects.fam'
+    output:
+        'ancestry/subjects.snpweights.csv'
+    run:
+        sampToSubDict = MakeSampToSubDict(input.track)
+        subjectDict = {}
+        with open(input.subjects) as f:
+            for line in f:
+                sub = line.split()[1]
+                subjectDict[sub] = 1
+        with open(input.ancestry) as f, open(output[0], 'w') as out:
+            head = f.readline()
+            out.write(head)
+            line = f.readline()
+            while line != '':
+                line_list = line.rstrip().split(',')
+                samp = line_list[0]
+                if sampToSubDict.get(samp):
+                    sub = sampToSubDict[samp]
+                    if subjectDict.get(sub):
+                        line_list[0] = sub
+                        output.write(','.join(line_list) + '\n')
+                line = f.readline()
+
+rule ancestry_plot:
+    
