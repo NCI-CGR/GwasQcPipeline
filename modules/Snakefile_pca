@@ -78,14 +78,14 @@ rule pca_csv:
         'pca/{pop}_subjects.eigenvec.csv'
     run:
         with open(input[0]) as f, open(output[0], 'w') as out:
-            out.write('Subject_ID')
-            for i in range(1, 21):
-                out.write(',PC' + str(i))
-            out.write('\n')
             line = f.readline()
             if line == 'Too few subjects to process pop\n':
                 out.write('Too few subjects to process pop\n')
             else:
+                out.write('Subject_ID')
+                for i in range(1, 21):
+                    out.write(',PC' + str(i))
+                out.write('\n')
                 while line != '':
                     line_list = line.split()
                     samp = line_list[1]
