@@ -17,7 +17,7 @@ rule make_pop_list:
                 ancestry = line_list[-1]
                 if sampToSubDict.get(samp) and ancestry == wildcards.pop:
                     sub = sampToSubDict[samp]
-                    output.write(sub + ' ' + sub + '\n')
+                    out.write(sub + ' ' + sub + '\n')
                 line = f.readline()
 
 rule plink_subset_pop:
