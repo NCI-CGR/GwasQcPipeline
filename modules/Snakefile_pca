@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 
-rule plink_ld_prune_unrelated:
+rule plink_ld_prune_pca:
     input:
         bed = 'final_qc_subject_level/{pop}_subjects.bed',
         bim = 'final_qc_subject_level/{pop}_subjects.bim',
@@ -25,7 +25,7 @@ rule plink_ld_prune_unrelated:
             shell('plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --memory 10000 --out {params.outProj}')
 
 
-rule extract_ld_prune_unrelated:
+rule extract_ld_prune_pca:
     input:
         bed = 'final_qc_subject_level/{pop}_subjects.bed',
         bim = 'final_qc_subject_level/{pop}_subjects.bim',
