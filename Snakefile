@@ -458,6 +458,11 @@ include: 'modules/Snakefile_for_lab'
 include: 'modules/Snakefile_idat_intensity'
 include: 'modules/Snakefile_remove_qc_failures'
 include: 'modules/Snakefile_subject_level'
+include: 'modules/Snakefile_remove_related'
+include: 'modules/Snakefile_split_pop'
+include: 'modules/Snakefile_autosomal_het'
+include: 'modules/Snakefile_subject_ancestry'
+include: 'modules/Snakefile_pca'
 
 localrules: summary_stats
 
