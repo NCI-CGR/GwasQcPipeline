@@ -6,27 +6,52 @@ rule subject_ancestry_csv:
         track = 'subject_level/SampleUsedforSubject.csv',
         subjects = 'final_qc_subject_level/{pop}_subjects.fam'
     output:
+        'ancestry/{pop}_subjects.snpweights.csv'
+    run:
+        with open(input.subjects) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            with open(output[0], 'w') as out:
+                out.write('Too few subjects to process pop\n')
+        else:
+            sampToSubDict = MakeSampToSubDict(input.track)
+            subjectDict = {}
+            with open(input.subjects) as f:
+                for line in f:
+                    sub = line.split()[1]
+                    subjectDict[sub] = 1
+            with open(input.ancestry) as f, open(output[0], 'w') as out:
+                head = f.readline()
+                out.write(head)
+                line = f.readline()
+                while line != '':
+                    line_list = line.rstrip().split(',')
+                    samp = line_list[0]
+                    if sampToSubDict.get(samp):
+                        sub = sampToSubDict[samp]
+                        if subjectDict.get(sub):
+                            line_list[0] = sub
+                            output.write(','.join(line_list) + '\n')
+                    line = f.readline()
+
+
+rule combine_ancestry_csv:
+    input:
+        expand('ancestry/{pop}_subjects.snpweights.csv', pop = POPS)
+    output:
         'ancestry/subjects.snpweights.csv'
     run:
-        sampToSubDict = MakeSampToSubDict(input.track)
-        subjectDict = {}
-        with open(input.subjects) as f:
-            for line in f:
-                sub = line.split()[1]
-                subjectDict[sub] = 1
-        with open(input.ancestry) as f, open(output[0], 'w') as out:
-            head = f.readline()
-            out.write(head)
-            line = f.readline()
-            while line != '':
-                line_list = line.rstrip().split(',')
-                samp = line_list[0]
-                if sampToSubDict.get(samp):
-                    sub = sampToSubDict[samp]
-                    if subjectDict.get(sub):
-                        line_list[0] = sub
-                        output.write(','.join(line_list) + '\n')
-                line = f.readline()
+        with open(output[0], 'w') as out:
+            out.write('ID,Pop,SNPs,EV1,EV2,AFR,EUR,ASN,Ancestry\n')
+        for x in input:
+            with open(x) as f:
+                head = f.readline()
+                if head != 'Too few subjects to process pop\n':
+                    line = f.readline()
+                    while line != '':
+                        out.write(line)
+                        line = f.readline()
+
 
 rule ancestry_plot:
     input:
