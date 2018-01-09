@@ -58,7 +58,7 @@ rule plink_pca:
         fam = 'pca/{pop}_subjects_ld_prune.fam'
     params:
         inProj = 'pca/{pop}_subjects_ld_prune',
-        inProj = 'pca/{pop}_subjects'
+        outProj = 'pca/{pop}_subjects'
     output:
         'pca/{pop}_subjects.eigenvec'
     threads: 20
