@@ -22,7 +22,7 @@ rule pop_autosomal_het:
 
 rule autosomal_het_fail_list:
     input:
-        'autosomal_heterozygosity/{pop}_subjects.het'
+        'autosomal_heterozygosity/{pop}_subjects_qc.het'
     output:
         'autosomal_heterozygosity/{pop}_subjects_het_fail.txt'
     run:
