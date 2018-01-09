@@ -43,14 +43,14 @@ rule combine_ancestry_csv:
     run:
         with open(output[0], 'w') as out:
             out.write('ID,Pop,SNPs,EV1,EV2,AFR,EUR,ASN,Ancestry\n')
-        for x in input:
-            with open(x) as f:
-                head = f.readline()
-                if head != 'Too few subjects to process pop\n':
-                    line = f.readline()
-                    while line != '':
-                        out.write(line)
+            for x in input:
+                with open(x) as f:
+                    head = f.readline()
+                    if head != 'Too few subjects to process pop\n':
                         line = f.readline()
+                        while line != '':
+                            out.write(line)
+                            line = f.readline()
 
 
 rule ancestry_plot:
