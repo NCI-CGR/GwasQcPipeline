@@ -29,7 +29,7 @@ rule extract_ld_prune_unrelated:
     input:
         bed = 'final_qc_subject_level/{pop}_subjects.bed',
         bim = 'final_qc_subject_level/{pop}_subjects.bim',
-        fam = 'final_qc_subject_level/{pop}_subjects.fam'
+        fam = 'final_qc_subject_level/{pop}_subjects.fam',
         prune = 'pca/{pop}_ldPruneList.prune.in'
     params:
         inProj = 'final_qc_subject_level/{pop}_subjects',
