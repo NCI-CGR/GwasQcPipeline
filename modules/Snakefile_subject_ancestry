@@ -31,7 +31,7 @@ rule subject_ancestry_csv:
                         sub = sampToSubDict[samp]
                         if subjectDict.get(sub):
                             line_list[0] = sub
-                            output.write(','.join(line_list) + '\n')
+                            out.write(','.join(line_list) + '\n')
                     line = f.readline()
 
 
