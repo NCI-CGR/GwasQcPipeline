@@ -46,7 +46,7 @@ adpc_file = config['adpc_file']
 
 
 POPS = ['ADMIXED_EUR', 'ADMIXED_ASN', 'ADMIXED_AFR', 'ASN_EUR', 'AFR_EUR', 'AFR_ASN', 'AFR_ASN_EUR', 'EUR', 'ASN', 'AFR']
-
+PCs = ['PC1_PC2', 'PC2_PC3', 'PC3_PC4', 'PC4_PC5', 'PC5_PC6', 'PC6_PC7', 'PC7_PC8', 'PC8_PC9', 'PC9_PC10']
 
 def MakeSampToSubDict(sample_to_sub_file):
     sampToSubDict = {}
@@ -477,7 +477,5 @@ rule all:
         'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
         'subject_level/subjects_qc.imiss',
         'ibd/unrelated_subjects.genome',
-        'ancestry/subjects.ancestry.png'
-
-
-
+        'ancestry/subjects.ancestry.png',
+        expand('pca/{pop}_subjects.{pc}.png', pop = POPS, pc = PCs)

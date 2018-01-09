@@ -1,0 +1,112 @@
+#!/usr/bin/python
+
+
+rule plink_ld_prune_unrelated:
+    input:
+        bed = 'final_qc_subject_level/{pop}_subjects.bed',
+        bim = 'final_qc_subject_level/{pop}_subjects.bim',
+        fam = 'final_qc_subject_level/{pop}_subjects.fam'
+    params:
+        inProj = 'final_qc_subject_level/{pop}_subjects',
+        outProj = 'pca/{pop}_ldPruneList',
+        r2 = ld_prune_r2,
+        maf = maf_for_ibd
+    output:
+        'pca/{pop}_ldPruneList.prune.in',
+        'pca/{pop}_ldPruneList.prune.out'
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            for x in output:
+                with open(x, 'w') as out:
+                    out.write('Too few subjects to process pop\n')
+        else:
+            shell('plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --memory 10000 --out {params.outProj}')
+
+
+rule extract_ld_prune_unrelated:
+    input:
+        bed = 'final_qc_subject_level/{pop}_subjects.bed',
+        bim = 'final_qc_subject_level/{pop}_subjects.bim',
+        fam = 'final_qc_subject_level/{pop}_subjects.fam'
+        prune = 'pca/{pop}_ldPruneList.prune.in'
+    params:
+        inProj = 'final_qc_subject_level/{pop}_subjects',
+        outProj = 'pca/{pop}_subjects_ld_prune'
+    output:
+        'pca/{pop}_subjects_ld_prune.bed',
+        'pca/{pop}_subjects_ld_prune.bim',
+        'pca/{pop}_subjects_ld_prune.fam'
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            for x in output:
+                with open(x, 'w') as out:
+                    out.write('Too few subjects to process pop\n')
+        else:
+            shell('plink --bfile {params.inProj} --extract {input.prune} --make-bed --memory 10000 --out {params.outProj}')
+
+
+
+
+rule plink_pca:
+    input:
+        bed = 'pca/{pop}_subjects_ld_prune.bed',
+        bim = 'pca/{pop}_subjects_ld_prune.bim',
+        fam = 'pca/{pop}_subjects_ld_prune.fam'
+    params:
+        inProj = 'pca/{pop}_subjects_ld_prune',
+        inProj = 'pca/{pop}_subjects'
+    output:
+        'pca/{pop}_subjects.eigenvec'
+    threads: 20
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            with open(output[0], 'w') as out:
+                out.write('Too few subjects to process pop\n')
+        else:
+            shell('plink --bfile {params.inProj} --pca --memory 240000 --threads {threads} --out {params.outProj}')
+
+rule pca_csv:
+    input:
+        'pca/{pop}_subjects.eigenvec'
+    output:
+        'pca/{pop}_subjects.eigenvec.csv'
+    run:
+        with open(input[0]) as f, open(output[0], 'w') as out:
+            out.write('Subject_ID')
+            for i in range(1, 21):
+                out.write(',PC' + str(i))
+            out.write('\n')
+            for line in f:
+                line_list = line.split()
+                samp = line_list[1]
+                pcas = line_list[2:]
+                out.write(','.join([samp] + pcas) + '\n')
+
+rule plot_pca:
+    input:
+        'pca/{pop}_subjects.eigenvec.csv'
+    output:
+        png = 'pca/{pop}_subjects.{pc}.png',
+        R = 'pca/{pop}_subjects.{pc}.R',
+        Rout = 'pca/{pop}_subjects.{pc}.R.out'
+    run:
+        (pc1, pc2) = wildcards.pc.split('_')
+        rTxt = '''
+        require(plotrix)
+        data <- read.csv("''' + input[0] + '''")
+        png("''' + output.png + '''")
+        plot(data$''' + pc1 + ''', data$''' + pc2 + ''',
+        pch = 20, col = rgb(0, 0, 1, .3),
+        xlab = ''' + pc1 + ''', ylab = ''' + pc2 + ''',
+        main = "''' + wildcards.pop + ''' ''' + pc1 + ''' vs ''' + pc2 + '''")
+        dev.off()
+        '''
+        with open(output.R, 'w')  as R:
+            R.write(rTxt)
+        shell('R --vanilla < {output.R} > {output.Rout}')
