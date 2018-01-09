@@ -253,6 +253,7 @@ def main():
     qsubTxt += 'module load plink2/1.90b5\n'
     qsubTxt += 'module load python/2.7.5\n'
     qsubTxt += 'module load eigensoft/6.0.1\n'
+    qsubTxt += 'module load R/3.4.0\n'
     if args.unlock_snakemake:
         qsubTxt += 'snakemake --unlock\n'
     qsubTxt += 'snakemake --rerun-incomplete --cluster "qsub -V -q {cluster.q} -pe by_node {threads} '

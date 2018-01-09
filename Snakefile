@@ -476,5 +476,8 @@ rule all:
         'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
         'subject_level/subjects_qc.imiss',
-        'ibd/unrelated_subjects.genome'
+        'ibd/unrelated_subjects.genome',
+        'ancestry/subjects.ancestry.png'
+
+
 

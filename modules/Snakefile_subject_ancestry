@@ -29,4 +29,27 @@ rule subject_ancestry_csv:
                 line = f.readline()
 
 rule ancestry_plot:
-    
+    input:
+        'ancestry/subjects.snpweights.csv'
+    output:
+        png = 'ancestry/subjects.ancestry.png',
+        R = 'ancestry/subjects.ancestry.R',
+        Rout = 'ancestry/subjects.ancestry.R.out'
+    run:
+        rTxt = '''
+        require(plotrix)
+        data <- read.csv("''' + input[0] + '''")
+        data$total=data$EUR+data$AFR+data$ASN         # Need to account
+        data$European=data$EUR/data$total             # for slight rounding
+        data$African=data$AFR/data$total              # in the ancestry
+        data$Asian=data$ASN/data$total
+        data_p=data[c("European","Asian","African")]  # triax.plot to work
+        png("''' + output.png + '''")
+        triax.plot(data_p, pch=20, col.symbol=rgb(red=0, green=0, blue=1, alpha=.3), cc.axes=T, show.grid=T)
+        dev.off()
+        '''
+        with open(output.R, 'w')  as R:
+            R.write(rTxt)
+        shell('R --vanilla < {output.R} > {output.Rout}')
+
+
