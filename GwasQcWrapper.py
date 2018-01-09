@@ -77,7 +77,8 @@ def makeClusterConfig(outDir, queue):
 
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
                subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, 
-               contam_threshold, adpc_file, gtc_dir, remove_contam, remove_sex_discordant, remove_rep_discordant, remove_unexpected_rep, pi_hat_threshold, autosomal_het_thresh):
+               contam_threshold, adpc_file, gtc_dir, remove_contam, remove_sex_discordant, remove_rep_discordant, remove_unexpected_rep, pi_hat_threshold,
+               autosomal_het_thresh, minimum_pop_subjects):
     '''
     (str, str, str) -> None
     '''
@@ -112,6 +113,7 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
         output.write('remove_unexpected_rep: ' + remove_unexpected_rep + '\n')
         output.write('pi_hat_threshold: ' + str(pi_hat_threshold) + '\n')
         output.write('autosomal_het_thresh: ' + str(autosomal_het_thresh) + '\n')
+        output.write('minimum_pop_subjects: ' + str(minimum_pop_subjects) + '\n')
         output.write('start_time: ' + start + '\n')
 
 
@@ -157,6 +159,7 @@ def get_args():
     requiredWithDefaults.add_argument('--remove_rep_discordant', type=str, default='YES', help='REQUIRED. If "YES" known replicate discordant samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
     requiredWithDefaults.add_argument('--remove_unexpected_rep', type=str, default='YES', help='REQUIRED. If "YES" all unexpected replicate samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
     requiredWithDefaults.add_argument('--pi_hat_threshold', type=float, default= 0.20, help='REQUIRED. PI_HAT cutoff to call subjects related.  default= 0.20, to remove 2nd degree relatives or higher.')
+    requiredWithDefaults.add_argument('--minimum_pop_subjects', type=int, default= 100, help='REQUIRED. Number of subjects needed in order to analyze a population.  default= 100.')
     requiredWithDefaults.add_argument('--autosomal_het_thresh', type=float, default= 0.10, help='REQUIRED. F coefficient from autosomal heterozygosity check cutoff for subject removal.  default= 0.10')
     parser.add_argument('-u', '--unlock_snakemake', action='store_true', help='OPTIONAL. If pipeline was killed unexpectedly you may need this flag to rerun')
     parser.add_argument('-f', '--finish', action='store_true', help='OPTIONAL. Use with -d option to restart pipeline or update with new features without making new config file, etc.')
@@ -244,7 +247,7 @@ def main():
         numSamps = getNumSamps(args.sample_sheet)
         makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold,
-               args.adpc_file, args.gtc_dir, args.remove_contam, args.remove_sex_discordant, args.remove_rep_discordant, args.remove_unexpected_rep, args.pi_hat_threshold, args.autosomal_het_thresh)
+               args.adpc_file, args.gtc_dir, args.remove_contam, args.remove_sex_discordant, args.remove_rep_discordant, args.remove_unexpected_rep, args.pi_hat_threshold, args.autosomal_het_thresh, args.minimum_pop_subjects)
         makeClusterConfig(outDir, args.queue)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
