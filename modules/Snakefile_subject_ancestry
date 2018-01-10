@@ -41,15 +41,22 @@ rule combine_ancestry_csv:
     output:
         'ancestry/subjects.snpweights.csv'
     run:
+        SubjectToCaCoDict = makeSubjectToCaCoDict('IlluminaSampleSheet.csv')
         with open(output[0], 'w') as out:
-            out.write('ID,Pop,SNPs,EV1,EV2,AFR,EUR,ASN,Ancestry\n')
+            out.write('ID,CaCo,SNPs,EV1,EV2,AFR,EUR,ASN,Ancestry\n')
             for x in input:
                 with open(x) as f:
                     head = f.readline()
                     if head != 'Too few subjects to process pop\n':
                         line = f.readline()
                         while line != '':
-                            out.write(line)
+                            line_list = line.split(',')
+                            sub = line_list[0]
+                            CaCo = SubjectToCaCoDict[sub]
+                            if CaCo == 'NA':
+                                CaCo = '2'
+                            line_list[1] = CaCo
+                            out.write(','.join(line_list))
                             line = f.readline()
 
 
@@ -63,6 +70,7 @@ rule ancestry_plot:
     run:
         rTxt = '''
         require(plotrix)
+        colors <- c(rgb(0, 0, 1, .3), rgb(1, 0, 0, .3), rgb(0, 1, 0, .3))
         data <- read.csv("''' + input[0] + '''")
         data$total=data$EUR+data$AFR+data$ASN         # Need to account
         data$European=data$EUR/data$total             # for slight rounding
@@ -70,7 +78,8 @@ rule ancestry_plot:
         data$Asian=data$ASN/data$total
         data_p=data[c("European","Asian","African")]  # triax.plot to work
         png("''' + output.png + '''")
-        triax.plot(data_p, pch=20, col.symbol=rgb(red=0, green=0, blue=1, alpha=.3), cc.axes=T, show.grid=T)
+        triax.plot(data_p, pch=20, col.symbol = colors[data$CaCo + 1], cc.axes=T, show.grid=T)
+        legend("topleft", legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19)
         dev.off()
         '''
         with open(output.R, 'w')  as R:
