@@ -503,6 +503,7 @@ include: 'modules/Snakefile_split_pop'
 include: 'modules/Snakefile_autosomal_het'
 include: 'modules/Snakefile_subject_ancestry'
 include: 'modules/Snakefile_pca'
+include: 'modules/Snakefile_HWP'
 
 localrules: summary_stats
 
@@ -523,4 +524,5 @@ rule all:
         'subject_level/subjects_qc.imiss',
         'ibd/unrelated_subjects.genome',
         'ancestry/subjects.ancestry.png',
-        expand('pca/{pop}_subjects.{pc}.png', pop = POPS, pc = PCs)
+        expand('pca/{pop}_subjects.{pc}.png', pop = POPS, pc = PCs),
+        expand('HWP/{pop}_subjects_qc.hwe', pop = POPS)
