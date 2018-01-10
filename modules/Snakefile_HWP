@@ -1,0 +1,47 @@
+#!/usr/bin/python
+
+rule make_control_list:
+    input:
+        fam = 'final_qc_subject_level/{pop}_subjects.fam',
+        sampSheet = sample_sheet
+    output:
+        'HWP/{pop}_controls.txt'
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            with open(output[0], 'w') as out:
+                out.write('Too few subjects to process pop\n')
+        else:
+            SubjectToCaCoDict = makeSubjectToCaCoDict(input.sampSheet)
+            controls = []
+            with open(input.fam) as f:
+                for line in f:
+                    sub = line.split()[1]
+                    CaCo = SubjectToCaCoDict[sub]
+                    if CaCo == '0':
+                        controls.append(sub)
+
+
+rule subset_controls:
+    input:
+        bed = 'final_qc_subject_level/{pop}_subjects.bed',
+        bim = 'final_qc_subject_level/{pop}_subjects.bim',
+        fam = 'final_qc_subject_level/{pop}_subjects.fam'
+    params:
+        inProj = 'final_qc_subject_level/{pop}_subjects',
+        outProj = 'HWP/{pop}_subjects'
+    output:
+        'HWP/{pop}_subjects.bed',
+        'HWP/{pop}_subjects.bim',
+        'HWP/{pop}_subjects.fam'
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            for x in output:
+                with open(x, 'w') as out:
+                    out.write('Too few subjects to process pop\n')
+        else:
+            SubjectToCaCoDict = makeSubjectToCaCoDict(sample_sheet)
+            
