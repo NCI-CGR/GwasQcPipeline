@@ -21,13 +21,21 @@ rule make_control_list:
                     CaCo = SubjectToCaCoDict[sub]
                     if CaCo == '0':
                         controls.append(sub)
+            if len(controls) < config['control_hwp_thresh']:
+                shell('cp {input.fam} {output}')
+            else:
+                with open(output[0], 'w') as out:
+                    for c in controls:
+                        out.write(c + ' ' + c + '\n')
+                    
 
 
 rule subset_controls:
     input:
         bed = 'final_qc_subject_level/{pop}_subjects.bed',
         bim = 'final_qc_subject_level/{pop}_subjects.bim',
-        fam = 'final_qc_subject_level/{pop}_subjects.fam'
+        fam = 'final_qc_subject_level/{pop}_subjects.fam',
+        keep = 'HWP/{pop}_controls.txt'
     params:
         inProj = 'final_qc_subject_level/{pop}_subjects',
         outProj = 'HWP/{pop}_subjects'
@@ -36,12 +44,31 @@ rule subset_controls:
         'HWP/{pop}_subjects.bim',
         'HWP/{pop}_subjects.fam'
     run:
-        with open(input.fam) as f:
+        with open(input.keep) as f:
             line = f.readline()
         if line == 'Too few subjects to process pop\n':
             for x in output:
                 with open(x, 'w') as out:
                     out.write('Too few subjects to process pop\n')
         else:
-            SubjectToCaCoDict = makeSubjectToCaCoDict(sample_sheet)
-            
+            shell('plink --bfile {params.inProj} --keep {input.keep} --memory 10000 --make-bed --out {params.outProj}')
+
+rule control_HWP:
+    input:
+        bed = 'HWP/{pop}_subjects.bed',
+        bim = 'HWP/{pop}_subjects.bim',
+        fam = 'HWP/{pop}_subjects.fam'
+    params:
+        inProj = 'HWP/{pop}_subjects',
+        outProj = 'HWP/{pop}_subjects_qc'
+    output:
+        'HWP/{pop}_subjects_qc.hwe'
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            with open(output[0], 'w') as out:
+                out.write('Too few subjects to process pop\n')
+        else:
+            shell('plink --bfile {params.inProj} --autosome --hardy --memory 10000 --out {params.outProj}')
+
