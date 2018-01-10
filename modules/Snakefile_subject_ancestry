@@ -41,7 +41,7 @@ rule combine_ancestry_csv:
     output:
         'ancestry/subjects.snpweights.csv'
     run:
-        SubjectToCaCoDict = makeSubjectToCaCoDict('IlluminaSampleSheet.csv')
+        SubjectToCaCoDict = makeSubjectToCaCoDict(sample_sheet)
         with open(output[0], 'w') as out:
             out.write('ID,CaCo,SNPs,EV1,EV2,AFR,EUR,ASN,Ancestry\n')
             for x in input:

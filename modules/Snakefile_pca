@@ -77,7 +77,7 @@ rule pca_csv:
     output:
         'pca/{pop}_subjects.eigenvec.csv'
     run:
-        SubjectToCaCoDict = makeSubjectToCaCoDict('IlluminaSampleSheet.csv')
+        SubjectToCaCoDict = makeSubjectToCaCoDict(sample_sheet)
         with open(input[0]) as f, open(output[0], 'w') as out:
             line = f.readline()
             if line == 'Too few subjects to process pop\n':
