@@ -39,7 +39,7 @@ rule plot_completion:
         caseCR <- data$CR[data$CaCo == 1]
         contCR <- data$CR[data$CaCo == 0]
         otherCR <- data$CR[data$CaCo == 2]
-        sampQuant <- quantile(data$CR, c(.99, .95, .90, .50), na.rm = T))
+        sampQuant <- quantile(data$CR, c(.99, .95, .90, .50), na.rm = T)
         dataSnp <- read.table("''' + input.snp + '''", head = T)
         snpCR <- 1.0 - dataSnp$F_MISS[!is.na(dataSnp$F_MISS)]
         snpQuant <- quantile(snpCR, c(.99, .95, .90, .50), na.rm = T)
