@@ -1,17 +1,19 @@
+#!/usr/bin/python
+
 rule plink_sample_qc_stats:
     input:
-        'plink_start/samples.bed',
-        'plink_start/samples.bim',
-        'plink_start/samples.fam'
+        '{d}/samples.bed',
+        '{d}/samples.bim',
+        '{d}/samples.fam'
     params:
-        inProj = 'plink_start/samples',
-        outProj = 'sample_qc_stats/samples'
+        inProj = '{d}/samples',
+        outProj = '{d}/samples{filt}'
     output:
-        'sample_qc_stats/samples.imiss',
-        'sample_qc_stats/samples.lmiss',
-        'sample_qc_stats/samples.sexcheck',
-        'sample_qc_stats/samples.frq',
-        'sample_qc_stats/samples.hwe'
+        '{d}/samples{filt}.imiss',
+        '{d}/samples{filt}.lmiss',
+        '{d}/samples{filt}.sexcheck',
+        '{d}/samples{filt}.frq',
+        '{d}/samples{filt}.hwe'
     shell:
         'plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --memory 10000 --out {params.outProj}'
 
@@ -33,6 +35,8 @@ rule filter_call_rate_1:
     shell:
         'plink --bfile {params.inProj} --mind {params.mind} --geno {params.geno} --make-bed --memory 10000 --out {params.outProj}'
 
+'''
+
 rule qc_stats_after_filter_1:
     input:
         'plink_filter_call_rate_1/samples.bed',
@@ -50,7 +54,7 @@ rule qc_stats_after_filter_1:
     shell:
         'plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --memory 10000 --out {params.outProj}'
 
-
+'''
 
 
 rule filter_call_rate_2:
@@ -70,7 +74,7 @@ rule filter_call_rate_2:
     shell:
         'plink --bfile {params.inProj} --mind {params.mind} --geno {params.geno} --memory 10000 --make-bed --out {params.outProj}'
 
-
+'''
 
 rule qc_stats_after_filter_2:
     input:
@@ -88,3 +92,7 @@ rule qc_stats_after_filter_2:
         'plink_filter_call_rate_2/samples_filter2.hwe'
     shell:
         'plink --bfile {params.inProj} --freq --missing --hardy --het --check-sex --memory 10000 --out {params.outProj}'
+
+
+'''
+
