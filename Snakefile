@@ -76,7 +76,7 @@ def makeSampleToCaCoDict(SampleSheet):
                 CaCo = line_list[CaCoCol]
                 if not CaCo.strip():
                     CaCo = 'NA'
-                sampToCaCoDict[subId] = CaCo
+                sampToCaCoDict[samp] = CaCo
             line = f.readline()
     return sampToCaCoDict
 
