@@ -50,6 +50,39 @@ PCs = ['PC1_PC2', 'PC2_PC3', 'PC3_PC4', 'PC4_PC5', 'PC5_PC6', 'PC6_PC7', 'PC7_PC
 
 
 
+def makeSampleToCaCoDict(SampleSheet):
+    sampToCaCoDict = {}
+    with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
+        head = f.readline()
+        while 'SentrixBarcode_A' not in head and head != '':
+            head = f.readline()
+        if 'SentrixBarcode_A' not in head:
+            print('Sample sheet not formatted correctly')
+            sys.exit(1)
+        head_list = head.rstrip().split(',')
+        CaCoCol = None
+        for i in range(len(head_list)):
+            if head_list[i] == 'Case/Control_Status':
+                CaCoCol = i
+        if CaCoCol == None:
+            print('Case/Control_Status not found in sample sheet')
+            sys.exit(1)
+        line = f.readline()
+        while line != '':
+            if line.strip():
+                line_list = line.rstrip().split(',')
+                samp = line_list[0]
+                CaCo = line_list[CaCoCol]
+                if not CaCo.strip():
+                    CaCo = 'NA'
+                sampToCaCoDict[subId] = CaCo
+            line = f.readline()
+    return sampToCaCoDict
+
+
+
+
+
 def makeSubjectToCaCoDict(SampleSheet):
     subToCaCoDict = {}
     with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
