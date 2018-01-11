@@ -69,7 +69,7 @@ rule plink_pca:
             with open(output[0], 'w') as out:
                 out.write('Too few subjects to process pop\n')
         else:
-            shell('plink --bfile {params.inProj} --pca --memory 240000 --threads {threads} --out {params.outProj}')
+            shell('plink --bfile {params.inProj} --pca approx --memory 240000 --threads {threads} --out {params.outProj}')
 
 rule pca_csv:
     input:
