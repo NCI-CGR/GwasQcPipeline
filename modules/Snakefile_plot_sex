@@ -1,0 +1,22 @@
+#!/usr/bin/python
+
+rule plot_sex:
+    input:
+        'all_sample_qc.csv'
+    output:
+        pdf = 'sex_plot/sex.pdf',
+        R = 'sex_plot/sex.R',
+        Rout = 'sex_plot/sex.R'
+    run:
+        rTxt = '''
+        data <- read.csv("''' + input[0] + '''")
+        pdf("''' + output.pdf + '''")
+        boxplot(data$ChrX_Inbreed_estimate, data$Expected_Sex, names = c("F", "M"),
+        ylab = "ChrX Inbreed Coeff", main = "ChrX Inbreeding Coeff by Reported Sex")
+        abline(h = 0.5)
+        dev.off()
+        '''
+        with open(output.R, 'w')  as R:
+            R.write(rTxt)
+        shell('R --vanilla < {output.R} > {output.Rout}')
+

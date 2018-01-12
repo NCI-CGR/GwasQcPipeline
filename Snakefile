@@ -539,6 +539,7 @@ include: 'modules/Snakefile_subject_ancestry'
 include: 'modules/Snakefile_pca'
 include: 'modules/Snakefile_HWP'
 include: 'modules/Snakefile_plot_completion'
+include: 'modules/Snakefile_plot_sex'
 
 localrules: summary_stats
 
@@ -562,6 +563,5 @@ rule all:
         expand('pca/{pop}_subjects.{pc}.png', pop = POPS, pc = PCs),
         expand('HWP/{pop}_subjects_qc.hwe', pop = POPS),
         expand('{d}/samples{filt}.completion.pdf', zip, d = D, filt = FILT),
-        expand('autosomal_heterozygosity/{pop}_subjects_qc.het.pdf', pop = POPS)
-
-
+        expand('autosomal_heterozygosity/{pop}_subjects_qc.het.pdf', pop = POPS),
+        'sex_plot/sex.pdf'
