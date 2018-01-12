@@ -87,6 +87,7 @@ rule smartpca:
     output:
         par = 'pca/{pop}_subjects.smartpca.par',
         eigen = 'pca/{pop}_subjects.eigenvec'
+    threads: 20
     run:
         with open(input.ind) as f:
             line = f.readline()
