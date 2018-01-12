@@ -83,6 +83,8 @@ rule het_csv:
                     line_list = line.split()
                     sub = line_list[1]
                     CaCo = SubjectToCaCoDict[sub]
+                    if CaCo == 'NA':
+                        CaCo = '2'
                     out.write(','.join([sub, CaCo] + line_list[2:]) + '\n')
                     line = f.readline()
 
@@ -92,7 +94,9 @@ rule plot_het:
     params:
         thresh = config['autosomal_het_thresh']
     output:
-        pdf = 'autosomal_heterozygosity/{pop}_subjects_qc.het.pdf'
+        pdf = 'autosomal_heterozygosity/{pop}_subjects_qc.het.pdf',
+        R = 'autosomal_heterozygosity/{pop}_subjects_qc.het.R',
+        Rout = 'autosomal_heterozygosity/{pop}_subjects_qc.het.R.out'
     run:
         with open(input[0]) as f:
             line = f.readline()
@@ -108,7 +112,7 @@ rule plot_het:
             pdf("''' + output.pdf + '''")                                                                                                              
             par(mar = c(5, 4, 4, 8) + 0.1)
             plot(1:nrow(sortData), sortData$F,                                                                                                         
-            pch = 20, col = colors[data$CaCo + 1],                                                                                                     
+            pch = 20, col = colors[sortData$CaCo + 1],                                                                                                     
             xlab = "subjects sorted by F", ylab = "F",
             main = "Homozygosity F Coefficient")
             abline(h = ''' + str(params.thresh) + ''')
@@ -117,3 +121,6 @@ rule plot_het:
             par(mar = c(5, 4, 4, 2) + 0.1)                                                                                                              
             dev.off()                                                                                                                                   
             '''
+            with open(output.R, 'w')  as R:
+                R.write(rTxt)
+            shell('R --vanilla < {output.R} > {output.Rout}')
