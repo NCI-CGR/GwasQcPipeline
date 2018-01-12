@@ -6,7 +6,7 @@ rule plot_sex:
     output:
         pdf = 'sex_plot/sex.pdf',
         R = 'sex_plot/sex.R',
-        Rout = 'sex_plot/sex.R'
+        Rout = 'sex_plot/sex.R.out'
     run:
         rTxt = '''
         data <- read.csv("''' + input[0] + '''")
