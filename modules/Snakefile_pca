@@ -35,9 +35,8 @@ rule extract_ld_prune_pca:
         inProj = 'final_qc_subject_level/{pop}_subjects',
         outProj = 'pca/{pop}_subjects_ld_prune'
     output:
-        'pca/{pop}_subjects_ld_prune.bed',
-        'pca/{pop}_subjects_ld_prune.bim',
-        'pca/{pop}_subjects_ld_prune.fam'
+        'pca/{pop}_subjects_ld_prune.ped',
+        'pca/{pop}_subjects_ld_prune.map'
     run:
         with open(input.fam) as f:
             line = f.readline()
@@ -46,11 +45,68 @@ rule extract_ld_prune_pca:
                 with open(x, 'w') as out:
                     out.write('Too few subjects to process pop\n')
         else:
-            shell('plink --bfile {params.inProj} --extract {input.prune} --make-bed --memory 10000 --out {params.outProj}')
+            shell('plink --bfile {params.inProj} --extract {input.prune} --recode --memory 10000 --out {params.outProj}')
 
 
 
+rule convert_eigen_pca:
+    input:
+        ped = 'pca/{pop}_subjects_ld_prune.ped',
+        map = 'pca/{pop}_subjects_ld_prune.map'
+    output:
+        par = 'pca/{pop}_subjects.convertEigen.par',
+        gen = 'pca/{pop}_subjects.eigenstratgeno',
+        snp = 'pca/{pop}_subjects.snp',
+        ind = 'pca/{pop}_subjects.ind'
+    run:
+        with open(input.map) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            for x in output:
+                with open(x, 'w') as out:
+                    out.write('Too few subjects to process pop\n')
+        else:
+            parTxt = 'genotypename: ' + input.ped + '\n'
+            parTxt += 'snpname: ' + input.map + '\n'
+            parTxt += 'indivname: ' + input.ped + '\n'
+            parTxt += 'outputformat: EIGENSTRAT\n'
+            parTxt += 'genooutfilename: ' + output.gen + '\n'
+            parTxt += 'snpoutfilename: ' + output.snp + '\n'
+            parTxt += 'indoutfilename: ' + output.ind + '\n'
+            parTxt += 'familynames: NO\n'
+            with open(output.par, 'w') as out:
+                out.write(parTxt)
+            shell('convertf -p {output.par}')
 
+
+rule smartpca:
+    input:
+        gen = 'pca/{pop}_subjects.eigenstratgeno',
+        snp = 'pca/{pop}_subjects.snp',
+        ind = 'pca/{pop}_subjects.ind'
+    output:
+        par = 'pca/{pop}_subjects.smartpca.par',
+        eigen = 'pca/{pop}_subjects.eigenvec'
+    run:
+        with open(input.ind) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            for x in output:
+                with open(x, 'w') as out:
+                    out.write('Too few subjects to process pop\n')
+        else:
+            parTxt = 'genotypename: ' + input.gen + '\n'
+            parTxt += 'snpname: ' + input.snp + '\n'
+            parTxt += 'indivname: ' + input.ind + '\n'
+            parTxt += 'evecoutname: ' + output.eigen + '\n'
+            parTxt += 'fastmode: YES\n'
+            with open(output.par, 'w') as out:
+                out.write(parTxt)
+            shell('smartpca -p {output.par}')
+
+
+
+'''
 rule plink_pca:
     input:
         bed = 'pca/{pop}_subjects_ld_prune.bed',
@@ -70,6 +126,8 @@ rule plink_pca:
                 out.write('Too few subjects to process pop\n')
         else:
             shell('plink --bfile {params.inProj} --pca approx --memory 240000 --threads {threads} --out {params.outProj}')
+'''
+
 
 rule pca_csv:
     input:
@@ -84,16 +142,17 @@ rule pca_csv:
                 out.write('Too few subjects to process pop\n')
             else:
                 out.write('Subject_ID,CaCo')
-                for i in range(1, 21):
+                for i in range(1, 11):
                     out.write(',PC' + str(i))
                 out.write('\n')
+                line = f.readline()
                 while line != '':
                     line_list = line.split()
-                    sub = line_list[1]
+                    sub = line_list[0]
                     CaCo = SubjectToCaCoDict[sub]
                     if CaCo == 'NA':
                         CaCo = '2'
-                    pcas = line_list[2:]
+                    pcas = line_list[1:11]
                     out.write(','.join([sub, CaCo] + pcas) + '\n')
                     line = f.readline()
 
