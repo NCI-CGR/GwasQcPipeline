@@ -46,7 +46,7 @@ rule plot_completion:
         x <- 100.0 * a/length(a)
         a2 <- 0:(length(snpCR) - 1)
         x2 <- 100.0 * a2/length(a2)
-        png("''' + output.png + '''")
+        png("''' + output.png + '''", 6.5, 6.5, "in", res = 300)
         layout(cbind(1,2))
         par(mar= c(7,4,2,0), family = "mono")
         plot(x, sortData$CR * 100.0, xlab="Samples(%)", xlim = c(0, 100), ylim = c(''' + ylim1 + ''', ''' + ylim2 + '''), ylab="Completion Rate(%)", pch=20, col= colors[sortData$CaCo + 1], cex = 0.4)
