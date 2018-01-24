@@ -49,17 +49,18 @@ rule plot_completion:
         png("''' + output.png + '''")
         layout(cbind(1,2))
         par(mar= c(7,4,2,0), family = "mono")
-        plot(x, sortData$CR * 100.0, xlab="Samples(%)", xlim = c(0, 100), ylim = c(''' + ylim1 + ''', ''' + ylim2 + '''), ylab="Completion Rate(%)", pch=20, col= colors[sortData$CaCo + 1], cex = 0.6)
+        plot(x, sortData$CR * 100.0, xlab="Samples(%)", xlim = c(0, 100), ylim = c(''' + ylim1 + ''', ''' + ylim2 + '''), ylab="Completion Rate(%)", pch=20, col= colors[sortData$CaCo + 1], cex = 0.4)
         abline(h=''' + params.cut1  + ''')
         abline(h=''' + params.cut2  + ''') 
         title(main= "Sample Completion",sub= "", cex=0.6)
         legend("bottom", legend = c("Cases", "Controls", "QC/Unknown"), col = c("red", "blue", "green"), pch = 19, cex=0.7, bty="n")
 
         par(mar= c(7,1,2,3))
-        plot(x2, 100 * sort(snpCR), xlim= c(0, 100), ylim= c(''' + ylim1 + ''', ''' + ylim2 + '''), xlab= "Loci(%)", ylab="", type="l", axes=F)
+        plot(x2, 100 * sort(snpCR), xlim= c(0, 100), ylim= c(''' + ylim1 + ''', ''' + ylim2 + '''), xlab= "Loci(%)", ylab="", col = rgb(0.5, 0.5, 0.5, 0.2), pch = 20, cex = 0.3, axes=F)
         axis(side=1, at= c(0,20,40,60,80,100), labels= c(0,20,40,60,80,100))
-        abline(h=''' + params.cut1  + ''')                                                                                                                                                                                                      
+        abline(h=''' + params.cut1  + ''')                            
         abline(h=''' + params.cut2  + ''')
+        title(main= "Locus Completion",sub= "", cex=0.6)
         dev.off()
         '''
         with open(output.R, 'w')  as R:
