@@ -1,18 +1,55 @@
 #!/usr/bin/python
 
+
+rule subset_qc_subject:
+    input:
+        fam = 'subject_level/samples.fam',
+        qc = 'all_sample_qc.csv',
+        sampSheet = sample_sheet
+    output:
+        'sex_plot/subject_qc.csv'
+    run:
+        sampToCaCoDict = makeSampleToCaCoDict(input.sampSheet)
+        sampDict = {}
+        with open(input.fam) as f:
+            for line in f:
+                samp = line.split()[1]
+                sampDict[samp] = 1
+        with open(input.qc) as f, open(output[0], 'w') as out:
+            head = f.readline()
+            out.write(head.rstrip() + ',CaCo\n')
+            line = f.readline()
+            while line != '':
+                samp = line.split(',')[0]
+                CaCo = sampToCaCoDict[samp]
+                if CaCo == 'NA':
+                    CaCo = '2'
+                if sampDict.get(samp):
+                    out.write(line.rstrip() + CaCo + '\n')
+                line = f.readline()
+
+
+
 rule plot_sex:
     input:
-        'all_sample_qc.csv'
+        'sex_plot/subject_qc.csv'
     output:
-        pdf = 'sex_plot/sex.pdf',
+        png = 'sex_plot/sex.png',
         R = 'sex_plot/sex.R',
         Rout = 'sex_plot/sex.R.out'
     run:
         rTxt = '''
+        colors <- c(rgb(0, 0, 1, .3), rgb(1, 0, 0, .3), rgb(0, 1, 0, .3))
         data <- read.csv("''' + input[0] + '''")
-        pdf("''' + output.pdf + '''")
-        boxplot(data$ChrX_Inbreed_estimate, data$Expected_Sex, names = c("F", "M"),
-        ylab = "ChrX Inbreed Coeff", main = "ChrX Inbreeding Coeff by Reported Sex", xlab = "Reported Sex")
+        femData <- subset(data, Expected_Sex == "F")
+        maleData <- subset(data, Expected_Sex == "M")
+        fem_X <- runif(nrow(femData), .8, 1.2)
+        male_X <- runif(nrow(maleData), 1.8, 2.2)
+        png("''' + output.png + '''")
+        boxplot(femData$ChrX_Inbreed_estimate, maleData$ChrX_Inbreed_estimate, names = c("F", "M"),
+        ylab = "ChrX Inbreed Coeff", main = "ChrX Inbreeding Coeff by Reported Sex", xlab = "Reported Sex", outline=FALSE)
+        points(fem_X, femData$ChrX_Inbreed_estimate, col = colors[data$CaCo + 1], pch = 20, cex = 0.3)
+        points(male_X, maleData$ChrX_Inbreed_estimate, col = colors[data$CaCo + 1], pch = 20, cex = 0.3)
         abline(h = 0.5)
         dev.off()
         '''
