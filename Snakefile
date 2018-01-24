@@ -564,6 +564,6 @@ rule all:
         'ancestry/subjects.ancestry.png',
         expand('pca/{pop}_subjects.{pc}.png', pop = POPS, pc = PCs),
         expand('HWP/{pop}_subjects_qc.hwe', pop = POPS),
-        expand('{d}/samples{filt}.completion.pdf', zip, d = D, filt = FILT),
+        expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT),
         expand('autosomal_heterozygosity/{pop}_subjects_qc.het.pdf', pop = POPS),
-        'sex_plot/sex.pdf'
+        'sex_plot/sex.png'

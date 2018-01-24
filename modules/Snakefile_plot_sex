@@ -25,7 +25,7 @@ rule subset_qc_subject:
                 if CaCo == 'NA':
                     CaCo = '2'
                 if sampDict.get(samp):
-                    out.write(line.rstrip() + CaCo + '\n')
+                    out.write(line.rstrip() + ',' + CaCo + '\n')
                 line = f.readline()
 
 
