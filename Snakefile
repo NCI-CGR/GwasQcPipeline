@@ -51,6 +51,8 @@ PCs = ['PC1_PC2', 'PC2_PC3', 'PC3_PC4', 'PC4_PC5', 'PC5_PC6', 'PC6_PC7', 'PC7_PC
 D = ['plink_start', 'plink_filter_call_rate_1', 'plink_filter_call_rate_2']
 FILT = ['_start', '_filter1', '_filter2']
 
+ylimDict = {'_start':('0', '100'), '_filter1':(str(samp_cr_1 * 100), '100'), '_filter2':(str(samp_cr_2 * 100), '100')}
+
 def makeSampleToCaCoDict(SampleSheet):
     sampToCaCoDict = {}
     with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
