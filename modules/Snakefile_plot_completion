@@ -31,8 +31,8 @@ rule plot_completion:
         R = '{d}/samples{filt}.completion.R',
         Rout = '{d}/samples{filt}.completion.R.out'
     params:
-        cut1 = samp_cr_1,
-        cut2 = samp_cr_2
+        cut1 = str(samp_cr_1),
+        cut2 = str(samp_cr_2)
     run:
         (ylim1, ylim2) = ylimDict[wildcards.filt]
         rTxt = '''
