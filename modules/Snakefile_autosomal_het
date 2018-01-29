@@ -22,6 +22,50 @@ rule pop_autosomal_het:
 
 rule autosomal_het_fail_list:
     input:
+        expand('autosomal_heterozygosity/{pop}_subjects_qc.het', pop = POPS)
+    output:
+        'autosomal_heterozygosity/subjects_het_fail.txt'
+    run:
+        with open(output[0], 'w') as out:
+            for i in input:
+                with open(i) as f:
+                    head = f.readline()
+                    if head != 'Too few subjects to process pop\n':
+                        line = f.readline()
+                        while line != '':
+                            line_list = line.split()
+                            sub = line_list[1]
+                            F = float(line_list[-1])
+                            if abs(F) > float(config['autosomal_het_thresh']):
+                                out.write(sub + ' ' + sub + '\n')
+                            line = f.readline()
+
+
+
+
+
+
+rule plink_remove_het_fail:
+    input:
+        bed = 'remove_related/subjects.bed',
+        bim = 'remove_related/subjects.bim',
+        fam = 'remove_related/subjects.fam',
+        remove = 'autosomal_heterozygosity/subjects_het_fail.txt'
+    params:
+        inProj = 'remove_related/subjects',
+        outProj = 'final_qc_subject_level/subjects'
+    output:
+        'final_qc_subject_level/subjects.bed',
+        'final_qc_subject_level/subjects.bim',
+        'final_qc_subject_level/subjects.fam'
+    shell:
+        'plink --bfile {params.inProj} --remove {input.remove} --memory 10000 --make-bed --out {params.outProj}'
+
+
+
+
+rule autosomal_het_fail_list_pop:
+    input:
         'autosomal_heterozygosity/{pop}_subjects_qc.het'
     output:
         'autosomal_heterozygosity/{pop}_subjects_het_fail.txt'
@@ -40,7 +84,7 @@ rule autosomal_het_fail_list:
                         out.write(sub + ' ' + sub + '\n')
                     line = f.readline()
 
-rule plink_remove_het_fail:
+rule plink_remove_het_fail_pop:
     input:
         bed = 'split_by_pop/{pop}_subjects.bed',
         bim = 'split_by_pop/{pop}_subjects.bim',
@@ -62,6 +106,10 @@ rule plink_remove_het_fail:
                     out.write('Too few subjects to process pop\n')
         else:
             shell('plink --bfile {params.inProj} --remove {input.remove} --memory 10000 --make-bed --out {params.outProj}')
+
+
+
+
 
 rule het_csv:
     input:

@@ -40,7 +40,7 @@ rule make_pop_list:
                 if sampToSubDict.get(samp):
                     sub = sampToSubDict[samp]
                     if subDict.get(sub):
-                        sub = line_list[0]
+                        line_list[0] = sub
                         CaCo = SubjectToCaCoDict[sub]
                         if CaCo == 'NA':
                             CaCo = '2'

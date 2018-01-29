@@ -573,4 +573,5 @@ rule all:
         expand('HWP/{pop}_subjects_qc.hwe', pop = POPS),
         expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT),
         expand('autosomal_heterozygosity/{pop}_subjects_qc.het.png', pop = POPS),
-        'sex_plot/sex.png'
+        'sex_plot/sex.png',
+        'final_qc_subject_level/subjects.bed'
