@@ -542,6 +542,7 @@ include: 'modules/Snakefile_pca'
 include: 'modules/Snakefile_HWP'
 include: 'modules/Snakefile_plot_completion'
 include: 'modules/Snakefile_plot_sex'
+include: 'modules/Snakefile_subject_qc_fail'
 
 localrules: summary_stats
 

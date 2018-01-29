@@ -1,0 +1,78 @@
+#!/usr/bin/python
+
+rule make_discordant_lists:
+    input:
+        sex = 'remove_qc_fail/SexDiscordant.txt',
+        unexpectRep = 'remove_qc_fail/UnexpectedReplicate.txt',
+        samp_to_sub = 'subject_level/SampleUsedforSubject.csv',
+        fam = 'subject_level/samples.fam'
+    output:
+        sex = 'subject_qc_removal/sex_discordant.txt',
+        unexpectRep = 'subject_qc_removal/unexpected_replicate.txt'
+    params:
+        sex = config['remove_sex_discordant'],
+        unexpectRep = config['remove_unexpected_rep']
+    run:
+        sampToSubDict = MakeSampToSubDict(input.samp_to_sub)
+        sampDict = {}
+        with open(input.fam) as f:
+            for line in f:
+                samp = line.split()[1]
+                sampDict[samp] = 1
+        sexRemDict = {}
+        with open(output.sex, 'w') as out:
+            if params.sex == 'YES':
+                with open(input.sex) as f:
+                    for line in f:
+                        samp = line.split()[1]
+                        if sampDict.get(samp):
+                            sub = sampToSubDict[samp]
+                            sexRemDict[sub] = 1
+                            out.write(sub + ' ' + sub + '\n')
+
+        with open(output.unexpectRep, 'w') as out:
+            if params.unexpectRep == 'YES':
+                with open(input.unexpectRep) as f:
+                    for line in f:
+                        samp = line.split()[1]
+                        if sampDict.get(samp):
+                            sub = sampToSubDict[samp]
+                            if not sexRemDict.get(sub):
+                                out.write(sub + ' ' + sub + '\n')
+
+
+                    
+rule combine_sub_qc:
+    input:
+        'subject_qc_removal/sex_discordant.txt',
+        'subject_qc_removal/unexpected_replicate.txt'
+    output:
+        'subject_qc_removal/subjectsToRemove.txt'
+    run:
+        with open(output[0], 'w') as out:
+            for i in input:
+                with open(i) as f:
+                    for line in f:
+                        out.write(line)
+
+
+
+rule remove_sub_qc:
+    input:
+        bed = 'subject_level/subjects.bed',
+        bim = 'subject_level/subjects.bim',
+        fam = 'subject_level/subjects.fam',
+        remove = 'subject_qc_removal/subjectsToRemove.txt'
+    params:
+        inProj = 'subject_level/subjects',
+        outProj = 'subject_qc_removal/subjects'
+    output:
+        'subject_qc_removal/subjects.bed',
+        'subject_qc_removal/subjects.bim',
+        'subject_qc_removal/subjects.fam'
+    shell:
+        'plink --bfile {params.inProj} --remove {input.remove} --memory 10000 --make-bed --out {params.outProj}'
+
+
+    
+
