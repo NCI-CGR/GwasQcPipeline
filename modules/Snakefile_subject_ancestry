@@ -77,7 +77,7 @@ rule ancestry_plot:
         data$African=data$AFR/data$total              # in the ancestry
         data$Asian=data$ASN/data$total
         data_p=data[c("European","Asian","African")]  # triax.plot to work
-        png("''' + output.png + '''")
+        png("''' + output.png + '''", 6.5, 6.5, "in", res = 300)
         triax.plot(data_p, pch=20, col.symbol = colors[data$CaCo + 1], cc.axes=T, show.grid=T)
         legend("topleft", legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19)
         dev.off()
