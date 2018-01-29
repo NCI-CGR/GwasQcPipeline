@@ -136,8 +136,13 @@ def MakeSampToSubDict(sample_to_sub_file):
             line = f.readline()
     return sampToSubDict
 
-def MakeRelatedDict(ibd_file, sample_to_sub_file, relatedThresh = float(config['pi_hat_threshold'])):
+def MakeRelatedDict(ibd_file, sample_to_sub_file, sub_fam_file, relatedThresh = float(config['pi_hat_threshold'])):
     sampToSubDict = MakeSampToSubDict(sample_to_sub_file)
+    subToKeepDict = {}
+    with open(sub_fam_file) as f:
+        for line in f:
+            sub = line.split()[1]
+            subToKeepDict[sub] = 1
     relatedDict = {}
     with open(ibd_file) as f:
         head = f.readline()
@@ -150,14 +155,15 @@ def MakeRelatedDict(ibd_file, sample_to_sub_file, relatedThresh = float(config['
             if sampToSubDict.get(samp1) and sampToSubDict.get(samp2) and piHat > relatedThresh:
                 sub1 = sampToSubDict[samp1]
                 sub2 = sampToSubDict[samp2]
-                if not relatedDict.get(sub1):
-                    relatedDict[sub1] = [sub2]
-                else:
-                    relatedDict[sub1].append(sub2)
-                if not relatedDict.get(sub2):
-                    relatedDict[sub2] = [sub1]
-                else:
-                    relatedDict[sub2].append(sub1)
+                if subToKeepDict.get(sub1) and subToKeepDict.get(sub2):
+                    if not relatedDict.get(sub1):
+                        relatedDict[sub1] = [sub2]
+                    else:
+                        relatedDict[sub1].append(sub2)
+                    if not relatedDict.get(sub2):
+                        relatedDict[sub2] = [sub1]
+                    else:
+                        relatedDict[sub2].append(sub1)
             line = f.readline()
     return relatedDict
 

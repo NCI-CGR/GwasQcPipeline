@@ -3,11 +3,12 @@
 rule make_related_list:
     input:
         track = 'subject_level/SampleUsedforSubject.csv',
-        ibd = 'ibd/samples.genome'
+        ibd = 'ibd/samples.genome',
+        fam = 'subject_qc_removal/subjects.fam'
     output:
         'remove_related/subjects_to_remove.txt'
     run:
-        relatedDict = MakeRelatedDict(input.ibd, input.track)
+        relatedDict = MakeRelatedDict(input.ibd, input.track, input.fam)
         with open(output[0], 'w') as out:
             while len(relatedDict.keys()) > 0:
                 maxLenList = 0
@@ -27,12 +28,12 @@ rule make_related_list:
 
 rule plink_remove_related:
     input:
-        bed = 'subject_level/subjects.bed',
-        bim = 'subject_level/subjects.bim',
-        fam = 'subject_level/subjects.fam',
+        bed = 'subject_qc_removal/subjects.bed',
+        bim = 'subject_qc_removal/subjects.bim',
+        fam = 'subject_qc_removal/subjects.fam',
         remove = 'remove_related/subjects_to_remove.txt'
     params:
-        inProj = 'subject_level/subjects',
+        inProj = 'subject_qc_removal/subjects',
         outProj = 'remove_related/subjects'
     output:
         'remove_related/subjects.bed',
