@@ -34,34 +34,24 @@ rule qc_fail_samp_list:
 rule combine_fail_lists:
     input:
         contam = 'remove_qc_fail/contaminated.txt',
-        sex = 'remove_qc_fail/SexDiscordant.txt',
-        repDisc = 'remove_qc_fail/ExpectedRepDiscordant.txt',
-        unexpectRep = 'remove_qc_fail/UnexpectedReplicate.txt'
+        fam = 'plink_filter_call_rate_2/samples.fam'
     params:
         contam = config['remove_contam'],
-        sex = config['remove_sex_discordant'],
-        repDisc = config['remove_rep_discordant'],
-        unexpectRep = config['remove_unexpected_rep']
     output:
         'remove_qc_fail/sampleFailures.txt'
     run:
+        sampDict = {}
+        with open(input.fam) as f:
+            for line in f:
+                samp = line.split()[1]
+                sampDict[samp] = 1
         with open(output[0], 'w') as out:
             if params.contam == 'YES':
                 with open(input.contam) as f:
                     for line in f:
-                        out.write(line)
-            if params.sex == 'YES':
-                with open(input.sex) as f:
-                    for line in f:
-                        out.write(line)
-            if params.repDisc == 'YES':
-                with open(input.repDisc) as f:
-                    for line in f:
-                        out.write(line)
-            if params.unexpectRep == 'YES':
-                with open(input.repDisc) as f:
-                    for line in f:
-                        out.write(line)
+                        samp = line.split()[1]
+                        if sampDict.get(samp):
+                            out.write(line)
 
 
 rule remove_failures:
