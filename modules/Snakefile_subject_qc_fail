@@ -1,17 +1,14 @@
 #!/usr/bin/python
 
-rule make_discordant_lists:
+rule sex_discordant_list:
     input:
         sex = 'remove_qc_fail/SexDiscordant.txt',
-        unexpectRep = 'remove_qc_fail/UnexpectedReplicate.txt',
         samp_to_sub = 'subject_level/SampleUsedforSubject.csv',
         fam = 'subject_level/samples.fam'
     output:
-        sex = 'subject_qc_removal/sex_discordant.txt',
-        unexpectRep = 'subject_qc_removal/unexpected_replicate.txt'
+        sex = 'subject_qc_removal/sex_discordant.txt'
     params:
-        sex = config['remove_sex_discordant'],
-        unexpectRep = config['remove_unexpected_rep']
+        sex = config['remove_sex_discordant']
     run:
         sampToSubDict = MakeSampToSubDict(input.samp_to_sub)
         sampDict = {}
