@@ -1,0 +1,14 @@
+#!/usr/bin/python
+
+rule count_exclusions:
+    input:
+        samp_sheet = sample_sheet,
+        start_fam = 'plink_start/samples.fam',
+        filt1_fam = 'plink_filter_call_rate_1/samples.fam',
+        filt2_fam = 'plink_filter_call_rate_2/samples.fam',
+        all_contam = 'remove_qc_fail/contaminated.txt',
+        contam_removed = 'remove_qc_fail/sampleFailures.txt',
+        internal_qc_removed = 'subject_level/internalControls.txt',
+        exp_dup_removed = 'subject_level/expectedDupToRemove.txt',
+        start_subject_fam = 'subject_level/subjects.fam',
+        

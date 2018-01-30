@@ -30,16 +30,44 @@ rule make_discordant_lists:
                             sexRemDict[sub] = 1
                             out.write(sub + ' ' + sub + '\n')
 
-        with open(output.unexpectRep, 'w') as out:
-            if params.unexpectRep == 'YES':
-                with open(input.unexpectRep) as f:
-                    for line in f:
-                        samp = line.split()[1]
-                        if sampDict.get(samp):
-                            sub = sampToSubDict[samp]
-                            if not sexRemDict.get(sub):
-                                out.write(sub + ' ' + sub + '\n')
 
+
+rule unexp_rep_list:
+    input:
+        sex = 'subject_qc_removal/sex_discordant.txt',
+        fam = 'subject_level/subjects.fam',
+        rep = 'concordance/UnknownReplicates.csv'
+    output:
+        'subject_qc_removal/unexpected_replicate.txt'
+    params:
+        unexpectRep = config['remove_unexpected_rep']
+    run:
+        subDict = {}
+        with open(input.fam) as f:
+            for line in f:
+                sub = line.split()[1]
+                subDict[sub] = 1
+        sexRemDict = {}
+        with open(input.sex) as f:
+            for line in f:
+                sub = line.split()[1]
+                sexRemDict[sub] = 1
+        repToRemDict = {}
+        if params.unexpectRep == 'YES':
+            with open(input.rep) as f:
+                head = f.readline()
+                line = f.readline()
+                while line != '':
+                    line_list = line.rstrip().split(',')
+                    sub1 = line_list[0]
+                    sub2 = line_list[0]
+                    if subDict.get(sub1) and subDict.get(sub2) and not sexRemDict.get(sub1) and not sexRemDict.get(sub2):
+                        repToRemDict[sub1] = 1
+                        repToRemDict[sub2] = 1
+                    line = f.readline()
+        with open(output.unexpectRep, 'w') as out:
+            for sub in repToRemDict.keys():
+                out.write(sub + ' ' + sub + '\n')
 
                     
 rule combine_sub_qc:

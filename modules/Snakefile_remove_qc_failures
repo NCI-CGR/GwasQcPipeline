@@ -8,10 +8,9 @@ rule qc_fail_samp_list:
         lowCR = 'remove_qc_fail/LowCR.txt',
         contam = 'remove_qc_fail/contaminated.txt',
         sex = 'remove_qc_fail/SexDiscordant.txt',
-        repDisc = 'remove_qc_fail/ExpectedRepDiscordant.txt',
-        unexpectRep = 'remove_qc_fail/UnexpectedReplicate.txt'
+        repDisc = 'remove_qc_fail/ExpectedRepDiscordant.txt'
     run:
-        with open(input[0]) as f, open(output.lowCR, 'w') as lowCrOut, open(output.contam, 'w') as contamOut, open(output.sex, 'w') as sexOut, open(output.repDisc, 'w') as repDiscOut, open(output.unexpectRep, 'w') as unexpectRepOut:
+        with open(input[0]) as f, open(output.lowCR, 'w') as lowCrOut, open(output.contam, 'w') as contamOut, open(output.sex, 'w') as sexOut, open(output.repDisc, 'w') as repDiscOut:
             head = f.readline()
             line = f.readline()
             while line != '':
@@ -26,8 +25,6 @@ rule qc_fail_samp_list:
                     sexOut.write(samp + ' ' + samp + '\n')
                 if repDisc == 'TRUE':
                     repDiscOut.write(samp + ' ' + samp + '\n')
-                if unexpectRep == 'TRUE':
-                    unexpectRepOut.write(samp + ' ' + samp + '\n')
                 line = f.readline()
 
 
