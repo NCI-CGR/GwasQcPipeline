@@ -57,12 +57,12 @@ rule unexp_rep_list:
                 while line != '':
                     line_list = line.rstrip().split(',')
                     sub1 = line_list[0]
-                    sub2 = line_list[0]
+                    sub2 = line_list[1]
                     if subDict.get(sub1) and subDict.get(sub2) and not sexRemDict.get(sub1) and not sexRemDict.get(sub2):
                         repToRemDict[sub1] = 1
                         repToRemDict[sub2] = 1
                     line = f.readline()
-        with open(output.unexpectRep, 'w') as out:
+        with open(output[0], 'w') as out:
             for sub in repToRemDict.keys():
                 out.write(sub + ' ' + sub + '\n')
 

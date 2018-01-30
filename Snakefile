@@ -53,6 +53,35 @@ FILT = ['_start', '_filter1', '_filter2']
 
 ylimDict = {'_start':('0', '100'), '_filter1':(str(samp_cr_1 * 100), '100'), '_filter2':(str(samp_cr_2 * 100), '100')}
 
+
+def DictDiff(dict1, dict2):
+    diffDict = {}
+    for key in dict1.keys():
+        if not dict2.get(key):
+            diffDict[key] = 1
+    return diffDict
+
+
+def makeSampDict(fam_file):
+    sampDict = {}
+    with open(fam_file) as f:
+        for line in f:
+            samp = line.split()[1]
+            sampDict[samp] = 1
+    return sampDict
+
+
+def getCountsByCaCo(sampList, CaCoDict):
+    countList = [0, 0, 0, 0]
+    for s in sampList:
+        CaCo = int(CaCoDict[s])
+        countList[CaCo] += 1
+    tot = sum(countList)
+    (controls, cases, qc, other) = countList
+    return [str(controls), str(cases), str(qc), str(other), str(tot)]
+
+
+
 def makeSampleToCaCoDict(SampleSheet):
     sampToCaCoDict = {}
     with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
@@ -64,11 +93,18 @@ def makeSampleToCaCoDict(SampleSheet):
             sys.exit(1)
         head_list = head.rstrip().split(',')
         CaCoCol = None
+        sampGroupCol = None
         for i in range(len(head_list)):
             if head_list[i] == 'Case/Control_Status':
                 CaCoCol = i
+        for i in range(len(head_list)):
+            if head_list[i] == 'Sample_Group':
+                sampGroupCol = i
         if CaCoCol == None:
             print('Case/Control_Status not found in sample sheet')
+            sys.exit(1)
+        if sampGroupCol == None:
+            print('Sample_Group not found in sample sheet')
             sys.exit(1)
         line = f.readline()
         while line != '':
@@ -76,8 +112,20 @@ def makeSampleToCaCoDict(SampleSheet):
                 line_list = line.rstrip().split(',')
                 samp = line_list[0]
                 CaCo = line_list[CaCoCol]
+                sampGroup = line_list[sampGroupCol]
                 if not CaCo.strip():
-                    CaCo = 'NA'
+                    if sampGroup == 'sVALD-001':
+                        CaCo = 'QC'
+                    else:
+                        CaCo = 'NA'
+                if CaCo == 'Control':
+                    CaCo = '0'
+                elif CaCo == 'Case':
+                    CaCo = '1'
+                elif CaCo == 'QC':
+                    CaCo = '2'
+                else:
+                    CaCo = '3'
                 sampToCaCoDict[samp] = CaCo
             line = f.readline()
     return sampToCaCoDict
@@ -98,9 +146,13 @@ def makeSubjectToCaCoDict(SampleSheet):
         head_list = head.rstrip().split(',')
         subjectIdCol = None
         CaCoCol = None
+        sampGroupCol = None
         for i in range(len(head_list)):
             if head_list[i] == subject_id_to_use:
                 subjectIdCol = i
+        for i in range(len(head_list)):
+            if head_list[i] == 'Sample_Group':
+                sampGroupCol = i
         if subjectIdCol == None:
             print('Subject ID not found in sample sheet')
             sys.exit(1)
@@ -110,14 +162,29 @@ def makeSubjectToCaCoDict(SampleSheet):
         if CaCoCol == None:
             print('Case/Control_Status not found in sample sheet')
             sys.exit(1)
+        if sampGroupCol == None:
+            print('Sample_Group not found in sample sheet')
+            sys.exit(1)
         line = f.readline()
         while line != '':
             if line.strip():
                 line_list = line.rstrip().split(',')
                 subId = line_list[subjectIdCol]
                 CaCo = line_list[CaCoCol]
+                sampGroup = line_list[sampGroupCol]
                 if not CaCo.strip():
-                    CaCo = 'NA'
+                    if sampGroup == 'sVALD-001':
+                        CaCo = 'QC'
+                    else:
+                        CaCo = 'NA'
+                if CaCo == 'Control':
+                    CaCo = '0'
+                elif CaCo == 'Case':
+                    CaCo = '1'
+                elif CaCo == 'QC':
+                    CaCo = '2'
+                else:
+                    CaCo = '3'
                 subToCaCoDict[subId] = CaCo
             line = f.readline()
     return subToCaCoDict
@@ -549,6 +616,7 @@ include: 'modules/Snakefile_HWP'
 include: 'modules/Snakefile_plot_completion'
 include: 'modules/Snakefile_plot_sex'
 include: 'modules/Snakefile_subject_qc_fail'
+include: 'modules/Snakefile_count_exclusions'
 
 localrules: summary_stats
 
@@ -574,4 +642,6 @@ rule all:
         expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT),
         expand('autosomal_heterozygosity/{pop}_subjects_qc.het.png', pop = POPS),
         'sex_plot/sex.png',
-        'final_qc_subject_level/subjects.bed'
+        'final_qc_subject_level/subjects.bed',
+        'counts/exclusion_counts.csv'
+

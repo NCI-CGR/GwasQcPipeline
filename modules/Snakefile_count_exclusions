@@ -11,4 +11,63 @@ rule count_exclusions:
         internal_qc_removed = 'subject_level/internalControls.txt',
         exp_dup_removed = 'subject_level/expectedDupToRemove.txt',
         start_subject_fam = 'subject_level/subjects.fam',
-        
+        sex_discord = 'subject_qc_removal/sex_discordant.txt',
+        unexp_rep = 'subject_qc_removal/unexpected_replicate.txt',
+        related = 'remove_related/subjects_to_remove.txt',
+        autosomal_het = 'autosomal_heterozygosity/subjects_het_fail.txt'
+    output:
+        exclusion = 'counts/exclusion_counts.csv',
+        remaining = 'counts/remaining_counts.csv'
+    run:
+        sampToCaCoDict = makeSampleToCaCoDict(input.samp_sheet)
+        subToCaCoDict = makeSubjectToCaCoDict(input.samp_sheet)
+        (subToSampListDict, sampToSubIdDict) = makeSubjectToSampListDict(input.samp_sheet)
+        with open(output.exclusion, 'w') as out1, open(output.remaining, 'w') as out2:
+            out1.write('Reason,Control_removed,Case_removed,QC_removed,Other_removed,Tot_removed\n')
+            out2.write('ExlusionPriorToCounts,Control,Case,QC,Other,Total\n')
+            out2.write(','.join(['None'] + getCountsByCaCo(sampToCaCoDict.keys(), sampToCaCoDict)) + '\n')
+            sampDictStart = makeSampDict(input.start_fam)
+            out2.write(','.join(['ArrayProcessing'] + getCountsByCaCo(sampDictStart.keys(), sampToCaCoDict)) + '\n')
+            arrayFailDict = DictDiff(sampToCaCoDict, sampDictStart)
+            out1.write(','.join(['ArrayProcessing'] + getCountsByCaCo(arrayFailDict.keys(), sampToCaCoDict)) + '\n')
+            filt1dict = makeSampDict(input.filt1_fam)
+            out2.write(','.join(['CR_filter1'] + getCountsByCaCo(filt1dict.keys(), sampToCaCoDict)) + '\n')
+            failFilt1 = DictDiff(sampDictStart, filt1dict)
+            out1.write(','.join(['CR_filter1'] + getCountsByCaCo(failFilt1.keys(), sampToCaCoDict)) + '\n')
+            filt2dict = makeSampDict(input.filt2_fam)
+            out2.write(','.join(['CR_filter2'] + getCountsByCaCo(filt2dict.keys(), sampToCaCoDict)) + '\n')
+            failFilt2 = DictDiff(filt1dict, filt2dict)
+            out1.write(','.join(['CR_filter2'] + getCountsByCaCo(failFilt2.keys(), sampToCaCoDict)) + '\n')
+            contam_dict = makeSampDict(input.contam_removed)
+            out1.write(','.join(['Contaminated'] + getCountsByCaCo(contam_dict.keys(), sampToCaCoDict)) + '\n')
+            filtContamDict = DictDiff(filt2dict, contam_dict)
+            out2.write(','.join(['Contaminated'] + getCountsByCaCo(filtContamDict.keys(), sampToCaCoDict)) + '\n')
+            internalQcDict = makeSampDict(input.internal_qc_removed)
+            out1.write(','.join(['InternalQC'] + getCountsByCaCo(internalQcDict.keys(), sampToCaCoDict)) + '\n')
+            filtInternQcDict = DictDiff(filtContamDict, internalQcDict)
+            out2.write(','.join(['InternalQC'] + getCountsByCaCo(filtInternQcDict.keys(), sampToCaCoDict)) + '\n')
+            expDupDict = makeSampDict(input.exp_dup_removed)
+            out1.write(','.join(['ExpectedDuplicates'] + getCountsByCaCo(expDupDict.keys(), sampToCaCoDict)) + '\n')
+            filtExpDupDict = DictDiff(filtInternQcDict, expDupDict)
+            out2.write(','.join(['ExpectedDuplicates'] + getCountsByCaCo(filtExpDupDict.keys(), sampToCaCoDict)) + '\n')
+            startSubjectDict = makeSampDict(input.start_subject_fam)
+            out2.write(','.join(['SubjectLevel'] + getCountsByCaCo(startSubjectDict.keys(), subToCaCoDict)) + '\n')
+            sex_dict = makeSampDict(input.sex_discord)
+            out1.write(','.join(['SexDiscordant'] + getCountsByCaCo(sex_dict.keys(), subToCaCoDict)) + '\n')
+            filtSexDict = DictDiff(startSubjectDict, sex_dict)
+            out2.write(','.join(['SexDiscordant'] + getCountsByCaCo(filtSexDict.keys(), subToCaCoDict)) + '\n')
+            unexpRepDict = makeSampDict(input.unexp_rep)
+            out1.write(','.join(['UnexpectedReplicates'] + getCountsByCaCo(unexpRepDict.keys(), subToCaCoDict)) + '\n')
+            filtUnexpDict = DictDiff(filtSexDict, unexpRepDict)
+            out2.write(','.join(['UnexpectedReplicates'] + getCountsByCaCo(filtUnexpDict.keys(), subToCaCoDict)) + '\n')
+            relatedDict = makeSampDict(input.related)
+            out1.write(','.join(['Related'] + getCountsByCaCo(relatedDict.keys(), subToCaCoDict)) + '\n')
+            filtRelatedDict = DictDiff(filtUnexpDict, relatedDict)
+            out2.write(','.join(['Related'] + getCountsByCaCo(filtRelatedDict.keys(), subToCaCoDict)) + '\n')
+            hetDict = makeSampDict(input.autosomal_het)
+            out1.write(','.join(['AutosomalHet'] + getCountsByCaCo(hetDict.keys(), subToCaCoDict)) + '\n')
+            filtHetDict = DictDiff(filtRelatedDict, hetDict)
+            out2.write(','.join(['AutosomalHet'] + getCountsByCaCo(filtHetDict.keys(), subToCaCoDict)) + '\n')
+
+
+
