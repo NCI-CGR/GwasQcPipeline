@@ -10,7 +10,7 @@ rule make_related_list:
         'remove_related/subjects_to_remove.txt'
     run:
         relatedDict = MakeRelatedDict(input.ibd, input.track, input.fam)
-        crDict = makeCallRateDict(input.imiss4)
+        crDict = makeCallRateDict(input.imiss)
         with open(output[0], 'w') as out:
             while len(relatedDict.keys()) > 0:
                 maxLenList = 0
