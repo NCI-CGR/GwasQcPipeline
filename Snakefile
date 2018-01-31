@@ -81,7 +81,7 @@ def makeSampSheetDict(SampleSheet, headers):
                 headerToColDict[myHead] = i
                 colDict[i] = 1
         for h in headers:
-            if not headerToColDict.get(h):
+            if headerToColDict.get(h) == None:
                 print(h + ' not found in sample sheet')
                 sys.exit(1)
         line = f.readline()
