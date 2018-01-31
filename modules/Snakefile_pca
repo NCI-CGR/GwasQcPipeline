@@ -87,7 +87,6 @@ rule smartpca:
     output:
         par = 'pca/{pop}_subjects.smartpca.par',
         eigen = 'pca/{pop}_subjects.eigenvec'
-    threads: 20
     run:
         with open(input.ind) as f:
             line = f.readline()
@@ -105,29 +104,6 @@ rule smartpca:
                 out.write(parTxt)
             shell('smartpca -p {output.par}')
 
-
-
-'''
-rule plink_pca:
-    input:
-        bed = 'pca/{pop}_subjects_ld_prune.bed',
-        bim = 'pca/{pop}_subjects_ld_prune.bim',
-        fam = 'pca/{pop}_subjects_ld_prune.fam'
-    params:
-        inProj = 'pca/{pop}_subjects_ld_prune',
-        outProj = 'pca/{pop}_subjects'
-    output:
-        'pca/{pop}_subjects.eigenvec'
-    threads: 20
-    run:
-        with open(input.fam) as f:
-            line = f.readline()
-        if line == 'Too few subjects to process pop\n':
-            with open(output[0], 'w') as out:
-                out.write('Too few subjects to process pop\n')
-        else:
-            shell('plink --bfile {params.inProj} --pca approx --memory 240000 --threads {threads} --out {params.outProj}')
-'''
 
 
 rule pca_csv:
