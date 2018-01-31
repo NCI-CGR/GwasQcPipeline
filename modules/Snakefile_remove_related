@@ -4,11 +4,13 @@ rule make_related_list:
     input:
         track = 'subject_level/SampleUsedforSubject.csv',
         ibd = 'ibd/samples.genome',
-        fam = 'subject_qc_removal/subjects.fam'
+        fam = 'subject_qc_removal/subjects.fam',
+        imiss = 'subject_level/subjects_qc.imiss'
     output:
         'remove_related/subjects_to_remove.txt'
     run:
         relatedDict = MakeRelatedDict(input.ibd, input.track, input.fam)
+        crDict = makeCallRateDict(input.imiss4)
         with open(output[0], 'w') as out:
             while len(relatedDict.keys()) > 0:
                 maxLenList = 0
@@ -16,7 +18,14 @@ rule make_related_list:
                 for samp in list(relatedDict):
                     lenList = len(relatedDict[samp])
                     if lenList > maxLenList:
+                        maxLenList = lenList
                         maxRelatedSamp = samp
+                if maxLenList == 1:
+                    crMax = crDict[maxRelatedSamp]
+                    maxPair = relatedDict[maxRelatedSamp][0]
+                    crPair = crDict[maxPair]
+                    if crMax > crPair:
+                        maxRelatedSamp = maxPair
                 out.write(maxRelatedSamp + ' ' + maxRelatedSamp + '\n')
                 for samp in list(relatedDict):
                     if maxRelatedSamp in relatedDict[samp]:
