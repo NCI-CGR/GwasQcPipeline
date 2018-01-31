@@ -1,0 +1,25 @@
+#!/usr/bin/python
+
+rule identifiler:
+    input:
+        outName + '_LimsUpload_' + sampSheetDate + '.csv'
+    output:
+        'files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv'
+    run:
+        with open(input[0]) as f, open(output[0], 'w') as out:
+            head = f.readline()
+            line = f.readline()
+            while line != '':
+                line_list = line.rstrip().split(',')
+                samp = line_list[2]
+                (lowCR, contam, sex, repDisc, unexpectRep) = line_list[5:]
+                if lowCR == 'TRUE':
+                    lowCrOut.write(samp + ' ' + samp + '\n')
+                if contam == 'TRUE':
+                    contamOut.write(samp + ' ' + samp + '\n')
+                if sex == 'TRUE':
+                    sexOut.write(samp + ' ' + samp + '\n')
+                if repDisc == 'TRUE':
+                    repDiscOut.write(samp + ' ' + samp + '\n')
+                line = f.readline()
+
