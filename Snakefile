@@ -44,6 +44,56 @@ contam_threshold = config['contam_threshold']
 adpc_file = config['adpc_file']
 
 
+
+def makeSampSheetDict(SampleSheet, headers):
+    '''
+    (str, list) -> dict
+    headers is a list of header names in the SampleSheet
+    headers[0] will be the key to the dict and the rest will be values
+    headers[0] is usually "Sample_ID"
+    '''
+    def getValList(sampSheetLine, headers, headerToColDict, colDict):
+        colToValDict = {}
+        line_list = sampSheetLine.rstrip().split(',')
+        for i in range(len(line_list)):
+            if colDict.get(i):
+                colToValDict[i] = line_list[i]
+        valList = []
+        for h in headers:
+            col = headerToColDict[h]
+            valList.append(colToValDict[col])
+        return valList
+
+    sampSheetDict = {}
+    headerToColDict = {}
+    colDict = {}
+    with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
+        head = f.readline()
+        while 'SentrixBarcode_A' not in head and head != '':
+            head = f.readline()
+        if 'SentrixBarcode_A' not in head:
+            print('Sample sheet not formatted correctly')
+            sys.exit(1)
+        head_list = head.rstrip().split(',')
+        for i in range(len(head_list)):
+            if head_list[i] in headers:
+                myHead = head_list[i]
+                headerToColDict[myHead] = i
+                colDict[i] = 1
+        for h in headers:
+            if headerToColDict.get(h) == None:
+                print(h + ' not found in sample sheet')
+                sys.exit(1)
+        line = f.readline()
+        while line != '':
+            if line.strip():
+                valList = getValList(line, headers, headerToColDict, colDict)
+                sampSheetDict[valList[0]] = valList
+            line = f.readline()
+    return sampSheetDict
+
+
+
 def makeRepDiscordantDict(knownConcordanceFile, thresh = dup_concordance_cutoff):
     RepDiscordantDict = {}
     with open(knownConcordanceFile) as f:
@@ -329,7 +379,7 @@ include: 'modules/Snakefile_sample_qc_report'
 include: 'modules/Snakefile_ancestry'
 include: 'modules/Snakefile_for_lab'
 include: 'modules/Snakefile_idat_intensity'
-
+include: 'modules/Snakefile_identifiler'
 
 localrules: summary_stats
 
@@ -345,4 +395,5 @@ rule all:
         'files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',
-        'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv'
+        'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
+        'files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv'
