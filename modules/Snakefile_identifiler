@@ -7,7 +7,7 @@ rule identifiler:
     output:
         'files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv'
     params:
-        header = 'Sample_ID,Project,Project-Sample ID,SR_Subject_ID,LIMS_Individual_ID'
+        header = 'Sample_ID,LIMSSample_ID,Project,Project-Sample ID,SR_Subject_ID,LIMS_Individual_ID'
     run:
         headers = params.header.split(',')
         sampSheetDict = makeSampSheetDict(input.sampSheet, headers)
@@ -24,8 +24,6 @@ rule identifiler:
                     identReasons.append('Contaminated')
                 if sex == 'TRUE':
                     identReasons.append('Sex Discordant')
-                if repDisc == 'TRUE':
-                    identReasons.append('Expected Rep Discordance')
                 if unexpectRep == 'TRUE':
                     identReasons.append('Unexpected Replicate')
                 if len(identReasons) > 0:
