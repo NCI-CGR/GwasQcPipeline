@@ -88,7 +88,7 @@ def makeSampSheetDict(SampleSheet, headers):
         while line != '':
             if line.strip():
                 valList = getValList(line, headers, headerToColDict, colDict)
-                sampSheetDict[valList[0]] = valList[1:]
+                sampSheetDict[valList[0]] = valList
             line = f.readline()
     return sampSheetDict
 
