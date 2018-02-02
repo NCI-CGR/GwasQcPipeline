@@ -68,13 +68,14 @@ rule sample_qc_report:
             for samp in sampSheetDict.keys():
                 sampFields = sampSheetDict[samp]
                 sampsheetFieldDict = {}
+                sampsheetFieldDict['Sample ID'] = samp
                 for h in blankHeadList:
                     sampsheetFieldDict[h] = ''
                 for i in range(len(sampSheetHeadList)):
                     h = sampSheetHeadList[i]
                     x = sampFields[i]
                     sampsheetFieldDict[h] = x
-                sampsheetFieldDict['Count_of_SR_SubjectID'] = SrCountDict[sampsheetFieldDict['SR_Subject_ID']]
+                sampsheetFieldDict['Count_of_SR_SubjectID'] = str(SrCountDict[sampsheetFieldDict['SR_Subject_ID']])
                 idatFound = sampToFoundIdatDict[samp]
                 sampsheetFieldDict['IdatsInProjectDir'] = idatFound
                 chipId = sampsheetFieldDict['SentrixBarcode_A'] + '_' + sampsheetFieldDict['SentrixPosition_A']
@@ -92,7 +93,7 @@ rule sample_qc_report:
                 else:
                     filt1 = 'N'
                     cr2 = crDict2[samp]
-                sampsheetFieldDict['Call_Rate_1'] = cr2
+                sampsheetFieldDict['Call_Rate_1'] = str(cr2)
                 sampsheetFieldDict['Call_Rate_1_filter'] = filt1
                 if not crDict3.get(samp):
                     filt2 = 'Y'
@@ -100,7 +101,7 @@ rule sample_qc_report:
                 else:
                     filt2 = 'N'
                     cr3 = crDict3[samp]
-                sampsheetFieldDict['Call_Rate_2'] = cr3
+                sampsheetFieldDict['Call_Rate_2'] = str(cr3)
                 sampsheetFieldDict['Call_Rate_2_filter'] = filt2
                 if not sexDict.get(samp):
                     (snpsex, inbreed) = ['U', 'NA']
@@ -111,6 +112,8 @@ rule sample_qc_report:
                     else:
                         snpsex = 'M'
                 sampsheetFieldDict['Predicted_Sex'] = snpsex
+                sampsheetFieldDict['ChrX_Inbreed_estimate'] = str(inbreed)
+                expectedSex = sampsheetFieldDict['Expected_Sex']
                 if snpsex == 'U' or expectedSex == 'U':
                     sexMatch = 'U'
                 elif snpsex != expectedSex:
