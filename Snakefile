@@ -93,6 +93,36 @@ def makeSampSheetDict(SampleSheet, headers):
     return sampSheetDict
 
 
+def classify_ancestry(labels,x,threshold):
+    '''
+    This code is modified from GLU admix.py
+    https://github.com/bioinformed/glu-genetics/blob/master/glu/modules/struct/admix.py#L345
+    An individual is considered of a given ancestry based on the supplied
+    labels and estimated admixture coefficients if their coefficient is
+    greater than a given threshold.
+    Otherwise, an individual who has no single estimated admixture coefficient
+    that meets the specified threshold then one of two behaviors result.  If
+    only one population group exceeds 1-threshold then the ancestry is deemed
+    'ADMIXED' for that population.  Otherwise, a list of populations with
+    estimated admixture above 1-threshold is returned.
+    '''
+    if len(labels) != len(x):
+        print('for classify_ancestry labels and x need to be same length')
+        sys.exit(1)
+    popset = set()
+    cmax = -1
+    for i in range(len(labels)):
+        pop = labels[i]
+        coeff = float(x[i])
+        if coeff >= 1 - threshold:
+            popset.add(pop)
+            cmax = max(cmax,coeff)
+    if len(popset) == 1 and cmax < threshold:
+        ipop = 'ADMIXED_%s' % popset.pop()
+    else:
+        ipop = '_'.join(sorted(popset))
+    return ipop
+
 
 def makeRepDiscordantDict(knownConcordanceFile, thresh = dup_concordance_cutoff):
     RepDiscordantDict = {}
@@ -267,14 +297,17 @@ def makeIdatIntensDict(intensFile):
 
 
 
-def makeAncestryDict(snpWeightsFile):
+def makeAncestryDict(snpWeightsCsvFile):
     ancestryDict = {}
-    with open(snpWeightsFile) as f:
-        for line in f:
-            line_list = line.split()
+    with open(snpWeightsCsvFile) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            line_list = line.rstrip().split(',')
             samp = line_list[0]
-            (AFR, EUR, ASN) = line_list[-3:]
-            ancestryDict[samp] = (float(AFR), float(EUR), float(ASN)) 
+            (AFR, EUR, ASN, ancestry) = line_list[-4:]
+            ancestryDict[samp] = (AFR, EUR, ASN, ancestry)
+            line = f.readline()
     return ancestryDict
 
 
@@ -390,7 +423,7 @@ rule all:
         'all_sample_idat_intensity/idat_intensity.csv',
         'concordance/KnownReplicates.csv',
         'concordance/UnknownReplicates.csv',
-        'snpweights/samples.snpweights',
+        'snpweights/samples.snpweights.csv',
         'all_contam/contam.csv',
         'files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',

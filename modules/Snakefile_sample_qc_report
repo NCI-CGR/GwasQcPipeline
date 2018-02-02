@@ -10,16 +10,40 @@ rule sample_qc_report:
         freq = 'sample_qc_stats/samples.frq',
         hwe = 'sample_qc_stats/samples.hwe',
         contam = 'all_contam/contam.csv',
-        ancestry = 'snpweights/samples.snpweights',
+        ancestry = 'snpweights/samples.snpweights.csv',
         knownConcordance = 'concordance/KnownReplicates.csv',
         unknownRep = 'concordance/UnknownReplicates.csv',
         intensity = 'all_sample_idat_intensity/idat_intensity.csv'
+    params:
+        outHead = 'SR_Subject_ID,Count_of_SR_SubjectID,SR,Current_Subject_Status,Subject_Notes,LIMS_Individual_ID,Project,Sample_ID,Project-Sample ID,LIMSSample_ID,Sample_Status,IdatsInProjectDir,IdatIntensity,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate,Count_of_QC_Issue,Identifiler_Needed',
+        sampSheetHead = 'Sample_ID,SentrixBarcode_A,SentrixPosition_A,SR_Subject_ID,LIMS_Individual_ID,Project,Sample_ID,Project-Sample ID,LIMSSample_ID,Expected_Sex,Identifiler_Sex,Sample_Group',
+        blankHead = 'SR,Current_Subject_Status,Subject_Notes,Sample_Status',
+        limsHead = 'SR_Subject_ID,LIMS_Individual_ID,Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate'
     output:
         allQc = 'all_sample_qc.csv',
         lims = outName + '_LimsUpload_' + sampSheetDate + '.csv',
         limsDirOut = lims_output_dir + '/' + outName + '_LimsUpload_' + sampSheetDate + '.csv'
     run:
-        chipIdToSampDict, sampIdToGtcDict, sampIdToProjDict, allSampleIds, idats, noIdats
+        outHeadList = params.outHead.split(',')
+        sampSheetHeadList = params.sampSheetHead.split(',')
+        blankHeadList = params.blankHead.split(',')
+        limsHeadList = params.limsHead.split(',')
+        sampSheetDict = makeSampSheetDict(input.sampSheet, sampSheetHeadList)
+        SrPos = None
+        for i in range(len(sampSheetHeadList)):
+            if sampSheetHeadList[i] == 'SR_Subject_ID':
+                SrPos = i
+        if SrPos == None:
+            print('No SR_Subject_ID in sampSheetHead')
+            sys.exit(1)
+        SrCountDict = {}
+        for samp in sampSheetDict.keys():
+            valList = sampSheetDict[samp]
+            SrId = valList[SrPos]
+            if SrCountDict.get(SrId):
+                SrCountDict[SrId] += 1
+            else:
+                SrCountDict[SrId] = 1
         sampToFoundIdatDict = {}
         for i in idats:
             chipId = os.path.basename(i)
@@ -29,8 +53,6 @@ rule sample_qc_report:
             chipId = os.path.basename(i)
             sampId = chipIdToSampDict[chipId]
             sampToFoundIdatDict[sampId] = 'NO'
-        (SubToSampListDict, sampToSubIdDict) = makeSubjectToSampListDict(sample_sheet)
-        ExpectedSexDict = makeSampToExpectedSexDict(sample_sheet)
         crDict1 = makeCallRateDict(input.imiss1)
         crDict2 = makeCallRateDict(input.imiss2)
         crDict3 = makeCallRateDict(input.imiss3)
@@ -40,156 +62,129 @@ rule sample_qc_report:
         ancestryDict = makeAncestryDict(input.ancestry)
         repDiscordantDict = makeRepDiscordantDict(input.knownConcordance)
         unexpectedRepDict = makeUnexpectedRepDict(input.unknownRep)
-        with open(input.sampSheet) as f, open(output.allQc, 'w') as out, open(output.lims, 'w') as limsOut:
-            out.write('Sample_ID,CGR_ID,Project_ID,Subject_ID,IdatsInProjectDir,IdatIntensity,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2\n')
-            limsOut.write('SR_Subject_ID,LIMS_Individual_ID,Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate\n')
-            head = f.readline()
-            while 'SentrixBarcode_A' not in head and head != '':
-                head = f.readline()
-            if 'SentrixBarcode_A' not in head:
-                print('Sample sheet not formatted correctly')
-                sys.exit(1)
-            head_list = head.rstrip().split(',')
-            expectedSexCol = None
-            subjectIdCol = None
-            projCol = None
-            projSampIdCol = None
-            sampleGroupCol = None
-            identSexCol = None
-            limsIdCol = None
-            SrIdCol = None
-            for i in range(len(head_list)):
-                if head_list[i] == expected_sex_col_name:
-                    expectedSexCol = i
-                elif head_list[i] == subject_id_to_use:
-                    subjectIdCol = i
-                elif head_list[i] == 'Project':
-                    projCol = i
-                elif head_list[i] == 'Project-Sample ID':
-                    projSampIdCol = i
-                elif head_list[i] == 'Sample_Group':
-                    sampleGroupCol = i
-                if head_list[i] == 'Identifiler_Sex':
-                    identSexCol = i
-                elif head_list[i] == 'LIMS_Individual_ID':
-                    limsIdCol = i
-                elif head_list[i] == 'SR_Subject_ID':
-                    SrIdCol = i
-            if expectedSexCol == None:
-                print('Expected Sex not found in sample sheet')
-                sys.exit(1)
-            if subjectIdCol == None:
-                print('Subject ID not found in sample sheet')
-                sys.exit(1)
-            if limsIdCol == None:
-                print('LIMS_Individual_ID not found in sample sheet')
-                sys.exit(1)
-            if SrIdCol == None:
-                print('SR_Subject_ID not found in sample sheet')
-                sys.exit(1)
-            if projCol == None:
-                print('No column named "Project" found')
-                sys.exit(1)
-            if projSampIdCol == None:
-                print('No column named "Project-Sample ID" found')
-            line = f.readline()
-            while line != '':
-                if line.strip():
-                    line_list = line.rstrip().split(',')
-                    samp = line_list[0]
-                    idatFound = sampToFoundIdatDict[samp]
-                    chipId = line_list[1] + '_' + line_list[2]
-                    proj = line_list[projCol]
-                    subId = line_list[subjectIdCol]
-                    if not subId.strip():
-                        subId = 'NA'
-                    limsSubId = line_list[limsIdCol]
-                    if not limsSubId.strip():
-                        limsSubId = 'NA'
-                    SrSubId = line_list[SrIdCol]
-                    if not SrSubId.strip():
-                        SrSubId = 'NA'
-                    if sampleGroupCol != None and identSexCol != None and line_list[sampleGroupCol] == 'sVALD-001':
-                        expectedSex = line_list[identSexCol]
+        with open(output.allQc, 'w') as out, open(output.lims, 'w') as limsOut:
+            out.write(params.outHead + '\n')
+            limsOut.write(params.limsHead + '\n')
+            for samp in sampSheetDict.keys():
+                sampFields = sampSheetDict[samp]
+                sampsheetFieldDict = {}
+                sampsheetFieldDict['Sample ID'] = samp
+                for h in blankHeadList:
+                    sampsheetFieldDict[h] = ''
+                for i in range(len(sampSheetHeadList)):
+                    h = sampSheetHeadList[i]
+                    x = sampFields[i]
+                    sampsheetFieldDict[h] = x
+                sampsheetFieldDict['Count_of_SR_SubjectID'] = str(SrCountDict[sampsheetFieldDict['SR_Subject_ID']])
+                idatFound = sampToFoundIdatDict[samp]
+                sampsheetFieldDict['IdatsInProjectDir'] = idatFound
+                chipId = sampsheetFieldDict['SentrixBarcode_A'] + '_' + sampsheetFieldDict['SentrixPosition_A']
+                if sampsheetFieldDict['Sample_Group'] == 'sVALD-001':
+                    sampsheetFieldDict['Expected_Sex'] = sampsheetFieldDict['Identifiler_Sex']
+                cgrId = samp.split('_')[0]
+                if not crDict1.get(samp):
+                    cr1 = 'NA'
+                else:
+                    cr1 = crDict1[samp]
+                sampsheetFieldDict['Call_Rate_Initial'] = str(cr1)
+                if not crDict2.get(samp):
+                    filt1 = 'Y'
+                    cr2 = 'NA'
+                else:
+                    filt1 = 'N'
+                    cr2 = crDict2[samp]
+                sampsheetFieldDict['Call_Rate_1'] = str(cr2)
+                sampsheetFieldDict['Call_Rate_1_filter'] = filt1
+                if not crDict3.get(samp):
+                    filt2 = 'Y'
+                    cr3 = 'NA'
+                else:
+                    filt2 = 'N'
+                    cr3 = crDict3[samp]
+                sampsheetFieldDict['Call_Rate_2'] = str(cr3)
+                sampsheetFieldDict['Call_Rate_2_filter'] = filt2
+                if not sexDict.get(samp):
+                    (snpsex, inbreed) = ['U', 'NA']
+                else:
+                    (defSex, inbreed) = sexDict[samp]
+                    if float(inbreed) < .5:
+                        snpsex = 'F'
                     else:
-                        expectedSex = line_list[expectedSexCol]
-                    projSampId = line_list[projSampIdCol]
-                    cgrId = samp.split('_')[0]
-                    if not crDict1.get(samp):
-                        cr1 = 'NA'
-                    else:
-                        cr1 = crDict1[samp]
-                    if not crDict2.get(samp):
-                        filt1 = 'Y'
-                        cr2 = 'NA'
-                    else:
-                        filt1 = 'N'
-                        cr2 = crDict2[samp]
-                    if not crDict3.get(samp):
-                        filt2 = 'Y'
-                        cr3 = 'NA'
-                    else:
-                        filt2 = 'N'
-                        cr3 = crDict3[samp]
-                    if not sexDict.get(samp):
-                        (snpsex, inbreed) = ['U', 'NA']
-                    else:
-                        (defSex, inbreed) = sexDict[samp]
-                        if float(inbreed) < .5:
-                            snpsex = 'F'
-                        else:
-                            snpsex = 'M'
-                    if snpsex == 'U' or expectedSex == 'U':
-                        sexMatch = 'U'
-                    elif snpsex != expectedSex:
-                        sexMatch = 'N'
-                    else:
-                        sexMatch = 'Y'
-                    if not ancestryDict.get(samp):
-                        (AFR, EUR, ASN, ancestry) = ['NA', 'NA', 'NA', 'NA']
-                    else:
-                        (AFR, EUR, ASN) = ancestryDict[samp]
-                        if AFR > 0.8:
-                            ancestry = 'AFR'
-                        elif EUR > 0.8:
-                            ancestry = 'EUR'
-                        elif ASN > 0.8:
-                            ancestry = 'ASN'
-                        else:
-                            ancestry = 'ADMIXED'
-                    if cr1 == 'NA' or cr2 == 'NA' or cr3 == 'NA':
-                        lowCR = 'TRUE'
-                    else:
-                        lowCR = 'FALSE'
-                    if not contamDict.get(samp):
-                        contam = 'NA'
-                    else:
-                        contam = contamDict[samp]
-                    if contam != 'NA' and float(contam) > contam_threshold:
-                        isContaminated = 'TRUE'
-                    else:
-                        isContaminated = 'FALSE'
-                    if not intensityDict.get(samp):
-                        intensity = 'NA'
-                    else:
-                        intensity = intensityDict[samp]
-                    if sexMatch == 'U':
-                        sexDiscordant = 'NA'
-                    elif sexMatch == 'N':
-                        sexDiscordant = 'TRUE'
-                    else:
-                        sexDiscordant = 'FALSE'
-                    if repDiscordantDict.get(samp):
-                        expectedRepDisc = 'TRUE'
-                    else:
-                        expectedRepDisc= 'FALSE'
-                    if unexpectedRepDict.get(samp):
-                        unexpectedRep = 'TRUE'
-                    else:
-                        unexpectedRep = 'FALSE'
-                    limsOut.write(','.join([SrSubId, limsSubId, samp, projSampId, str(cr1), lowCR, isContaminated, sexDiscordant, expectedRepDisc, unexpectedRep]) + '\n')
-                    out.write(','.join([samp, cgrId, proj, subId, idatFound, intensity, expectedSex, snpsex, sexMatch, inbreed, str(AFR), str(EUR), str(ASN), ancestry, contam, str(cr1), filt1, str(cr2), filt2, str(cr3)]) + '\n')
-                    line = f.readline()
+                        snpsex = 'M'
+                sampsheetFieldDict['Predicted_Sex'] = snpsex
+                sampsheetFieldDict['ChrX_Inbreed_estimate'] = str(inbreed)
+                expectedSex = sampsheetFieldDict['Expected_Sex']
+                if snpsex == 'U' or expectedSex == 'U':
+                    sexMatch = 'U'
+                elif snpsex != expectedSex:
+                    sexMatch = 'N'
+                else:
+                    sexMatch = 'Y'
+                sampsheetFieldDict['SexMatch'] = sexMatch
+                if not ancestryDict.get(samp):
+                    (AFR, EUR, ASN, ancestry) = ['NA', 'NA', 'NA', 'NA']
+                else:
+                    (AFR, EUR, ASN, ancestry) = ancestryDict[samp]
+                sampsheetFieldDict['AFR'] = AFR
+                sampsheetFieldDict['EUR'] = EUR
+                sampsheetFieldDict['ASN'] = ASN
+                sampsheetFieldDict['Ancestry'] = ancestry
+                if cr1 == 'NA' or cr2 == 'NA' or cr3 == 'NA':
+                    lowCR = 'TRUE'
+                else:
+                    lowCR = 'FALSE'
+                sampsheetFieldDict['Low Call Rate'] = lowCR
+                if not contamDict.get(samp):
+                    contam = 'NA'
+                else:
+                    contam = contamDict[samp]
+                sampsheetFieldDict['Contamination_Rate'] = contam
+                if contam != 'NA' and float(contam) > contam_threshold:
+                    isContaminated = 'TRUE'
+                else:
+                    isContaminated = 'FALSE'
+                sampsheetFieldDict['Contaminated'] = isContaminated
+                if not intensityDict.get(samp):
+                    intensity = 'NA'
+                else:
+                    intensity = intensityDict[samp]
+                sampsheetFieldDict['IdatIntensity'] = intensity
+                if sexMatch == 'U':
+                    sexDiscordant = 'NA'
+                elif sexMatch == 'N':
+                    sexDiscordant = 'TRUE'
+                else:
+                    sexDiscordant = 'FALSE'
+                sampsheetFieldDict['Sex Discordant'] = sexDiscordant
+                if repDiscordantDict.get(samp):
+                    expectedRepDisc = 'TRUE'
+                else:
+                    expectedRepDisc= 'FALSE'
+                sampsheetFieldDict['Expected Replicate Discordance'] = expectedRepDisc
+                if unexpectedRepDict.get(samp):
+                    unexpectedRep = 'TRUE'
+                else:
+                    unexpectedRep = 'FALSE'
+                sampsheetFieldDict['Unexpected Replicate'] = unexpectedRep
+                sampsheetFieldDict['Call Rate'] = str(cr1)
+                issueCount = 0
+                for issue in [lowCR, isContaminated, sexDiscordant, expectedRepDisc, unexpectedRep]:
+                    if issue == 'TRUE':
+                        issueCount += 1
+                sampsheetFieldDict['Count_of_QC_Issue'] = str(issueCount)
+                if isContaminated == 'TRUE' or sexDiscordant == 'TRUE' or unexpectedRep == 'TRUE':
+                    identifiler = 'TRUE'
+                else:
+                    identifiler = 'FALSE'
+                sampsheetFieldDict['Identifiler_Needed'] = identifiler
+                limsOutList = []
+                for h in limsHeadList:
+                    limsOutList.append(sampsheetFieldDict[h])
+                limsOut.write(','.join(limsOutList) + '\n')
+                qcOutList = []
+                for h in outHeadList:
+                    qcOutList.append(sampsheetFieldDict[h])
+                out.write(','.join(qcOutList) + '\n')
         shell('cp {output.lims} {output.limsDirOut}')
 
 
