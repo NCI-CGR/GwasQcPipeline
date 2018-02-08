@@ -54,6 +54,7 @@ FILT = ['_start', '_filter1', '_filter2']
 ylimDict = {'_start':('0', '100'), '_filter1':(str(samp_cr_1 * 100), '100'), '_filter2':(str(samp_cr_2 * 100), '100')}
 
 
+
 def DictDiff(dict1, dict2):
     diffDict = {}
     for key in dict1.keys():
@@ -79,7 +80,6 @@ def getCountsByCaCo(sampList, CaCoDict):
     tot = sum(countList)
     (controls, cases, qc, other) = countList
     return [str(controls), str(cases), str(qc), str(other), str(tot)]
-
 
 
 def makeSampleToCaCoDict(SampleSheet):
@@ -235,36 +235,56 @@ def MakeRelatedDict(ibd_file, sample_to_sub_file, sub_fam_file, relatedThresh = 
     return relatedDict
 
 
-def classify_ancestry(labels,x,threshold):
-    '''
-    This code is modified from GLU admix.py
-    https://github.com/bioinformed/glu-genetics/blob/master/glu/modules/struct/admix.py#L345
-    An individual is considered of a given ancestry based on the supplied
-    labels and estimated admixture coefficients if their coefficient is
-    greater than a given threshold.
-    Otherwise, an individual who has no single estimated admixture coefficient
-    that meets the specified threshold then one of two behaviors result.  If
-    only one population group exceeds 1-threshold then the ancestry is deemed
-    'ADMIXED' for that population.  Otherwise, a list of populations with
-    estimated admixture above 1-threshold is returned.
-    '''
-    if len(labels) != len(x):
-        print('for classify_ancestry labels and x need to be same length')
-        sys.exit(1)
-    popset = set()
-    cmax = -1
-    for i in range(len(labels)):
-        pop = labels[i]
-        coeff = float(x[i])
-        if coeff >= 1 - threshold:
-            popset.add(pop)
-            cmax = max(cmax,coeff)
-    if len(popset) == 1 and cmax < threshold:
-        ipop = 'ADMIXED_%s' % popset.pop()
-    else:
-        ipop = '_'.join(sorted(popset))
-    return ipop
 
+
+
+
+def makeSampSheetDict(SampleSheet, headers):
+    '''
+    (str, list) -> dict
+    headers is a list of header names in the SampleSheet
+    headers[0] will be the key to the dict and the rest will be values
+    headers[0] is usually "Sample_ID"
+    '''
+    def getValList(sampSheetLine, headers, headerToColDict, colDict):
+        colToValDict = {}
+        line_list = sampSheetLine.rstrip().split(',')
+        for i in range(len(line_list)):
+            if colDict.get(i):
+                colToValDict[i] = line_list[i]
+        valList = []
+        for h in headers:
+            col = headerToColDict[h]
+            valList.append(colToValDict[col])
+        return valList
+
+    sampSheetDict = {}
+    headerToColDict = {}
+    colDict = {}
+    with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
+        head = f.readline()
+        while 'SentrixBarcode_A' not in head and head != '':
+            head = f.readline()
+        if 'SentrixBarcode_A' not in head:
+            print('Sample sheet not formatted correctly')
+            sys.exit(1)
+        head_list = head.rstrip().split(',')
+        for i in range(len(head_list)):
+            if head_list[i] in headers:
+                myHead = head_list[i]
+                headerToColDict[myHead] = i
+                colDict[i] = 1
+        for h in headers:
+            if headerToColDict.get(h) == None:
+                print(h + ' not found in sample sheet')
+                sys.exit(1)
+        line = f.readline()
+        while line != '':
+            if line.strip():
+                valList = getValList(line, headers, headerToColDict, colDict)
+                sampSheetDict[valList[0]] = valList
+            line = f.readline()
+    return sampSheetDict
 
 
 def getBestSamp(CrSampList, crList):
@@ -317,7 +337,35 @@ def makeControlDict(SampleSheet):
     return controlDict
 
 
-
+def classify_ancestry(labels,x,threshold):
+    '''
+    This code is modified from GLU admix.py
+    https://github.com/bioinformed/glu-genetics/blob/master/glu/modules/struct/admix.py#L345
+    An individual is considered of a given ancestry based on the supplied
+    labels and estimated admixture coefficients if their coefficient is
+    greater than a given threshold.
+    Otherwise, an individual who has no single estimated admixture coefficient
+    that meets the specified threshold then one of two behaviors result.  If
+    only one population group exceeds 1-threshold then the ancestry is deemed
+    'ADMIXED' for that population.  Otherwise, a list of populations with
+    estimated admixture above 1-threshold is returned.
+    '''
+    if len(labels) != len(x):
+        print('for classify_ancestry labels and x need to be same length')
+        sys.exit(1)
+    popset = set()
+    cmax = -1
+    for i in range(len(labels)):
+        pop = labels[i]
+        coeff = float(x[i])
+        if coeff >= 1 - threshold:
+            popset.add(pop)
+            cmax = max(cmax,coeff)
+    if len(popset) == 1 and cmax < threshold:
+        ipop = 'ADMIXED_%s' % popset.pop()
+    else:
+        ipop = '_'.join(sorted(popset))
+    return ipop
 
 
 def makeRepDiscordantDict(knownConcordanceFile, thresh = dup_concordance_cutoff):
@@ -493,14 +541,17 @@ def makeIdatIntensDict(intensFile):
 
 
 
-def makeAncestryDict(snpWeightsFile):
+def makeAncestryDict(snpWeightsCsvFile):
     ancestryDict = {}
-    with open(snpWeightsFile) as f:
-        for line in f:
-            line_list = line.split()
+    with open(snpWeightsCsvFile) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            line_list = line.rstrip().split(',')
             samp = line_list[0]
-            (AFR, EUR, ASN) = line_list[-3:]
-            ancestryDict[samp] = (float(AFR), float(EUR), float(ASN)) 
+            (AFR, EUR, ASN, ancestry) = line_list[-4:]
+            ancestryDict[samp] = (AFR, EUR, ASN, ancestry)
+            line = f.readline()
     return ancestryDict
 
 
@@ -605,6 +656,7 @@ include: 'modules/Snakefile_sample_qc_report'
 include: 'modules/Snakefile_ancestry'
 include: 'modules/Snakefile_for_lab'
 include: 'modules/Snakefile_idat_intensity'
+include: 'modules/Snakefile_identifiler'
 include: 'modules/Snakefile_remove_qc_failures'
 include: 'modules/Snakefile_subject_level'
 include: 'modules/Snakefile_remove_related'
@@ -629,11 +681,11 @@ rule all:
         'concordance/UnknownReplicates.csv',
         'snpweights/samples.snpweights.csv',
         'all_contam/contam.csv',
-        'remove_qc_fail/samples_remove_failures.imiss',
         'files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
+        'files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv',
         'subject_level/subjects_qc.imiss',
         'ibd/unrelated_subjects.genome',
         'ancestry/subjects.ancestry.png',
