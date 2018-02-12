@@ -31,11 +31,10 @@ rule sex_discordant_list:
 
 rule unexp_rep_list:
     input:
-        sex = 'subject_qc_removal/sex_discordant.txt',
-        fam = 'subject_level/subjects.fam',
+        fam = 'subject_level/samples.fam',
         rep = 'concordance/UnknownReplicates.csv'
     output:
-        'subject_qc_removal/unexpected_replicate.txt'
+        'subject_qc_removal/unexpected_replicate.csv'
     params:
         unexpectRep = config['remove_unexpected_rep']
     run:
@@ -44,60 +43,18 @@ rule unexp_rep_list:
             for line in f:
                 sub = line.split()[1]
                 subDict[sub] = 1
-        sexRemDict = {}
-        with open(input.sex) as f:
-            for line in f:
-                sub = line.split()[1]
-                sexRemDict[sub] = 1
         repToRemDict = {}
         if params.unexpectRep == 'YES':
-            with open(input.rep) as f:
+            with open(input.rep) as f, open(output[0], 'w') as out:
                 head = f.readline()
+                out.write(head)
                 line = f.readline()
                 while line != '':
                     line_list = line.rstrip().split(',')
-                    sub1 = line_list[0]
-                    sub2 = line_list[1]
-                    if subDict.get(sub1) and subDict.get(sub2) and not sexRemDict.get(sub1) and not sexRemDict.get(sub2):
-                        repToRemDict[sub1] = 1
-                        repToRemDict[sub2] = 1
-                    line = f.readline()
-        with open(output[0], 'w') as out:
-            for sub in repToRemDict.keys():
-                out.write(sub + ' ' + sub + '\n')
-
-                    
-rule combine_sub_qc:
-    input:
-        'subject_qc_removal/sex_discordant.txt',
-        'subject_qc_removal/unexpected_replicate.txt'
-    output:
-        'subject_qc_removal/subjectsToRemove.txt'
-    run:
-        with open(output[0], 'w') as out:
-            for i in input:
-                with open(i) as f:
-                    for line in f:
+                    samp1 = line_list[2]
+                    samp2 = line_list[3]
+                    if subDict.get(samp1) and subDict.get(samp2):
                         out.write(line)
-
-
-
-rule remove_sub_qc:
-    input:
-        bed = 'subject_level/subjects.bed',
-        bim = 'subject_level/subjects.bim',
-        fam = 'subject_level/subjects.fam',
-        remove = 'subject_qc_removal/subjectsToRemove.txt'
-    params:
-        inProj = 'subject_level/subjects',
-        outProj = 'subject_qc_removal/subjects'
-    output:
-        'subject_qc_removal/subjects.bed',
-        'subject_qc_removal/subjects.bim',
-        'subject_qc_removal/subjects.fam'
-    shell:
-        'plink --bfile {params.inProj} --remove {input.remove} --memory 10000 --make-bed --out {params.outProj}'
-
+                    line = f.readline()
 
     
-
