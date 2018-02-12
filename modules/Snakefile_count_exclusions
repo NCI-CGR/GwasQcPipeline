@@ -12,7 +12,7 @@ rule count_exclusions:
         exp_dup_removed = 'subject_level/expectedDupToRemove.txt',
         start_subject_fam = 'subject_level/subjects.fam',
         sex_discord = 'subject_qc_removal/sex_discordant.txt',
-        unexp_rep = 'subject_qc_removal/unexpected_replicate.txt',
+        unexp_rep = 'subject_qc_removal/unexpected_replicate.csv',
         related = 'remove_related/subjects_to_remove.txt',
         autosomal_het = 'autosomal_heterozygosity/subjects_het_fail.txt'
     output:
@@ -56,7 +56,17 @@ rule count_exclusions:
             out1.write(','.join(['SexDiscordant'] + getCountsByCaCo(sex_dict.keys(), subToCaCoDict)) + '\n')
             filtSexDict = DictDiff(startSubjectDict, sex_dict)
             out2.write(','.join(['SexDiscordant'] + getCountsByCaCo(filtSexDict.keys(), subToCaCoDict)) + '\n')
-            unexpRepDict = makeSampDict(input.unexp_rep)
+            unexpRepDict = {}
+            with open(input.unexp_rep) as f:
+                head = f.readline()
+                line = f.readline()
+                while line != '':
+                    line_list = line.rstrip().split(',')
+                    sub1 = line_list[0]
+                    unexpRepDict[sub1] = 1
+                    sub2 = line_list[1]
+                    unexpRepDict[sub2] = 1
+                    line = f.readline()
             out1.write(','.join(['UnexpectedReplicates'] + getCountsByCaCo(unexpRepDict.keys(), subToCaCoDict)) + '\n')
             filtUnexpDict = DictDiff(filtSexDict, unexpRepDict)
             out2.write(','.join(['UnexpectedReplicates'] + getCountsByCaCo(filtUnexpDict.keys(), subToCaCoDict)) + '\n')
