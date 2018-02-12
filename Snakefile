@@ -690,7 +690,7 @@ rule all:
         'ibd/unrelated_subjects.genome',
         'ancestry/subjects.ancestry.png',
         expand('pca/{pop}_subjects.{pc}.png', pop = POPS, pc = PCs),
-        expand('HWP/{pop}_subjects_qc.hwe', pop = POPS),
+        expand('HWP/{pop}_subjects_qc.HWP.png', pop = POPS),
         expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT),
         expand('autosomal_heterozygosity/{pop}_subjects_qc.het.png', pop = POPS),
         'sex_plot/sex.png',

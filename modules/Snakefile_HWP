@@ -2,7 +2,7 @@
 
 rule make_control_list:
     input:
-        fam = 'final_qc_subject_level/{pop}_subjects.fam',
+        fam = 'split_by_pop/{pop}_subjects.fam',
         sampSheet = sample_sheet
     output:
         'HWP/{pop}_controls.txt'
@@ -32,12 +32,12 @@ rule make_control_list:
 
 rule subset_controls:
     input:
-        bed = 'final_qc_subject_level/{pop}_subjects.bed',
-        bim = 'final_qc_subject_level/{pop}_subjects.bim',
-        fam = 'final_qc_subject_level/{pop}_subjects.fam',
+        bed = 'split_by_pop/{pop}_subjects.bed',
+        bim = 'split_by_pop/{pop}_subjects.bim',
+        fam = 'split_by_pop/{pop}_subjects.fam',
         keep = 'HWP/{pop}_controls.txt'
     params:
-        inProj = 'final_qc_subject_level/{pop}_subjects',
+        inProj = 'split_by_pop/{pop}_subjects',
         outProj = 'HWP/{pop}_subjects'
     output:
         'HWP/{pop}_subjects.bed',
@@ -70,5 +70,30 @@ rule control_HWP:
             with open(output[0], 'w') as out:
                 out.write('Too few subjects to process pop\n')
         else:
-            shell('plink --bfile {params.inProj} --autosome --hardy --memory 10000 --out {params.outProj}')
+            shell('plink --bfile {params.inProj} --autosome --maf 0.05 --hardy --memory 10000 --out {params.outProj}')
 
+rule plot_HWP:
+    input:
+        'HWP/{pop}_subjects_qc.hwe'
+    output:
+        png = 'HWP/{pop}_subjects_qc.HWP.png',
+        R = 'HWP/{pop}_subjects_qc.HWP.R',
+        Rout = 'HWP/{pop}_subjects_qc.HWP.R.out'
+    run:
+        with open(input[0]) as f:
+            line = f.readline()
+        if line == 'Too few subjects to process pop\n':
+            for x in output:
+                with open(x, 'w') as out:
+                    out.write('Too few subjects to process pop\n')
+        else:
+            rTxt = '''
+            require(qqman)
+            data <- read.table("''' + input[0] + '''", head = T)                                                                                                   
+            png("''' + output.png + '''", 6.5, 6.5, "in", res = 300)
+            qq(data$P, main = "''' + wildcards.pop + ''' HWP qq plot")
+            dev.off()                                                                                                                                   
+            '''
+            with open(output.R, 'w')  as R:
+                R.write(rTxt)
+            shell('R --vanilla < {output.R} > {output.Rout}')
