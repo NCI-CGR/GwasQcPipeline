@@ -3,11 +3,11 @@
 
 rule plink_ld_prune_pca:
     input:
-        bed = 'final_qc_subject_level/{pop}_subjects.bed',
-        bim = 'final_qc_subject_level/{pop}_subjects.bim',
-        fam = 'final_qc_subject_level/{pop}_subjects.fam'
+        bed = 'split_by_pop/{pop}_subjects.bed',
+        bim = 'split_by_pop/{pop}_subjects.bim',
+        fam = 'split_by_pop/{pop}_subjects.fam'
     params:
-        inProj = 'final_qc_subject_level/{pop}_subjects',
+        inProj = 'split_by_pop/{pop}_subjects',
         outProj = 'pca/{pop}_ldPruneList',
         r2 = ld_prune_r2,
         maf = maf_for_ibd
@@ -27,12 +27,12 @@ rule plink_ld_prune_pca:
 
 rule extract_ld_prune_pca:
     input:
-        bed = 'final_qc_subject_level/{pop}_subjects.bed',
-        bim = 'final_qc_subject_level/{pop}_subjects.bim',
-        fam = 'final_qc_subject_level/{pop}_subjects.fam',
+        bed = 'split_by_pop/{pop}_subjects.bed',
+        bim = 'split_by_pop/{pop}_subjects.bim',
+        fam = 'split_by_pop/{pop}_subjects.fam',
         prune = 'pca/{pop}_ldPruneList.prune.in'
     params:
-        inProj = 'final_qc_subject_level/{pop}_subjects',
+        inProj = 'split_by_pop/{pop}_subjects',
         outProj = 'pca/{pop}_subjects_ld_prune'
     output:
         'pca/{pop}_subjects_ld_prune.ped',
