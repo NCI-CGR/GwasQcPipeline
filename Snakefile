@@ -696,6 +696,6 @@ rule all:
         'sex_plot/sex.png',
         'subject_qc_removal/sex_discordant.txt',
         'subject_qc_removal/unexpected_replicate.csv',
-        'final_qc_subject_level/subjects.bed',
-        'counts/exclusion_counts.csv'
+        'counts/exclusion_counts.csv',
+        'remove_related/subjects_ibd.csv'
 
