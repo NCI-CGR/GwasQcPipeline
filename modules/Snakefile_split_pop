@@ -4,7 +4,7 @@ rule make_pop_list:
     input:
         snpweights = 'snpweights/samples.snpweights.csv',
         samp_to_sub = 'subject_level/SampleUsedforSubject.csv',
-        fam = 'remove_related/subjects.fam',
+        fam = 'subject_level/subjects.fam',
         SampSheet = sample_sheet
     output:
         snpweights = 'ancestry/subjects.snpweights.csv',
@@ -56,12 +56,12 @@ rule make_pop_list:
 
 rule plink_subset_pop:
     input:
-        bed = 'remove_related/subjects.bed',
-        bim = 'remove_related/subjects.bim',
-        fam = 'remove_related/subjects.fam',
+        bed = 'subject_level/subjects.bed',
+        bim = 'subject_level/subjects.bim',
+        fam = 'subject_level/subjects.fam',
         keep = 'split_by_pop/{pop}.keep.txt'
     params:
-        inProj = 'remove_related/subjects',
+        inProj = 'subject_level/subjects',
         outProj = 'split_by_pop/{pop}_subjects'
     output:
         'split_by_pop/{pop}_subjects.bed',
