@@ -20,7 +20,7 @@ rule subset_qc_subject:
             out.write(head.rstrip() + ',CaCo\n')
             line = f.readline()
             while line != '':
-                samp = line.split(',')[0]
+                samp = line.split(',')[7]
                 CaCo = sampToCaCoDict[samp]
                 if CaCo == 'NA':
                     CaCo = '2'
