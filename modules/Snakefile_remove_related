@@ -50,6 +50,7 @@ rule subject_ibd_csv:
             out.write('Subject_ID1,Subject_ID2,PI_HAT\n')
             line = f.readline()
             while line != '':
+                line_list = line.split()
                 samp1 = line_list[1]
                 samp2 = line_list[2]
                 piHat = float(line_list[9])
