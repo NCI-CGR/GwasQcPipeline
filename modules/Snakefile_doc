@@ -2,25 +2,43 @@
 
 rule word_doc:
     input:
+        samp_sheet = sample_sheet,
         sex_plot = 'sex_plot/sex.png',
-        template = config['doc_template']
+        template = config['doc_template'],
+        completion1 = 'plink_start/samples_start.completion.png',
+        exclusions = 'counts/exclusion_counts.csv',
+        remaining = 'counts/remaining_counts.csv',
+        completion3 = 'plink_filter_call_rate_2/samples_filter2.completion.png',
+        ancestry_plot = 'ancestry/subjects.ancestry.png'
     output:
-        doc = outName + '_QC_Report_' + sampSheetDate + '.docx',
+        doc = outName + '_QC_Report_' + sampSheetDate + '.docx', 
         R = 'word_doc/doc.R',
         Rout = 'word_doc/doc.R.out'
     run:
+        subToCaCoDict = makeSubjectToCaCoDict(input.samp_sheet)
+        totSubs = len(subToCaCoDict.keys())
         rTxt = '''
         library(officer)
         library(magrittr)
+        exclusions <- read.csv("''' + input.exclusions + '''")
+        remaining <- read.csv("''' + input.remaining + '''")
+        tot_samps <- remaining[1,6]
         my_doc <- read_docx(path = "''' + input.template + '''")  %>%
-            body_replace_all_text("PROJECT_NAME", "PLCO Batch 1 to 9") %>%
+            body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''") %>%
             body_replace_all_text("DATE", date()) %>%
-            body_replace_all_text("TOT_SAMPS", "40000") %>%
-            body_replace_all_text("TOT_SUBS", "35000") %>%
-            cursor_reach(keyword = "be included in final analytical exclusions.") %>%
-            slip_in_img(src = "manhattan.png", width = 6, height = 6)
+            body_replace_all_text("TOT_SAMPS", as.character(tot_samps)) %>%
+            body_replace_all_text("TOT_SUBS", "''' + str(totSubs) + '''") %>%
+            cursor_reach(keyword = "Figure 1a initial completion rate") %>%
+            slip_in_img(src = "''' + input.completion1 + '''", width = 6, height = 6, pos = "before") %>%
+            cursor_reach(keyword = "Figure 1b completion rate by sample and by locus after filter 2") %>%
+            slip_in_img(src = "''' + input.completion3 + '''", width = 6, height = 6, pos = "before") %>%
+            cursor_reach(keyword = "Figure 2 chrX F coefficient distribution") %>%
+            slip_in_img(src = "''' + input.sex_plot + '''", width = 4, height = 4, pos = "before") %>%
+            cursor_reach(keyword = "Figure 3 Ancestry using") %>%
+            slip_in_img(src = "''' + input.ancestry_plot + '''", width = 6, height = 6, pos = "before") %>%
+            
 
-        print(my_doc, target = "Test1_GwasQcPipeline.docx")
+        print(my_doc, target = "''' + output.doc + '''")
         '''
         with open(output.R, 'w')  as R:
             R.write(rTxt)
