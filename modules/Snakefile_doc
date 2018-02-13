@@ -1,0 +1,27 @@
+#!/usr/bin/python
+
+rule word_doc:
+    input:
+        sex_plot = 'sex_plot/sex.png',
+        template = config['doc_template']
+    output:
+        doc = outName + '_QC_Report_' + sampSheetDate + '.docx',
+        R = 'word_doc/doc.R',
+        Rout = 'word_doc/doc.R.out'
+    run:
+        rTxt = '''
+        library(officer)
+        library(magrittr)
+        my_doc <- read_docx(path = "''' + input.template + '''")  %>%
+            body_replace_all_text("PROJECT_NAME", "PLCO Batch 1 to 9") %>%
+            body_replace_all_text("DATE", date()) %>%
+            body_replace_all_text("TOT_SAMPS", "40000") %>%
+            body_replace_all_text("TOT_SUBS", "35000") %>%
+            cursor_reach(keyword = "be included in final analytical exclusions.") %>%
+            slip_in_img(src = "manhattan.png", width = 6, height = 6)
+
+        print(my_doc, target = "Test1_GwasQcPipeline.docx")
+        '''
+        with open(output.R, 'w')  as R:
+            R.write(rTxt)
+        shell('R --vanilla < {output.R} > {output.Rout}')
