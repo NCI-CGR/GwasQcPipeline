@@ -16,6 +16,7 @@ import sys
 import os
 import shutil
 import codecs
+import string
 from snakemake.utils import R
 
 
@@ -669,6 +670,7 @@ include: 'modules/Snakefile_plot_completion'
 include: 'modules/Snakefile_plot_sex'
 include: 'modules/Snakefile_subject_qc_fail'
 include: 'modules/Snakefile_count_exclusions'
+include: 'modules/Snakefile_doc'
 
 localrules: summary_stats
 
@@ -696,5 +698,6 @@ rule all:
         'subject_qc_removal/sex_discordant.txt',
         'subject_qc_removal/unexpected_replicate.csv',
         'counts/exclusion_counts.csv',
-        'remove_related/subjects_ibd.csv'
+        'remove_related/subjects_ibd.csv',
+        outName + '_QC_Report_' + sampSheetDate + '.docx'
 

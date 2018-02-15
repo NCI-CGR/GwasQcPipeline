@@ -9,12 +9,28 @@ rule word_doc:
         exclusions = 'counts/exclusion_counts.csv',
         remaining = 'counts/remaining_counts.csv',
         completion3 = 'plink_filter_call_rate_2/samples_filter2.completion.png',
-        ancestry_plot = 'ancestry/subjects.ancestry.png'
+        ancestry_plot = 'ancestry/subjects.ancestry.png',
+        ancestry_counts = 'ancestry/subjects.snpweights.csv',
+        expand('autosomal_heterozygosity/{pop}_subjects_qc.het.png', pop = POPS),
+        expand('pca/{pop}_subjects.PC1_PC2.png', pop = POPS)
+    params:
+        min_subjects = config['minimum_pop_subjects']
     output:
         doc = outName + '_QC_Report_' + sampSheetDate + '.docx', 
         R = 'word_doc/doc.R',
         Rout = 'word_doc/doc.R.out'
     run:
+        ancestCountDict = {}
+        with open(input.ancestry_counts) as f:
+            head = f.readline()
+            line = f.readline()
+            while line != '':
+                ancest = line.rstrip().split(',')[-1]
+                if ancestCountDict.get(ancest):
+                    ancestCountDict[ancest] += 1
+                else:
+                    ancestCountDict[ancest] = 1
+                line = f.readline()
         subToCaCoDict = makeSubjectToCaCoDict(input.samp_sheet)
         totSubs = len(subToCaCoDict.keys())
         rTxt = '''
@@ -36,8 +52,29 @@ rule word_doc:
             slip_in_img(src = "''' + input.sex_plot + '''", width = 4, height = 4, pos = "before") %>%
             cursor_reach(keyword = "Figure 3 Ancestry using") %>%
             slip_in_img(src = "''' + input.ancestry_plot + '''", width = 6, height = 6, pos = "before") %>%
-            
-
+            cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.") %>%
+            '''
+        hetTxt = ''
+        pcaTxt = '            cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.") %>%\n'
+        c = 0
+        for i in range(len(POPS)):
+            pop = POPS[i]
+            if not ancestCountDict.get(pop):
+                ancestCount = 0
+            else:
+                ancestCount = ancestCountDict[pop]
+            if ancestCount >= params.min_subjects:
+                figLetter = string.ascii_lowercase[c]
+                hetTxt += '            slip_in_img(src = "autosomal_heterozygosity/' + pop + '_subjects_qc.het.png", width = 6, height = 6, pos = "after") %>%\n'
+                hetTxt += '            slip_in_text("Figure 4' + figLetter + ' ", tyle = "strong", pos = "after") %>%\n'
+                hetTxt += '            slip_in_text("' + pop + ' F coefficient distribution", tyle = "Normal", pos = "after") %>%\n'
+                pcaTxt += '            slip_in_img(src = "pca/' + pop + '_subjects.PC1_PC2.png", width = 6, height = 6, pos = "after") %>%\n'
+                pcaTxt += '            slip_in_text("Figure 5' + figLetter + ' ", tyle = "strong", pos = "after") %>%\n'
+                pcaTxt += '            slip_in_text("' + pop + ' PCA plot", tyle = "Normal", pos = "after") %>%\n'
+                c += 1
+        rTxt += hetTxt
+        rTxt += pcaTxt
+        rTxt += '''
         print(my_doc, target = "''' + output.doc + '''")
         '''
         with open(output.R, 'w')  as R:
