@@ -16,7 +16,9 @@ rule word_doc:
         start_snps = 'plink_start/samples.bim',
         filt1_snps = 'plink_filter_call_rate_1/samples.bim',
         filt2_snps = 'plink_filter_call_rate_2/samples.bim',
-        all_qc = 'all_sample_qc.csv'
+        all_qc = 'all_sample_qc.csv',
+        qc_known_rep = 'concordance/InternalQcKnown.csv',
+        sample_known_rep = 'concordance/StudySampleKnown.csv'
     params:
         min_subjects = config['minimum_pop_subjects'],
         manifest = illumina_manifest_file
