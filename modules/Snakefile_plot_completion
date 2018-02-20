@@ -36,7 +36,7 @@ rule plot_completion:
     run:
         (ylim1, ylim2) = ylimDict[wildcards.filt]
         rTxt = '''
-        colors <- c(rgb(0, 0, 1, .3), rgb(1, 0, 0, .3), rgb(0, 1, 0, .3))
+        colors <- c(rgb(0, 0, 1, .3), rgb(1, 0, 0, .3), rgb(.75, .75, .75, .3), rgb(0, 1, 0, .3))
         data <- read.csv("''' + input.samp + '''")
         data$CR <- 1.0 - data$F_MISS
         sortData <- data[with(data, order(data$CR)), ]
@@ -55,7 +55,7 @@ rule plot_completion:
         abline(h=''' + params.cut1  + ''')
         abline(h=''' + params.cut2  + ''') 
         title(main= "Sample Completion",sub= "", cex=0.6)
-        legend("center", legend = c("Cases", "Controls", "QC/Unknown"), col = c("red", "blue", "green"), pch = 19, cex=0.7, bty="n")
+        legend("center", legend = c("Cases", "Controls", "QC", "Unknown"), col = c("red", "blue", "gray", "green"), pch = 19, cex=0.7, bty="n")
 
         par(mar= c(7,1,2,3))
         plot(x2, 100 * sort(snpCR), xlim= c(0, 100), ylim= c(''' + ylim1 + ''', ''' + ylim2 + '''), xlab= "Loci(%)", ylab="", col = rgb(0.5, 0.5, 0.5, 0.2), pch = 20, cex = 0.3, axes=F)
