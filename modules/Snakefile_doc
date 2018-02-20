@@ -12,14 +12,31 @@ rule word_doc:
         remaining = 'counts/remaining_counts.csv',
         completion3 = 'plink_filter_call_rate_2/samples_filter2.completion.png',
         ancestry_plot = 'ancestry/subjects.ancestry.png',
-        ancestry_counts = 'ancestry/subjects.snpweights.csv'
+        ancestry_counts = 'ancestry/subjects.snpweights.csv',
+        start_snps = 'plink_start/samples.bim',
+        filt1_snps = 'plink_filter_call_rate_1/samples.bim',
+        filt2_snps = 'plink_filter_call_rate_2/samples.bim',
+        all_qc = 'all_sample_qc.csv'
     params:
-        min_subjects = config['minimum_pop_subjects']
+        min_subjects = config['minimum_pop_subjects'],
+        manifest = illumina_manifest_file
     output:
         doc = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx', 
         R = 'word_doc/doc.R',
         Rout = 'word_doc/doc.R.out'
     run:
+        StartSnpCount = 0
+        with open(input.start_snps) as f:
+            for line in f:
+                StartSnpCount += 1
+        Filt1snpCount = 0
+        with open(input.filt1_snps) as f:
+            for line in f:
+                Filt1snpCount += 1
+        Filt2snpCount = 0
+        with open(input.filt2_snps) as f:
+            for line in f:
+                Filt2snpCount += 1
         ancestCountDict = {}
         with open(input.ancestry_counts) as f:
             head = f.readline()
@@ -37,12 +54,57 @@ rule word_doc:
 library(magrittr)
 exclusions <- read.csv("''' + input.exclusions + '''")
 remaining <- read.csv("''' + input.remaining + '''")
+data <- read.csv("''' + input.all_qc + '''")
 tot_samps <- remaining[1,6]
+numCase <- remaining[1,2]
+numControl <- remaining[1,3]
+numMale <- length(data$Expected_Sex[data$Expected_Sex == "M"])
+numFemale <- length(data$Expected_Sex[data$Expected_Sex == "F"])
+array_processing <- exclusions[1,6]
+rem_array_process <- remaining[2,6]
+mean_samp_completion <- mean(data$Call_Rate_Initial, na.rm = T)
+filt1_samps <- exclusions[2,6]
+filt2_samps <- exclusions[3,6]
+filt1_remaining <- remaining[3,6]
+filt2_remaining <- remaining[4,6]
+contam_samps <- exclusions[4,6]
+contam_remaining <- remaining[5,6]
+start_qc_samps <- remaining[1,4]
+filt_qc_samps <- remaining[5,4]
+qc_remaining <- remaining[6,6]
+
 my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''") %>%
     body_replace_all_text("DATE", date()) %>%
     body_replace_all_text("TOT_SAMPS", as.character(tot_samps)) %>%
     body_replace_all_text("TOT_SUBS", "''' + str(totSubs) + '''") %>%
+    body_replace_all_text("NUM_LOCI", "''' + str(StartSnpCount) + '''") %>%
+    body_replace_all_text("SNP_ARRAY", "''' + os.path.basename(params.manifest).split('_')[0] + '''") %>%
+    body_replace_all_text("numCase", as.character(numCase)) %>%
+    body_replace_all_text("numControl", as.character(numControl)) %>%
+    body_replace_all_text("numMale", as.character(numMale)) %>%
+    body_replace_all_text("numFemale", as.character(numFemale)) %>%
+    body_replace_all_text("ARRAY_PROCESSING", as.character(array_processing)) %>%
+    body_replace_all_text("REMAIN_ARRAY", as.character(rem_array_process)) %>%
+    body_replace_all_text("MEAN_COMPLETION", as.character(mean_samp_completion)) %>%
+    body_replace_all_text("CR_SAMP_THRESH_1", "''' + str(samp_cr_1) + '''") %>%
+    body_replace_all_text("CR_SNP_THRESH_1", "''' + str(snp_cr_1) + '''") %>%
+    body_replace_all_text("CR_SAMP_THRESH_2", "''' + str(samp_cr_2) + '''") %>%
+    body_replace_all_text("CR_SNP_THRESH_2", "''' + str(snp_cr_2) + '''") %>%
+    body_replace_all_text("FILT_1_SAMPS", as.character(filt1_samps)) %>%
+    body_replace_all_text("FILT_1_SNPS", "''' + str(StartSnpCount - Filt1snpCount) + '''") %>%
+    body_replace_all_text("FILT_2_SAMPS", as.character(filt2_samps)) %>%
+    body_replace_all_text("FILT_2_SNPS", "''' + str(Filt1snpCount - Filt2snpCount) + '''") %>%
+    body_replace_all_text("REMAIN_SAMPS_FILT1", as.character(filt1_remaining)) %>%
+    body_replace_all_text("REMAIN_SAMPS_FILT2", as.character(filt2_remaining)) %>%
+    body_replace_all_text("REMAIN_SNPS_FILT1", "''' + str(Filt1snpCount) + '''") %>%
+    body_replace_all_text("REMAIN_SNPS_FILT2", "''' + str(Filt2snpCount) + '''") %>%
+    body_replace_all_text("CONTAM_SAMPS", as.character(contam_samps)) %>%
+    body_replace_all_text("REMAIN_SAMPS_CONTAM", as.character(contam_remaining)) %>%
+    body_replace_all_text("START_QC_SAMPS", as.character(start_qc_samps)) %>%
+    body_replace_all_text("FILT_QC_SAMPS", as.character(filt_qc_samps)) %>%
+    body_replace_all_text("REMAIN_SAMPS_QC", as.character(qc_remaining)) %>%
+
     cursor_reach(keyword = "Figure 1a initial completion rate") %>%
     slip_in_img(src = "''' + input.completion1 + '''", width = 6, height = 6, pos = "before") %>%
     cursor_reach(keyword = "Figure 1b completion rate by sample and by locus after filter 2") %>%
@@ -53,7 +115,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     slip_in_img(src = "''' + input.ancestry_plot + '''", width = 6, height = 6, pos = "before") %>%
     cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.")'''
         hetTxt = ''
-        pcaTxt = '    cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.")'
+        pcaTxt = ' %>%\n    cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.")'
         c = 0
         for i in range(len(POPS)):
             pop = POPS[i]
@@ -66,11 +128,11 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
                 hetTxt += ' %>%\n'
                 hetTxt += '    slip_in_img(src = "autosomal_heterozygosity/' + pop + '_subjects_qc.het.png", width = 6, height = 6, pos = "after") %>%\n'
                 hetTxt += '    slip_in_text("Figure 4' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
-                hetTxt += '    slip_in_text("' + pop + ' F coefficient distribution", style = "normal", pos = "after") %>%\n'
+                hetTxt += '    slip_in_text("' + pop + ' F coefficient distribution", style = "normal", pos = "after")'
                 pcaTxt += ' %>%\n'
                 pcaTxt += '    slip_in_img(src = "pca/' + pop + '_subjects.PC1_PC2.png", width = 6, height = 6, pos = "after") %>%\n'
                 pcaTxt += '    slip_in_text("Figure 5' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
-                pcaTxt += '    slip_in_text("' + pop + ' PCA plot", style = "normal", pos = "after")\n'
+                pcaTxt += '    slip_in_text("' + pop + ' PCA plot", style = "normal", pos = "after")'
                 c += 1
         rTxt += hetTxt
         rTxt += pcaTxt
