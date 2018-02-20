@@ -699,5 +699,5 @@ rule all:
         'subject_qc_removal/unexpected_replicate.csv',
         'counts/exclusion_counts.csv',
         'remove_related/subjects_ibd.csv',
-        outName + '_QC_Report_' + sampSheetDate + '.docx'
+        'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx'
 

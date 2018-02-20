@@ -16,7 +16,7 @@ rule word_doc:
     params:
         min_subjects = config['minimum_pop_subjects']
     output:
-        doc = outName + '_QC_Report_' + sampSheetDate + '.docx', 
+        doc = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx', 
         R = 'word_doc/doc.R',
         Rout = 'word_doc/doc.R.out'
     run:
@@ -33,29 +33,27 @@ rule word_doc:
                 line = f.readline()
         subToCaCoDict = makeSubjectToCaCoDict(input.samp_sheet)
         totSubs = len(subToCaCoDict.keys())
-        rTxt = '''
-        library(officer)
-        library(magrittr)
-        exclusions <- read.csv("''' + input.exclusions + '''")
-        remaining <- read.csv("''' + input.remaining + '''")
-        tot_samps <- remaining[1,6]
-        my_doc <- read_docx(path = "''' + input.template + '''")  %>%
-            body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''") %>%
-            body_replace_all_text("DATE", date()) %>%
-            body_replace_all_text("TOT_SAMPS", as.character(tot_samps)) %>%
-            body_replace_all_text("TOT_SUBS", "''' + str(totSubs) + '''") %>%
-            cursor_reach(keyword = "Figure 1a initial completion rate") %>%
-            slip_in_img(src = "''' + input.completion1 + '''", width = 6, height = 6, pos = "before") %>%
-            cursor_reach(keyword = "Figure 1b completion rate by sample and by locus after filter 2") %>%
-            slip_in_img(src = "''' + input.completion3 + '''", width = 6, height = 6, pos = "before") %>%
-            cursor_reach(keyword = "Figure 2 chrX F coefficient distribution") %>%
-            slip_in_img(src = "''' + input.sex_plot + '''", width = 4, height = 4, pos = "before") %>%
-            cursor_reach(keyword = "Figure 3 Ancestry using") %>%
-            slip_in_img(src = "''' + input.ancestry_plot + '''", width = 6, height = 6, pos = "before") %>%
-            cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.") %>%
-            '''
+        rTxt = '''library(officer)
+library(magrittr)
+exclusions <- read.csv("''' + input.exclusions + '''")
+remaining <- read.csv("''' + input.remaining + '''")
+tot_samps <- remaining[1,6]
+my_doc <- read_docx(path = "''' + input.template + '''")  %>%
+    body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''") %>%
+    body_replace_all_text("DATE", date()) %>%
+    body_replace_all_text("TOT_SAMPS", as.character(tot_samps)) %>%
+    body_replace_all_text("TOT_SUBS", "''' + str(totSubs) + '''") %>%
+    cursor_reach(keyword = "Figure 1a initial completion rate") %>%
+    slip_in_img(src = "''' + input.completion1 + '''", width = 6, height = 6, pos = "before") %>%
+    cursor_reach(keyword = "Figure 1b completion rate by sample and by locus after filter 2") %>%
+    slip_in_img(src = "''' + input.completion3 + '''", width = 6, height = 6, pos = "before") %>%
+    cursor_reach(keyword = "Figure 2 chrX F coefficient distribution") %>%
+    slip_in_img(src = "''' + input.sex_plot + '''", width = 4, height = 4, pos = "before") %>%
+    cursor_reach(keyword = "Figure 3 Ancestry using") %>%
+    slip_in_img(src = "''' + input.ancestry_plot + '''", width = 6, height = 6, pos = "before") %>%
+    cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.")'''
         hetTxt = ''
-        pcaTxt = '            cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.") %>%\n'
+        pcaTxt = '    cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.")'
         c = 0
         for i in range(len(POPS)):
             pop = POPS[i]
@@ -65,18 +63,20 @@ rule word_doc:
                 ancestCount = ancestCountDict[pop]
             if ancestCount >= params.min_subjects:
                 figLetter = string.ascii_lowercase[c]
-                hetTxt += '            slip_in_img(src = "autosomal_heterozygosity/' + pop + '_subjects_qc.het.png", width = 6, height = 6, pos = "after") %>%\n'
-                hetTxt += '            slip_in_text("Figure 4' + figLetter + ' ", tyle = "strong", pos = "after") %>%\n'
-                hetTxt += '            slip_in_text("' + pop + ' F coefficient distribution", tyle = "Normal", pos = "after") %>%\n'
-                pcaTxt += '            slip_in_img(src = "pca/' + pop + '_subjects.PC1_PC2.png", width = 6, height = 6, pos = "after") %>%\n'
-                pcaTxt += '            slip_in_text("Figure 5' + figLetter + ' ", tyle = "strong", pos = "after") %>%\n'
-                pcaTxt += '            slip_in_text("' + pop + ' PCA plot", tyle = "Normal", pos = "after") %>%\n'
+                hetTxt += ' %>%\n'
+                hetTxt += '    slip_in_img(src = "autosomal_heterozygosity/' + pop + '_subjects_qc.het.png", width = 6, height = 6, pos = "after") %>%\n'
+                hetTxt += '    slip_in_text("Figure 4' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
+                hetTxt += '    slip_in_text("' + pop + ' F coefficient distribution", style = "normal", pos = "after") %>%\n'
+                pcaTxt += ' %>%\n'
+                pcaTxt += '    slip_in_img(src = "pca/' + pop + '_subjects.PC1_PC2.png", width = 6, height = 6, pos = "after") %>%\n'
+                pcaTxt += '    slip_in_text("Figure 5' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
+                pcaTxt += '    slip_in_text("' + pop + ' PCA plot", style = "normal", pos = "after")\n'
                 c += 1
         rTxt += hetTxt
         rTxt += pcaTxt
         rTxt += '''
-        print(my_doc, target = "''' + output.doc + '''")
-        '''
+print(my_doc, target = "''' + output.doc + '''")
+'''
         with open(output.R, 'w')  as R:
             R.write(rTxt)
         shell('R --vanilla < {output.R} > {output.Rout}')
