@@ -80,12 +80,52 @@ table1 <- data.frame(study = "''' + outName + '''_''' + sampSheetDate + '''", ar
 CaCo = paste(numCase, numControl, sep = ":"), m_f = paste(numMale, numFemale, sep = ":"), tot = tot_samps)
 names(table1) <- c("STUDY NAME", "ARRAY", "CASE:CONTROL", "MALE:FEMALE", "TOTAL COUNT")
 
+
+double_format <- function(x){
+  sprintf("%.2f", x)
+}
+percent_format <- function(x){
+  sprintf("%.2f %%", x)
+}
+
+int_format <- function(x){
+  sprintf("%.0f", x)
+}
+
 ft_1 <- regulartable(table1, col_keys = names(table1)) %>%
     fontsize(size = 8, part = "all") %>%
     fontsize(i = 1, size = 10, part = "header") %>%
     color(i = 1, color = "#007FA6", part = "header") %>%
     theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
     autofit()
+
+table2a <- data.frame(thresh = c(100 * ''' + str(samp_cr_1) + ''', 100 * ''' + str(samp_cr_2) + '''), 
+exclusions = c(filt1_samps, filt2_samps), remain = c(filt1_remaining, filt2_remaining))
+names(table2a) <- c("THRESHOLD", "SAMPLE EXCLUSION", "REMAINING")
+
+ft_2a <- regulartable(table2a, col_keys = names(table2a)) %>%
+    set_formatter("THRESHOLD" = percent_format, "SAMPLE EXCLUSION" = int_format, "REMAINING" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+
+table2b <- data.frame(thresh = c(100 * ''' + str(snp_cr_1) + ''', 100 * ''' + str(snp_cr_2) + '''), 
+exclusions = c(''' + str(StartSnpCount - Filt1snpCount) + ''', ''' + str(Filt1snpCount - Filt2snpCount) + '''), 
+remain = c(''' + str(Filt1snpCount) + ''', ''' + str(Filt2snpCount) + '''))
+names(table2b) <- c("THRESHOLD", "LOCI EXCLUSION", "REMAINING")
+
+ft_2b <- regulartable(table2b, col_keys = names(table2b)) %>%
+    set_formatter("THRESHOLD" = percent_format, "LOCI EXCLUSION" = int_format, "REMAINING" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+
 
 my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''") %>%
@@ -121,6 +161,10 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     slip_in_img(src = "''' + input.completion1 + '''", width = 6, height = 6, pos = "before") %>%
     cursor_reach(keyword = "Figure 1b completion rate by sample and by locus after filter 2") %>%
     slip_in_img(src = "''' + input.completion3 + '''", width = 6, height = 6, pos = "before") %>%
+    cursor_reach(keyword = "Table 2a Sample Quality Control Exclusion") %>%
+    body_add_flextable(value = ft_2a) %>%
+    cursor_reach(keyword = "Table 2b Loci Quality Control Exclusion") %>%
+    body_add_flextable(value = ft_2b) %>%
     cursor_reach(keyword = "Figure 2 chrX F coefficient distribution") %>%
     slip_in_img(src = "''' + input.sex_plot + '''", width = 4, height = 4, pos = "before") %>%
     cursor_reach(keyword = "Figure 3 Ancestry using") %>%
