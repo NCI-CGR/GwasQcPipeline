@@ -116,7 +116,7 @@ rule plot_het:
             plot(1:nrow(sortData), sortData$F,                                                                                                         
             pch = 20, col = colors[sortData$CaCo + 1],                                                                                                     
             xlab = "subjects sorted by F", ylab = "F",
-            main = "Homozygosity F Coefficient")
+            main = "''' + wildcards.pop + ''' Homozygosity F Coefficient")
             abline(h = ''' + str(params.thresh) + ''')
             abline(h = -''' + str(params.thresh) + ''')
             legend("topright", inset=c(-.30,0), xpd=TRUE, legend = c("Cases", "Controls", "QC", "Unknown"), col = c("red", "blue", "gray", "green"), pch = 19)       
