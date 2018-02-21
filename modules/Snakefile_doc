@@ -81,10 +81,11 @@ CaCo = paste(numCase, numControl, sep = ":"), m_f = paste(numMale, numFemale, se
 names(table1) <- c("STUDY NAME", "ARRAY", "CASE:CONTROL", "MALE:FEMALE", "TOTAL COUNT")
 
 ft_1 <- regulartable(table1, col_keys = names(table1)) %>%
-    fontsize(size = 10, part = "all") %>%
-    fontsize(i = 1, size = 11, part = "header") %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
     color(i = 1, color = "#007FA6", part = "header") %>%
-    theme_zebra(odd_header = "transparent", even_header = "transparent")
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
 
 my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''") %>%
