@@ -57,6 +57,8 @@ library(magrittr)
 library(flextable)
 exclusions <- read.csv("''' + input.exclusions + '''")
 remaining <- read.csv("''' + input.remaining + '''")
+qc_known_rep <- read.csv("''' + input.qc_known_rep + '''")
+sample_known_rep <- read.csv("''' + input.sample_known_rep + '''")
 data <- read.csv("''' + input.all_qc + '''")
 tot_samps <- remaining[1,6]
 numCase <- remaining[1,2]
@@ -66,6 +68,10 @@ numFemale <- length(data$Expected_Sex[data$Expected_Sex == "F"])
 array_processing <- exclusions[1,6]
 rem_array_process <- remaining[2,6]
 mean_samp_completion <- mean(data$Call_Rate_Initial, na.rm = T)
+mean_concord_qc <- mean(qc_known_rep$Concordance, na.rm = T)
+min_concord_qc <- min(qc_known_rep$Concordance, na.rm = T)
+mean_concord_sample <- mean(sample_known_rep$Concordance, na.rm = T)
+min_concord_sample <- min(sample_known_rep$Concordance, na.rm = T)
 filt1_samps <- exclusions[2,6]
 filt2_samps <- exclusions[3,6]
 filt1_remaining <- remaining[3,6]
@@ -75,6 +81,9 @@ contam_remaining <- remaining[5,6]
 start_qc_samps <- remaining[1,4]
 filt_qc_samps <- remaining[5,4]
 qc_remaining <- remaining[6,6]
+exp_rep_filt <- exclusions[6,6]
+exp_rep_remaining <- remaining[7,6]
+total_sample_exclusions <- array_processing + filt1_samps + filt2_samps + contam_samps + filt_qc_samps + exp_rep_filt
 
 table1 <- data.frame(study = "''' + outName + '''_''' + sampSheetDate + '''", array = "''' + os.path.basename(params.manifest).split('_')[0] + '''", 
 CaCo = paste(numCase, numControl, sep = ":"), m_f = paste(numMale, numFemale, sep = ":"), tot = tot_samps)
@@ -152,6 +161,13 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("START_QC_SAMPS", as.character(start_qc_samps), fixed=TRUE) %>%
     body_replace_all_text("FILT_QC_SAMPS", as.character(filt_qc_samps), fixed=TRUE) %>%
     body_replace_all_text("REMAIN_SAMPS_QC", as.character(qc_remaining), fixed=TRUE) %>%
+    body_replace_all_text("QC_MIN_CONCORD", as.character(round(100 * min_concord_qc, 2)), fixed=TRUE) %>%
+    body_replace_all_text("QC_MEAN_CONCORD", as.character(round(100 * mean_concord_qc, 2)), fixed=TRUE) %>%
+    body_replace_all_text("SAMPLE_MIN_CONCORD", as.character(round(100 * min_concord_sample, 2)), fixed=TRUE) %>%
+    body_replace_all_text("SAMPLE_MEAN_CONCORD", as.character(round(100 * mean_concord_sample, 2)), fixed=TRUE) %>%
+    body_replace_all_text("EXP_REP_FILT", as.character(exp_rep_filt), fixed=TRUE) %>%
+    body_replace_all_text("EXP_REP_REMAIN", as.character(exp_rep_remaining), fixed=TRUE) %>%
+    body_replace_all_text("TOTAL_SAMP_EXCLUSIONS", as.character(total_sample_exclusions), fixed=TRUE) %>%
 
     cursor_reach(keyword = "Table 1 Sample manifest information prior to processing") %>%
     body_add_flextable(value = ft_1) %>%
