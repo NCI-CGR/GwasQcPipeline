@@ -93,10 +93,6 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("TOT_SUBS", "''' + str(totSubs) + '''") %>%
     body_replace_all_text("NUM_LOCI", "''' + str(StartSnpCount) + '''") %>%
     body_replace_all_text("SNP_ARRAY", "''' + os.path.basename(params.manifest).split('_')[0] + '''") %>%
-    body_replace_all_text("numCase", as.character(numCase)) %>%
-    body_replace_all_text("numControl", as.character(numControl)) %>%
-    body_replace_all_text("numMale", as.character(numMale)) %>%
-    body_replace_all_text("numFemale", as.character(numFemale)) %>%
     body_replace_all_text("ARRAY_PROCESSING", as.character(array_processing)) %>%
     body_replace_all_text("REMAIN_ARRAY", as.character(rem_array_process)) %>%
     body_replace_all_text("MEAN_COMPLETION", as.character(mean_samp_completion)) %>%
