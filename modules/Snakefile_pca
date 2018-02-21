@@ -158,7 +158,7 @@ rule plot_pca:
             pch = 20, col = colors[data$CaCo + 1],
             xlab = "''' + pc1 + '''", ylab = "''' + pc2 + '''",
             main = "''' + wildcards.pop + ''' ''' + pc1 + ''' vs ''' + pc2 + '''")
-            legend("topright", inset=c(-.30,0), xpd=TRUE, legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "gray", "green"), pch = 19)
+            legend("topright", inset=c(-.30,0), xpd=TRUE, legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19)
             par(mar = c(5, 4, 4, 2) + 0.1)
             dev.off()
             '''
