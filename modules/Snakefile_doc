@@ -119,7 +119,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("REMAIN_SAMPS_QC", as.character(qc_remaining)) %>%
 
     cursor_reach(keyword = "Table 1 Sample manifest information prior to processing") %>%
-    body_add_flextable(value = ft_1)
+    body_add_flextable(value = ft_1) %>%
     cursor_reach(keyword = "Figure 1a initial completion rate") %>%
     slip_in_img(src = "''' + input.completion1 + '''", width = 6, height = 6, pos = "before") %>%
     cursor_reach(keyword = "Figure 1b completion rate by sample and by locus after filter 2") %>%
