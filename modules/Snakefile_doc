@@ -54,6 +54,7 @@ rule word_doc:
         totSubs = len(subToCaCoDict.keys())
         rTxt = '''library(officer)
 library(magrittr)
+library(flextable)
 exclusions <- read.csv("''' + input.exclusions + '''")
 remaining <- read.csv("''' + input.remaining + '''")
 data <- read.csv("''' + input.all_qc + '''")
@@ -74,6 +75,16 @@ contam_remaining <- remaining[5,6]
 start_qc_samps <- remaining[1,4]
 filt_qc_samps <- remaining[5,4]
 qc_remaining <- remaining[6,6]
+
+table1 <- data.frame(study = "''' + outName + '''_''' + sampSheetDate + '''", array = "''' + os.path.basename(params.manifest).split('_')[0] + '''", 
+CaCo = paste(numCase, numControl, sep = ":"), m_f = paste(numMale, numFemale, sep = ":"), tot = tot_samps)
+names(table1) <- c("STUDY NAME", "ARRAY", "CASE:CONTROL", "MALE:FEMALE", "TOTAL COUNT")
+
+ft_1 <- regulartable(table1, col_keys = names(table1)) %>%
+    fontsize(size = 10, part = "all") %>%
+    fontsize(i = 1, size = 11, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent")
 
 my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''") %>%
@@ -107,6 +118,8 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("FILT_QC_SAMPS", as.character(filt_qc_samps)) %>%
     body_replace_all_text("REMAIN_SAMPS_QC", as.character(qc_remaining)) %>%
 
+    cursor_reach(keyword = "Table 1 Sample manifest information prior to processing") %>%
+    body_add_flextable(value = ft_1)
     cursor_reach(keyword = "Figure 1a initial completion rate") %>%
     slip_in_img(src = "''' + input.completion1 + '''", width = 6, height = 6, pos = "before") %>%
     cursor_reach(keyword = "Figure 1b completion rate by sample and by locus after filter 2") %>%
