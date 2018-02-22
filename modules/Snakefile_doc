@@ -151,6 +151,21 @@ ft_3 <- regulartable(table3, col_keys = names(table3)) %>%
     theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
     autofit()
 
+sample_exclusions <- exclusions[1:6,2:6]
+table4a <- rbind(sample_exclusions, colSums(sample_exclusions))
+table4a <- cbind(c(as.character(exclusions[1:6,1]), "TOTAL"), table4a)
+names(table4a) <- c("FILTER REASON","CONTROLS","CASES","QC","OTHER", "ALL SAMPLES")
+
+ft_4a <- regulartable(table4a, col_keys = names(table4a)) %>%
+    set_formatter("CONTROLS" = int_format, "CASES" = int_format, "QC" = int_format, "OTHER" = int_format, "ALL SAMPLES" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+
+
 my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''", fixed=TRUE) %>%
     body_replace_all_text("DATE", date(), fixed=TRUE) %>%
