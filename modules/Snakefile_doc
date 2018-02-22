@@ -60,6 +60,7 @@ remaining <- read.csv("''' + input.remaining + '''")
 qc_known_rep <- read.csv("''' + input.qc_known_rep + '''")
 sample_known_rep <- read.csv("''' + input.sample_known_rep + '''")
 data <- read.csv("''' + input.all_qc + '''")
+ancestry <- read.csv("''' + input.ancestry_counts + '''")
 tot_samps <- remaining[1,6]
 numCase <- remaining[1,2]
 numControl <- remaining[1,3]
@@ -84,6 +85,9 @@ qc_remaining <- remaining[6,6]
 exp_rep_filt <- exclusions[6,6]
 exp_rep_remaining <- remaining[7,6]
 total_sample_exclusions <- array_processing + filt1_samps + filt2_samps + contam_samps + filt_qc_samps + exp_rep_filt
+num_sex_discordant <- exclusions[7,6]
+num_unexp_rep <- exclusions[8,6]
+num_auto_het <- exclusions[10,6]
 
 table1 <- data.frame(study = "''' + outName + '''_''' + sampSheetDate + '''", array = "''' + os.path.basename(params.manifest).split('_')[0] + '''", 
 CaCo = paste(numCase, numControl, sep = ":"), m_f = paste(numMale, numFemale, sep = ":"), tot = tot_samps)
@@ -134,7 +138,18 @@ ft_2b <- regulartable(table2b, col_keys = names(table2b)) %>%
     theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
     autofit()
 
+ancest_m <- cbind(table(ancestry$Ancestry))
+table3 <- data.frame(ancest = row.names(ancest_m), counts = ancest_m[,1])
+row.names(table3) <- NULL
+names(table3) <- c("ANCESTRY GROUP", "COUNT")
 
+ft_3 <- regulartable(table3, col_keys = names(table3)) %>%
+    set_formatter("COUNT" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
 
 my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''", fixed=TRUE) %>%
@@ -168,6 +183,9 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("EXP_REP_FILT", as.character(exp_rep_filt), fixed=TRUE) %>%
     body_replace_all_text("EXP_REP_REMAIN", as.character(exp_rep_remaining), fixed=TRUE) %>%
     body_replace_all_text("TOTAL_SAMP_EXCLUSIONS", as.character(total_sample_exclusions), fixed=TRUE) %>%
+    body_replace_all_text("NUM_SEX_DISCORDANT", as.character(num_sex_discordant), fixed=TRUE) %>%
+    body_replace_all_text("NUM_UNEXP_REP", as.character(num_unexp_rep), fixed=TRUE) %>%
+    body_replace_all_text("NUM_AUTO_HET", as.character(num_auto_het), fixed=TRUE) %>%
 
     cursor_reach(keyword = "Table 1 Sample manifest information prior to processing") %>%
     body_add_flextable(value = ft_1) %>%
@@ -179,6 +197,8 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_add_flextable(value = ft_2a) %>%
     cursor_reach(keyword = "Table 2b Loci Quality Control Exclusion") %>%
     body_add_flextable(value = ft_2b) %>%
+    cursor_reach(keyword = "Table 3 Subject Counts by Ancestry Group") %>%
+    body_add_flextable(value = ft_3) %>%
     cursor_reach(keyword = "Figure 2 chrX F coefficient distribution") %>%
     slip_in_img(src = "''' + input.sex_plot + '''", width = 4, height = 4, pos = "before") %>%
     cursor_reach(keyword = "Figure 3 Ancestry using") %>%
