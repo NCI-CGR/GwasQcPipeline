@@ -171,7 +171,7 @@ names(table4b) <- c("FILTER REASON","CONTROLS","CASES","QC","OTHER", "ALL SAMPLE
 
 
 
-ft_4b <- regulartable(table4a, col_keys = names(table4a)) %>%
+ft_4b <- regulartable(table4b, col_keys = names(table4b)) %>%
     set_formatter("CONTROLS" = int_format, "CASES" = int_format, "QC" = int_format, "OTHER" = int_format, "ALL SAMPLES" = int_format) %>%
     fontsize(size = 8, part = "all") %>%
     fontsize(i = 1, size = 10, part = "header") %>%
