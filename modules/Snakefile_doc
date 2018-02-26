@@ -166,6 +166,20 @@ ft_4a <- regulartable(table4a, col_keys = names(table4a)) %>%
 
 
 
+table4b <- exclusions[c(7, 8, 10),]
+names(table4b) <- c("FILTER REASON","CONTROLS","CASES","QC","OTHER", "ALL SAMPLES")
+
+
+
+ft_4b <- regulartable(table4a, col_keys = names(table4a)) %>%
+    set_formatter("CONTROLS" = int_format, "CASES" = int_format, "QC" = int_format, "OTHER" = int_format, "ALL SAMPLES" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+
 my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''", fixed=TRUE) %>%
     body_replace_all_text("DATE", date(), fixed=TRUE) %>%
@@ -201,6 +215,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("NUM_SEX_DISCORDANT", as.character(num_sex_discordant), fixed=TRUE) %>%
     body_replace_all_text("NUM_UNEXP_REP", as.character(num_unexp_rep), fixed=TRUE) %>%
     body_replace_all_text("NUM_AUTO_HET", as.character(num_auto_het), fixed=TRUE) %>%
+    body_replace_all_text("MIN_POP_SUBJECTS", "''' + str(params.min_subjects) + '''", fixed=TRUE) %>%
 
     cursor_reach(keyword = "Table 1 Sample manifest information prior to processing") %>%
     body_add_flextable(value = ft_1) %>%
@@ -218,6 +233,10 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     slip_in_img(src = "''' + input.sex_plot + '''", width = 4, height = 4, pos = "before") %>%
     cursor_reach(keyword = "Figure 3 Ancestry using") %>%
     slip_in_img(src = "''' + input.ancestry_plot + '''", width = 6, height = 6, pos = "before") %>%
+    cursor_reach(keyword = "Table 4a Summary of sample level exclusions") %>%
+    body_add_flextable(value = ft_4a) %>%
+    cursor_reach(keyword = "Table 4b Summary of recommended subject level exclusions") %>%
+    body_add_flextable(value = ft_4b) %>%
     cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.")'''
         hetTxt = ''
         pcaTxt = ' %>%\n    cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.")'
