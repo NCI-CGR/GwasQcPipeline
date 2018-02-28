@@ -17,6 +17,8 @@ import os
 import shutil
 import codecs
 import string
+import csv
+import xlwt
 from snakemake.utils import R
 
 
@@ -729,5 +731,6 @@ rule all:
         'subject_qc_removal/unexpected_replicate.csv',
         'counts/exclusion_counts.csv',
         'remove_related/subjects_ibd.csv',
-        'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx'
+        'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
+        'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.xls'
 

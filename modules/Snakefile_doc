@@ -279,3 +279,35 @@ print(my_doc, target = "''' + output.doc + '''")
         with open(output.R, 'w')  as R:
             R.write(rTxt)
         shell('R --vanilla < {output.R} > {output.Rout}')
+
+
+
+rule excel_sheet:
+    input:
+        pca = expand('pca/{pop}_subjects.eigenvec.csv', pop = POPS),
+        all_qc = 'all_sample_qc.csv',
+        ibd = 'remove_related/subjects_ibd.csv',
+        fam = 'remove_related/fam.csv'
+    output:
+        'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.xls'
+    run:
+        csvFiles = [input.all_qc, input.ibd, input.fam]
+        tabs = ['ALL_QC', 'IBD', 'Families']
+        for p in input.pca:
+            with open(p) as f:
+                line = f.readline()
+            if line != 'Too few subjects to process pop\n':
+                csvFiles.append(p)
+                t = os.path.basename(p).strip('_subjects.eigenvec.csv') + '_PCA'
+                tabs.append(t)
+        wb = xlwt.Workbook()
+        for i in range(len(tabs)):
+            tab = tabs[i]
+            ws = wb.add_sheet(tab)
+            with open(csvFiles[i]) as f:
+                reader = csv.reader(f)
+                for r, row in enumerate(reader):
+                    for c, col in enumerate(row):
+                        ws.write(r, c, col)
+        wb.save(output[0])
+
