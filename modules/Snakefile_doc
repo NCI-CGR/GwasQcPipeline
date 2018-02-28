@@ -18,15 +18,26 @@ rule word_doc:
         filt2_snps = 'plink_filter_call_rate_2/samples.bim',
         all_qc = 'all_sample_qc.csv',
         qc_known_rep = 'concordance/InternalQcKnown.csv',
-        sample_known_rep = 'concordance/StudySampleKnown.csv'
+        sample_known_rep = 'concordance/StudySampleKnown.csv',
+        related = 'remove_related/subjects_ibd.csv'
     params:
         min_subjects = config['minimum_pop_subjects'],
         manifest = illumina_manifest_file
     output:
         doc = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx', 
         R = 'word_doc/doc.R',
-        Rout = 'word_doc/doc.R.out'
+        Rout = 'word_doc/doc.R.out',
+        related = 'remove_related/fam.csv'
     run:
+        famDict = makeFamDict(input.related)
+        with open(output.related, 'w') as out:
+            out.write('Subject_ID,Fam\n')
+            for sub in famDict.keys():
+                fam = famDict[sub]
+                famId = 'F' + str(fam).zfill(6)
+                out.write(sub + ',' + famId + '\n')
+        totRelated = len(famDict.keys())
+        numFams = len(set(famDict.values()))
         StartSnpCount = 0
         with open(input.start_snps) as f:
             for line in f:
@@ -214,6 +225,8 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("TOTAL_SAMP_EXCLUSIONS", as.character(total_sample_exclusions), fixed=TRUE) %>%
     body_replace_all_text("NUM_SEX_DISCORDANT", as.character(num_sex_discordant), fixed=TRUE) %>%
     body_replace_all_text("NUM_UNEXP_REP", as.character(num_unexp_rep), fixed=TRUE) %>%
+    body_replace_all_text("TOTAL_RELATED", "''' + str(totRelated) + '''", fixed=TRUE) %>%
+    body_replace_all_text("NUMBER_OF_FAMILIES", "''' + str(numFams) + '''", fixed=TRUE) %>%
     body_replace_all_text("NUM_AUTO_HET", as.character(num_auto_het), fixed=TRUE) %>%
     body_replace_all_text("MIN_POP_SUBJECTS", "''' + str(params.min_subjects) + '''", fixed=TRUE) %>%
 
