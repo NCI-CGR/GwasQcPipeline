@@ -56,6 +56,36 @@ ylimDict = {'_start':('0', '100'), '_filter1':(str(samp_cr_1 * 100), '100'), '_f
 
 
 
+
+def makeFamDict(ibd_csv):
+    famDict = {}
+    famCount = 1
+    with open(ibd_csv) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            (sub1, sub2, piHat) = line.rstrip().split(',')
+            if famDict.get(sub1) and famDict.get(sub2) and (famDict[sub1] != famDict[sub2]):
+                fam = min(famDict[sub1], famDict[sub2])
+                for sub in famDict.keys():
+                    if sub != sub1 and sub != sub2 and famDict[sub] != fam and (famDict[sub] == famDict[sub1] or famDict[sub] == famDict[sub2]):
+                        famDict[sub] = fam
+            elif famDict.get(sub1):
+                fam = famDict[sub1]
+            elif famDict.get(sub2):
+                fam = famDict[sub2]
+            else:
+                fam = famCount
+                famCount += 1
+            famDict[sub1] = fam
+            famDict[sub2] = fam
+            line = f.readline()
+    return famDict
+
+
+
+
+
 def DictDiff(dict1, dict2):
     diffDict = {}
     for key in dict1.keys():
