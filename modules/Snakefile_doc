@@ -22,7 +22,8 @@ rule word_doc:
         related = 'remove_related/subjects_ibd.csv'
     params:
         min_subjects = config['minimum_pop_subjects'],
-        manifest = illumina_manifest_file
+        manifest = illumina_manifest_file,
+        excel = outName + '_QC_Report_' + sampSheetDate + '.xls'
     output:
         doc = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx', 
         R = 'word_doc/doc.R',
@@ -229,6 +230,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("NUMBER_OF_FAMILIES", "''' + str(numFams) + '''", fixed=TRUE) %>%
     body_replace_all_text("NUM_AUTO_HET", as.character(num_auto_het), fixed=TRUE) %>%
     body_replace_all_text("MIN_POP_SUBJECTS", "''' + str(params.min_subjects) + '''", fixed=TRUE) %>%
+    body_replace_all_text("EXCEL_FILE_NAME", "''' + str(params.excel) + '''", fixed=TRUE) %>%
 
     cursor_reach(keyword = "Table 1 Sample manifest information prior to processing") %>%
     body_add_flextable(value = ft_1) %>%
