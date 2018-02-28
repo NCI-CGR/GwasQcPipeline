@@ -88,12 +88,15 @@ rule plot_HWP:
                     out.write('Too few subjects to process pop\n')
         else:
             rTxt = '''
-            require(qqman)
-            data <- read.table("''' + input[0] + '''", head = T)                                                                                                   
-            png("''' + output.png + '''", 6.5, 6.5, "in", res = 300)
-            qq(data$P, main = "''' + wildcards.pop + ''' HWP qq plot")
-            dev.off()                                                                                                                                   
-            '''
+par(family='mono')
+data <- read.table("''' + input[0] + '''", head = T)
+exp = ppoints(nrow(data))
+png("''' + output.png + '''", 6.5, 6.5, "in", res = 300)
+plot(exp, sort(data$P), type = "l", col = "red", xlab = "Expected P value", ylab = "Observed P value", 
+main = "''' + wildcards.pop + ''' Hardy-Weinberg Proportion")
+abline(0,1, col = "gray")
+dev.off()                                                                                                                                   
+'''
             with open(output.R, 'w')  as R:
                 R.write(rTxt)
             shell('R --vanilla < {output.R} > {output.Rout}')
