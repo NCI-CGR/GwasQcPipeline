@@ -3,6 +3,7 @@
 rule word_doc:
     input:
         het_plots = expand('autosomal_heterozygosity/{pop}_subjects_qc.het.png', pop = POPS),
+        hwp_plots = expand('HWP/{pop}_subjects_qc.HWP.png', pop = POPS),
         pca_plots = expand('pca/{pop}_subjects.PC1_PC2.png', pop = POPS),
         samp_sheet = sample_sheet,
         sex_plot = 'sex_plot/sex.png',
