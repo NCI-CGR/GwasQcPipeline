@@ -256,7 +256,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.")'''
         hetTxt = ''
         pcaTxt = ' %>%\n    cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.")'
-        hwpTxt = ' %>%\n    cursor_reach(keyword = "extremely low p values (p < 0.001) should be treated with cautions in further association analysis.")'
+        hwpTxt = ' %>%\n    cursor_reach(keyword = "in further association analysis.")'
         c = 0
         for i in range(len(POPS)):
             pop = POPS[i]
