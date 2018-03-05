@@ -88,13 +88,17 @@ rule plot_HWP:
                     out.write('Too few subjects to process pop\n')
         else:
             rTxt = '''
-par(family='mono')
 data <- read.table("''' + input[0] + '''", head = T)
 exp = ppoints(nrow(data))
+table_r1 <- paste("total", "p<.001", "p<.05", sep = "     ")
+table_r2 <- paste(nrow(data), length(data$P[data$P < 0.001]), length(data$P[data$P < 0.05]), sep = "     ")
+table <- paste(table_r1, table_r2, sep = "\n")
 png("''' + output.png + '''", 6.5, 6.5, "in", res = 300)
+par(family='mono')
 plot(exp, sort(data$P), type = "l", col = "red", xlab = "Expected P value", ylab = "Observed P value", 
 main = "''' + wildcards.pop + ''' Hardy-Weinberg Proportion")
 abline(0,1, col = "gray")
+legend("right", table, cex=0.5, inset=.04, bty='n')
 dev.off()                                                                                                                                   
 '''
             with open(output.R, 'w')  as R:
