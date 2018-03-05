@@ -708,7 +708,6 @@ localrules: summary_stats
 
 rule all:
     input:
-        'all_sample_qc.csv',
         'summary_stats.txt',
         'all_sample_idat_intensity/idat_intensity.csv',
         'concordance/KnownReplicates.csv',
@@ -721,16 +720,9 @@ rule all:
         'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv',
         'subject_level/subjects_qc.imiss',
-        'ancestry/subjects.ancestry.png',
-        expand('pca/{pop}_subjects.{pc}.png', pop = POPS, pc = PCs),
-        expand('HWP/{pop}_subjects_qc.HWP.png', pop = POPS),
         expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT),
-        expand('autosomal_heterozygosity/{pop}_subjects_qc.het.png', pop = POPS),
-        'sex_plot/sex.png',
         'subject_qc_removal/sex_discordant.txt',
         'subject_qc_removal/unexpected_replicate.csv',
-        'counts/exclusion_counts.csv',
-        'remove_related/subjects_ibd.csv',
         'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
         'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.xls'
 
