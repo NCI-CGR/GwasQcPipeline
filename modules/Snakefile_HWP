@@ -51,7 +51,7 @@ rule subset_controls:
                 with open(x, 'w') as out:
                     out.write('Too few subjects to process pop\n')
         else:
-            shell('plink --bfile {params.inProj} --keep {input.keep} --memory 10000 --make-bed --out {params.outProj}')
+            shell('plink --bfile {params.inProj} --keep {input.keep} --autosome --maf 0.05 --snps-only --memory 10000 --make-bed --out {params.outProj}')
 
 rule control_HWP:
     input:
@@ -70,7 +70,7 @@ rule control_HWP:
             with open(output[0], 'w') as out:
                 out.write('Too few subjects to process pop\n')
         else:
-            shell('plink --bfile {params.inProj} --autosome --maf 0.05 --hardy --memory 10000 --out {params.outProj}')
+            shell('plink --bfile {params.inProj} --hardy --memory 10000 --out {params.outProj}')
 
 rule plot_HWP:
     input:
