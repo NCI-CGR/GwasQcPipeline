@@ -35,7 +35,8 @@ rule subset_controls:
         bed = 'split_by_pop/{pop}_subjects.bed',
         bim = 'split_by_pop/{pop}_subjects.bim',
         fam = 'split_by_pop/{pop}_subjects.fam',
-        keep = 'HWP/{pop}_controls.txt'
+        keep = 'HWP/{pop}_controls.txt',
+        related = 'remove_related/subjects_to_remove.txt'
     params:
         inProj = 'split_by_pop/{pop}_subjects',
         outProj = 'HWP/{pop}_subjects'
@@ -51,7 +52,7 @@ rule subset_controls:
                 with open(x, 'w') as out:
                     out.write('Too few subjects to process pop\n')
         else:
-            shell('plink --bfile {params.inProj} --keep {input.keep} --autosome --maf 0.05 --snps-only --memory 10000 --make-bed --out {params.outProj}')
+            shell('plink --bfile {params.inProj} --keep {input.keep} --remove {input.related} --autosome --maf 0.05 --snps-only --memory 10000 --make-bed --out {params.outProj}')
 
 rule control_HWP:
     input:
