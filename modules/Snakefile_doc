@@ -75,8 +75,8 @@ sample_known_rep <- read.csv("''' + input.sample_known_rep + '''")
 data <- read.csv("''' + input.all_qc + '''")
 ancestry <- read.csv("''' + input.ancestry_counts + '''")
 tot_samps <- remaining[1,6]
-numCase <- remaining[1,2]
-numControl <- remaining[1,3]
+numCase <- remaining[1,3]
+numControl <- remaining[1,2]
 numMale <- length(data$Expected_Sex[data$Expected_Sex == "M"])
 numFemale <- length(data$Expected_Sex[data$Expected_Sex == "F"])
 array_processing <- exclusions[1,6]
