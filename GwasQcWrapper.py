@@ -227,7 +227,7 @@ def main():
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
     qsubTxt += 'module load python3/3.5.1\n'
-    qsubTxt += 'module load R\n'
+    qsubTxt += 'module load R/3.4.0\n'
     qsubTxt += 'module load plink2/1.90b5\n'
     qsubTxt += 'module load python/2.7.5\n'
     qsubTxt += 'module load eigensoft/6.0.1\n'
