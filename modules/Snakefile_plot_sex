@@ -56,7 +56,7 @@ if (nrow(femData) > 0 & nrow(maleData) > 0) {
     fem_X <- runif(nrow(femData), .8, 1.2)
     boxplot(as.numeric(femData$ChrX_Inbreed_estimate), names = c("F"),
     ylab = "ChrX Inbreed Coeff", main = "ChrX Inbreeding Coeff by Reported Sex", xlab = "Reported Sex", outline=FALSE)
-    points(fem_X, as.numeric(femData$ChrX_Inbreed_estimate), col = colors[as.numeric(femData$CaCo + 1]), pch = 20, cex = 0.3)
+    points(fem_X, as.numeric(femData$ChrX_Inbreed_estimate), col = colors[as.numeric(femData$CaCo) + 1], pch = 20, cex = 0.3)
 
 } else if (nrow(maleData) > 0) {
     male_X <- runif(nrow(maleData), .8, 1.2)
