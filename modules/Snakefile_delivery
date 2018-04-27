@@ -1,0 +1,34 @@
+#!/usr/bin/python
+
+rule copy_docs:
+    input:
+        doc = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
+        xls = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.xls',
+        samp_sheet = sample_sheet
+    output:
+        doc = 'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
+        xls = 'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls',
+        samp_sheet = 'delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv'
+    shell:
+        'cp {input.doc} {output.doc};cp {input.xls} {output.xls};cp {input.samp_sheet} {output.samp_sheet}'
+
+rule zip_HWP:
+    input:
+        expand('HWP/{pop}_subjects_qc.hwe', pop = POPS)
+    output:
+        'delivery/HWP.zip'
+    shell:
+        'zip {output} {input}'
+
+rule copy_geno_data:
+    input:
+        bed = 'subject_level/subjects.bed',
+        bim = 'subject_level/subjects.bim',
+        fam = 'subject_level/subjects.fam'
+    output:
+        bed = 'delivery/subjects.bed',
+        bim = 'delivery/subjects.bim',
+        fam = 'delivery/subjects.fam'
+    shell:
+        'cp {input.bed} {output.bed};cp {input.bim} {output.bim};cp {input.fam} {output.fam}'
+
