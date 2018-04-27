@@ -703,6 +703,7 @@ include: 'modules/Snakefile_plot_sex'
 include: 'modules/Snakefile_subject_qc_fail'
 include: 'modules/Snakefile_count_exclusions'
 include: 'modules/Snakefile_doc'
+include: 'modules/Snakefile_delivery'
 
 localrules: summary_stats
 
