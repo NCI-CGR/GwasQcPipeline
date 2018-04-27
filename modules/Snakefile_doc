@@ -291,10 +291,38 @@ print(my_doc, target = "''' + output.doc + '''")
 
 
 
+
+rule subset_all_qc:
+    input:
+        'all_sample_qc.csv'
+    output:
+        'word_doc/all_sample_qc.csv'
+    params:
+        colsToRemove = 'Count_of_SR_SubjectID,SR,Current_Subject_Status,Subject_Notes,Expected Replicate Discordance,Count_of_QC_Issue,Identifiler_Needed'
+    run:
+        removeColumns = params.colsToRemove.split(',')
+        colToRemoveDict = {}
+        with open(input[0]) as f, open(output[0], 'w') as out:
+            line = f.readline()
+            line_list = line.rstrip().split(',')
+            for i in range(len(line_list)):
+                colName = line_list[i]
+                if colName in removeColumns:
+                    colToRemoveDict[i] = 1
+            while line != '':
+                line_list = line.rstrip().split(',')
+                keep_list = []
+                for i in range(len(line_list)):
+                    if not colToRemoveDict.get(i):
+                        keep_list.append(line_list[i])
+                out.write(','.join(keep_list) + '\n')
+                line = f.readline()
+
+
 rule excel_sheet:
     input:
         pca = expand('pca/{pop}_subjects.eigenvec.csv', pop = POPS),
-        all_qc = 'all_sample_qc.csv',
+        all_qc = 'word_doc/all_sample_qc.csv',
         ancestry = 'ancestry/subjects.snpweights.csv',
         ibd = 'remove_related/subjects_ibd.csv',
         fam = 'remove_related/fam.csv'
