@@ -723,6 +723,11 @@ rule all:
         expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT),
         'subject_qc_removal/sex_discordant.txt',
         'subject_qc_removal/unexpected_replicate.csv',
-        'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
-        'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.xls'
+        'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
+        'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls',
+        'delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv',
+        'delivery/HWP.zip',
+        'delivery/subjects.bed',
+        'delivery/subjects.bim',
+        'delivery/subjects.fam'
 
