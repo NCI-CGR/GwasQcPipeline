@@ -32,12 +32,18 @@ rule word_doc:
         related = 'remove_related/fam.csv'
     run:
         famDict = makeFamDict(input.related)
+        famListDict = {}
+        for sub in famDict.keys():
+            fam = famDict[sub]
+            famId = 'F' + str(fam).zfill(6)
+            if not famListDict.get(famId):
+                famListDict[famId] = []
+            famListDict[famId].append(sub)
         with open(output.related, 'w') as out:
-            out.write('Subject_ID,Fam\n')
-            for sub in famDict.keys():
-                fam = famDict[sub]
-                famId = 'F' + str(fam).zfill(6)
-                out.write(sub + ',' + famId + '\n')
+            out.write('Fam_ID,Subject_ID\n')
+            for famId in sorted(famListDict.keys()):
+                for sub in sorted(famListDict[famId]):
+                    out.write(famId + ',' + sub + '\n')
         totRelated = len(famDict.keys())
         numFams = len(set(famDict.values()))
         StartSnpCount = 0
