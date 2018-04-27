@@ -32,3 +32,17 @@ rule copy_geno_data:
     shell:
         'cp {input.bed} {output.bed};cp {input.bim} {output.bim};cp {input.fam} {output.fam}'
 
+
+rule readme:
+    input:
+        egt = '/DCEG/CGF/Infinium/Clustering/CG0311/initial/GSA_9K_CR99.egt'
+    output:
+        'delivery/README'
+    run:
+        with open(output[0], 'w') as out:
+            out.write('GTC files were generated using the cluster file: ' + input.egt + '\n')
+            out.write('subjects.* contain genotypes in PLINK format for all subjects that passed 2-step call rate filter,\n')
+            out.write('and contamination filter. If multiple samples for a subject the sample with the highest call rate is kept.\n')
+            out.write('More details and QC stats can be found in ' + outName + '_QC_Report_' + sampSheetDate + '.docx\n')
+            out.write('and the supplemental multi-tab excel workbook ' + outName + '_QC_Report_' + sampSheetDate + '.xls\n')
+

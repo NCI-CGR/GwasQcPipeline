@@ -730,5 +730,6 @@ rule all:
         'delivery/HWP.zip',
         'delivery/subjects.bed',
         'delivery/subjects.bim',
-        'delivery/subjects.fam'
+        'delivery/subjects.fam',
+        'delivery/README'
 
