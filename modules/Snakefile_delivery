@@ -43,6 +43,7 @@ rule readme:
             out.write('GTC files were generated using the cluster file: ' + input.egt + '\n')
             out.write('subjects.* contain genotypes in PLINK format for all subjects that passed 2-step call rate filter,\n')
             out.write('and contamination filter. If multiple samples for a subject the sample with the highest call rate is kept.\n')
+            out.write('Sample and subject identifiers can be found in ' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv')
             out.write('More details and QC stats can be found in ' + outName + '_QC_Report_' + sampSheetDate + '.docx\n')
             out.write('and the supplemental multi-tab excel workbook ' + outName + '_QC_Report_' + sampSheetDate + '.xls\n')
 
