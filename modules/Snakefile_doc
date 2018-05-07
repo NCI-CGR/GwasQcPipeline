@@ -328,6 +328,7 @@ rule subset_all_qc:
 rule excel_sheet:
     input:
         pca = expand('pca/{pop}_subjects.eigenvec.csv', pop = POPS),
+        het = expand('autosomal_heterozygosity/{pop}_subjects_qc.het.csv', pop = POPS),
         all_qc = 'word_doc/all_sample_qc.csv',
         ancestry = 'ancestry/subjects.snpweights.csv',
         ibd = 'remove_related/subjects_ibd.csv',
@@ -345,6 +346,14 @@ rule excel_sheet:
             if line != 'Too few subjects to process pop\n':
                 csvFiles.append(p)
                 t = os.path.basename(p).strip('_subjects.eigenvec.csv') + '_PCA'
+                tabs.append(t)
+
+        for h in input.het:
+            with open(h) as f:
+                line = f.readline()
+            if line != 'Too few subjects to process pop\n':
+                csvFiles.append(h)
+                t = os.path.basename(h).strip('_subjects_qc.het.csv') + '_HET'
                 tabs.append(t)
         wb = xlwt.Workbook()
         for i in range(len(tabs)):
