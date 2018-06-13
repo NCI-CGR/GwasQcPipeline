@@ -20,7 +20,19 @@ rule zip_HWP:
     shell:
         'zip {output} {input}'
 
-rule copy_geno_data:
+rule copy_sample_geno_data:
+    input:
+        bed = 'plink_start/samples.bed',
+        bim = 'plink_start/samples.bim',
+        fam = 'plink_start/samples.fam'
+    output:
+        bed = 'delivery/samples.bed',
+        bim = 'delivery/samples.bim',
+        fam = 'delivery/samples.fam'
+    shell:
+        'cp {input.bed} {output.bed};cp {input.bim} {output.bim};cp {input.fam} {output.fam}'
+
+rule copy_subject_geno_data:
     input:
         bed = 'subject_level/subjects.bed',
         bim = 'subject_level/subjects.bim',
