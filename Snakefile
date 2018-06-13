@@ -731,5 +731,8 @@ rule all:
         'delivery/subjects.bed',
         'delivery/subjects.bim',
         'delivery/subjects.fam',
+        'delivery/samples.bed',
+        'delivery/samples.bim',
+        'delivery/samples.fam',
         'delivery/README'
 
