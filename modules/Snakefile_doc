@@ -4,7 +4,7 @@ rule word_doc:
     input:
         het_plots = expand('autosomal_heterozygosity/{pop}_subjects_qc.het.png', pop = POPS),
         hwp_plots = expand('HWP/{pop}_subjects_qc.HWP.png', pop = POPS),
-        pca_plots = expand('pca/{pop}_subjects.PC1_PC2.png', pop = POPS),
+        pca_plots = expand('pca/{pop}_subjects.{pc}.png', pop = POPS, pc = PCs),
         samp_sheet = sample_sheet,
         sex_plot = 'sex_plot/sex.png',
         template = config['doc_template'],
@@ -279,10 +279,12 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
                 hetTxt += '    slip_in_img(src = "autosomal_heterozygosity/' + pop + '_subjects_qc.het.png", width = 6, height = 6, pos = "after") %>%\n'
                 hetTxt += '    slip_in_text("Figure 4' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
                 hetTxt += '    slip_in_text("' + pop + ' F coefficient distribution", style = "normal", pos = "after")'
-                pcaTxt += ' %>%\n'
-                pcaTxt += '    slip_in_img(src = "pca/' + pop + '_subjects.PC1_PC2.png", width = 6, height = 6, pos = "after") %>%\n'
-                pcaTxt += '    slip_in_text("Figure 5' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
-                pcaTxt += '    slip_in_text("' + pop + ' PCA plot", style = "normal", pos = "after")'
+                for pc in PCs:
+                    (pc1, pc2) = pc.split('_')
+                    pcaTxt += ' %>%\n'
+                    pcaTxt += '    slip_in_img(src = "pca/' + pop + '_subjects.' + pc + '.png", width = 6, height = 6, pos = "after") %>%\n'
+                    pcaTxt += '    slip_in_text("Figure 5' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
+                    pcaTxt += '    slip_in_text("' + pop + ' ' + pc1 + ' vs ' + pc2 + ' PCA plot", style = "normal", pos = "after")'
                 hwpTxt += ' %>%\n'
                 hwpTxt += '    slip_in_img(src = "HWP/' + pop + '_subjects_qc.HWP.png", width = 6, height = 6, pos = "after") %>%\n'
                 hwpTxt += '    slip_in_text("Figure 6' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'

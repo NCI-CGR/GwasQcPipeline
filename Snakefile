@@ -49,7 +49,7 @@ adpc_file = config['adpc_file']
 
 
 POPS = ['EUR', 'ASN', 'AFR', 'ADMIXED_EUR', 'ADMIXED_ASN', 'ADMIXED_AFR', 'ASN_EUR', 'AFR_EUR', 'AFR_ASN', 'AFR_ASN_EUR']
-PCs = ['PC1_PC2', 'PC2_PC3', 'PC3_PC4', 'PC4_PC5', 'PC5_PC6', 'PC6_PC7', 'PC7_PC8', 'PC8_PC9', 'PC9_PC10']
+PCs = ['PC1_PC2', 'PC2_PC3', 'PC3_PC4', 'PC4_PC5']
 
 D = ['plink_start', 'plink_filter_call_rate_1', 'plink_filter_call_rate_2']
 FILT = ['_start', '_filter1', '_filter2']
