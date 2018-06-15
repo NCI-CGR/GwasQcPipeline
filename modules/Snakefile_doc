@@ -267,6 +267,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
         pcaTxt = ' %>%\n    cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.")'
         hwpTxt = ' %>%\n    cursor_reach(keyword = "in further association analysis.")'
         c = 0
+        d = 0
         for i in range(len(POPS)):
             pop = POPS[i]
             if not ancestCountDict.get(pop):
@@ -283,13 +284,15 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
                     (pc1, pc2) = pc.split('_')
                     pcaTxt += ' %>%\n'
                     pcaTxt += '    slip_in_img(src = "pca/' + pop + '_subjects.' + pc + '.png", width = 6, height = 6, pos = "after") %>%\n'
-                    pcaTxt += '    slip_in_text("Figure 5' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
-                    pcaTxt += '    slip_in_text("' + pop + ' ' + pc1 + ' vs ' + pc2 + ' PCA plot", style = "normal", pos = "after")'
+                    pcaTxt += '    slip_in_text("Figure 5' + string.ascii_lowercase[d] + ' ", style = "Bold", pos = "after") %>%\n'
+                    pcaTxt += '    slip_in_text("' + pop + ' ' + pc1 + ' vs ' + pc2 + '", style = "normal", pos = "after")'
+                    d += 1
                 hwpTxt += ' %>%\n'
                 hwpTxt += '    slip_in_img(src = "HWP/' + pop + '_subjects_qc.HWP.png", width = 6, height = 6, pos = "after") %>%\n'
                 hwpTxt += '    slip_in_text("Figure 6' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
                 hwpTxt += '    slip_in_text("' + pop + ' Q-Q plot of test for deviation from Hardy-Weinberg Proportion", style = "normal", pos = "after")'
                 c += 1
+                d += 1
         rTxt += hetTxt
         rTxt += pcaTxt
         rTxt += hwpTxt
