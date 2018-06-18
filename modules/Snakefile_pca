@@ -149,7 +149,6 @@ rule plot_pca:
                 with open(x, 'w') as out:
                     out.write('Too few subjects to process pop\n')
         else:
-            (pc1, pc2) = wildcards.pc.split('_')
             rTxt = '''
             colors <- c(rgb(0, 0, 1, .3), rgb(1, 0, 0, .3), rgb(.75, .75, .75, .3), rgb(0, 1, 0, .3))
             data <- read.csv("''' + input[0] + '''")
