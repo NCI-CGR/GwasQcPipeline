@@ -30,7 +30,8 @@ rule extract_ld_prune_pca:
         bed = 'split_by_pop/{pop}_subjects.bed',
         bim = 'split_by_pop/{pop}_subjects.bim',
         fam = 'split_by_pop/{pop}_subjects.fam',
-        prune = 'pca/{pop}_ldPruneList.prune.in'
+        prune = 'pca/{pop}_ldPruneList.prune.in',
+        related = 'remove_related/subjects_to_remove.txt'
     params:
         inProj = 'split_by_pop/{pop}_subjects',
         outProj = 'pca/{pop}_subjects_ld_prune'
@@ -45,7 +46,7 @@ rule extract_ld_prune_pca:
                 with open(x, 'w') as out:
                     out.write('Too few subjects to process pop\n')
         else:
-            shell('plink --bfile {params.inProj} --extract {input.prune} --recode --memory 10000 --out {params.outProj}')
+            shell('plink --bfile {params.inProj} --remove {input.related} --extract {input.prune} --recode --memory 10000 --out {params.outProj}')
 
 
 
