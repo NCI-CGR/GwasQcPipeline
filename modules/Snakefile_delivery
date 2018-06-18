@@ -4,13 +4,15 @@ rule copy_docs:
     input:
         doc = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
         xls = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.xls',
-        samp_sheet = sample_sheet
+        samp_sheet = sample_sheet,
+        sub_mapping = 'subject_level/SampleUsedforSubject.csv'
     output:
         doc = 'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
         xls = 'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls',
-        samp_sheet = 'delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv'
+        samp_sheet = 'delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv',
+        sub_mapping = 'delivery/SampleUsedforSubject.csv'
     shell:
-        'cp {input.doc} {output.doc};cp {input.xls} {output.xls};cp {input.samp_sheet} {output.samp_sheet}'
+        'cp {input.doc} {output.doc};cp {input.xls} {output.xls};cp {input.samp_sheet} {output.samp_sheet};cp {input.sub_mapping} {output.sub_mapping}'
 
 rule zip_HWP:
     input:
