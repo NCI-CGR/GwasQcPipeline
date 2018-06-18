@@ -160,7 +160,7 @@ rule plot_pca:
             plot(data$PC4, data$PC5, pch = 20, col = colors[data$CaCo + 1], xlab = "PC4", ylab = "PC5")
             plot(data$PC5, data$PC6, pch = 20, col = colors[data$CaCo + 1], xlab = "PC5", ylab = "PC6")
             plot(c(0, 1), c(0, 1), type="n", ann=FALSE, axes=FALSE)
-            legend("center", legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19)
+            legend("center", legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19, cex = 3, y.intersp=2)
             par(mar = c(5, 4, 4, 2) + 0.1)
             dev.off()
             '''
