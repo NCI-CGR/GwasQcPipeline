@@ -138,9 +138,9 @@ rule plot_pca:
     input:
         'pca/{pop}_subjects.eigenvec.csv'
     output:
-        png = 'pca/{pop}_subjects.{pc}.png',
-        R = 'pca/{pop}_subjects.{pc}.R',
-        Rout = 'pca/{pop}_subjects.{pc}.R.out'
+        png = 'pca/{pop}_subjects.pca.png',
+        R = 'pca/{pop}_subjects.pca.R',
+        Rout = 'pca/{pop}_subjects.pca.R.out'
     run:
         with open(input[0]) as f:
             line = f.readline()
@@ -154,12 +154,14 @@ rule plot_pca:
             colors <- c(rgb(0, 0, 1, .3), rgb(1, 0, 0, .3), rgb(.75, .75, .75, .3), rgb(0, 1, 0, .3))
             data <- read.csv("''' + input[0] + '''")
             png("''' + output.png + '''", 6.5, 6.5, "in", res = 300)
-            par(mar = c(5, 4, 4, 8) + 0.1)
-            plot(data$''' + pc1 + ''', data$''' + pc2 + ''',
-            pch = 20, col = colors[data$CaCo + 1],
-            xlab = "''' + pc1 + '''", ylab = "''' + pc2 + '''",
-            main = "''' + wildcards.pop + ''' ''' + pc1 + ''' vs ''' + pc2 + '''")
-            legend("topright", inset=c(-.30,0), xpd=TRUE, legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19)
+            par(mfrow=c(3,2),ps=20,cex=0.3,mar=c(4.5,4.5,1.5,1)+0.1,oma=rep(3,4))
+            plot(data$PC1, data$PC2, pch = 20, col = colors[data$CaCo + 1], xlab = "PC1", ylab = "PC2")
+            plot(data$PC2, data$PC3, pch = 20, col = colors[data$CaCo + 1], xlab = "PC2", ylab = "PC3")
+            plot(data$PC3, data$PC4, pch = 20, col = colors[data$CaCo + 1], xlab = "PC3", ylab = "PC4")
+            plot(data$PC4, data$PC5, pch = 20, col = colors[data$CaCo + 1], xlab = "PC4", ylab = "PC5")
+            plot(data$PC5, data$PC6, pch = 20, col = colors[data$CaCo + 1], xlab = "PC5", ylab = "PC6")
+            plot(c(0, 1), c(0, 1), type="n", ann=FALSE, axes=FALSE)
+            legend("center", legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19)
             par(mar = c(5, 4, 4, 2) + 0.1)
             dev.off()
             '''
