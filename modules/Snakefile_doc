@@ -264,7 +264,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_add_flextable(value = ft_4b) %>%
     cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.")'''
         hetTxt = ''
-        pcaTxt = ' %>%\n    cursor_reach(keyword = "group of PC1 vs PC2 are shown in Figure 5.")'
+        pcaTxt = ' %>%\n    cursor_reach(keyword = "Figure 5.")'
         hwpTxt = ' %>%\n    cursor_reach(keyword = "in further association analysis.")'
         c = 0
         for i in range(len(POPS)):
