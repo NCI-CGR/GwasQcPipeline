@@ -441,18 +441,27 @@ def makeSubjectToSampListDict(SampleSheet):
             sys.exit(1)
         head_list = head.rstrip().split(',')
         subjectIdCol = None
+        sampGroupCol = None
+        limsIdCol = None
         for i in range(len(head_list)):
             if head_list[i] == subject_id_to_use:
                 subjectIdCol = i
-        if subjectIdCol == None:
-            print('Subject ID not found in sample sheet')
+            elif head_list[i] == 'Sample_Group':
+                sampGroupCol = i
+            elif head_list[i] == 'LIMS_Individual_ID':
+                limsIdCol = i
+        if subjectIdCol == None or sampGroupCol == None or limsIdCol == None:
+            print('Subject ID or Sample_Group or LIMS_Individual_ID not found in sample sheet')
             sys.exit(1)
         line = f.readline()
         while line != '':
             if line.strip():
                 line_list = line.rstrip().split(',')
                 sampId = line_list[0]
+                sampGroup = line_list[sampGroupCol]
                 subId = line_list[subjectIdCol]
+                if not subId.strip() and sampGroup == 'sVALD-001':
+                    subId = line_list[limsIdCol]
                 sampToSubIdDict[sampId] = subId
                 if not subToSampListDict.get(subId):
                     subToSampListDict[subId] = []
