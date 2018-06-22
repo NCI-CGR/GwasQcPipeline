@@ -349,7 +349,7 @@ def makeControlDict(SampleSheet):
         for i in range(len(head_list)):
             if head_list[i] == 'Sample_Group':
                 sampGroupCol = i
-            elif head_list[i] == subject_id_to_use:
+            elif head_list[i] == 'LIMS_Individual_ID':
                 subjectIdCol = i
         if sampGroupCol == None:
             print('Sample_Group not found in sample sheet')
