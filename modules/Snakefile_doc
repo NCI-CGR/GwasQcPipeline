@@ -337,12 +337,13 @@ rule excel_sheet:
         ibd = 'remove_related/subjects_ibd.csv',
         fam = 'remove_related/fam.csv',
         knownRep = 'concordance/KnownReplicates.csv',
-        unknownRep = 'concordance/UnknownReplicates.csv'
+        unknownRepSamp = 'concordance/UnknownReplicates.csv',
+        unknownRepSub = 'subject_qc_removal/unexpected_replicate.csv'
     output:
         'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.xls'
     run:
-        csvFiles = [input.all_qc, input.ancestry, input.ibd, input.fam, input.knownRep, input.unknownRep]
-        tabs = ['ALL_QC', 'ANCESTRY', 'IBD', 'FAMILIES', 'EXPECTED_REPLICATES', 'UNEXPECTED_REPLICATES']
+        csvFiles = [input.all_qc, input.ancestry, input.ibd, input.fam, input.knownRep, input.unknownRepSamp, input.unknownRepSub]
+        tabs = ['ALL_QC', 'ANCESTRY', 'IBD', 'FAMILIES', 'EXPECTED_REPLICATES', 'UNEXPECTED_REPLICATES_SAMPLES', 'UNEXPECTED_REPLICATES_SUBJECTS']
         for p in input.pca:
             with open(p) as f:
                 line = f.readline()
