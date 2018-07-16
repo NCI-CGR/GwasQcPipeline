@@ -24,7 +24,8 @@ rule word_doc:
     params:
         min_subjects = config['minimum_pop_subjects'],
         manifest = illumina_manifest_file,
-        excel = outName + '_QC_Report_' + sampSheetDate + '.xls'
+        excel = outName + '_QC_Report_' + sampSheetDate + '.xls',
+        concord_thresh = config['dup_concordance_cutoff']
     output:
         doc = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx', 
         R = 'word_doc/doc.R',
@@ -92,6 +93,7 @@ mean_concord_qc <- mean(qc_known_rep$Concordance, na.rm = T)
 min_concord_qc <- min(qc_known_rep$Concordance, na.rm = T)
 mean_concord_sample <- mean(sample_known_rep$Concordance, na.rm = T)
 min_concord_sample <- min(sample_known_rep$Concordance, na.rm = T)
+num_low_concord_exp <- length(which(sample_known_rep$Concordance < ''' + str(params.concord_thresh) + '''))
 filt1_samps <- exclusions[2,6]
 filt2_samps <- exclusions[3,6]
 filt1_remaining <- remaining[3,6]
@@ -228,6 +230,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("QC_MEAN_CONCORD", as.character(round(100 * mean_concord_qc, 2)), fixed=TRUE) %>%
     body_replace_all_text("SAMPLE_MIN_CONCORD", as.character(round(100 * min_concord_sample, 2)), fixed=TRUE) %>%
     body_replace_all_text("SAMPLE_MEAN_CONCORD", as.character(round(100 * mean_concord_sample, 2)), fixed=TRUE) %>%
+    body_replace_all_text("NUM_LOW_CONCORD_EXP", as.character(num_low_concord_exp), fixed=TRUE) %>%
     body_replace_all_text("EXP_REP_FILT", as.character(exp_rep_filt), fixed=TRUE) %>%
     body_replace_all_text("EXP_REP_REMAIN", as.character(exp_rep_remaining), fixed=TRUE) %>%
     body_replace_all_text("TOTAL_SAMP_EXCLUSIONS", as.character(total_sample_exclusions), fixed=TRUE) %>%
