@@ -61,6 +61,7 @@ rule readme:
             out.write('Sample and subject identifiers can be found in ' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv')
             out.write('More details and QC stats can be found in ' + outName + '_QC_Report_' + sampSheetDate + '.docx\n')
             out.write('and the supplemental multi-tab excel workbook ' + outName + '_QC_Report_' + sampSheetDate + '.xls\n')
+            out.write('"NA" values in "EXPECTED_REPLICATES" tab of excel indicate that one or both samples failed QC.\n')
             out.write('HWP.zip contains the hardy-weinberg p-values for all SNPs for each ancestry group.')
             out.write('SampleUsedforSubject.csv lists each subject in your project in the first column.\n')
             out.write('In the second column it has "NA" if no samples passed QC for this subject.  Otherwise it gives the sample Id\n')
