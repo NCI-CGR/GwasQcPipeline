@@ -258,7 +258,7 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_add_par("", style = "Normal", pos = "on") %>%
     slip_in_img(src = "''' + input.sex_plot + '''", width = 6, height = 6, pos = "after") %>%
     slip_in_text("Figure 2", style = "Bold", pos = "after") %>%
-    slip_in_text(" chrX F coefficient distribution of female samples and male samples", style = "normal", pos = "after") %>%
+    slip_in_text(" chrX F coefficient distribution of female samples and male samples", style = "Normal1", pos = "after") %>%
     cursor_reach(keyword = "Figure 3 Ancestry using") %>%
     slip_in_img(src = "''' + input.ancestry_plot + '''", width = 6, height = 6, pos = "before") %>%
     cursor_reach(keyword = "Table 4a Summary of sample level exclusions") %>%
@@ -281,15 +281,15 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
                 hetTxt += ' %>%\n'
                 hetTxt += '    slip_in_img(src = "autosomal_heterozygosity/' + pop + '_subjects_qc.het.png", width = 6, height = 6, pos = "after") %>%\n'
                 hetTxt += '    slip_in_text("Figure 4' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
-                hetTxt += '    slip_in_text("' + pop + ' F coefficient distribution", style = "normal", pos = "after")'
+                hetTxt += '    slip_in_text("' + pop + ' F coefficient distribution", style = "Normal1", pos = "after")'
                 pcaTxt += ' %>%\n'
                 pcaTxt += '    slip_in_img(src = "pca/' + pop + '_subjects.pca.png", width = 6, height = 6, pos = "after") %>%\n'
                 pcaTxt += '    slip_in_text("Figure 5' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
-                pcaTxt += '    slip_in_text("' + pop + ' PCA plots", style = "normal", pos = "after")'
+                pcaTxt += '    slip_in_text("' + pop + ' PCA plots", style = "Normal1", pos = "after")'
                 hwpTxt += ' %>%\n'
                 hwpTxt += '    slip_in_img(src = "HWP/' + pop + '_subjects_qc.HWP.png", width = 6, height = 6, pos = "after") %>%\n'
                 hwpTxt += '    slip_in_text("Figure 6' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
-                hwpTxt += '    slip_in_text("' + pop + ' Q-Q plot of test for deviation from Hardy-Weinberg Proportion", style = "normal", pos = "after")'
+                hwpTxt += '    slip_in_text("' + pop + ' Q-Q plot of test for deviation from Hardy-Weinberg Proportion", style = "Normal1", pos = "after")'
                 c += 1
         rTxt += hetTxt
         rTxt += pcaTxt
