@@ -201,6 +201,18 @@ ft_4b <- regulartable(table4b, col_keys = names(table4b)) %>%
     autofit()
 
 
+table4c <- remaining[1:8,]
+names(table4c) <- c("FILTER REASON","CONTROLS","CASES","QC","OTHER", "ALL SAMPLES")
+
+ft_4c <- regulartable(table4c, col_keys = names(table4c)) %>%
+    set_formatter("CONTROLS" = int_format, "CASES" = int_format, "QC" = int_format, "OTHER" = int_format, "ALL SAMPLES" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+
 my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''", fixed=TRUE) %>%
     body_replace_all_text("DATE", date(), fixed=TRUE) %>%
@@ -265,6 +277,8 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_add_flextable(value = ft_4a) %>%
     cursor_reach(keyword = "Table 4b Summary of recommended subject level exclusions") %>%
     body_add_flextable(value = ft_4b) %>%
+    cursor_reach(keyword = "Table 4c Summary of remaining samples after exclusions") %>%
+    body_add_flextable(value = ft_4c) %>%
     cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.")'''
         hetTxt = ''
         pcaTxt = ' %>%\n    cursor_reach(keyword = "Figure 5.")'
