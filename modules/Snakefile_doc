@@ -88,7 +88,7 @@ numMale <- length(data$Expected_Sex[data$Expected_Sex == "M"])
 numFemale <- length(data$Expected_Sex[data$Expected_Sex == "F"])
 array_processing <- exclusions[1,6]
 rem_array_process <- remaining[2,6]
-mean_samp_completion <- mean(data$Call_Rate_Initial, na.rm = T)
+mean_samp_completion <- round(mean(data$Call_Rate_Initial, na.rm = T), 4)
 mean_concord_qc <- mean(qc_known_rep$Concordance, na.rm = T)
 min_concord_qc <- min(qc_known_rep$Concordance, na.rm = T)
 mean_concord_sample <- mean(sample_known_rep$Concordance, na.rm = T)
