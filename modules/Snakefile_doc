@@ -172,10 +172,10 @@ ft_3 <- regulartable(table3, col_keys = names(table3)) %>%
     theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
     autofit()
 
-sample_exclusions <- exclusions[1:6,2:6]
-table4a <- rbind(sample_exclusions, colSums(sample_exclusions))
-table4a <- cbind(c(as.character(exclusions[1:6,1]), "TOTAL"), table4a)
-names(table4a) <- c("FILTER REASON","CONTROLS","CASES","QC","OTHER", "ALL SAMPLES")
+sample_exclusions <- exclusions[1:5,2:6]
+table4a <- rbind(sample_exclusions, remaining[6, 2:6], exclusions[6,2:6], colSums(sample_exclusions), remaining[8, 2:6])
+table4a <- cbind(c(as.character(exclusions[1:5,1]), "Samples Remaining for Analysis", "Expected Duplicates Removed", "Total Sample QC Exclusions", "Subjects Remaining"), table4a)
+names(table4a) <- c("FILTER REASON/DESCRIPTION","CONTROLS","CASES","QC","OTHER", "ALL SAMPLES")
 
 ft_4a <- regulartable(table4a, col_keys = names(table4a)) %>%
     set_formatter("CONTROLS" = int_format, "CASES" = int_format, "QC" = int_format, "OTHER" = int_format, "ALL SAMPLES" = int_format) %>%
@@ -194,18 +194,6 @@ names(table4b) <- c("FILTER REASON","CONTROLS","CASES", "OTHER", "ALL SUBJECTS")
 
 ft_4b <- regulartable(table4b, col_keys = names(table4b)) %>%
     set_formatter("CONTROLS" = int_format, "CASES" = int_format, "OTHER" = int_format, "ALL SUBJECTS" = int_format) %>%
-    fontsize(size = 8, part = "all") %>%
-    fontsize(i = 1, size = 10, part = "header") %>%
-    color(i = 1, color = "#007FA6", part = "header") %>%
-    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
-    autofit()
-
-
-table4c <- remaining[1:8,]
-names(table4c) <- c("FILTER REASON","CONTROLS","CASES","QC","OTHER", "ALL SAMPLES")
-
-ft_4c <- regulartable(table4c, col_keys = names(table4c)) %>%
-    set_formatter("CONTROLS" = int_format, "CASES" = int_format, "QC" = int_format, "OTHER" = int_format, "ALL SAMPLES" = int_format) %>%
     fontsize(size = 8, part = "all") %>%
     fontsize(i = 1, size = 10, part = "header") %>%
     color(i = 1, color = "#007FA6", part = "header") %>%
@@ -277,8 +265,6 @@ my_doc <- read_docx(path = "''' + input.template + '''")  %>%
     body_add_flextable(value = ft_4a) %>%
     cursor_reach(keyword = "Table 4b Summary of recommended subject level exclusions") %>%
     body_add_flextable(value = ft_4b) %>%
-    cursor_reach(keyword = "Table 4c Summary of remaining samples after exclusions") %>%
-    body_add_flextable(value = ft_4c) %>%
     cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.")'''
         hetTxt = ''
         pcaTxt = ' %>%\n    cursor_reach(keyword = "Figure 5.")'
