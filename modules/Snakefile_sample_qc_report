@@ -214,5 +214,18 @@ rule summary_stats:
         capture.output(summary(data$IdatIntensity), file = "{output}", append = T)
         write("\nFail contamination rate:", file = "{output}", append = T)
         capture.output(table(data$Contamination_Rate > .1, useNA = "ifany"), file = "{output}", append = T)
+
+        write("\nFail Call Rate:", file = "{output}", append = T)
+        capture.output(table(data$Low.Call.Rate, useNA = "ifany"), file = "{output}", append = T)
+        write("\nSex Discordant:", file = "{output}", append = T)
+        capture.output(table(data$Sex.Discordant, useNA = "ifany"), file = "{output}", append = T)
+        write("\nExpected Replicate Discordance:", file = "{output}", append = T)
+        capture.output(table(data$Expected.Replicate.Discordance, useNA = "ifany"), file = "{output}", append = T)
+        write("\nUnexpected Replicate:", file = "{output}", append = T)
+        capture.output(table(data$Unexpected.Replicate, useNA = "ifany"), file = "{output}", append = T)
+        write("\nIdentifiler Needed:", file = "{output}", append = T)
+        capture.output(table(data$Identifiler_Needed, useNA = "ifany"), file = "{output}", append = T)
+        write("\nNumber of QC Issues:", file = "{output}", append = T)
+        capture.output(table(data$Count_of_QC_Issue, useNA = "ifany"), file = "{output}", append = T)
         """)
 
