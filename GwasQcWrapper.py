@@ -14,6 +14,8 @@ import shutil
 import argparse
 import time
 import glob
+from os import stat
+from pwd import getpwuid
 
 def makeQsub(qsubFile, qsubText):
     '''
@@ -71,10 +73,14 @@ def makeClusterConfig(outDir, queue):
         output.write('    q: ' + new_q + '\n')
         output.write('merge_sample_peds:\n')
         output.write('    q: ' + new_q + '\n')
+        output.write('plink_ibd:\n')
+        output.write('    q: ' + new_q + '\n')
 
 
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
-               subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, contam_threshold, adpc_file, gtc_dir):
+               subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, 
+               contam_threshold, adpc_file, gtc_dir, remove_contam, remove_sex_discordant, remove_rep_discordant, remove_unexpected_rep, pi_hat_threshold,
+               autosomal_het_thresh, minimum_pop_subjects, control_hwp_thresh, word_doc_template):
     '''
     (str, str, str) -> None
     '''
@@ -103,6 +109,15 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
         output.write('contam_threshold: ' + str(contam_threshold) + '\n')
         output.write('adpc_file: ' + str(adpc_file) + '\n')
         output.write('gtc_dir: ' + str(gtc_dir) + '\n')
+        output.write('remove_contam: "' + remove_contam + '"\n')
+        output.write('remove_sex_discordant: "' + remove_sex_discordant + '"\n')
+        output.write('remove_rep_discordant: "' + remove_rep_discordant + '"\n')
+        output.write('remove_unexpected_rep: "' + remove_unexpected_rep + '"\n')
+        output.write('pi_hat_threshold: ' + str(pi_hat_threshold) + '\n')
+        output.write('autosomal_het_thresh: ' + str(autosomal_het_thresh) + '\n')
+        output.write('minimum_pop_subjects: ' + str(minimum_pop_subjects) + '\n')
+        output.write('control_hwp_thresh: ' + str(control_hwp_thresh) + '\n')
+        output.write('doc_template: ' + word_doc_template + '\n')
         output.write('start_time: ' + start + '\n')
 
 
@@ -143,7 +158,17 @@ def get_args():
     parser.add_argument('-g', '--gtc_dir', type=str, help='Full path to gtc directory to use instead of project directory, which is the default.  Will recursively find gtc files in this directory.')
     requiredArgs.add_argument('--expected_sex_col_name', type=str, default='Expected_Sex', help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
     requiredWithDefaults.add_argument('-q', '--queue', type=str, default='all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q', help='OPTIONAL. Queue on cgemsiii to use to submit jobs.  Defaults to all of the seq queues and all.q if not supplied.  default="all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q"')
+    requiredWithDefaults.add_argument('--remove_contam', type=str, default='YES', help='REQUIRED. If "YES" contaminated samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
+    requiredWithDefaults.add_argument('--remove_sex_discordant', type=str, default='YES', help='REQUIRED. If "YES" sex discordant samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
+    requiredWithDefaults.add_argument('--remove_rep_discordant', type=str, default='YES', help='REQUIRED. If "YES" known replicate discordant samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
+    requiredWithDefaults.add_argument('--remove_unexpected_rep', type=str, default='YES', help='REQUIRED. If "YES" all unexpected replicate samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
+    requiredWithDefaults.add_argument('--pi_hat_threshold', type=float, default= 0.20, help='REQUIRED. PI_HAT cutoff to call subjects related.  default= 0.20, to remove 2nd degree relatives or higher.')
+    requiredWithDefaults.add_argument('--minimum_pop_subjects', type=int, default= 100, help='REQUIRED. Number of subjects needed in order to analyze a population.  default= 100.')
+    requiredWithDefaults.add_argument('--control_hwp_thresh', type=int, default= 50, help='REQUIRED. Number of controls needed in order to just use controls for HWP.  default= 50.')
+    requiredWithDefaults.add_argument('--autosomal_het_thresh', type=float, default= 0.10, help='REQUIRED. F coefficient from autosomal heterozygosity check cutoff for subject removal.  default= 0.10')
+    requiredWithDefaults.add_argument('-w', '--word_doc_template', type=str, default='/DCEG/CGF/Bioinformatics/Production/Eric/refFiles/GwasQcPipeline_Template_interim.docx', help='REQUIRED. Template to use to generate QC report word docx')
     parser.add_argument('-u', '--unlock_snakemake', action='store_true', help='OPTIONAL. If pipeline was killed unexpectedly you may need this flag to rerun')
+    parser.add_argument('-f', '--finish', action='store_true', help='OPTIONAL. Use with -d option to restart pipeline or update with new features without making new config file, etc.')
     args = parser.parse_args()
     return args
 
@@ -182,8 +207,17 @@ def getOutDir(sampleSheet, baseDir = '/DCEG/CGF/GWAS/Scans/GSA_Lab_QC/'):
 def main():
     scriptDir = os.path.dirname(os.path.abspath(__file__))
     args = get_args()
+    sampSheetOwner = getpwuid(stat(args.sample_sheet).st_uid).pw_name
+#I want to add this check that the file was created by LIMS, but we can't roll it out just yet
+#    if sampSheetOwner != 'cgflims':
+#        print('Pipeline requires AnalysisManifest to be generated by LIMS.  File owner is ' + sampSheetOwner)
+#        print('Exiting.  Generate a file using LIMS and rerun.')
+#        sys.exit(1)
     outDir = args.directory_for_output
     if not outDir:
+        if args.finish:
+            print('you need to use the -d option if using the -f option.')
+            sys.exit(1)
         outDir = getOutDir(args.sample_sheet)
     if outDir[0] != '/':
         print('-d argument must be full path to working directory.  Relative paths will not work.')
@@ -219,18 +253,23 @@ def main():
     figFiles = glob.glob(scriptDir + '/figures/*')
     for f in figFiles:
         shutil.copy2(f, outDir + '/figures')
-    numSamps = getNumSamps(args.sample_sheet)
-    makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
+    if args.finish:
+        numSamps = getNumSamps(outDir + '/IlluminaSampleSheet.csv')
+    if not args.finish:
+        numSamps = getNumSamps(args.sample_sheet)
+        makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold,
-               args.adpc_file, args.gtc_dir)
-    makeClusterConfig(outDir, args.queue)
+               args.adpc_file, args.gtc_dir, args.remove_contam, args.remove_sex_discordant, args.remove_rep_discordant, args.remove_unexpected_rep, args.pi_hat_threshold, args.autosomal_het_thresh,
+               args.minimum_pop_subjects, args.control_hwp_thresh, args.word_doc_template)
+        makeClusterConfig(outDir, args.queue)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
     qsubTxt += 'module load python3/3.5.1\n'
     qsubTxt += 'module load R/3.4.0\n'
     qsubTxt += 'module load plink2/1.90b5\n'
     qsubTxt += 'module load python/2.7.5\n'
-    qsubTxt += 'module load eigensoft/6.0.1\n'
+    qsubTxt += 'module load eigensoft/7.2.1\n'
+    qsubTxt += 'module load R/3.4.0\n'
     if args.unlock_snakemake:
         qsubTxt += 'snakemake --unlock\n'
     qsubTxt += 'snakemake --rerun-incomplete --cluster "qsub -V -q {cluster.q} -pe by_node {threads} '

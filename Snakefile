@@ -16,6 +16,9 @@ import sys
 import os
 import shutil
 import codecs
+import string
+import csv
+import xlwt
 from snakemake.utils import R
 
 
@@ -42,6 +45,230 @@ expected_sex_col_name = config['expected_sex_col_name']
 lims_output_dir = config['lims_output_dir']
 contam_threshold = config['contam_threshold']
 adpc_file = config['adpc_file']
+
+
+
+POPS = ['EUR', 'ASN', 'AFR', 'ADMIXED_EUR', 'ADMIXED_ASN', 'ADMIXED_AFR', 'ASN_EUR', 'AFR_EUR', 'AFR_ASN', 'AFR_ASN_EUR']
+PCs = ['PC1_PC2', 'PC2_PC3', 'PC3_PC4', 'PC4_PC5']
+
+D = ['plink_start', 'plink_filter_call_rate_1', 'plink_filter_call_rate_2']
+FILT = ['_start', '_filter1', '_filter2']
+
+ylimDict = {'_start':('0', '100'), '_filter1':(str(samp_cr_1 * 100), '100'), '_filter2':(str(samp_cr_2 * 100), '100')}
+
+
+
+
+def makeFamDict(ibd_csv):
+    famDict = {}
+    famCount = 1
+    with open(ibd_csv) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            (sub1, sub2, piHat) = line.rstrip().split(',')
+            if famDict.get(sub1) and famDict.get(sub2) and (famDict[sub1] != famDict[sub2]):
+                fam = min(famDict[sub1], famDict[sub2])
+                for sub in famDict.keys():
+                    if sub != sub1 and sub != sub2 and famDict[sub] != fam and (famDict[sub] == famDict[sub1] or famDict[sub] == famDict[sub2]):
+                        famDict[sub] = fam
+            elif famDict.get(sub1):
+                fam = famDict[sub1]
+            elif famDict.get(sub2):
+                fam = famDict[sub2]
+            else:
+                fam = famCount
+                famCount += 1
+            famDict[sub1] = fam
+            famDict[sub2] = fam
+            line = f.readline()
+    return famDict
+
+
+
+
+
+def DictDiff(dict1, dict2):
+    diffDict = {}
+    for key in dict1.keys():
+        if not dict2.get(key):
+            diffDict[key] = 1
+    return diffDict
+
+
+def makeSampDict(fam_file):
+    sampDict = {}
+    with open(fam_file) as f:
+        for line in f:
+            samp = line.split()[1]
+            sampDict[samp] = 1
+    return sampDict
+
+
+def getCountsByCaCo(sampList, CaCoDict):
+    countList = [0, 0, 0, 0]
+    for s in sampList:
+        CaCo = int(CaCoDict[s])
+        countList[CaCo] += 1
+    tot = sum(countList)
+    (controls, cases, qc, other) = countList
+    return [str(controls), str(cases), str(qc), str(other), str(tot)]
+
+
+def makeSampleToCaCoDict(SampleSheet):
+    sampToCaCoDict = {}
+    with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
+        head = f.readline()
+        while 'SentrixBarcode_A' not in head and head != '':
+            head = f.readline()
+        if 'SentrixBarcode_A' not in head:
+            print('Sample sheet not formatted correctly')
+            sys.exit(1)
+        head_list = head.rstrip().split(',')
+        CaCoCol = None
+        sampGroupCol = None
+        for i in range(len(head_list)):
+            if head_list[i] == 'Case/Control_Status':
+                CaCoCol = i
+        for i in range(len(head_list)):
+            if head_list[i] == 'Sample_Group':
+                sampGroupCol = i
+        if CaCoCol == None:
+            print('Case/Control_Status not found in sample sheet')
+            sys.exit(1)
+        if sampGroupCol == None:
+            print('Sample_Group not found in sample sheet')
+            sys.exit(1)
+        line = f.readline()
+        while line != '':
+            if line.strip():
+                line_list = line.rstrip().split(',')
+                samp = line_list[0]
+                CaCo = line_list[CaCoCol]
+                sampGroup = line_list[sampGroupCol]
+                if not CaCo.strip():
+                    if sampGroup == 'sVALD-001':
+                        CaCo = 'QC'
+                    else:
+                        CaCo = 'NA'
+                if CaCo == 'Control':
+                    CaCo = '0'
+                elif CaCo == 'Case':
+                    CaCo = '1'
+                elif CaCo == 'QC':
+                    CaCo = '2'
+                else:
+                    CaCo = '3'
+                sampToCaCoDict[samp] = CaCo
+            line = f.readline()
+    return sampToCaCoDict
+
+
+
+
+
+def makeSubjectToCaCoDict(SampleSheet):
+    subToCaCoDict = {}
+    with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
+        head = f.readline()
+        while 'SentrixBarcode_A' not in head and head != '':
+            head = f.readline()
+        if 'SentrixBarcode_A' not in head:
+            print('Sample sheet not formatted correctly')
+            sys.exit(1)
+        head_list = head.rstrip().split(',')
+        subjectIdCol = None
+        CaCoCol = None
+        sampGroupCol = None
+        for i in range(len(head_list)):
+            if head_list[i] == subject_id_to_use:
+                subjectIdCol = i
+        for i in range(len(head_list)):
+            if head_list[i] == 'Sample_Group':
+                sampGroupCol = i
+        if subjectIdCol == None:
+            print('Subject ID not found in sample sheet')
+            sys.exit(1)
+        for i in range(len(head_list)):
+            if head_list[i] == 'Case/Control_Status':
+                CaCoCol = i
+        if CaCoCol == None:
+            print('Case/Control_Status not found in sample sheet')
+            sys.exit(1)
+        if sampGroupCol == None:
+            print('Sample_Group not found in sample sheet')
+            sys.exit(1)
+        line = f.readline()
+        while line != '':
+            if line.strip():
+                line_list = line.rstrip().split(',')
+                subId = line_list[subjectIdCol]
+                CaCo = line_list[CaCoCol]
+                sampGroup = line_list[sampGroupCol]
+                if not CaCo.strip():
+                    if sampGroup == 'sVALD-001':
+                        CaCo = 'QC'
+                    else:
+                        CaCo = 'NA'
+                if CaCo == 'Control':
+                    CaCo = '0'
+                elif CaCo == 'Case':
+                    CaCo = '1'
+                elif CaCo == 'QC':
+                    CaCo = '2'
+                else:
+                    CaCo = '3'
+                subToCaCoDict[subId] = CaCo
+            line = f.readline()
+    return subToCaCoDict
+
+
+
+def MakeSampToSubDict(sample_to_sub_file):
+    sampToSubDict = {}
+    with open(sample_to_sub_file) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            (sub, samp) = line.rstrip().split(',')
+            if samp != 'NA':
+                sampToSubDict[samp] = sub
+            line = f.readline()
+    return sampToSubDict
+
+def MakeRelatedDict(ibd_file, sample_to_sub_file, sub_fam_file, relatedThresh = float(config['pi_hat_threshold'])):
+    sampToSubDict = MakeSampToSubDict(sample_to_sub_file)
+    subToKeepDict = {}
+    with open(sub_fam_file) as f:
+        for line in f:
+            sub = line.split()[1]
+            subToKeepDict[sub] = 1
+    relatedDict = {}
+    with open(ibd_file) as f:
+        head = f.readline()
+        line = f.readline()
+        while line != '':
+            line_list = line.split()
+            samp1 = line_list[1]
+            samp2 = line_list[3]
+            piHat = float(line_list[9])
+            if sampToSubDict.get(samp1) and sampToSubDict.get(samp2) and piHat > relatedThresh:
+                sub1 = sampToSubDict[samp1]
+                sub2 = sampToSubDict[samp2]
+                if subToKeepDict.get(sub1) and subToKeepDict.get(sub2):
+                    if not relatedDict.get(sub1):
+                        relatedDict[sub1] = [sub2]
+                    else:
+                        relatedDict[sub1].append(sub2)
+                    if not relatedDict.get(sub2):
+                        relatedDict[sub2] = [sub1]
+                    else:
+                        relatedDict[sub2].append(sub1)
+            line = f.readline()
+    return relatedDict
+
+
+
 
 
 
@@ -91,6 +318,56 @@ def makeSampSheetDict(SampleSheet, headers):
                 sampSheetDict[valList[0]] = valList
             line = f.readline()
     return sampSheetDict
+
+
+def getBestSamp(CrSampList, crList):
+    if len(CrSampList) == 1:
+        return CrSampList[0]
+    maxCr = 0.0
+    maxSamp = 'NA'
+    for i in range(len(CrSampList)):
+        samp = CrSampList[i]
+        CR = float(crList[i])
+        if CR > maxCr:
+            maxCr = CR
+            maxSamp = samp
+    return maxSamp
+
+
+def makeControlDict(SampleSheet):
+    controlDict = {}
+    with codecs.open(SampleSheet,"r",encoding='utf-8', errors='ignore') as f:
+        head = f.readline()
+        while 'SentrixBarcode_A' not in head and head != '':
+            head = f.readline()
+        if 'SentrixBarcode_A' not in head:
+            print('Sample sheet not formatted correctly')
+            sys.exit(1)
+        head_list = head.rstrip().split(',')
+        sampGroupCol = None
+        subjectIdCol = None
+        for i in range(len(head_list)):
+            if head_list[i] == 'Sample_Group':
+                sampGroupCol = i
+            elif head_list[i] == 'LIMS_Individual_ID':
+                subjectIdCol = i
+        if sampGroupCol == None:
+            print('Sample_Group not found in sample sheet')
+            sys.exit(1)
+        if subjectIdCol == None:
+            print('subject ID col not found in sample sheet')
+            sys.exit(1)
+        line = f.readline()
+        while line != '':
+            if line.strip():
+                line_list = line.rstrip().split(',')
+                sampId = line_list[0]
+                subId = line_list[subjectIdCol]
+                sampGroup = line_list[sampGroupCol]
+                if sampGroup == 'sVALD-001':
+                    controlDict[subId] = 1
+            line = f.readline()
+    return controlDict
 
 
 def classify_ancestry(labels,x,threshold):
@@ -164,18 +441,27 @@ def makeSubjectToSampListDict(SampleSheet):
             sys.exit(1)
         head_list = head.rstrip().split(',')
         subjectIdCol = None
+        sampGroupCol = None
+        limsIdCol = None
         for i in range(len(head_list)):
             if head_list[i] == subject_id_to_use:
                 subjectIdCol = i
-        if subjectIdCol == None:
-            print('Subject ID not found in sample sheet')
+            elif head_list[i] == 'Sample_Group':
+                sampGroupCol = i
+            elif head_list[i] == 'LIMS_Individual_ID':
+                limsIdCol = i
+        if subjectIdCol == None or sampGroupCol == None or limsIdCol == None:
+            print('Subject ID or Sample_Group or LIMS_Individual_ID not found in sample sheet')
             sys.exit(1)
         line = f.readline()
         while line != '':
             if line.strip():
                 line_list = line.rstrip().split(',')
                 sampId = line_list[0]
+                sampGroup = line_list[sampGroupCol]
                 subId = line_list[subjectIdCol]
+                if not subId.strip() and sampGroup == 'sVALD-001':
+                    subId = line_list[limsIdCol]
                 sampToSubIdDict[sampId] = subId
                 if not subToSampListDict.get(subId):
                     subToSampListDict[subId] = []
@@ -413,12 +699,25 @@ include: 'modules/Snakefile_ancestry'
 include: 'modules/Snakefile_for_lab'
 include: 'modules/Snakefile_idat_intensity'
 include: 'modules/Snakefile_identifiler'
+include: 'modules/Snakefile_remove_qc_failures'
+include: 'modules/Snakefile_subject_level'
+include: 'modules/Snakefile_remove_related'
+include: 'modules/Snakefile_split_pop'
+include: 'modules/Snakefile_autosomal_het'
+include: 'modules/Snakefile_subject_ancestry'
+include: 'modules/Snakefile_pca'
+include: 'modules/Snakefile_HWP'
+include: 'modules/Snakefile_plot_completion'
+include: 'modules/Snakefile_plot_sex'
+include: 'modules/Snakefile_subject_qc_fail'
+include: 'modules/Snakefile_count_exclusions'
+include: 'modules/Snakefile_doc'
+include: 'modules/Snakefile_delivery'
 
 localrules: summary_stats
 
 rule all:
     input:
-        'all_sample_qc.csv',
         'summary_stats.txt',
         'all_sample_idat_intensity/idat_intensity.csv',
         'concordance/KnownReplicates.csv',
@@ -429,4 +728,20 @@ rule all:
         'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',
         'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
-        'files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv'
+        'files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv',
+        'subject_level/subjects_qc.imiss',
+        expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT),
+        'subject_qc_removal/sex_discordant.txt',
+        'subject_qc_removal/unexpected_replicate.csv',
+        'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
+        'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls',
+        'delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv',
+        'delivery/HWP.zip',
+        'delivery/subjects.bed',
+        'delivery/subjects.bim',
+        'delivery/subjects.fam',
+        'delivery/samples.bed',
+        'delivery/samples.bim',
+        'delivery/samples.fam',
+        'delivery/README'
+

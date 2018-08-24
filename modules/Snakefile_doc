@@ -1,0 +1,375 @@
+#!/usr/bin/python
+
+rule word_doc:
+    input:
+        het_plots = expand('autosomal_heterozygosity/{pop}_subjects_qc.het.png', pop = POPS),
+        hwp_plots = expand('HWP/{pop}_subjects_qc.HWP.png', pop = POPS),
+        pca_plots = expand('pca/{pop}_subjects.pca.png', pop = POPS),
+        samp_sheet = sample_sheet,
+        sex_plot = 'sex_plot/sex.png',
+        template = config['doc_template'],
+        completion1 = 'plink_start/samples_start.completion.png',
+        exclusions = 'counts/exclusion_counts.csv',
+        remaining = 'counts/remaining_counts.csv',
+        completion3 = 'plink_filter_call_rate_2/samples_filter2.completion.png',
+        ancestry_plot = 'ancestry/subjects.ancestry.png',
+        ancestry_counts = 'ancestry/subjects.snpweights.csv',
+        start_snps = 'plink_start/samples.bim',
+        filt1_snps = 'plink_filter_call_rate_1/samples.bim',
+        filt2_snps = 'plink_filter_call_rate_2/samples.bim',
+        all_qc = 'all_sample_qc.csv',
+        qc_known_rep = 'concordance/InternalQcKnown.csv',
+        sample_known_rep = 'concordance/StudySampleKnown.csv',
+        related = 'remove_related/subjects_ibd.csv'
+    params:
+        min_subjects = config['minimum_pop_subjects'],
+        manifest = illumina_manifest_file,
+        excel = outName + '_QC_Report_' + sampSheetDate + '.xls',
+        concord_thresh = config['dup_concordance_cutoff']
+    output:
+        doc = 'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.docx', 
+        R = 'word_doc/doc.R',
+        Rout = 'word_doc/doc.R.out',
+        related = 'remove_related/fam.csv'
+    run:
+        famDict = makeFamDict(input.related)
+        famListDict = {}
+        for sub in famDict.keys():
+            fam = famDict[sub]
+            famId = 'F' + str(fam).zfill(6)
+            if not famListDict.get(famId):
+                famListDict[famId] = []
+            famListDict[famId].append(sub)
+        with open(output.related, 'w') as out:
+            out.write('Fam_ID,Subject_ID\n')
+            for famId in sorted(famListDict.keys()):
+                for sub in sorted(famListDict[famId]):
+                    out.write(famId + ',' + sub + '\n')
+        totRelated = len(famDict.keys())
+        numFams = len(set(famDict.values()))
+        StartSnpCount = 0
+        with open(input.start_snps) as f:
+            for line in f:
+                StartSnpCount += 1
+        Filt1snpCount = 0
+        with open(input.filt1_snps) as f:
+            for line in f:
+                Filt1snpCount += 1
+        Filt2snpCount = 0
+        with open(input.filt2_snps) as f:
+            for line in f:
+                Filt2snpCount += 1
+        ancestCountDict = {}
+        with open(input.ancestry_counts) as f:
+            head = f.readline()
+            line = f.readline()
+            while line != '':
+                ancest = line.rstrip().split(',')[-1]
+                if ancestCountDict.get(ancest):
+                    ancestCountDict[ancest] += 1
+                else:
+                    ancestCountDict[ancest] = 1
+                line = f.readline()
+        subToCaCoDict = makeSubjectToCaCoDict(input.samp_sheet)
+        totSubs = len(subToCaCoDict.keys())
+        rTxt = '''library(officer)
+library(magrittr)
+library(flextable)
+exclusions <- read.csv("''' + input.exclusions + '''")
+remaining <- read.csv("''' + input.remaining + '''")
+qc_known_rep <- read.csv("''' + input.qc_known_rep + '''")
+sample_known_rep <- read.csv("''' + input.sample_known_rep + '''")
+data <- read.csv("''' + input.all_qc + '''")
+ancestry <- read.csv("''' + input.ancestry_counts + '''")
+tot_samps <- remaining[1,6]
+numCase <- remaining[1,3]
+numControl <- remaining[1,2]
+numMale <- length(data$Expected_Sex[data$Expected_Sex == "M"])
+numFemale <- length(data$Expected_Sex[data$Expected_Sex == "F"])
+array_processing <- exclusions[1,6]
+rem_array_process <- remaining[2,6]
+mean_samp_completion <- round(mean(data$Call_Rate_Initial, na.rm = T), 4)
+mean_concord_qc <- mean(qc_known_rep$Concordance, na.rm = T)
+min_concord_qc <- min(qc_known_rep$Concordance, na.rm = T)
+mean_concord_sample <- mean(sample_known_rep$Concordance, na.rm = T)
+min_concord_sample <- min(sample_known_rep$Concordance, na.rm = T)
+num_low_concord_exp <- length(which(sample_known_rep$Concordance < ''' + str(params.concord_thresh) + '''))
+filt1_samps <- exclusions[2,6]
+filt2_samps <- exclusions[3,6]
+filt1_remaining <- remaining[3,6]
+filt2_remaining <- remaining[4,6]
+contam_samps <- exclusions[4,6]
+contam_remaining <- remaining[5,6]
+start_qc_samps <- remaining[1,4]
+filt_qc_samps <- remaining[5,4]
+qc_remaining <- remaining[6,6]
+exp_rep_filt <- exclusions[6,6]
+exp_rep_remaining <- remaining[7,6]
+total_sample_exclusions <- array_processing + filt1_samps + filt2_samps + contam_samps + filt_qc_samps + exp_rep_filt
+num_sex_discordant <- exclusions[7,6]
+num_unexp_rep <- exclusions[8,6]
+num_auto_het <- exclusions[10,6]
+
+table1 <- data.frame(study = "''' + outName + '''_''' + sampSheetDate + '''", array = "''' + os.path.basename(params.manifest).split('_')[0] + '''", 
+CaCo = paste(numCase, numControl, sep = ":"), m_f = paste(numMale, numFemale, sep = ":"), tot = tot_samps)
+names(table1) <- c("STUDY NAME", "ARRAY", "CASE:CONTROL", "MALE:FEMALE", "TOTAL COUNT")
+
+
+double_format <- function(x){
+  sprintf("%.2f", x)
+}
+percent_format <- function(x){
+  sprintf("%.2f %%", x)
+}
+
+int_format <- function(x){
+  sprintf("%.0f", x)
+}
+
+ft_1 <- regulartable(table1, col_keys = names(table1)) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+table2a <- data.frame(thresh = c(100 * ''' + str(samp_cr_1) + ''', 100 * ''' + str(samp_cr_2) + '''), 
+exclusions = c(filt1_samps, filt2_samps), remain = c(filt1_remaining, filt2_remaining))
+names(table2a) <- c("THRESHOLD", "SAMPLE EXCLUSION", "REMAINING")
+
+ft_2a <- regulartable(table2a, col_keys = names(table2a)) %>%
+    set_formatter("THRESHOLD" = percent_format, "SAMPLE EXCLUSION" = int_format, "REMAINING" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+
+table2b <- data.frame(thresh = c(100 * ''' + str(snp_cr_1) + ''', 100 * ''' + str(snp_cr_2) + '''), 
+exclusions = c(''' + str(StartSnpCount - Filt1snpCount) + ''', ''' + str(Filt1snpCount - Filt2snpCount) + '''), 
+remain = c(''' + str(Filt1snpCount) + ''', ''' + str(Filt2snpCount) + '''))
+names(table2b) <- c("THRESHOLD", "LOCI EXCLUSION", "REMAINING")
+
+ft_2b <- regulartable(table2b, col_keys = names(table2b)) %>%
+    set_formatter("THRESHOLD" = percent_format, "LOCI EXCLUSION" = int_format, "REMAINING" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+ancest_m <- cbind(table(ancestry$Ancestry))
+table3 <- data.frame(ancest = row.names(ancest_m), counts = ancest_m[,1])
+row.names(table3) <- NULL
+names(table3) <- c("ANCESTRY GROUP", "COUNT")
+
+ft_3 <- regulartable(table3, col_keys = names(table3)) %>%
+    set_formatter("COUNT" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+sample_exclusions <- exclusions[1:5,2:6]
+table4a <- rbind(sample_exclusions, remaining[6, 2:6], exclusions[6,2:6], remaining[8, 2:6])
+table4a <- cbind(c(as.character(exclusions[1:5,1]), "Samples Remaining for Analysis", "Expected Duplicates Removed", "Subjects Remaining"), table4a)
+names(table4a) <- c("FILTER REASON/DESCRIPTION","CONTROLS","CASES","QC","OTHER", "ALL SAMPLES")
+
+ft_4a <- regulartable(table4a, col_keys = names(table4a)) %>%
+    set_formatter("CONTROLS" = int_format, "CASES" = int_format, "QC" = int_format, "OTHER" = int_format, "ALL SAMPLES" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+
+
+table4b <- exclusions[c(7, 8, 10), c(1, 2, 3, 5, 6)]
+names(table4b) <- c("FILTER REASON","CONTROLS","CASES", "OTHER", "ALL SUBJECTS")
+
+
+
+ft_4b <- regulartable(table4b, col_keys = names(table4b)) %>%
+    set_formatter("CONTROLS" = int_format, "CASES" = int_format, "OTHER" = int_format, "ALL SUBJECTS" = int_format) %>%
+    fontsize(size = 8, part = "all") %>%
+    fontsize(i = 1, size = 10, part = "header") %>%
+    color(i = 1, color = "#007FA6", part = "header") %>%
+    theme_zebra(odd_header = "transparent", even_header = "transparent") %>%
+    autofit()
+
+
+my_doc <- read_docx(path = "''' + input.template + '''")  %>%
+    body_replace_all_text("PROJECT_NAME", "''' + outName + '''_''' + sampSheetDate + '''", fixed=TRUE) %>%
+    body_replace_all_text("DATE", date(), fixed=TRUE) %>%
+    body_replace_all_text("TOT_SAMPS", as.character(tot_samps), fixed=TRUE) %>%
+    body_replace_all_text("TOT_SUBS", "''' + str(totSubs) + '''", fixed=TRUE) %>%
+    body_replace_all_text("NUM_LOCI", "''' + str(StartSnpCount) + '''", fixed=TRUE) %>%
+    body_replace_all_text("SNP_ARRAY", "''' + os.path.basename(params.manifest).split('_')[0] + '''", fixed=TRUE) %>%
+    body_replace_all_text("ARRAY_PROCESSING", as.character(array_processing), fixed=TRUE) %>%
+    body_replace_all_text("REMAIN_ARRAY", as.character(rem_array_process), fixed=TRUE) %>%
+    body_replace_all_text("MEAN_COMPLETION", as.character(mean_samp_completion), fixed=TRUE) %>%
+    body_replace_all_text("CR_SAMP_THRESH_1", "''' + str(samp_cr_1) + '''", fixed=TRUE) %>%
+    body_replace_all_text("CR_SNP_THRESH_1", "''' + str(snp_cr_1) + '''", fixed=TRUE) %>%
+    body_replace_all_text("CR_SAMP_THRESH_2", "''' + str(samp_cr_2) + '''", fixed=TRUE) %>%
+    body_replace_all_text("CR_SNP_THRESH_2", "''' + str(snp_cr_2) + '''", fixed=TRUE) %>%
+    body_replace_all_text("FILT_1_SAMPS", as.character(filt1_samps), fixed=TRUE) %>%
+    body_replace_all_text("FILT_1_SNPS", "''' + str(StartSnpCount - Filt1snpCount) + '''", fixed=TRUE) %>%
+    body_replace_all_text("FILT_2_SAMPS", as.character(filt2_samps), fixed=TRUE) %>%
+    body_replace_all_text("FILT_2_SNPS", "''' + str(Filt1snpCount - Filt2snpCount) + '''", fixed=TRUE) %>%
+    body_replace_all_text("REMAIN_SAMPS_FILT2", as.character(filt2_remaining), fixed=TRUE) %>%
+    body_replace_all_text("REMAIN_SNPS_FILT2", "''' + str(Filt2snpCount) + '''", fixed=TRUE) %>%
+    body_replace_all_text("CONTAM_SAMPS", as.character(contam_samps), fixed=TRUE) %>%
+    body_replace_all_text("REMAIN_SAMPS_CONTAM", as.character(contam_remaining), fixed=TRUE) %>%
+    body_replace_all_text("START_QC_SAMPS", as.character(start_qc_samps), fixed=TRUE) %>%
+    body_replace_all_text("FILT_QC_SAMPS", as.character(filt_qc_samps), fixed=TRUE) %>%
+    body_replace_all_text("REMAIN_SAMPS_QC", as.character(qc_remaining), fixed=TRUE) %>%
+    body_replace_all_text("QC_MIN_CONCORD", as.character(round(100 * min_concord_qc, 2)), fixed=TRUE) %>%
+    body_replace_all_text("QC_MEAN_CONCORD", as.character(round(100 * mean_concord_qc, 2)), fixed=TRUE) %>%
+    body_replace_all_text("SAMPLE_MIN_CONCORD", as.character(round(100 * min_concord_sample, 2)), fixed=TRUE) %>%
+    body_replace_all_text("SAMPLE_MEAN_CONCORD", as.character(round(100 * mean_concord_sample, 2)), fixed=TRUE) %>%
+    body_replace_all_text("NUM_LOW_CONCORD_EXP", as.character(num_low_concord_exp), fixed=TRUE) %>%
+    body_replace_all_text("EXP_REP_FILT", as.character(exp_rep_filt), fixed=TRUE) %>%
+    body_replace_all_text("EXP_REP_REMAIN", as.character(exp_rep_remaining), fixed=TRUE) %>%
+    body_replace_all_text("TOTAL_SAMP_EXCLUSIONS", as.character(total_sample_exclusions), fixed=TRUE) %>%
+    body_replace_all_text("NUM_SEX_DISCORDANT", as.character(num_sex_discordant), fixed=TRUE) %>%
+    body_replace_all_text("NUM_UNEXP_REP", as.character(num_unexp_rep), fixed=TRUE) %>%
+    body_replace_all_text("TOTAL_RELATED", "''' + str(totRelated) + '''", fixed=TRUE) %>%
+    body_replace_all_text("NUMBER_OF_FAMILIES", "''' + str(numFams) + '''", fixed=TRUE) %>%
+    body_replace_all_text("NUM_AUTO_HET", as.character(num_auto_het), fixed=TRUE) %>%
+    body_replace_all_text("MIN_POP_SUBJECTS", "''' + str(params.min_subjects) + '''", fixed=TRUE) %>%
+    body_replace_all_text("EXCEL_FILE_NAME", "''' + str(params.excel) + '''", fixed=TRUE) %>%
+
+    cursor_reach(keyword = "Table 1 Sample manifest information prior to processing") %>%
+    body_add_flextable(value = ft_1) %>%
+    cursor_reach(keyword = "Figure 1a initial completion rate") %>%
+    slip_in_img(src = "''' + input.completion1 + '''", width = 6, height = 6, pos = "before") %>%
+    cursor_reach(keyword = "Figure 1b completion rate by sample and by locus after filter 2") %>%
+    slip_in_img(src = "''' + input.completion3 + '''", width = 6, height = 6, pos = "before") %>%
+    cursor_reach(keyword = "Table 2a Sample Quality Control Exclusion") %>%
+    body_add_flextable(value = ft_2a) %>%
+    cursor_reach(keyword = "Table 2b Loci Quality Control Exclusion") %>%
+    body_add_flextable(value = ft_2b) %>%
+    cursor_reach(keyword = "Table 3 Subject Counts by Ancestry Group") %>%
+    body_add_flextable(value = ft_3) %>%
+    cursor_reach(keyword = "FIG_2_PLACEHOLDER") %>%
+    body_add_par("", style = "Normal", pos = "on") %>%
+    slip_in_img(src = "''' + input.sex_plot + '''", width = 6, height = 6, pos = "after") %>%
+    slip_in_text("Figure 2", style = "Bold", pos = "after") %>%
+    slip_in_text(" chrX F coefficient distribution of female samples and male samples", style = "Normal1", pos = "after") %>%
+    cursor_reach(keyword = "Figure 3 Ancestry using") %>%
+    slip_in_img(src = "''' + input.ancestry_plot + '''", width = 6, height = 6, pos = "before") %>%
+    cursor_reach(keyword = "Table 4a Summary of sample level exclusions") %>%
+    body_add_flextable(value = ft_4a) %>%
+    cursor_reach(keyword = "Table 4b Summary of recommended subject level exclusions") %>%
+    body_add_flextable(value = ft_4b) %>%
+    cursor_reach(keyword = "autosomal heterozygosity exclusion threshold.")'''
+        hetTxt = ''
+        pcaTxt = ' %>%\n    cursor_reach(keyword = "Figure 5.")'
+        hwpTxt = ' %>%\n    cursor_reach(keyword = "in further association analysis.")'
+        c = 0
+        for i in range(len(POPS)):
+            pop = POPS[i]
+            if not ancestCountDict.get(pop):
+                ancestCount = 0
+            else:
+                ancestCount = ancestCountDict[pop]
+            if ancestCount >= params.min_subjects:
+                figLetter = string.ascii_lowercase[c]
+                hetTxt += ' %>%\n'
+                hetTxt += '    slip_in_img(src = "autosomal_heterozygosity/' + pop + '_subjects_qc.het.png", width = 6, height = 6, pos = "after") %>%\n'
+                hetTxt += '    slip_in_text("Figure 4' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
+                hetTxt += '    slip_in_text("' + pop + ' F coefficient distribution", style = "Normal1", pos = "after")'
+                pcaTxt += ' %>%\n'
+                pcaTxt += '    slip_in_img(src = "pca/' + pop + '_subjects.pca.png", width = 6, height = 6, pos = "after") %>%\n'
+                pcaTxt += '    slip_in_text("Figure 5' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
+                pcaTxt += '    slip_in_text("' + pop + ' PCA plots", style = "Normal1", pos = "after")'
+                hwpTxt += ' %>%\n'
+                hwpTxt += '    slip_in_img(src = "HWP/' + pop + '_subjects_qc.HWP.png", width = 6, height = 6, pos = "after") %>%\n'
+                hwpTxt += '    slip_in_text("Figure 6' + figLetter + ' ", style = "Bold", pos = "after") %>%\n'
+                hwpTxt += '    slip_in_text("' + pop + ' Q-Q plot of test for deviation from Hardy-Weinberg Proportion", style = "Normal1", pos = "after")'
+                c += 1
+        rTxt += hetTxt
+        rTxt += pcaTxt
+        rTxt += hwpTxt
+        rTxt += '''
+print(my_doc, target = "''' + output.doc + '''")
+'''
+        with open(output.R, 'w')  as R:
+            R.write(rTxt)
+        shell('R --vanilla < {output.R} > {output.Rout}')
+
+
+
+
+rule subset_all_qc:
+    input:
+        'all_sample_qc.csv'
+    output:
+        'word_doc/all_sample_qc.csv'
+    params:
+        colsToRemove = 'Count_of_SR_SubjectID,SR,Current_Subject_Status,Subject_Notes,Expected Replicate Discordance,Count_of_QC_Issue,Identifiler_Needed'
+    run:
+        removeColumns = params.colsToRemove.split(',')
+        colToRemoveDict = {}
+        with open(input[0]) as f, open(output[0], 'w') as out:
+            line = f.readline()
+            line_list = line.rstrip().split(',')
+            for i in range(len(line_list)):
+                colName = line_list[i]
+                if colName in removeColumns:
+                    colToRemoveDict[i] = 1
+            while line != '':
+                line_list = line.rstrip().split(',')
+                keep_list = []
+                for i in range(len(line_list)):
+                    if not colToRemoveDict.get(i):
+                        keep_list.append(line_list[i])
+                out.write(','.join(keep_list) + '\n')
+                line = f.readline()
+
+
+rule excel_sheet:
+    input:
+        pca = expand('pca/{pop}_subjects.eigenvec.csv', pop = POPS),
+        het = expand('autosomal_heterozygosity/{pop}_subjects_qc.het.csv', pop = POPS),
+        all_qc = 'word_doc/all_sample_qc.csv',
+        ancestry = 'ancestry/subjects.snpweights.csv',
+        ibd = 'remove_related/subjects_ibd.csv',
+        fam = 'remove_related/fam.csv',
+        knownRep = 'concordance/KnownReplicates.csv',
+        unknownRepSamp = 'concordance/UnknownReplicates.csv',
+        unknownRepSub = 'subject_qc_removal/unexpected_replicate.csv'
+    output:
+        'word_doc/' + outName + '_QC_Report_' + sampSheetDate + '.xls'
+    run:
+        csvFiles = [input.all_qc, input.ancestry, input.ibd, input.fam, input.knownRep, input.unknownRepSamp, input.unknownRepSub]
+        tabs = ['ALL_QC', 'ANCESTRY', 'IBD', 'FAMILIES', 'EXPECTED_REPLICATES', 'UNEXPECTED_REPLICATES_SAMPLES', 'UNEXPECTED_REPLICATES_SUBJECTS']
+        for p in input.pca:
+            with open(p) as f:
+                line = f.readline()
+            if line != 'Too few subjects to process pop\n':
+                csvFiles.append(p)
+                t = os.path.basename(p).strip('_subjects.eigenvec.csv') + '_PCA'
+                tabs.append(t)
+
+        for h in input.het:
+            with open(h) as f:
+                line = f.readline()
+            if line != 'Too few subjects to process pop\n':
+                csvFiles.append(h)
+                t = os.path.basename(h).strip('_subjects_qc.het.csv') + '_HET'
+                tabs.append(t)
+        wb = xlwt.Workbook()
+        for i in range(len(tabs)):
+            tab = tabs[i]
+            ws = wb.add_sheet(tab)
+            with open(csvFiles[i]) as f:
+                reader = csv.reader(f)
+                for r, row in enumerate(reader):
+                    for c, col in enumerate(row):
+                        ws.write(r, c, col)
+        wb.save(output[0])
+

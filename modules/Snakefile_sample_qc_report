@@ -3,12 +3,12 @@
 rule sample_qc_report:
     input:
         sampSheet = sample_sheet,
-        imiss1 = 'sample_qc_stats/samples.imiss',
+        imiss1 = 'plink_start/samples_start.imiss',
         imiss2 = 'plink_filter_call_rate_1/samples_filter1.imiss',
         imiss3 = 'plink_filter_call_rate_2/samples_filter2.imiss',
         sexcheck = 'plink_filter_call_rate_1/samples_filter1.sexcheck',
-        freq = 'sample_qc_stats/samples.frq',
-        hwe = 'sample_qc_stats/samples.hwe',
+        freq = 'plink_start/samples_start.frq',
+        hwe = 'plink_start/samples_start.hwe',
         contam = 'all_contam/contam.csv',
         ancestry = 'snpweights/samples.snpweights.csv',
         knownConcordance = 'concordance/KnownReplicates.csv',
@@ -214,5 +214,18 @@ rule summary_stats:
         capture.output(summary(data$IdatIntensity), file = "{output}", append = T)
         write("\nFail contamination rate:", file = "{output}", append = T)
         capture.output(table(data$Contamination_Rate > .1, useNA = "ifany"), file = "{output}", append = T)
+
+        write("\nFail Call Rate:", file = "{output}", append = T)
+        capture.output(table(data$Low.Call.Rate, useNA = "ifany"), file = "{output}", append = T)
+        write("\nSex Discordant:", file = "{output}", append = T)
+        capture.output(table(data$Sex.Discordant, useNA = "ifany"), file = "{output}", append = T)
+        write("\nExpected Replicate Discordance:", file = "{output}", append = T)
+        capture.output(table(data$Expected.Replicate.Discordance, useNA = "ifany"), file = "{output}", append = T)
+        write("\nUnexpected Replicate:", file = "{output}", append = T)
+        capture.output(table(data$Unexpected.Replicate, useNA = "ifany"), file = "{output}", append = T)
+        write("\nIdentifiler Needed:", file = "{output}", append = T)
+        capture.output(table(data$Identifiler_Needed, useNA = "ifany"), file = "{output}", append = T)
+        write("\nNumber of QC Issues:", file = "{output}", append = T)
+        capture.output(table(data$Count_of_QC_Issue, useNA = "ifany"), file = "{output}", append = T)
         """)
 

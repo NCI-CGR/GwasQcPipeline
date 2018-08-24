@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 rule plink_ld_prune:
     input:
         'plink_filter_call_rate_2/samples.bed',
@@ -42,8 +44,9 @@ rule plink_ibd:
         outProj = 'ibd/samples'
     output:
         'ibd/samples.genome'
+    threads: 20
     shell:
-        'plink --bfile {params.inProj} --genome full --min 0.05 --memory 10000 --out {params.outProj}'
+        'plink --bfile {params.inProj} --genome full --min 0.05 --memory 240000 --threads {threads} --out {params.outProj}'
 
 rule output_replicates:
     input:
@@ -116,3 +119,27 @@ rule output_replicates:
                     subId2 = sampToSubIdDict[samp2]
                     if subId1 != subId2 and crDict.get(samp1) and crDict.get(samp2):
                         outUn.write(','.join([subId1, subId2, samp1, samp2, str(concordance), str(piHat)]) + '\n')
+
+
+rule split_known_rep:
+    input:
+        sampSheet = sample_sheet,
+        rep = 'concordance/KnownReplicates.csv'
+    output:
+        qc = 'concordance/InternalQcKnown.csv',
+        other = 'concordance/StudySampleKnown.csv'
+    run:
+        qcSubDict = makeControlDict(input.sampSheet)
+        with open(input.rep) as f, open(output.qc, 'w') as out1, open(output.other, 'w') as out2:
+            head = f.readline()
+            out1.write(head)
+            out2.write(head)
+            line = f.readline()
+            while line != '':
+                sub = line.split(',')[0]
+                if qcSubDict.get(sub):
+                    out1.write(line)
+                else:
+                    out2.write(line)
+                line = f.readline()
+
