@@ -448,7 +448,7 @@ def makeSubjectToSampListDict(SampleSheet):
                 subjectIdCol = i
             elif head_list[i] == 'Sample_Group':
                 sampGroupCol = i
-            elif head_list[i] == 'LIMS_Individual_ID':
+            if head_list[i] == 'LIMS_Individual_ID':
                 limsIdCol = i
         if subjectIdCol == None or sampGroupCol == None or limsIdCol == None:
             print('Subject ID or Sample_Group or LIMS_Individual_ID not found in sample sheet')
