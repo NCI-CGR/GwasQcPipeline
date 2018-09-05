@@ -22,12 +22,18 @@ rule internal_controls:
 rule expected_duplicates:
     input:
         sampSheet = sample_sheet,
-        imiss4 = 'remove_qc_fail/samples_remove_failures.imiss'
+        imiss4 = 'remove_qc_fail/samples_remove_failures.imiss',
+        repDisc = 'remove_qc_fail/ExpectedRepDiscordant.txt'
     output:
         remove = 'subject_level/expectedDupToRemove.txt',
         track = 'subject_level/SampleUsedforSubject.csv',
         rename = 'subject_level/renameSampToSub.txt'
     run:
+        lowConcordDict = {}
+        with open(input.repDisc) as f:
+            for line in f:
+                samp = line.split()[0]
+                lowConcordDict[samp] = 1
         (SubToSampListDict, sampToSubIdDict) = makeSubjectToSampListDict(sample_sheet)
         crDict = makeCallRateDict(input.imiss4)
         controlDict = makeControlDict(sample_sheet)
@@ -38,11 +44,18 @@ rule expected_duplicates:
                     sampList = SubToSampListDict[sub]
                     crList = []
                     CrSampList = []
+                    lowConcord = False
                     for s in sampList:
+                        if lowConcordDict.get(s):
+                            lowConcord = True
                         if crDict.get(s):
                             crList.append(crDict[s])
                             CrSampList.append(s)
-                    if len(crList) > 0:
+                    if lowConcord == True:
+                        out2.write(','.join([sub, 'NA']) + '\n')
+                        for s in sampList:
+                            out1.write(s + ' ' + s + '\n')
+                    elif len(crList) > 0:
                         bestSamp = getBestSamp(CrSampList, crList)
                         out2.write(','.join([sub, bestSamp]) + '\n')
                         out3.write(' '.join([bestSamp, bestSamp, sub, sub]) + '\n')
