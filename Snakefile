@@ -45,7 +45,7 @@ expected_sex_col_name = config['expected_sex_col_name']
 lims_output_dir = config['lims_output_dir']
 contam_threshold = config['contam_threshold']
 adpc_file = config['adpc_file']
-
+contam_pop = config['contam_pop']
 
 
 POPS = ['EUR', 'ASN', 'AFR', 'ADMIXED_EUR', 'ADMIXED_ASN', 'ADMIXED_AFR', 'ASN_EUR', 'AFR_EUR', 'AFR_ASN', 'AFR_ASN_EUR']
