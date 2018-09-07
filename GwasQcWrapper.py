@@ -154,7 +154,7 @@ def get_args():
     requiredWithDefaults.add_argument('--dup_concordance_cutoff', type=float, default= 0.95, help='REQUIRED. SNP concordance cutoff to call samples replicates.  default= 0.95')
     requiredWithDefaults.add_argument('--lims_output_dir', type = str, default = '/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc', help='Directory to copy QC file to upload to LIMS')
     requiredWithDefaults.add_argument('--contam_threshold', type=float, default= 0.10, help='REQUIRED. Cutoff to call a sample contaminated.  default= 0.10')
-    requiredWithDefaults.add_argument('--contam_pop', type=str, default= 'AF', help='REQUIRED. 1KG pop to use for freq for contam test. Must be one of:  AF,EAS_AF,AMR_AF,AFR_AF,EUR_AF,SAS_AF.  default= AF')
+    requiredWithDefaults.add_argument('--contam_pop', type=str, default= 'AF', choices=['AF','EAS_AF','AMR_AF','AFR_AF','EUR_AF','SAS_AF'], help='REQUIRED. 1KG pop to use for freq for contam test. Must be one of:  AF,EAS_AF,AMR_AF,AFR_AF,EUR_AF,SAS_AF.  default= AF')
     parser.add_argument('-i', '--illumina_manifest_file',type=str, default='/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm', help='Full path to illimina .bpm manifest file. Required for gtc files.')
     parser.add_argument('-a', '--adpc_file', type=str, help='Full path to adpc.bin file. Required for PLINK input.')
     parser.add_argument('-g', '--gtc_dir', type=str, help='Full path to gtc directory to use instead of project directory, which is the default.  Will recursively find gtc files in this directory.')
