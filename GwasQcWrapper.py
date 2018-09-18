@@ -80,7 +80,7 @@ def makeClusterConfig(outDir, queue):
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
                subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, 
                contam_threshold, adpc_file, gtc_dir, remove_contam, remove_sex_discordant, remove_rep_discordant, remove_unexpected_rep, pi_hat_threshold,
-               autosomal_het_thresh, minimum_pop_subjects, control_hwp_thresh, word_doc_template):
+               autosomal_het_thresh, minimum_pop_subjects, control_hwp_thresh, word_doc_template, contam_pop):
     '''
     (str, str, str) -> None
     '''
@@ -118,6 +118,7 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
         output.write('minimum_pop_subjects: ' + str(minimum_pop_subjects) + '\n')
         output.write('control_hwp_thresh: ' + str(control_hwp_thresh) + '\n')
         output.write('doc_template: ' + word_doc_template + '\n')
+        output.write('contam_pop: ' + contam_pop + '\n')
         output.write('start_time: ' + start + '\n')
 
 
@@ -153,11 +154,12 @@ def get_args():
     requiredWithDefaults.add_argument('--dup_concordance_cutoff', type=float, default= 0.95, help='REQUIRED. SNP concordance cutoff to call samples replicates.  default= 0.95')
     requiredWithDefaults.add_argument('--lims_output_dir', type = str, default = '/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc', help='Directory to copy QC file to upload to LIMS')
     requiredWithDefaults.add_argument('--contam_threshold', type=float, default= 0.10, help='REQUIRED. Cutoff to call a sample contaminated.  default= 0.10')
+    requiredWithDefaults.add_argument('--contam_pop', type=str, default= 'AF', choices=['AF','EAS_AF','AMR_AF','AFR_AF','EUR_AF','SAS_AF'], help='REQUIRED. 1KG pop to use for freq for contam test. Must be one of:  AF,EAS_AF,AMR_AF,AFR_AF,EUR_AF,SAS_AF.  default= AF')
     parser.add_argument('-i', '--illumina_manifest_file',type=str, default='/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm', help='Full path to illimina .bpm manifest file. Required for gtc files.')
     parser.add_argument('-a', '--adpc_file', type=str, help='Full path to adpc.bin file. Required for PLINK input.')
     parser.add_argument('-g', '--gtc_dir', type=str, help='Full path to gtc directory to use instead of project directory, which is the default.  Will recursively find gtc files in this directory.')
     requiredArgs.add_argument('--expected_sex_col_name', type=str, default='Expected_Sex', help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
-    requiredWithDefaults.add_argument('-q', '--queue', type=str, default='all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q', help='OPTIONAL. Queue on cgemsiii to use to submit jobs.  Defaults to all of the seq queues and all.q if not supplied.  default="all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q"')
+    requiredWithDefaults.add_argument('-q', '--queue', type=str, default='all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q,bigmem.q', help='OPTIONAL. Queue on cgemsiii to use to submit jobs.  Defaults to all of the seq queues and all.q if not supplied.  default="all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q,bigmem.q"')
     requiredWithDefaults.add_argument('--remove_contam', type=str, default='YES', help='REQUIRED. If "YES" contaminated samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
     requiredWithDefaults.add_argument('--remove_sex_discordant', type=str, default='YES', help='REQUIRED. If "YES" sex discordant samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
     requiredWithDefaults.add_argument('--remove_rep_discordant', type=str, default='YES', help='REQUIRED. If "YES" known replicate discordant samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
@@ -260,7 +262,7 @@ def main():
         makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold,
                args.adpc_file, args.gtc_dir, args.remove_contam, args.remove_sex_discordant, args.remove_rep_discordant, args.remove_unexpected_rep, args.pi_hat_threshold, args.autosomal_het_thresh,
-               args.minimum_pop_subjects, args.control_hwp_thresh, args.word_doc_template)
+               args.minimum_pop_subjects, args.control_hwp_thresh, args.word_doc_template, args.contam_pop)
         makeClusterConfig(outDir, args.queue)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'

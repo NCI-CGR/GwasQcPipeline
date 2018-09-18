@@ -10,10 +10,20 @@ rule gtc_to_adpc:
     shell:
         'python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2adpc.py {input.gtc} {input.manifest} {output.adpc}'
 
+rule make_abf_txt:
+    input:
+        manifest = illumina_manifest_file
+    params:
+        pop = contam_pop
+    output:
+        illumina_manifest_file[:-3] + contam_pop + '.abf.txt'
+    shell:
+        'python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/bpm_to_1kg_contam_abf.py {input.manifest} {params.pop}'
+
 rule contam_test_GSA_1000g:
     input:
         adpc = 'contam/{sample_id}.adpc.bin',
-        abf = '/DCEG/CGF/Bioinformatics/Production/Eric/refFiles/ThousG.AF.abf.txt'
+        abf = illumina_manifest_file[:-3] + contam_pop + '.abf.txt'
     params:
         software = '/DCEG/CGF/Bioinformatics/Production/BZhu/verifyIDintensity/verifyIDintensity/verifyIDintensity',
     output:
