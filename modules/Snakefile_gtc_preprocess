@@ -10,9 +10,11 @@ rule gtc_to_ped:
         manifest = illumina_manifest_file
     output:
         'per_sample_plink_files/{sample_id}.ped',
-        'per_sample_plink_files/{sample_id}.map',
+        'per_sample_plink_files/{sample_id}.map'
+    params:
+        script = 'scripts/gtc2plink_' + config['strand']+ '.py'
     shell:
-        'python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/gtc2plink.py {input.gtc} {input.manifest} {wildcards.sample_id} per_sample_plink_files'
+        'python {params.script} {input.gtc} {input.manifest} {wildcards.sample_id} per_sample_plink_files'
 
 
 rule merge_sample_peds:

@@ -80,7 +80,7 @@ def makeClusterConfig(outDir, queue):
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
                subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, 
                contam_threshold, adpc_file, gtc_dir, remove_contam, remove_sex_discordant, remove_rep_discordant, remove_unexpected_rep, pi_hat_threshold,
-               autosomal_het_thresh, minimum_pop_subjects, control_hwp_thresh, word_doc_template, contam_pop):
+               autosomal_het_thresh, minimum_pop_subjects, control_hwp_thresh, word_doc_template, contam_pop, strand):
     '''
     (str, str, str) -> None
     '''
@@ -119,6 +119,7 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
         output.write('control_hwp_thresh: ' + str(control_hwp_thresh) + '\n')
         output.write('doc_template: ' + word_doc_template + '\n')
         output.write('contam_pop: ' + contam_pop + '\n')
+        output.write('strand: ' + strand + '\n')
         output.write('start_time: ' + start + '\n')
 
 
@@ -156,6 +157,7 @@ def get_args():
     requiredWithDefaults.add_argument('--contam_threshold', type=float, default= 0.10, help='REQUIRED. Cutoff to call a sample contaminated.  default= 0.10')
     requiredWithDefaults.add_argument('--contam_pop', type=str, default= 'AF', choices=['AF','EAS_AF','AMR_AF','AFR_AF','EUR_AF','SAS_AF'], help='REQUIRED. 1KG pop to use for freq for contam test. Must be one of:  AF,EAS_AF,AMR_AF,AFR_AF,EUR_AF,SAS_AF.  default= AF')
     parser.add_argument('-i', '--illumina_manifest_file',type=str, default='/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm', help='Full path to illimina .bpm manifest file. Required for gtc files.')
+    requiredWithDefaults.add_argument('--strand', type=str, default= 'TOP', choices=['TOP','FWD'], help='REQUIRED. strand to use for genotypes. Must be one of:  TOP, FWD.  default= TOP')
     parser.add_argument('-a', '--adpc_file', type=str, help='Full path to adpc.bin file. Required for PLINK input.')
     parser.add_argument('-g', '--gtc_dir', type=str, help='Full path to gtc directory to use instead of project directory, which is the default.  Will recursively find gtc files in this directory.')
     requiredArgs.add_argument('--expected_sex_col_name', type=str, default='Expected_Sex', help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
@@ -262,7 +264,7 @@ def main():
         makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold,
                args.adpc_file, args.gtc_dir, args.remove_contam, args.remove_sex_discordant, args.remove_rep_discordant, args.remove_unexpected_rep, args.pi_hat_threshold, args.autosomal_het_thresh,
-               args.minimum_pop_subjects, args.control_hwp_thresh, args.word_doc_template, args.contam_pop)
+               args.minimum_pop_subjects, args.control_hwp_thresh, args.word_doc_template, args.contam_pop, args.strand)
         makeClusterConfig(outDir, args.queue)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'
