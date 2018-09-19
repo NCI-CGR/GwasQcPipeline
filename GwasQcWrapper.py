@@ -231,6 +231,8 @@ def main():
         os.mkdir(outDir + '/logs')
     if 'modules' not in paths:
         os.mkdir(outDir + '/modules')
+    if 'scripts' not in paths:
+        os.mkdir(outDir + '/scripts')
     if 'figures' not in paths:
         os.mkdir(outDir + '/figures')
     if not args.path_to_plink_file:
@@ -254,6 +256,9 @@ def main():
     moduleFiles = glob.glob(scriptDir + '/modules/*')
     for f in moduleFiles:
         shutil.copy2(f, outDir + '/modules')
+    scriptFiles = glob.glob(scriptDir + '/scripts/*')
+    for f in scriptFiles:
+        shutil.copy2(f, outDir + '/scripts')
     figFiles = glob.glob(scriptDir + '/figures/*')
     for f in figFiles:
         shutil.copy2(f, outDir + '/figures')
