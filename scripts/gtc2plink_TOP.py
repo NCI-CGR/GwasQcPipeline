@@ -29,7 +29,7 @@ def outputPlink(gtc_file, manifest_file, sample_name, plink_out_dir, genoThresh 
     with open(outBase + '.ped', 'w') as pedOut, open(outBase +'.map','w') as mapOut:
         for (name, chrom, map_info, source_strand_genotype, genoScore) in zip(manifest.names, manifest.chroms, manifest.map_infos, top_strand_genotypes, GenoScores):
             mapOut.write(' '.join([chrom, name, '0', str(map_info)]) + '\n')
-            if source_strand_genotype == '-':
+            if source_strand_genotype == '--':
                 geno = ['0', '0']
             else:
                 geno = [source_strand_genotype[0], source_strand_genotype[1]]
