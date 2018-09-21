@@ -23,7 +23,7 @@ rule idat_intensity:
         '''
         with open(output.R, 'w') as Rout:
             Rout.write(rTxt)
-        shell('env TMPDIR=/scratch/karlinser R --vanilla < {output.R} > {output.Rout}')
+        shell('env TMPDIR=/DCEG/CGF/GWAS/Scans/GSA_Lab_QC/tmp R --vanilla < {output.R} > {output.Rout}')
 
 rule combine_idat_intensity:
     input:
