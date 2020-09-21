@@ -19,6 +19,7 @@ import codecs
 import string
 import csv
 import xlwt
+import openpyxl
 from snakemake.utils import R
 
 

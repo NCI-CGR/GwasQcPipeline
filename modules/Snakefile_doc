@@ -362,14 +362,21 @@ rule excel_sheet:
                 csvFiles.append(h)
                 t = os.path.basename(h).strip('_subjects_qc.het.csv') + '_HET'
                 tabs.append(t)
-        wb = xlwt.Workbook()
+#        wb = xlwt.Workbook()
+        wb = openpyxl.Workbook() #new program
         for i in range(len(tabs)):
             tab = tabs[i]
-            ws = wb.add_sheet(tab)
+#            ws = wb.add_sheet(tab)
+            if i==0:  #new program
+                ws = wb.active #new program
+                ws.title = tab #new program
+            else: #new program
+                ws = wb.create_sheet(tab) #new program
             with open(csvFiles[i]) as f:
                 reader = csv.reader(f)
                 for r, row in enumerate(reader):
-                    for c, col in enumerate(row):
-                        ws.write(r, c, col)
+#                    for c, col in enumerate(row):
+#                        ws.write(r, c, col)
+                    ws.append(row) #new program
         wb.save(output[0])
 
