@@ -16,6 +16,7 @@ import time
 import glob
 from os import stat
 from pwd import getpwuid
+import shlex
 
 def makeQsub(qsubFile, qsubText):
     '''
@@ -53,7 +54,14 @@ def getNumSamps(sampleSheet):
             line = f.readline()
     return samps
 
-
+### Added by Jiahui Wang, to automatically greb #SNPs from bpm file and pass it to Snakefile_contam rule contam_test_GSA_1000g -m
+def getNumSNPs(illumina_manifest_file):
+    snps = 0
+    subprocess.check_output(["glu", "convert.dump_bpm", illumina_manifest_file, "-o", "illumina_manifest_file.txt"])
+    a = subprocess.check_output(["wc", "-l", "illumina_manifest_file.txt"])
+    args = shlex.split(a)
+    snps = int(args[0])-1
+    return snps
 
 
 def makeClusterConfig(outDir, queue):
@@ -80,7 +88,7 @@ def makeClusterConfig(outDir, queue):
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
                subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, 
                contam_threshold, adpc_file, gtc_dir, remove_contam, remove_sex_discordant, remove_rep_discordant, remove_unexpected_rep, pi_hat_threshold,
-               autosomal_het_thresh, minimum_pop_subjects, control_hwp_thresh, word_doc_template, contam_pop, strand):
+               autosomal_het_thresh, minimum_pop_subjects, control_hwp_thresh, word_doc_template, contam_pop, strand, numSNPs, skip_contam_check, skip_intensity_check):
     '''
     (str, str, str) -> None
     '''
@@ -121,6 +129,7 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
         output.write('contam_pop: ' + contam_pop + '\n')
         output.write('strand: ' + strand + '\n')
         output.write('start_time: ' + start + '\n')
+        output.write('numSNPs: ' + str(numSNPs) + '\n')
 
 
 def getStartTime(configFile):
@@ -265,6 +274,7 @@ def main():
         numSamps = getNumSamps(outDir + '/IlluminaSampleSheet.csv')
     if not args.finish:
         numSamps = getNumSamps(args.sample_sheet)
+        numSNPs = getNumSNPs(args.illumina_manifest_file)
         makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold,
                args.adpc_file, args.gtc_dir, args.remove_contam, args.remove_sex_discordant, args.remove_rep_discordant, args.remove_unexpected_rep, args.pi_hat_threshold, args.autosomal_het_thresh,

@@ -26,10 +26,11 @@ rule contam_test_GSA_1000g:
         abf = illumina_manifest_file[:-3] + contam_pop + '.abf.txt'
     params:
         software = '/DCEG/CGF/Bioinformatics/Production/BZhu/verifyIDintensity/verifyIDintensity/verifyIDintensity',
+        snps = numSNPs
     output:
         'one_samp_b_1000g_contam/{sample_id}.contam.out'
     shell:
-        '{params.software} -m 700078 -n 1 -b {input.abf} -v -p -i {input.adpc} > {output}'
+        '{params.software} -m {params.snps} -n 1 -b {input.abf} -v -p -i {input.adpc} > {output}'
 
 rule combine_contam_one_samp_b_1000g:
     input:
