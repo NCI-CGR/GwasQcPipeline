@@ -181,7 +181,7 @@ def get_args():
     requiredWithDefaults.add_argument('--remove_rep_discordant', type=str, default='YES', help='REQUIRED. If "YES" known replicate discordant samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
     requiredWithDefaults.add_argument('--remove_unexpected_rep', type=str, default='YES', help='REQUIRED. If "YES" all unexpected replicate samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
     requiredWithDefaults.add_argument('--pi_hat_threshold', type=float, default= 0.20, help='REQUIRED. PI_HAT cutoff to call subjects related.  default= 0.20, to remove 2nd degree relatives or higher.')
-    requiredWithDefaults.add_argument('--minimum_pop_subjects', type=int, default= 100, help='REQUIRED. Number of subjects needed in order to analyze a population.  default= 100.')
+    requiredWithDefaults.add_argument('--minimum_pop_subjects', type=int, default= 50, help='REQUIRED. Number of subjects needed in order to analyze a population.  default= 50.')
     requiredWithDefaults.add_argument('--control_hwp_thresh', type=int, default= 50, help='REQUIRED. Number of controls needed in order to just use controls for HWP.  default= 50.')
     requiredWithDefaults.add_argument('--autosomal_het_thresh', type=float, default= 0.10, help='REQUIRED. F coefficient from autosomal heterozygosity check cutoff for subject removal.  default= 0.10')
     requiredWithDefaults.add_argument('-w', '--word_doc_template', type=str, default='/DCEG/CGF/Bioinformatics/Production/Eric/refFiles/GwasQcPipeline_Template_interim.docx', help='REQUIRED. Template to use to generate QC report word docx')
