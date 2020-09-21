@@ -1,61 +1,63 @@
 #!/usr/bin/python
 
+
 rule plink_ld_prune:
     input:
-        'plink_filter_call_rate_2/samples.bed',
-        'plink_filter_call_rate_2/samples.bim',
-        'plink_filter_call_rate_2/samples.fam'
+        "plink_filter_call_rate_2/samples.bed",
+        "plink_filter_call_rate_2/samples.bim",
+        "plink_filter_call_rate_2/samples.fam",
     params:
-        inProj = 'plink_filter_call_rate_2/samples',
-        outProj = 'ld_prune/ldPruneList',
-        r2 = ld_prune_r2,
-        maf = maf_for_ibd
+        inProj="plink_filter_call_rate_2/samples",
+        outProj="ld_prune/ldPruneList",
+        r2=ld_prune_r2,
+        maf=maf_for_ibd,
     output:
-        'ld_prune/ldPruneList.prune.in',
-        'ld_prune/ldPruneList.prune.out'
+        "ld_prune/ldPruneList.prune.in",
+        "ld_prune/ldPruneList.prune.out",
     shell:
-        'plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --memory 10000 --out {params.outProj}'
+        "plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --memory 10000 --out {params.outProj}"
 
 
 rule extract_ld_prune:
     input:
-        bed = 'plink_filter_call_rate_2/samples.bed',
-        bim = 'plink_filter_call_rate_2/samples.bim',
-        fam = 'plink_filter_call_rate_2/samples.fam',
-        prune = 'ld_prune/ldPruneList.prune.in'
+        bed="plink_filter_call_rate_2/samples.bed",
+        bim="plink_filter_call_rate_2/samples.bim",
+        fam="plink_filter_call_rate_2/samples.fam",
+        prune="ld_prune/ldPruneList.prune.in",
     params:
-        inProj = 'plink_filter_call_rate_2/samples',
-        outProj = 'ld_prune/samples'
+        inProj="plink_filter_call_rate_2/samples",
+        outProj="ld_prune/samples",
     output:
-        'ld_prune/samples.bed',
-        'ld_prune/samples.bim',
-        'ld_prune/samples.fam'
+        "ld_prune/samples.bed",
+        "ld_prune/samples.bim",
+        "ld_prune/samples.fam",
     shell:
-        'plink --bfile {params.inProj} --extract {input.prune} --make-bed --memory 10000 --out {params.outProj}'
+        "plink --bfile {params.inProj} --extract {input.prune} --make-bed --memory 10000 --out {params.outProj}"
 
 
 rule plink_ibd:
     input:
-        'ld_prune/samples.bed',
-        'ld_prune/samples.bim',
-        'ld_prune/samples.fam'
+        "ld_prune/samples.bed",
+        "ld_prune/samples.bim",
+        "ld_prune/samples.fam",
     params:
-        inProj = 'ld_prune/samples',
-        outProj = 'ibd/samples'
+        inProj="ld_prune/samples",
+        outProj="ibd/samples",
     output:
-        'ibd/samples.genome'
+        "ibd/samples.genome",
     threads: 20
     shell:
-        'plink --bfile {params.inProj} --genome full --min 0.05 --memory 240000 --threads {threads} --out {params.outProj}'
+        "plink --bfile {params.inProj} --genome full --min 0.05 --memory 240000 --threads {threads} --out {params.outProj}"
+
 
 rule output_replicates:
     input:
-        sampSheet = sample_sheet,
-        imiss3 = 'plink_filter_call_rate_2/samples_filter2.imiss',
-        ibd = 'ibd/samples.genome'
+        sampSheet=sample_sheet,
+        imiss3="plink_filter_call_rate_2/samples_filter2.imiss",
+        ibd="ibd/samples.genome",
     output:
-        known = 'concordance/KnownReplicates.csv',
-        unknown = 'concordance/UnknownReplicates.csv'
+        known="concordance/KnownReplicates.csv",
+        unknown="concordance/UnknownReplicates.csv",
     run:
         (SubToSampListDict, sampToSubIdDict) = makeSubjectToSampListDict(sample_sheet)
         crDict = makeCallRateDict(input.imiss3)
@@ -66,19 +68,19 @@ rule output_replicates:
             (piHatCol, ibs0col, ibs1col, ibs2col) = [None, None, None, None]
             head_list = head.split()
             for i in range(len(head_list)):
-                if head_list[i] == 'PI_HAT':
+                if head_list[i] == "PI_HAT":
                     piHatCol = i
-                elif head_list[i] == 'IBS0':
+                elif head_list[i] == "IBS0":
                     ibs0col = i
-                elif head_list[i] == 'IBS1':
+                elif head_list[i] == "IBS1":
                     ibs1col = i
-                elif head_list[i] == 'IBS2':
+                elif head_list[i] == "IBS2":
                     ibs2col = i
             if not piHatCol or not ibs0col or not ibs1col or not ibs2col:
-                print('Necessary column headers not in IBD output.')
+                print("Necessary column headers not in IBD output.")
                 sys.exit(1)
             line = f.readline()
-            while line != '':
+            while line != "":
                 line_list = line.split()
                 samp1 = line_list[1]
                 samp2 = line_list[3]
@@ -92,8 +94,8 @@ rule output_replicates:
                 sampList = sorted([samp1, samp2])
                 piHatDict[(sampList[0], sampList[1])] = (piHat, concordance)
                 line = f.readline()
-        with open(output.known, 'w') as outKnown:
-            outKnown.write('Subject_ID,Sample_ID1,Sample_ID2,Concordance,PI_HAT\n')
+        with open(output.known, "w") as outKnown:
+            outKnown.write("Subject_ID,Sample_ID1,Sample_ID2,Concordance,PI_HAT\n")
             for subId in SubToSampListDict:
                 sampList = sorted(set(SubToSampListDict[subId]))
                 if len(sampList) > 1:
@@ -102,41 +104,63 @@ rule output_replicates:
                             samp1 = sampList[i]
                             samp2 = sampList[j]
                             if not piHatDict.get((samp1, samp2)):
-                                piHat = .05
+                                piHat = 0.05
                                 concordance = minConcordance
                             else:
                                 (piHat, concordance) = piHatDict[(samp1, samp2)]
                             if not crDict.get(samp1) or not crDict.get(samp2):
-                                concordance = 'NA'
-                                piHat = 'NA'
-                            outKnown.write(','.join([subId, samp1, samp2, str(concordance), str(piHat)]) + '\n')
-        with open(output.unknown, 'w') as outUn:
-            outUn.write('Subject_ID1,Subject_ID2,Sample_ID1,Sample_ID2,Concordance,PI_HAT\n')
+                                concordance = "NA"
+                                piHat = "NA"
+                            outKnown.write(
+                                ",".join(
+                                    [subId, samp1, samp2, str(concordance), str(piHat)]
+                                )
+                                + "\n"
+                            )
+        with open(output.unknown, "w") as outUn:
+            outUn.write(
+                "Subject_ID1,Subject_ID2,Sample_ID1,Sample_ID2,Concordance,PI_HAT\n"
+            )
             for (samp1, samp2) in piHatDict.keys():
-                (piHat, concordance) = piHatDict[(samp1,samp2)]
+                (piHat, concordance) = piHatDict[(samp1, samp2)]
                 if concordance > dup_concordance_cutoff:
                     subId1 = sampToSubIdDict[samp1]
                     subId2 = sampToSubIdDict[samp2]
                     if subId1 != subId2 and crDict.get(samp1) and crDict.get(samp2):
-                        outUn.write(','.join([subId1, subId2, samp1, samp2, str(concordance), str(piHat)]) + '\n')
+                        outUn.write(
+                            ",".join(
+                                [
+                                    subId1,
+                                    subId2,
+                                    samp1,
+                                    samp2,
+                                    str(concordance),
+                                    str(piHat),
+                                ]
+                            )
+                            + "\n"
+                        )
+
 
 
 rule split_known_rep:
     input:
-        sampSheet = sample_sheet,
-        rep = 'concordance/KnownReplicates.csv'
+        sampSheet=sample_sheet,
+        rep="concordance/KnownReplicates.csv",
     output:
-        qc = 'concordance/InternalQcKnown.csv',
-        other = 'concordance/StudySampleKnown.csv'
+        qc="concordance/InternalQcKnown.csv",
+        other="concordance/StudySampleKnown.csv",
     run:
         qcSubDict = makeControlDict(input.sampSheet)
-        with open(input.rep) as f, open(output.qc, 'w') as out1, open(output.other, 'w') as out2:
+        with open(input.rep) as f, open(output.qc, "w") as out1, open(
+            output.other, "w"
+        ) as out2:
             head = f.readline()
             out1.write(head)
             out2.write(head)
             line = f.readline()
-            while line != '':
-                sub = line.split(',')[0]
+            while line != "":
+                sub = line.split(",")[0]
                 if qcSubDict.get(sub):
                     out1.write(line)
                 else:
