@@ -48,7 +48,8 @@ contam_threshold = config['contam_threshold']
 adpc_file = config['adpc_file']
 contam_pop = config['contam_pop']
 numSNPs = config['numSNPs']
-
+skip_contam_check = config['skip_contam_check']
+skip_intensity_check = config['skip_intensity_check']
 
 POPS = ['EUR', 'ASN', 'AFR', 'ADMIXED_EUR', 'ADMIXED_ASN', 'ADMIXED_AFR', 'ASN_EUR', 'AFR_EUR', 'AFR_ASN', 'AFR_ASN_EUR']
 PCs = ['PC1_PC2', 'PC2_PC3', 'PC3_PC4', 'PC4_PC5']
@@ -642,7 +643,7 @@ def makeChipIdToSampDict(SampleSheet, gtc_dir):
                 proj = line_list[projCol]
                 sampIdToProjDict[sampId] = proj
                 idatBase = baseProjDir + '/' + proj + '/' + line_list[1] + '/' + chipId
-                
+
                 if gtc_dir == 'None' and os.path.isfile(idatBase + '.gtc'):
                     gtcFiles.append(idatBase + '.gtc')
                     SAMPLE_IDS.append(sampId)
@@ -681,25 +682,155 @@ def getGreenIdat(wildcards):
     return idatBaseDict[idatBase] + '_Grn.idat'
 
 
+
+def get_input(wildcards):
+    input_list = []
+    if config['plink_genotype_file'] == 'None':
+        if skip_contam_check == 'FALSE':
+            input_list.append("summary_stats.txt")
+            input_list.append('all_sample_idat_intensity/idat_intensity.csv')
+            input_list.append('concordance/KnownReplicates.csv')
+            input_list.append('concordance/UnknownReplicates.csv')
+            input_list.append('snpweights/samples.snpweights.csv')
+            input_list.append('all_contam/contam.csv')
+            input_list.append('files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv')
+            input_list.append('files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv')
+            input_list.append('files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv')
+            input_list.append('files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv')
+            input_list.append('files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv')
+            input_list.append('subject_level/subjects_qc.imiss')
+            #input_list.append(expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT))
+            input_list.append('subject_qc_removal/sex_discordant.txt')
+            input_list.append('subject_qc_removal/unexpected_replicate.csv')
+            input_list.append('delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx')
+            input_list.append('delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls')
+            input_list.append('delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv')
+            input_list.append('delivery/HWP.zip')
+            input_list.append('delivery/subjects.bed')
+            input_list.append('delivery/subjects.bim')
+            input_list.append('delivery/subjects.fam')
+            input_list.append('delivery/samples.bed')
+            input_list.append('delivery/samples.bim')
+            input_list.append('delivery/samples.fam')
+            input_list.append('delivery/README')
+        else:
+            input_list.append("summary_stats.txt")
+            #input_list.append('all_sample_idat_intensity/idat_intensity.csv')
+            input_list.append('concordance/KnownReplicates.csv')
+            input_list.append('concordance/UnknownReplicates.csv')
+            input_list.append('snpweights/samples.snpweights.csv')
+            #input_list.append('all_contam/contam.csv')
+            input_list.append('files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv')
+            input_list.append('files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv')
+            input_list.append('files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv')
+            input_list.append('files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv')
+            input_list.append('files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv')
+            input_list.append('subject_level/subjects_qc.imiss')
+            #input_list.append(expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT))
+            input_list.append('subject_qc_removal/sex_discordant.txt')
+            input_list.append('subject_qc_removal/unexpected_replicate.csv')
+            input_list.append('delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx')
+            input_list.append('delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls')
+            input_list.append('delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv')
+            input_list.append('delivery/HWP.zip')
+            input_list.append('delivery/subjects.bed')
+            input_list.append('delivery/subjects.bim')
+            input_list.append('delivery/subjects.fam')
+            input_list.append('delivery/samples.bed')
+            input_list.append('delivery/samples.bim')
+            input_list.append('delivery/samples.fam')
+            input_list.append('delivery/README')
+
+    elif config['plink_genotype_file'][-4:] == '.ped':
+        input_list.append("summary_stats.txt")
+        #input_list.append('all_sample_idat_intensity/idat_intensity.csv')
+        input_list.append('concordance/KnownReplicates.csv')
+        input_list.append('concordance/UnknownReplicates.csv')
+        input_list.append('snpweights/samples.snpweights.csv')
+        #input_list.append('all_contam/contam.csv')
+        input_list.append('files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv')
+        input_list.append('files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv')
+        input_list.append('files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv')
+        input_list.append('files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv')
+        input_list.append('files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv')
+        input_list.append('subject_level/subjects_qc.imiss')
+        #input_list.append(expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT))
+        input_list.append('subject_qc_removal/sex_discordant.txt')
+        input_list.append('subject_qc_removal/unexpected_replicate.csv')
+        input_list.append('delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx')
+        input_list.append('delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls')
+        input_list.append('delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv')
+        input_list.append('delivery/HWP.zip')
+        input_list.append('delivery/subjects.bed')
+        input_list.append('delivery/subjects.bim')
+        input_list.append('delivery/subjects.fam')
+        input_list.append('delivery/samples.bed')
+        input_list.append('delivery/samples.bim')
+        input_list.append('delivery/samples.fam')
+        input_list.append('delivery/README')
+
+    elif config['plink_genotype_file'][-4:] == '.bed':
+        input_list.append("summary_stats.txt")
+        #input_list.append('all_sample_idat_intensity/idat_intensity.csv')
+        input_list.append('concordance/KnownReplicates.csv')
+        input_list.append('concordance/UnknownReplicates.csv')
+        input_list.append('snpweights/samples.snpweights.csv')
+        #input_list.append('all_contam/contam.csv')
+        input_list.append('files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv')
+        input_list.append('files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv')
+        input_list.append('files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv')
+        input_list.append('files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv')
+        input_list.append('files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv')
+        input_list.append('subject_level/subjects_qc.imiss')
+        #input_list.append(expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT))
+        input_list.append('subject_qc_removal/sex_discordant.txt')
+        input_list.append('subject_qc_removal/unexpected_replicate.csv')
+        input_list.append('delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx')
+        input_list.append('delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls')
+        input_list.append('delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv')
+        input_list.append('delivery/HWP.zip')
+        input_list.append('delivery/subjects.bed')
+        input_list.append('delivery/subjects.bim')
+        input_list.append('delivery/subjects.fam')
+        input_list.append('delivery/samples.bed')
+        input_list.append('delivery/samples.bim')
+        input_list.append('delivery/samples.fam')
+        input_list.append('delivery/README')
+
+    return input_list
+
+
+
+
+
 if config['plink_genotype_file'] == 'None':
     include: 'modules/Snakefile_gtc_preprocess'
-    include: 'modules/Snakefile_gtc_contam'
+    if skip_contam_check == 'FALSE':
+        include: 'modules/Snakefile_gtc_contam'
+        include: 'modules/Snakefile_idat_intensity'
+        include: 'modules/Snakefile_sample_qc_report_20200223'
+    else:
+        include: 'modules/Snakefile_sample_qc_report_20200222'
+
 
 elif config['plink_genotype_file'][-4:] == '.ped':
     include: 'modules/Snakefile_ped_preprocess'
-    include: 'modules/Snakefile_plink_contam'
+    #include: 'modules/Snakefile_plink_contam'
+    include: 'modules/Snakefile_sample_qc_report_20200222'
 
 elif config['plink_genotype_file'][-4:] == '.bed':
     include: 'modules/Snakefile_bed_preprocess'
-    include: 'modules/Snakefile_plink_contam'
+    #include: 'modules/Snakefile_plink_contam'
+    include: 'modules/Snakefile_sample_qc_report_20200222'
+
 
 
 include: 'modules/Snakefile_plink_stats_filters'
 include: 'modules/Snakefile_replicate_concordance'
-include: 'modules/Snakefile_sample_qc_report'
+#include: 'modules/Snakefile_sample_qc_report'
 include: 'modules/Snakefile_ancestry'
 include: 'modules/Snakefile_for_lab'
-include: 'modules/Snakefile_idat_intensity'
+#include: 'modules/Snakefile_idat_intensity'
 include: 'modules/Snakefile_identifiler'
 include: 'modules/Snakefile_remove_qc_failures'
 include: 'modules/Snakefile_subject_level'
@@ -720,30 +851,5 @@ localrules: summary_stats
 
 rule all:
     input:
-        'summary_stats.txt',
-        'all_sample_idat_intensity/idat_intensity.csv',
-        'concordance/KnownReplicates.csv',
-        'concordance/UnknownReplicates.csv',
-        'snpweights/samples.snpweights.csv',
-        'all_contam/contam.csv',
-        'files_for_lab/' + outName + '_all_sample_qc_' + sampSheetDate + '.csv',
-        'files_for_lab/' + outName + '_KnownReplicates_' + sampSheetDate + '.csv',
-        'files_for_lab/' + outName + '_UnknownReplicates_' + sampSheetDate + '.csv',
-        'files_for_lab/' + outName + '_LimsUpload_' + sampSheetDate + '.csv',
-        'files_for_lab/' + outName + '_Identifiler_' + sampSheetDate + '.csv',
-        'subject_level/subjects_qc.imiss',
-        expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT),
-        'subject_qc_removal/sex_discordant.txt',
-        'subject_qc_removal/unexpected_replicate.csv',
-        'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.docx',
-        'delivery/' + outName + '_QC_Report_' + sampSheetDate + '.xls',
-        'delivery/' + outName + '_AnalysisManifest_' + sampSheetDate + '.csv',
-        'delivery/HWP.zip',
-        'delivery/subjects.bed',
-        'delivery/subjects.bim',
-        'delivery/subjects.fam',
-        'delivery/samples.bed',
-        'delivery/samples.bim',
-        'delivery/samples.fam',
-        'delivery/README'
-
+        get_input,
+        expand('{d}/samples{filt}.completion.png', zip, d = D, filt = FILT)

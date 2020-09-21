@@ -86,7 +86,7 @@ def makeClusterConfig(outDir, queue):
 
 
 def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_cr_2, ld_prune_r2, maf_for_ibd, sample_sheet,
-               subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir, 
+               subject_id_to_use, ibd_pi_hat_cutoff, dup_concordance_cutoff, illumina_manifest_file, expected_sex_col_name, numSamps, lims_output_dir,
                contam_threshold, adpc_file, gtc_dir, remove_contam, remove_sex_discordant, remove_rep_discordant, remove_unexpected_rep, pi_hat_threshold,
                autosomal_het_thresh, minimum_pop_subjects, control_hwp_thresh, word_doc_template, contam_pop, strand, numSNPs, skip_contam_check, skip_intensity_check):
     '''
@@ -130,6 +130,8 @@ def makeConfig(outDir, plink_genotype_file, snp_cr_1, samp_cr_1, snp_cr_2, samp_
         output.write('strand: ' + strand + '\n')
         output.write('start_time: ' + start + '\n')
         output.write('numSNPs: ' + str(numSNPs) + '\n')
+        output.write('skip_contam_check: "' + skip_contam_check + '"\n')
+        output.write('skip_intensity_check: "' + skip_intensity_check + '"\n')
 
 
 def getStartTime(configFile):
@@ -172,6 +174,9 @@ def get_args():
     requiredArgs.add_argument('--expected_sex_col_name', type=str, default='Expected_Sex', help='Name of column in sample sheet that corresponds to expected sex of sample.')##I should be able to add a default once this is available
     requiredWithDefaults.add_argument('-q', '--queue', type=str, default='all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q,bigmem.q', help='OPTIONAL. Queue on cgemsiii to use to submit jobs.  Defaults to all of the seq queues and all.q if not supplied.  default="all.q,seq-alignment.q,seq-calling.q,seq-calling2.q,seq-gvcf.q,bigmem.q"')
     requiredWithDefaults.add_argument('--remove_contam', type=str, default='YES', help='REQUIRED. If "YES" contaminated samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
+    #added by Jiahui Wang on 20191112 --skip_contam_check, --skip_intensity_check
+    requiredWithDefaults.add_argument('--skip_contam_check', type=str, default='FALSE', help='REQUIRED. If "YES" contamination check will be skipped.  Defaults to "FALSE" when start with gtc files. Must be "YES" when start with plink files.')
+    requiredWithDefaults.add_argument('--skip_intensity_check', type=str, default='FALSE', help='REQUIRED. If "YES" intensity check will be skipped.  Defaults to "FALSE" when start with gtc files. Must be "YES" when start with plink files.')
     requiredWithDefaults.add_argument('--remove_sex_discordant', type=str, default='YES', help='REQUIRED. If "YES" sex discordant samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
     requiredWithDefaults.add_argument('--remove_rep_discordant', type=str, default='YES', help='REQUIRED. If "YES" known replicate discordant samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
     requiredWithDefaults.add_argument('--remove_unexpected_rep', type=str, default='YES', help='REQUIRED. If "YES" all unexpected replicate samples will be removed prior to sample to subject transformation.  Defaults to "YES"')
@@ -251,6 +256,8 @@ def main():
     else:
         plinkFile = args.path_to_plink_file
         plinkDir = os.path.dirname(plinkFile)
+        args.skip_contam_check = "YES"
+        args.skip_intensity_check = "YES"
         if not args.adpc_file:
             args.adpc_file = plinkDir + '/Data/adpc.bin'
         if plinkFile[-4:] == '.ped':
@@ -278,7 +285,7 @@ def main():
         makeConfig(outDir, args.path_to_plink_file, args.snp_cr_1, args.samp_cr_1, args.snp_cr_2, args.samp_cr_2, args.ld_prune_r2, args.maf_for_ibd, args.sample_sheet,
                args.subject_id_to_use, args.ibd_pi_hat_cutoff, args.dup_concordance_cutoff, args.illumina_manifest_file, args.expected_sex_col_name, numSamps, args.lims_output_dir, args.contam_threshold,
                args.adpc_file, args.gtc_dir, args.remove_contam, args.remove_sex_discordant, args.remove_rep_discordant, args.remove_unexpected_rep, args.pi_hat_threshold, args.autosomal_het_thresh,
-               args.minimum_pop_subjects, args.control_hwp_thresh, args.word_doc_template, args.contam_pop, args.strand)
+               args.minimum_pop_subjects, args.control_hwp_thresh, args.word_doc_template, args.contam_pop, args.strand, numSNPs, args.skip_contam_check, args.skip_intensity_check)
         makeClusterConfig(outDir, args.queue)
     qsubTxt = 'cd ' + outDir + '\n'
     qsubTxt += 'module load sge\n'

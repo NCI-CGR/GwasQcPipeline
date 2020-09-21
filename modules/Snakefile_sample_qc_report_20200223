@@ -15,9 +15,12 @@ rule sample_qc_report:
         unknownRep = 'concordance/UnknownReplicates.csv',
         intensity = 'all_sample_idat_intensity/idat_intensity.csv'
     params:
-        outHead = 'SR_Subject_ID,Count_of_SR_SubjectID,SR,Current_Subject_Status,Subject_Notes,LIMS_Individual_ID,Project,Sample_ID,Project-Sample ID,LIMSSample_ID,Sample_Status,IdatsInProjectDir,IdatIntensity,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate,Count_of_QC_Issue,Identifiler_Needed',
-        sampSheetHead = 'Sample_ID,SentrixBarcode_A,SentrixPosition_A,SR_Subject_ID,LIMS_Individual_ID,Project,Sample_ID,Project-Sample ID,LIMSSample_ID,Expected_Sex,Identifiler_Sex,Sample_Group',
-        blankHead = 'SR,Current_Subject_Status,Subject_Notes,Sample_Status',
+        #replace Subject_Notes with PI_Subject_ID, replace Current_Subject_Status with Case/Control_Status
+        outHead = 'SR_Subject_ID,Count_of_SR_SubjectID,SR,Case/Control_Status,PI_Subject_ID,LIMS_Individual_ID,Project,Sample_ID,Project-Sample ID,LIMSSample_ID,Sample_Status,IdatsInProjectDir,IdatIntensity,Expected_Sex,Predicted_Sex,SexMatch,ChrX_Inbreed_estimate,AFR,EUR,ASN,Ancestry,Contamination_Rate,Call_Rate_Initial,Call_Rate_1_filter,Call_Rate_1,Call_Rate_2_filter,Call_Rate_2,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate,Count_of_QC_Issue,Identifiler_Needed',
+        #add PI_Subject_ID, Case/Control_Status into sampSheetHead
+        sampSheetHead = 'Sample_ID,SentrixBarcode_A,SentrixPosition_A,SR_Subject_ID,LIMS_Individual_ID,Project,PI_Subject_ID,Project-Sample ID,LIMSSample_ID,Expected_Sex,Identifiler_Sex,Sample_Group,Case/Control_Status',
+        #delete Subject_Notes,Current_Subject_Status
+        blankHead = 'SR,Sample_Status',
         limsHead = 'SR_Subject_ID,LIMS_Individual_ID,Sample ID,Project-Sample ID,Call Rate,Low Call Rate,Contaminated,Sex Discordant,Expected Replicate Discordance,Unexpected Replicate'
     output:
         allQc = 'all_sample_qc.csv',
@@ -210,7 +213,7 @@ rule summary_stats:
         capture.output(summary(data$Call_Rate_Initial), file = "{output}", append = T)
         write("\nContamination Rate:\n", file = "{output}", append = T)
         capture.output(summary(data$Contamination_Rate), file = "{output}", append = T)
-        write("\nidat intensity:\n", file = "{output}", append = T)                                                                                                    
+        write("\nidat intensity:\n", file = "{output}", append = T)
         capture.output(summary(data$IdatIntensity), file = "{output}", append = T)
         write("\nFail contamination rate:", file = "{output}", append = T)
         capture.output(table(data$Contamination_Rate > .1, useNA = "ifany"), file = "{output}", append = T)
@@ -228,4 +231,3 @@ rule summary_stats:
         write("\nNumber of QC Issues:", file = "{output}", append = T)
         capture.output(table(data$Count_of_QC_Issue, useNA = "ifany"), file = "{output}", append = T)
         """)
-
