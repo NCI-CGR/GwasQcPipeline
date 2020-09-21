@@ -48,6 +48,7 @@ yEnd <- max(max(as.numeric(data$ChrX_Inbreed_estimate), na.rm = T), 1.0)
 
 
 png("''' + output.png + '''", 6.5, 6.5, "in", res = 300)
+par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=FALSE)
 if (nrow(femData) > 0 & nrow(maleData) > 0) {
     fem_X <- runif(nrow(femData), .8, 1.2)
     male_X <- runif(nrow(maleData), 1.8, 2.2)
@@ -76,7 +77,8 @@ if (nrow(femData) > 0 & nrow(maleData) > 0) {
 }
 
 abline(h = 0.5)                                                                                                                                                             
-legend("topleft", legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19)
+par(xpd=TRUE)
+legend("topright", inset=c(-0.3,0), legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19)
 dev.off()
 '''
         with open(output.R, 'w')  as R:
