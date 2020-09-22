@@ -933,94 +933,92 @@ def get_input(wildcards):
 
 if config["plink_genotype_file"] == "None":
 
-    include: "modules/Snakefile_gtc_preprocess"
+    include: "rules/Snakefile_gtc_preprocess"
 
 
 if skip_contam_check == "FALSE":
 
-        include: "modules/Snakefile_gtc_contam"
+        include: "rules/Snakefile_gtc_contam"
 
-        include: "modules/Snakefile_idat_intensity"
+        include: "rules/Snakefile_idat_intensity"
 
-        include: "modules/Snakefile_sample_qc_report_20200223"
+        include: "rules/Snakefile_sample_qc_report_20200223"
 
 
 else:
 
-        include: "modules/Snakefile_sample_qc_report_20200222"
+        include: "rules/Snakefile_sample_qc_report_20200222"
 
 
 elif config["plink_genotype_file"][-4:] == ".ped":
 
-    include: "modules/Snakefile_ped_preprocess" #include: 'modules/Snakefile_plink_contam'
+    include: "rules/Snakefile_ped_preprocess" #include: 'modules/Snakefile_plink_contam'
 
-    include: "modules/Snakefile_sample_qc_report_20200222"
+    include: "rules/Snakefile_sample_qc_report_20200222"
 
 
 elif config["plink_genotype_file"][-4:] == ".bed":
 
-    include: "modules/Snakefile_bed_preprocess" #include: 'modules/Snakefile_plink_contam'
+    include: "rules/Snakefile_bed_preprocess" #include: 'modules/Snakefile_plink_contam'
 
-    include: "modules/Snakefile_sample_qc_report_20200222"
-
-
-include: "modules/Snakefile_plink_stats_filters"
+    include: "rules/Snakefile_sample_qc_report_20200222"
 
 
-include: "modules/Snakefile_replicate_concordance"
+include: "rules/Snakefile_plink_stats_filters"
 
 
-# include: 'modules/Snakefile_sample_qc_report'
-include: "modules/Snakefile_ancestry"
+include: "rules/Snakefile_replicate_concordance"
 
 
-include: "modules/Snakefile_for_lab"
+include: "rules/Snakefile_ancestry"
 
 
-# include: 'modules/Snakefile_idat_intensity'
-include: "modules/Snakefile_identifiler"
+include: "rules/Snakefile_for_lab"
 
 
-include: "modules/Snakefile_remove_qc_failures"
+include: "rules/Snakefile_identifiler"
 
 
-include: "modules/Snakefile_subject_level"
+include: "rules/Snakefile_remove_qc_failures"
 
 
-include: "modules/Snakefile_remove_related"
+include: "rules/Snakefile_subject_level"
 
 
-include: "modules/Snakefile_split_pop"
+include: "rules/Snakefile_remove_related"
 
 
-include: "modules/Snakefile_autosomal_het"
+include: "rules/Snakefile_split_pop"
 
 
-include: "modules/Snakefile_subject_ancestry"
+include: "rules/Snakefile_autosomal_het"
 
 
-include: "modules/Snakefile_pca"
+include: "rules/Snakefile_subject_ancestry"
 
 
-include: "modules/Snakefile_HWP"
+include: "rules/Snakefile_pca"
 
 
-include: "modules/Snakefile_plot_completion"
+include: "rules/Snakefile_HWP"
 
 
-include: "modules/Snakefile_plot_sex"
+include: "rules/Snakefile_plot_completion"
 
 
-include: "modules/Snakefile_subject_qc_fail"
+include: "rules/Snakefile_plot_sex"
 
 
-include: "modules/Snakefile_count_exclusions"
+include: "rules/Snakefile_subject_qc_fail"
 
 
-include: "modules/Snakefile_doc"
+include: "rules/Snakefile_count_exclusions"
 
 
-include: "modules/Snakefile_delivery"
+include: "rules/Snakefile_doc"
+
+
+include: "rules/Snakefile_delivery"
 
 
 localrules:
