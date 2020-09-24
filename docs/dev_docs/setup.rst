@@ -22,7 +22,7 @@ Once installed you can set up a development environment by running the following
     $ make -C docs html                   # This will build documentation
     $ pytest                              # This will run the test suite
     $ mypy                                # This will run type checking
-    $ flake8 --config flake8.ini  <path>  # This will run python linting
+    $ flake8 <path>                       # This will run python linting
 
     # Build python sdist and wheel
     $ poetry build
