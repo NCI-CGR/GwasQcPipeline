@@ -1,103 +1,168 @@
-#!/usr/bin/python
+"""Predicts ancestry using weighted SNPs from an external population.
+
+SNP weights (Principal Component loadings) are calculated for 3 populations from the HapMap 3
+project (YRI: Nigerian, CEU: Utah with European descent, and ASI: Chinese {CHB, CHD}). These
+weights are used to calculate the probability that a given individual is from a specific
+population. The final output table contains sample level ancestry probabilities along with the
+assigned class label.
+"""
+
 
 rule thousG_match:
+    """Flags SNPs and flips alleles to match the 1KG project.
+
+    This is a custom python2 script that compares markers with the 1KG vcf file. For a given SNP,
+    if 1KG uses the compliment this script will flip the allele. It then flags SNPs for removal
+    if they:
+
+    #. Don't match a SNP in 1KG
+    #. Ambiguous alleles (i.e., A/T or C/G)
+    #. Indels
+    #. SNPs on chromosomes other than 1-22 and X (converts 23 to X)
+    """
     input:
-        'ld_prune/samples.bim'
+        "ld_prune/samples.bim", # Also requires /DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz
     output:
-        bim = 'ld_prune/samples.vcfStrand.bim',
-        remove = 'ld_prune/thousG_rename.remove.txt'
+        bim="ld_prune/samples.vcfStrand.bim",
+        remove="ld_prune/thousG_rename.remove.txt",
     shell:
-        'python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/thousGmatchAndRemoveDups.py {input} {output.remove}'
+        "python /DCEG/CGF/Bioinformatics/Production/Eric/scripts/thousGmatchAndRemoveDups.py {input} {output.remove}"
+
 
 rule remove_not_thousG:
-    input:
-        bim = 'ld_prune/samples.vcfStrand.bim',
-        bed = 'ld_prune/samples.bed',
-        fam = 'ld_prune/samples.fam',
-        remove = 'ld_prune/thousG_rename.remove.txt'
-    params:
-        outProj = 'plink_thousG_match/samples'
-    output:
-        'plink_thousG_match/samples.bed',
-        'plink_thousG_match/samples.bim',
-        'plink_thousG_match/samples.fam'
-    shell:
-        'plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --exclude {input.remove} --memory 10000 --make-bed --out {params.outProj}'
+    """Removes SNPs not matching the 1KG project.
 
+    Outputs a new set of ``plink`` files BED + BIM + FAM removing the SNPs (and Indels) flagged as
+    not in the 1KG project.
+
+    .. resources::
+        :memory: 10Gb
+    """
+    input:
+        bim="ld_prune/samples.vcfStrand.bim",
+        bed="ld_prune/samples.bed",
+        fam="ld_prune/samples.fam",
+        remove="ld_prune/thousG_rename.remove.txt",
+    params:
+        outProj="plink_thousG_match/samples",
+    output:
+        "plink_thousG_match/samples.bed",
+        "plink_thousG_match/samples.bim",
+        "plink_thousG_match/samples.fam",
+    shell:
+        "plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --exclude {input.remove} --memory 10000 --make-bed --out {params.outProj}"
 
 
 rule ped_for_snpweights:
+    """Converts ``plink`` BED + BIM + FAM to text PED + MAP.
+
+    Takes 1KG filtered ``plink`` data set and further removes markers using a more stringent MAF
+    hard-coded as 0.05 (still much higher than default 0.01). Finally, converts to the text based
+    PED + MAP.
+
+    .. warning::
+        Hard-coded parameter (``--maf 0.05``)
+
+    .. resources::
+        :memory: 10Gb
+    """
     input:
-        'plink_thousG_match/samples.bed',
-        'plink_thousG_match/samples.bim',
-        'plink_thousG_match/samples.fam'
+        "plink_thousG_match/samples.bed",
+        "plink_thousG_match/samples.bim",
+        "plink_thousG_match/samples.fam",
     params:
-        inProj = 'plink_thousG_match/samples',
-        outProj = 'snpweights/samples'
+        inProj="plink_thousG_match/samples",
+        outProj="snpweights/samples",
     output:
-        'snpweights/samples.ped',
-        'snpweights/samples.map'
+        "snpweights/samples.ped",
+        "snpweights/samples.map",
     shell:
-        'plink --bfile {params.inProj} --maf 0.05 --recode --memory 10000 --out {params.outProj}'
+        "plink --bfile {params.inProj} --maf 0.05 --recode --memory 10000 --out {params.outProj}"
+
 
 rule convert_eigen:
+    """Converts the PED + MAP to the EIGENSTRAT format.
+
+    Uses ``eigensoft``'s ``convertf`` tool to convert from PED + MAP to EIGENSTRATGENO + SNP + IND.
+    """
     input:
-        ped = 'snpweights/samples.ped',
-        map = 'snpweights/samples.map'
+        ped="snpweights/samples.ped",
+        map="snpweights/samples.map",
     output:
-        par = 'snpweights/convertEigen.par',
-        gen = 'snpweights/samples.eigenstratgeno',
-        snp = 'snpweights/samples.snp',
-        ind = 'snpweights/samples.ind'
+        par="snpweights/convertEigen.par",
+        gen="snpweights/samples.eigenstratgeno",
+        snp="snpweights/samples.snp",
+        ind="snpweights/samples.ind",
     run:
-        parTxt = 'genotypename: ' + input.ped + '\n'
-        parTxt += 'snpname: ' + input.map + '\n'
-        parTxt += 'indivname: ' + input.ped + '\n'
-        parTxt += 'outputformat: EIGENSTRAT\n'
-        parTxt += 'genooutfilename: ' + output.gen + '\n'
-        parTxt += 'snpoutfilename: ' + output.snp + '\n'
-        parTxt += 'indoutfilename: ' + output.ind + '\n'
-        parTxt += 'familynames: NO\n'
-        with open(output.par, 'w') as out:
+        parTxt = "genotypename: " + input.ped + "\n"
+        parTxt += "snpname: " + input.map + "\n"
+        parTxt += "indivname: " + input.ped + "\n"
+        parTxt += "outputformat: EIGENSTRAT\n"
+        parTxt += "genooutfilename: " + output.gen + "\n"
+        parTxt += "snpoutfilename: " + output.snp + "\n"
+        parTxt += "indoutfilename: " + output.ind + "\n"
+        parTxt += "familynames: NO\n"
+        with open(output.par, "w") as out:
             out.write(parTxt)
-        shell('convertf -p {output.par}')
+        shell("convertf -p {output.par}")
+
 
 
 rule snpweights:
+    """Estimates ancestry based on SNP weights from an external reference panel.
+
+    Uses SNP weights for European, West African and East Asian ancestral populations.
+
+    Chen, Chia-Yen, Samuela Pollack, David J. Hunter, Joel N. Hirschhorn, Peter Kraft, and Alkes
+    L. Price. “Improved Ancestry Inference Using Weights from External Reference Panels.”
+    Bioinformatics 29, no. 11 (June 1, 2013): 1399–1406.
+
+    """
     input:
-        gen = 'snpweights/samples.eigenstratgeno',
-        snp = 'snpweights/samples.snp',
-        ind = 'snpweights/samples.ind'
+        gen="snpweights/samples.eigenstratgeno",
+        snp="snpweights/samples.snp",
+        ind="snpweights/samples.ind",
     params:
-        weight = '/DCEG/CGF/Bioinformatics/Production/Eric/software/SNPweights2.1/snpwt.CO',
-        software = '/DCEG/CGF/Bioinformatics/Production/Eric/software/SNPweights2.1/bin/inferanc'
+        weight=(
+            # https://cdn1.sph.harvard.edu/wp-content/uploads/sites/181/2014/03/snpwt.CO_.zip
+            "/DCEG/CGF/Bioinformatics/Production/Eric/software/SNPweights2.1/snpwt.CO"
+        ),
+        software="/DCEG/CGF/Bioinformatics/Production/Eric/software/SNPweights2.1/bin/inferanc",
     output:
-        par = 'snpweights/SNPWEIGHTS.par',
-        predpcoutput = 'snpweights/samples.snpweights'
+        par="snpweights/SNPWEIGHTS.par",
+        predpcoutput="snpweights/samples.snpweights",
     run:
-        parTxt = 'geno: ' + input.gen + '\n'
-        parTxt += 'snp: ' + input.snp + '\n'
-        parTxt += 'ind: ' + input.ind + '\n'
-        parTxt += 'snpwt: ' + params.weight + '\n'
-        parTxt += 'predpcoutput: ' + output.predpcoutput + '\n'
-        with open(output.par, 'w') as out:
+        parTxt = "geno: " + input.gen + "\n"
+        parTxt += "snp: " + input.snp + "\n"
+        parTxt += "ind: " + input.ind + "\n"
+        parTxt += "snpwt: " + params.weight + "\n"
+        parTxt += "predpcoutput: " + output.predpcoutput + "\n"
+        with open(output.par, "w") as out:
             out.write(parTxt)
-        shell('{params.software} -p {output.par}')
+        shell("{params.software} -p {output.par}")
+
+
 
 rule snpweights_csv:
+    """Calls ancestry based on snpweights.
+
+    Converts the snpweights output to a CSV and adds an `Ancestry` column using the inferred
+    percent ancestry along with a threshold (currently 0.8).
+    """
     input:
-        'snpweights/samples.snpweights'
+        "snpweights/samples.snpweights",
     output:
-        'snpweights/samples.snpweights.csv'
+        "snpweights/samples.snpweights.csv",
     params:
-        threshold = 0.8
+        threshold=0.8,
     run:
-        with open(input[0]) as f, open(output[0], 'w') as out:
-            out.write('ID,Pop,SNPs,EV1,EV2,AFR,EUR,ASN,Ancestry\n')
-            labels = 'AFR,EUR,ASN'.split(',')
+        with open(input[0]) as f, open(output[0], "w") as out:
+            out.write("ID,Pop,SNPs,EV1,EV2,AFR,EUR,ASN,Ancestry\n")
+            labels = "AFR,EUR,ASN".split(",")
             for line in f:
                 line_list = line.split()
                 x = line_list[-3:]
                 ancestry = classify_ancestry(labels, x, float(params.threshold))
                 line_list.append(ancestry)
-                out.write(','.join(line_list) + '\n')
+                out.write(",".join(line_list) + "\n")
+

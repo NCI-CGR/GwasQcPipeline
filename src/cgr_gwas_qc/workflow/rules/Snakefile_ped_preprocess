@@ -1,12 +1,12 @@
 rule plink_make_bed:
     input:
-        plinkIn + '.ped',
-        plinkIn + '.map'
+        plinkIn + ".ped",
+        plinkIn + ".map",
     params:
-        outProj = 'plink_start/samples'
+        outProj="plink_start/samples",
     output:
-        'plink_start/samples.bed',
-        'plink_start/samples.bim',
-        'plink_start/samples.fam'
+        "plink_start/samples.bed",
+        "plink_start/samples.bim",
+        "plink_start/samples.fam",
     shell:
-        'plink --file ' + plinkIn + ' --make-bed --out {params.outProj} --memory 10000'
+        "plink --file " + plinkIn + " --make-bed --out {params.outProj} --memory 10000"

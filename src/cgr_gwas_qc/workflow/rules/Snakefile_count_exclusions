@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 rule count_exclusions:
     input:
         samp_sheet=sample_sheet,
@@ -206,4 +203,3 @@ rule count_exclusions:
                 )
                 + "\n"
             )
-

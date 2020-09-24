@@ -1,6 +1,7 @@
 # IDEs
 .vscode
 .idea
+.devcontainer
 
 # OSX hidden files
 .DS_Store

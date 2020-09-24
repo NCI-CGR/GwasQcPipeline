@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 rule copy_docs:
     input:
         doc="word_doc/" + outName + "_QC_Report_" + sampSheetDate + ".docx",
@@ -106,4 +103,3 @@ rule readme:
                 'In the second column it has "NA" if no samples passed QC for this subject.  Otherwise it gives the sample Id\n'
             )
             out.write("of the sample that was mapped to the subject ID in subjects.*\n")
-

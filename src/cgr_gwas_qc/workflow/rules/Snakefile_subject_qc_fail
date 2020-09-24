@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 rule sex_discordant_list:
     input:
         sex="remove_qc_fail/SexDiscordant.txt",
@@ -27,7 +24,6 @@ rule sex_discordant_list:
                             sub = sampToSubDict[samp]
                             sexRemDict[sub] = 1
                             out.write(sub + " " + sub + "\n")
-
 
 
 rule unexp_rep_list:
@@ -57,4 +53,3 @@ rule unexp_rep_list:
                     if subDict.get(samp1) and subDict.get(samp2):
                         out.write(line)
                     line = f.readline()
-
