@@ -10,4 +10,3 @@ To create the conda environment run:
     $ git checkout -b documentation_setup
     $ conda env create -f environment.yml -p ./venv
     $ conda activate ./venv
-

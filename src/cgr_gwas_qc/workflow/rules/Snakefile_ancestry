@@ -165,4 +165,3 @@ rule snpweights_csv:
                 ancestry = classify_ancestry(labels, x, float(params.threshold))
                 line_list.append(ancestry)
                 out.write(",".join(line_list) + "\n")
-

@@ -3,6 +3,7 @@ from contextlib import redirect_stdout
 
 from cgr_gwas_qc.cli import hello_cli
 
+
 def test_hello_cgr():
     expected = "Hello there pytest.\n"
 
