@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "cgr_gwas_qc"
+version = "0.1.0"
+description = "The CGR GWAS QC Pipeline"
+authors = [
+    "Justin Fear <justin.fear@nih.gov>",
+    "Jiahui Wang <jiahui.wang2@nih.gov>",
+    "Jai Liu <jia.liu3@nih.gov>",
+    "Eric Karlins",
+    "Bari Ballew <bari.ballew@nih.gov>",
+    "Cameron Palmer <cameron.palmer@nih.gov>",
+    "Bin Zhu <bin.zhu2@nih.gov>",
+]
+readme = "README.md"
+repository = "http://10.133.130.114/jfear/GwasQcPipeline"
+keywords = ["GWAS", "cancer", "QC", "snakemake"]
+packages = [
+    { include = "cgr_gwas_qc", from = "src"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+typer = "^0.3.2"
+pandas = "^1.1.2"
+snakemake = "^5.25.0"
+
+[tool.poetry.dev-dependencies]
+black = "^19.10b0"
+flake8 = "^3.8.3"
+snakefmt = "^0.2.0"
+pytest = "^6.0.2"
+sphinx = "^3.2.1"
+mypy = "^0.782"
+isort = "^5.5.3"
+
+[tool.poetry.scripts]
+say_hi = "cgr_gwas_qc.cli.hello_cli:main"
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.black]
+line-length = 100
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
