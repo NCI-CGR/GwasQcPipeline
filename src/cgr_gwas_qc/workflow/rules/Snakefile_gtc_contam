@@ -117,4 +117,3 @@ rule combine_contam_one_samp_b_1000g:
                     if intens < params.intensThresh and not crDict3.get(samp):
                         line_list[1] = "NA"
                     out.write(",".join(line_list) + "\n")
-

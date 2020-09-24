@@ -64,4 +64,3 @@ rule merge_sample_peds:
                 + inProj
                 + " --merge-list {output.mergeList} --make-bed --out {params.outProj} --threads {threads} --memory 240000"
             )
-

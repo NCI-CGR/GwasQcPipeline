@@ -19,14 +19,7 @@
 
 project = "GwasQcPipeline"
 copyright = "2020, Leidos Biomedical Research, Inc."
-authors = [
-    "Justin Fear",
-    "Eric Karlins",
-    "Jiahui Wang",
-    "Cameron Palmer",
-    "Bari Ballew",
-    "Bin Zhu",
-]
+authors = ["Justin Fear", "Eric Karlins", "Jiahui Wang", "Cameron Palmer", "Bari Ballew", "Bin Zhu"]
 
 # The full version, including alpha/beta/rc tags
 release = "0.1.0a"
@@ -39,7 +32,7 @@ templates_path = ["templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", ]
+exclude_patterns = ["_build"]
 
 
 # -- Extension Settings -------------------------------------------------
@@ -50,7 +43,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
-    "sphinxcontrib.mermaid"
+    "sphinxcontrib.mermaid",
 ]
 
 todo_include_todos = True

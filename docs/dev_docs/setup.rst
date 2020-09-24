@@ -22,10 +22,16 @@ Once installed you can set up a development environment by running the following
     $ make -C docs html                   # This will build documentation
     $ pytest                              # This will run the test suite
     $ mypy                                # This will run type checking
-    $ flake8 --config flake8.ini  <path>  # This will run python linting
+    $ flake8 <path>                       # This will run python linting
 
     # Build python sdist and wheel
     $ poetry build
+
+This repository also has git pre-commit hooks that need to be activated. Each hook builds a virtual environment, so the first time running will take a little while::
+
+    $ pre-commit install             # Installs the hooks
+
+Now everytime you commit files it will run the required set of tools and make modifications or flag issues found when running these tools.
 
 Workflow Environments
 ---------------------

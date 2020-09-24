@@ -222,4 +222,3 @@ rule split_known_rep:
                 else:
                     out2.write(line)
                 line = f.readline()
-

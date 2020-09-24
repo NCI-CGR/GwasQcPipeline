@@ -64,4 +64,3 @@ rule combine_idat_intensity:
                     line = f.readline()
                 medIntens = line.strip()
                 out.write(",".join([sampId, chipId, medIntens]) + "\n")
-
