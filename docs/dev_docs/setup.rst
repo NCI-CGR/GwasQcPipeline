@@ -27,6 +27,12 @@ Once installed you can set up a development environment by running the following
     # Build python sdist and wheel
     $ poetry build
 
+This repository also has git pre-commit hooks that need to be activated. Each hook builds a virtual environment, so the first time running will take a little while::
+
+    $ pre-commit install             # Installs the hooks
+
+Now everytime you commit files it will run the required set of tools and make modifications or flag issues found when running these tools.
+
 Workflow Environments
 ---------------------
 
