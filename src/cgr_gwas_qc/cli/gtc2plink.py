@@ -7,8 +7,8 @@ MAP File:
 
     chrom code: The chromosome name.
     variant_id: The variant identifier.
-    positon: This is an optional position in (centi)morgans. To ignore we set it to 0.
-    coordiante: This is the location in the reference assembly.
+    position: This is an optional position in (centi)morgans. To ignore we set it to 0.
+    coordinate: This is the location in the reference assembly.
 
 PED File:
     The plink PED file describes the genotype calls for a given sample (row) for

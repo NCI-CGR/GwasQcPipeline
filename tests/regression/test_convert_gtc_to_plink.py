@@ -48,7 +48,7 @@ def test_gtc2plink_fwd(bpm_file, gtc_file, tmpdir):
 
 
 @pytest.mark.regression
-def test_gtc2plink_theshold(bpm_file, gtc_file, tmpdir):
+def test_gtc2plink_threshold(bpm_file, gtc_file, tmpdir):
     """Run gtc2plink using a genotype call threshold."""
     # Run without threshold
     results = runner.invoke(app, [gtc_file.as_posix(), bpm_file.as_posix(), sample_id, str(tmpdir)])
