@@ -121,9 +121,6 @@ def convert_base_call(base_call: Union[str, bytes], flag_no_call: bool) -> str:
 
     Sets base calls below the genotype score threshold or missing (-) to "0".
     """
-    if isinstance(base_call, bytes):
-        base_call = base_call.decode("utf-8")
-
     if flag_no_call or base_call in ["--", "-"]:
         return "0 0"
 
