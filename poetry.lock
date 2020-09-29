@@ -529,6 +529,14 @@ python-versions = ">=3.5"
 version = "0.17.3"
 
 [[package]]
+category = "main"
+description = "pysam"
+name = "pysam"
+optional = false
+python-versions = "*"
+version = "0.16.0.1"
+
+[[package]]
 category = "dev"
 description = "pytest: simple powerful testing with Python"
 name = "pytest"
@@ -943,7 +951,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "c535e539865e37c2e25f75dd3bf93cd271152d7be159f50e6b00267444583a35"
+content-hash = "5851cde1254c5e7b0d10f58b16300b5442326ddedface2235d55fed373856255"
 lock-version = "1.0"
 python-versions = "^3.8"
 
@@ -1262,6 +1270,15 @@ pyparsing = [
 ]
 pyrsistent = [
     {file = "pyrsistent-0.17.3.tar.gz", hash = "sha256:2e636185d9eb976a18a8a8e96efce62f2905fea90041958d8cc2a189756ebf3e"},
+]
+pysam = [
+    {file = "pysam-0.16.0.1-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:9e3597a49e4bc72c31199d6231018ad3034e08a8243b9f8086953afb2ab5a3af"},
+    {file = "pysam-0.16.0.1-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:a5a0fc1f0d724d0b7789341add26ba181ac009430021f0998f6083fb62432193"},
+    {file = "pysam-0.16.0.1-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:9da29490c666a963e5a7f6f5114e86c9b36a8a6adc2227f5772bdc38c09d2d37"},
+    {file = "pysam-0.16.0.1-cp36-cp36m-manylinux1_x86_64.whl", hash = "sha256:107eca9050d8140910b5ea5c5a9e66313e1155eb44cc180e10f48f9cb71e8095"},
+    {file = "pysam-0.16.0.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:f65659deadc4904984de24cb6f3878b6052cf504a2a85a50b80f2ff7939f96db"},
+    {file = "pysam-0.16.0.1-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:3eb70111a5ed86cc7a048c9b2205087b1184093e6135f02ad7f144b206951452"},
+    {file = "pysam-0.16.0.1.tar.gz", hash = "sha256:d428a9768691d5ea3c28cc52a949c920ae691aa4c110a8b7328dc4d165ef1ad6"},
 ]
 pytest = [
     {file = "pytest-6.0.2-py3-none-any.whl", hash = "sha256:0e37f61339c4578776e090c3b8f6b16ce4db333889d65d0efb305243ec544b40"},
