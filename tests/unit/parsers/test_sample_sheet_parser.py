@@ -43,8 +43,8 @@ def test_load_str_or_path(file_name):
 
 
 @pytest.fixture(scope="module")
-def sample_sheet():
-    return SampleSheet(example_sample_sheet)
+def sample_sheet(sample_sheet_file):
+    return SampleSheet(sample_sheet_file)
 
 
 def test_sample_sheet_properties_right_type(sample_sheet):

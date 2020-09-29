@@ -30,10 +30,12 @@
 # following changes:
 #   - Reformated code with black
 #   - Added comment to disable flake8
+#   - Refactored GenotypeCalls.get_base_calls* to use generators
 # flake8: noqa
 
 __version__ = "1.2.0"
 import struct
+from typing import Generator
 
 from numpy import arctan2, cos, dtype, float32, frombuffer, int32, pi, seterr, sin, uint16
 
@@ -304,7 +306,9 @@ class GenotypeCalls:
         """
         return self.__get_generic_array(GenotypeCalls.__ID_GENOTYPES, read_byte)
 
-    def get_base_calls_generic(self, snps, strand_annotations, report_strand, unknown_annotation):
+    def get_base_calls_generic(
+        self, snps, strand_annotations, report_strand, unknown_annotation
+    ) -> Generator[str, None, None]:
         """
         Get base calls on arbitrary strand
         Args:
@@ -312,8 +316,8 @@ class GenotypeCalls:
             strand_annotations (list<int>) : A list of strand annotations for the loci
             report_strand (int) : The strand to use for reporting (must match encoding of strand_annotations)
             unknown_annotation (int) : The encoding used in strand annotations for an unknown strand
-        Returns:
-            The genotype basecalls on the report strand as a list of strings.
+        Yields:
+            The genotype basecalls on the report strand as a string.
             The characters are A, C, G, T, or - for a no-call/null.
         """
         genotypes = self.get_genotypes()
@@ -325,7 +329,6 @@ class GenotypeCalls:
                 "The number of reference strand annotations must match the number of loci in the GTC file"
             )
 
-        result = []
         for (genotype, snp, strand_annotation) in zip(genotypes, snps, strand_annotations):
             ab_genotype = code2genotype[genotype]
             a_nucleotide = snp[1]
@@ -334,10 +337,9 @@ class GenotypeCalls:
                 a_nucleotide == "N"
                 or b_nucleotide == "N"
                 or strand_annotation == unknown_annotation
-                or ab_genotype == "NC"
-                or ab_genotype == "NULL"
+                or ab_genotype in ["NC", "NULL"]
             ):
-                result.append("-")
+                yield "-"
             else:
                 report_strand_nucleotides = []
                 for ab_allele in ab_genotype:
@@ -347,10 +349,11 @@ class GenotypeCalls:
                         if strand_annotation == report_strand
                         else complement(nucleotide_allele)
                     )
-                result.append("".join(report_strand_nucleotides))
-        return result
+                yield "".join(report_strand_nucleotides)
 
-    def get_base_calls_plus_strand(self, snps, ref_strand_annotations):
+    def get_base_calls_plus_strand(
+        self, snps, ref_strand_annotations
+    ) -> Generator[str, None, None]:
         """
         Get base calls on plus strand of genomic reference. If you only see no-calls returned from this method,
         please verify that the reference strand annotations passed as argument are not unknown (RefStrand.Unknown)
@@ -358,32 +361,34 @@ class GenotypeCalls:
         Args:
             snps (list<string>) : A list of string representing the snp on the design strand for the loci (e.g. [A/C])
             ref_strand_annotations (list<int>) : A list of strand annotations for the loci (e.g., RefStrand.Plus)
-        Returns:
-            The genotype basecalls on the report strand as a list of strings.
+        Yields:
+            The genotype basecalls on the report strand as a string.
             The characters are A, C, G, T, or - for a no-call/null.
         """
-        return self.get_base_calls_generic(
+        yield from self.get_base_calls_generic(
             snps, ref_strand_annotations, RefStrand.Plus, RefStrand.Unknown
         )
 
-    def get_base_calls_forward_strand(self, snps, forward_strand_annotations):
+    def get_base_calls_forward_strand(
+        self, snps, forward_strand_annotations
+    ) -> Generator[str, None, None]:
         """
         Get base calls on the forward strand.
 
         Args:
             snps (list<string>) : A list of string representing the snp on the design strand for the loci (e.g. [A/C])
             forward_strand_annotations (list<int>) : A list of strand annotations for the loci (e.g., SourceStrand.Forward)
-        Returns:
-            The genotype basecalls on the report strand as a list of strings.
+        Yields:
+            The genotype basecalls on the report strand as a string.
             The characters are A, C, G, T, or - for a no-call/null.
         """
-        return self.get_base_calls_generic(
+        yield from self.get_base_calls_generic(
             snps, forward_strand_annotations, SourceStrand.Forward, RefStrand.Unknown
         )
 
-    def get_base_calls(self):
-        """Returns:
-            The genotype basecalls as a list of strings.
+    def get_base_calls(self) -> Generator[str, None, None]:
+        """Yields:
+            The genotype basecalls as a string.
             The characters are A, C, G, T, or - for a no-call/null.
             The calls are relative to the top strand.
         """
@@ -392,30 +397,26 @@ class GenotypeCalls:
         except:
             ploidy_type = 1
 
-        if ploidy_type != 1:
-            genotypes = self.get_genotypes()
+        genotypes = self.get_genotypes() if ploidy_type != 1 else None
 
         with open(self.filename, "rb") as gtc_handle:
             gtc_handle.seek(self.toc_table[GenotypeCalls.__ID_BASE_CALLS])
             num_entries = read_int(gtc_handle)
-            result = []
             for idx in range(num_entries):
                 if ploidy_type == 1:
-                    result.append(gtc_handle.read(2))
+                    yield gtc_handle.read(2).decode("utf-8")
                 else:
-                    byte_string = gtc_handle.read(2)
+                    data_string = gtc_handle.read(2).decode("utf-8")
                     ab_genotype = code2genotype[genotypes[idx]]
-                    if ab_genotype == "NC" or ab_genotype == "NULL":
-                        result.append("-")
+                    if ab_genotype in ["NC", "NULL"]:
+                        yield "-"
                     else:
-                        top_genotype = "".join(
+                        yield "".join(
                             [
-                                byte_string[0] if allele == "A" else byte_string[1]
+                                data_string[0] if allele == "A" else data_string[1]
                                 for allele in ab_genotype
                             ]
                         )
-                        result.append(top_genotype)
-            return result
 
     def get_genotype_scores(self):
         """Returns:

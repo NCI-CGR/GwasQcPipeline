@@ -39,6 +39,7 @@ rstcheck = "^3.3.1"
 
 [tool.poetry.scripts]
 say_hi = "cgr_gwas_qc.cli.hello_cli:main"
+gtc2plink = "cgr_gwas_qc.cli.gtc2plink:app"
 
 [tool.isort]
 profile = "black"
@@ -46,6 +47,11 @@ line_length = 100
 
 [tool.black]
 line-length = 100
+
+[tool.pytest.ini_options]
+markers = [
+    "regression: Functional tests to compare with outputs from legacy workflow."
+]
 
 [build-system]
 requires = ["poetry>=0.12"]

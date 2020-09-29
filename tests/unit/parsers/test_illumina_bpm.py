@@ -5,8 +5,8 @@ from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
 
 
 @pytest.fixture(scope="module")
-def bpm() -> BeadPoolManifest:
-    return BeadPoolManifest("tests/data/illumina/bpm/small_manifest.bpm")
+def bpm(bpm_file) -> BeadPoolManifest:
+    return BeadPoolManifest(bpm_file)
 
 
 bpm_list_attributes = [
