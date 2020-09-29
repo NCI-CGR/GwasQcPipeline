@@ -19,19 +19,19 @@ def test_length_of_gtc_toc(gtc):
 
 
 def test_get_top_base_calls(gtc, bpm):
-    base_calls = gtc.get_base_calls()
+    base_calls = list(gtc.get_base_calls())
     assert len(base_calls) == bpm.num_loci
-    assert all((isinstance(base_call, bytes) for base_call in base_calls))  # Always outputs bytes
+    assert all((isinstance(base_call, str) for base_call in base_calls))  # Always outputs bytes
 
 
 def test_get_fwd_base_calls(gtc, bpm):
-    base_calls = gtc.get_base_calls_forward_strand(bpm.snps, bpm.source_strands)
+    base_calls = list(gtc.get_base_calls_forward_strand(bpm.snps, bpm.source_strands))
     assert len(base_calls) == bpm.num_loci
     assert all((isinstance(base_call, str) for base_call in base_calls))  # Always outputs strings
 
 
 def test_get_plus_base_calls(gtc, bpm):
-    base_calls = gtc.get_base_calls_plus_strand(bpm.snps, bpm.ref_strands)
+    base_calls = list(gtc.get_base_calls_plus_strand(bpm.snps, bpm.ref_strands))
     assert len(base_calls) == bpm.num_loci
     assert all((isinstance(base_call, str) for base_call in base_calls))  # Always outputs strings
 
