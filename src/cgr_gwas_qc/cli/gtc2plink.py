@@ -27,7 +27,7 @@ PED File:
     Allele B marker_n: This is the second allele at marker n.
 """
 from pathlib import Path
-from typing import Iterator, List, Optional, Union
+from typing import Iterator, List, Optional
 
 import typer
 
@@ -116,7 +116,7 @@ def get_base_calls(
     return map(convert_base_call, base_calls, flags)
 
 
-def convert_base_call(base_call: Union[str, bytes], flag_no_call: bool) -> str:
+def convert_base_call(base_call: str, flag_no_call: bool) -> str:
     """Converts base calls to plink format.
 
     Sets base calls below the genotype score threshold or missing (-) to "0".
@@ -124,7 +124,7 @@ def convert_base_call(base_call: Union[str, bytes], flag_no_call: bool) -> str:
     if flag_no_call or base_call in ["--", "-"]:
         return "0 0"
 
-    return "{} {}".format(base_call[0], base_call[1])
+    return "{} {}".format(*base_call)
 
 
 if __name__ == "__main__":
