@@ -37,6 +37,7 @@ sphinxcontrib-mermaid = "^0.4.0"
 sphinx-rtd-theme = "^0.5.0"
 pre-commit = "^2.7.1"
 rstcheck = "^3.3.1"
+ipykernel = "^5.3.4"
 
 [tool.poetry.scripts]
 say_hi = "cgr_gwas_qc.cli.hello_cli:main"
