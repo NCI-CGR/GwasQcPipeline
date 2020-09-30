@@ -12,26 +12,25 @@ This project uses poetry_ as a package manager and build tool. Poetry is a moder
 
 Once installed you can set up a development environment by running the following::
 
-    $ git clone http://10.133.130.114/jfear/GwasQcPipeline.git
+    # Clone repository, checkout `restructure` branch, and download all submodules
+    $ git clone -b restructure --recursive http://10.133.130.114/jfear/GwasQcPipeline.git
     $ cd GwasQcPipeline
-    $ git checkout restructure     # Switch to the active dev branch
-    $ poetry install               # Install all dependencies
+    $ poetry install               # Install all development and runtime dependencies
     $ poetry shell                 # Activate poetry virtual environment
 
     # Make sure everything is working
-    $ make -C docs html                   # This will build documentation
+    $ make -C docs html                   # This will build documentation in docs/_build/html
     $ pytest                              # This will run the test suite
     $ mypy                                # This will run type checking
-    $ flake8 <path>                       # This will run python linting
 
     # Build python sdist and wheel
     $ poetry build
 
-This repository also has git pre-commit hooks that need to be activated. Each hook builds a virtual environment, so the first time running will take a little while::
+This repository also has git pre-commit hooks setup (`.pre-commit-config.yaml`), but they need to be activated. Each pre-commit hook builds a virtual environment, so the first time running will take a few minutes::
 
     $ pre-commit install             # Installs the hooks
 
-Now everytime you commit files it will run the required set of tools and make modifications or flag issues found when running these tools.
+Now every time you commit files it will run the required set of tools and make modifications or flag issues found when running these tools. This will slow down making commits, but I find it helps catch silly mistakes. If you don't want the tools to run you can use `git commit --no-verify`.
 
 Workflow Environments
 ---------------------
