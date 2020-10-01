@@ -9,6 +9,11 @@ def gtc_file():
 
 
 @pytest.fixture(scope="session")
+def vcf_file():
+    return Path("tests/data/1KG/small_1KG.vcf.gz")
+
+
+@pytest.fixture(scope="session")
 def bpm_file():
     return Path("tests/data/illumina/bpm/small_manifest.bpm")
 

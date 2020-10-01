@@ -54,6 +54,7 @@ cover/
 
 # Sphinx documentation
 docs/_build/
+deploy_docs.sh
 
 # mypy
 .mypy_cache/

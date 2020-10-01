@@ -23,6 +23,7 @@ python = "^3.8"
 typer = "^0.3.2"
 pandas = "^1.1.2"
 snakemake = "^5.25.0"
+pysam = "^0.16.0"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
@@ -36,10 +37,12 @@ sphinxcontrib-mermaid = "^0.4.0"
 sphinx-rtd-theme = "^0.5.0"
 pre-commit = "^2.7.1"
 rstcheck = "^3.3.1"
+ipykernel = "^5.3.4"
 
 [tool.poetry.scripts]
 say_hi = "cgr_gwas_qc.cli.hello_cli:main"
 gtc2plink = "cgr_gwas_qc.cli.gtc2plink:app"
+bpm2abf = "cgr_gwas_qc.cli.bpm2abf:app"
 
 [tool.isort]
 profile = "black"
