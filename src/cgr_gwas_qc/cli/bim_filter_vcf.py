@@ -107,6 +107,7 @@ def no_match(row, vcf) -> bool:
         if any("<" in alt for alt in record.alts):
             continue
 
+        # Perfect match
         if row.coordinate == record.pos and sorted(row.alleles) == sorted(record.alleles):
             row.variant_id = record.id
 
@@ -118,6 +119,7 @@ def no_match(row, vcf) -> bool:
             counter["match"] += 1
             return False
 
+        # Complements of alleles match the VCF
         if row.coordinate == record.pos and sorted(row.allele_complements) == sorted(
             record.alleles
         ):
@@ -128,6 +130,7 @@ def no_match(row, vcf) -> bool:
                 counter["duplicate"] += 1
                 return True
 
+            # Fix the alleles by taking the complement to match VCF record
             _alleles = row.alleles
             row.set_complements()
             typer.echo(
