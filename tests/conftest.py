@@ -21,3 +21,15 @@ def bpm_file():
 @pytest.fixture(scope="session")
 def sample_sheet_file():
     return Path("tests/data/example_sample_sheet.csv")
+
+
+@pytest.fixture(scope="session")
+def bim_file():
+    return Path("tests/data/plink/samples.bim")
+
+
+@pytest.fixture(scope="session")
+def vcf(vcf_file):
+    import pysam
+
+    return pysam.VariantFile(vcf_file, "r")
