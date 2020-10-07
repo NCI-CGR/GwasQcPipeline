@@ -43,6 +43,7 @@ ipykernel = "^5.3.4"
 say_hi = "cgr_gwas_qc.cli.hello_cli:main"
 gtc2plink = "cgr_gwas_qc.cli.gtc2plink:app"
 bpm2abf = "cgr_gwas_qc.cli.bpm2abf:app"
+bim_filter_vcf = "cgr_gwas_qc.cli.bim_filter_vcf:app"
 
 [tool.isort]
 profile = "black"
