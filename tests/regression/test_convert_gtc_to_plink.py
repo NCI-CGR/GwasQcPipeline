@@ -20,11 +20,11 @@ def test_gtc2plink_top(bpm_file, gtc_file, tmpdir):
     assert f"Saving PED file: {tmpdir}/{sample_id}.ped" in results.stdout
 
     obs_map = Path(tmpdir) / f"{sample_id}.map"
-    exp_map = Path("tests/data/plink/T0001_top.map")
+    exp_map = Path("tests/data/plink/top/T0001.map")
     assert file_hashes_equal(obs_map, exp_map)
 
     obs_ped = Path(tmpdir) / f"{sample_id}.ped"
-    exp_ped = Path("tests/data/plink/T0001_top.ped")
+    exp_ped = Path("tests/data/plink/top/T0001.ped")
     assert file_hashes_equal(obs_ped, exp_ped)
 
 
@@ -39,11 +39,11 @@ def test_gtc2plink_fwd(bpm_file, gtc_file, tmpdir):
     assert f"Saving PED file: {tmpdir}/{sample_id}.ped" in results.stdout
 
     obs_map = Path(tmpdir) / f"{sample_id}.map"
-    exp_map = Path("tests/data/plink/T0001_fwd.map")
+    exp_map = Path("tests/data/plink/fwd/T0001.map")
     assert file_hashes_equal(obs_map, exp_map)
 
     obs_ped = Path(tmpdir) / f"{sample_id}.ped"
-    exp_ped = Path("tests/data/plink/T0001_fwd.ped")
+    exp_ped = Path("tests/data/plink/fwd/T0001.ped")
     assert file_hashes_equal(obs_ped, exp_ped)
 
 
