@@ -1,13 +1,4 @@
-"""
-python gtc2plink.py /path/to/file.gtc /path/to/manifest.bpm /path/to/out.adpc.bin
-also outputs a txt file with one line that has the number of markers:
-/path/to/out.adpc.bin.numSnps.txt
-
-written by Eric Karlins with help from Bin Zhu
-
-note that I'm using a version of IlluminaBeadArrayFiles.py that I edited to address ZeroDivisionError in the function get_normalized_intensities
-"""
-
+"""Converts a GCT + BIM file into Illumina's adpc.bin format."""
 from pathlib import Path
 from typing import Generator, List, Optional
 
@@ -22,16 +13,32 @@ app = typer.Typer(add_completion=False)
 @app.command()
 def main(
     gtc_file: Path = typer.Argument(
-        ..., help="Path to a sample's GTC file.", exists=True, readable=True
+        ..., help="Path to a sample(s) GTC file.", exists=True, readable=True
     ),
     bpm_file: Path = typer.Argument(
         ..., help="Path to the array's BPM manifest.", exists=True, readable=True
     ),
-    adpc_file: Path = typer.Argument(..., help="Output adpc file.", file_okay=True, writable=True),
+    adpc_file: Path = typer.Argument(
+        ..., help="Path to output the adpc.bin file.", file_okay=True, writable=True
+    ),
     snp_count_file: Optional[Path] = typer.Argument(
-        None, help="Save the number of snps.", file_okay=True, writable=True
+        None,
+        help="Path to save the number of snps in the BPM manifest.",
+        file_okay=True,
+        writable=True,
     ),
 ) -> None:
+    """Converts a GCT + BIM file into Illumina's adpc.bin format.
+
+    The adpc.bin format includes::
+
+        x_raw: Raw intensities for allele A
+        y_raw: Raw intensities for allele B
+        x_norm: Normalized intensities for allele A
+        y_norm: Normalized intensities for allele B
+        genotype_score: The genotype clustering confidence score
+        genotype: The called genotype (0: AA, 1: AB, 2: BB, 3: unknown or missing)
+    """
 
     with AdpcWriter(adpc_file) as fh:
         for record in get_adpc_records(bpm_file, gtc_file):
@@ -45,7 +52,7 @@ def main(
         fh.write(f"{num_snps}\n")
 
 
-def get_adpc_records(bpm_file: Path, gtc_file: Path) -> Generator["AdpcRecord", None, None]:
+def get_adpc_records(bpm_file: Path, gtc_file: Path) -> Generator[AdpcRecord, None, None]:
     bpm = BeadPoolManifest(bpm_file)
     gtc = GenotypeCalls(gtc_file)
 
