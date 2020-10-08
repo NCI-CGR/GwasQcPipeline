@@ -684,8 +684,15 @@ class NormalizationTransform:
         tempx3 = tempx2 - self.shear * tempy2
         tempy3 = tempy2
 
-        xn = tempx3 / self.scale_x
-        yn = tempy3 / self.scale_y
+        try:
+            xn = tempx3 / self.scale_x
+        except ZeroDivisionError:
+            xn = 0
+
+        try:
+            yn = tempy3 / self.scale_y
+        except ZeroDivisionError:
+            yn = 0
 
         if threshold:
             xn = 0 if 0 > xn else xn
