@@ -5,7 +5,7 @@ from numpy import isclose
 from typer.testing import CliRunner
 
 from cgr_gwas_qc.cli.gtc2adpc import app
-from cgr_gwas_qc.parsers.adpc import AdpcReader
+from cgr_gwas_qc.parsers.illumina import AdpcReader
 
 runner = CliRunner()
 

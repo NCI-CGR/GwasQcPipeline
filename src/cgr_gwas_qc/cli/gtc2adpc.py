@@ -14,8 +14,7 @@ from typing import Generator, List, Optional
 import typer
 from more_itertools import unzip
 
-from cgr_gwas_qc.parsers.adpc import AdpcRecord, AdpcWriter
-from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
+from cgr_gwas_qc.parsers.illumina import AdpcRecord, AdpcWriter, BeadPoolManifest, GenotypeCalls
 
 app = typer.Typer(add_completion=False)
 
