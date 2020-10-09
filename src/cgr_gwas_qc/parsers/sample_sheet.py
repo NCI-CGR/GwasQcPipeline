@@ -85,7 +85,7 @@ class SampleSheet:
     @staticmethod
     def _clean_data(data) -> pd.DataFrame:
         """Converts Data section into a dataframe."""
-        return pd.read_csv(StringIO(data))
+        return pd.read_csv(StringIO(data)).dropna(how="all")
 
 
 def _strip_terminal_commas(data: str) -> str:
