@@ -1,7 +1,14 @@
 from pathlib import Path
 from typing import ChainMap, List, Optional, Union
 
+import pandas as pd
+
 import cgr_gwas_qc.yaml as yaml
+from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+
+
+class CgrGwasQcConfigError(Exception):
+    pass
 
 
 class ConfigMgr:
@@ -43,6 +50,14 @@ class ConfigMgr:
         self._config = yaml.load([self.user_config, self.CONFIG_DIR / "config.yml"])
         self._patterns = yaml.load([self.user_patterns, self.CONFIG_DIR / "patterns.yml"])
 
+        try:
+            self.sample_sheet_file = self.config["sample_sheet"]
+            self._sample_sheet = SampleSheet(self.sample_sheet_file)
+        except IndexError:
+            raise CgrGwasQcConfigError("Please add `sample_sheet` to your config file.")
+        except FileNotFoundError:
+            raise CgrGwasQcConfigError(f"Sample Sheet File [{self.sample_sheet_file}] not found.")
+
     @staticmethod
     def find_configs():
         root = Path.cwd().absolute()
@@ -58,12 +73,17 @@ class ConfigMgr:
         return cls.__instance
 
     @property
-    def config(self):
+    def config(self) -> ChainMap:
         return self._config
 
     @property
-    def patterns(self):
+    def patterns(self) -> ChainMap:
         return self._patterns
+
+    @property
+    def ss(self) -> pd.DataFrame:
+        """Access the sample sheet DataFrame."""
+        return self._sample_sheet.data
 
 
 def scan_for_yaml(base_dir: Path, name: str) -> Optional[Path]:
