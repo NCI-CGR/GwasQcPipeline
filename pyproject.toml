@@ -24,6 +24,7 @@ typer = "^0.3.2"
 pandas = "^1.1.2"
 snakemake = "^5.25.0"
 pysam = "^0.16.0"
+ryd = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
