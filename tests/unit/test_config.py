@@ -16,12 +16,12 @@ yaml_extensions = [
 
 
 @pytest.mark.parametrize("name,ext", yaml_extensions)
-def test_scan_for_yaml(tmpdir, name, ext):
+def test_scan_for_yaml(tmp_path, name, ext):
     # Create a config file
-    cfg_file = Path(tmpdir) / f"{name}.{ext}"
+    cfg_file = tmp_path / f"{name}.{ext}"
     cfg_file.touch()
 
-    found_config = scan_for_yaml(Path(tmpdir), name)
+    found_config = scan_for_yaml(tmp_path, name)
 
     assert found_config.as_posix() == cfg_file.as_posix()
 
