@@ -1,11 +1,11 @@
-import os
-import shutil
 from collections import ChainMap
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from cgr_gwas_qc.config import ConfigMgr, flatten_nested, scan_for_yaml
+from cgr_gwas_qc.testing import chdir
 
 yaml_extensions = [
     ("config", "yml"),
@@ -54,25 +54,16 @@ def test_flatten_nested(nested_content, expected_content):
     assert sorted(flattened_content) == sorted(expected_content)
 
 
-@pytest.fixture
-def create_user_dir(tmpdir):
-    tmp_pth = Path(tmpdir)
-
-    # copy sample sheet
-    shutil.copyfile("tests/data/example_sample_sheet.csv", tmp_pth / "samplesheet.csv")
-
-    # create user config
-    config_file = tmp_pth / "config.yml"
-    config_file.write_text("project_name: test\nsample_sheet: ./samplesheet.csv")
-
-    return tmp_pth
+def test_config_loads(working_dir: Path):
+    with chdir(working_dir):
+        cfg = ConfigMgr.instance()
+        assert cfg.user_config == (working_dir / "config.yml").absolute()
+        assert cfg.config["project_name"] == "Test Project"
+        assert isinstance(cfg.ss, pd.DataFrame)
 
 
-def test_create_config_instance(create_user_dir: Path):
-    os.chdir(create_user_dir)
-    cfg = ConfigMgr.instance()
-    assert cfg.user_config == (create_user_dir / "config.yml").absolute()
-    assert cfg.config["project_name"] == "test"
-
+def test_config_only_uses_one_instance(working_dir: Path):
+    with chdir(working_dir):
+        cfg = ConfigMgr.instance()
     cfg2 = ConfigMgr.instance()
     assert cfg is cfg2
