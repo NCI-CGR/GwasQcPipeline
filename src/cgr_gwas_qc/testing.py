@@ -1,7 +1,19 @@
+import contextlib
+import os
 from hashlib import sha256
 from math import isclose
 from pathlib import Path
 from typing import Union
+
+
+@contextlib.contextmanager
+def chdir(dirname: Path):
+    curdir = Path().cwd()
+    try:
+        os.chdir(dirname)
+        yield
+    finally:
+        os.chdir(curdir)
 
 
 def file_hashes_equal(file1: Union[str, Path], file2: Union[str, Path]) -> bool:
