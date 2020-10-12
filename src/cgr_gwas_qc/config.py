@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import ChainMap, List, Optional, Union
+from typing import Optional, Tuple
 
 import pandas as pd
+from snakemake.rules import expand
 
 import cgr_gwas_qc.yaml as yaml
+from cgr_gwas_qc.models.config import Config
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 
 
@@ -35,35 +37,30 @@ class ConfigMgr:
     SRC_DIR = Path(__file__).parent.absolute()
     WORKFLOW_DIR = SRC_DIR / "workflow"
 
-    CONFIG_DIR = WORKFLOW_DIR / "config"
     RULE_DIR = WORKFLOW_DIR / "rules"
     SCRIPTS_DIR = WORKFLOW_DIR / "scripts"
     SNAKEFILE = WORKFLOW_DIR / "Snakefile"
 
     __instance = None
 
-    def __init__(self, root: Path, user_config: Optional[Path], user_patterns: Optional[Path]):
+    def __init__(self, root: Path, user_config: Path):
         self.root = root
         self.user_config = user_config
-        self.user_patterns = user_patterns
 
-        self._config = yaml.load([self.user_config, self.CONFIG_DIR / "config.yml"])
-        self._patterns = yaml.load([self.user_patterns, self.CONFIG_DIR / "patterns.yml"])
+        self._config = Config(**yaml.load(self.user_config))
 
-        try:
-            self.sample_sheet_file = self.config["sample_sheet"]
-            self._sample_sheet = SampleSheet(self.sample_sheet_file)
-        except IndexError:
-            raise CgrGwasQcConfigError("Please add `sample_sheet` to your config file.")
-        except FileNotFoundError:
-            raise CgrGwasQcConfigError(f"Sample Sheet File [{self.sample_sheet_file}] not found.")
+        self.sample_sheet_file = self.config.reference_paths.sample_sheet
+        self._sample_sheet = SampleSheet(self.sample_sheet_file)
 
     @staticmethod
-    def find_configs():
+    def find_configs() -> Tuple[Path, Path]:
         root = Path.cwd().absolute()
         user_config = scan_for_yaml(root, "config")
-        user_patterns = scan_for_yaml(root, "patterns")
-        return root, user_config, user_patterns
+
+        if user_config is None:
+            raise FileNotFoundError("Please run with a `config.yml` in your working directory.")
+
+        return root, user_config
 
     @classmethod
     def instance(cls):
@@ -73,17 +70,16 @@ class ConfigMgr:
         return cls.__instance
 
     @property
-    def config(self) -> ChainMap:
+    def config(self) -> Config:
         return self._config
-
-    @property
-    def patterns(self) -> ChainMap:
-        return self._patterns
 
     @property
     def ss(self) -> pd.DataFrame:
         """Access the sample sheet DataFrame."""
         return self._sample_sheet.data
+
+    def expand(self, pattern, combination=zip):
+        return expand(pattern, combination, **self.ss.to_dict())
 
 
 def scan_for_yaml(base_dir: Path, name: str) -> Optional[Path]:
@@ -103,27 +99,3 @@ def scan_for_yaml(base_dir: Path, name: str) -> Optional[Path]:
         return base_dir / f"{name}.yaml"
 
     return None
-
-
-def flatten_nested(content: Union[list, dict, ChainMap]) -> List[Union[str, int, float]]:
-    """Flatten an arbitrary nested dictionary.
-
-    Useful for flattening file patterns from a Yaml config.
-
-    Example:
-        >>> content = {"one": ["one_a", "one_b"], "two": "two_a"}
-        >>> sorted(flatten_nested(content))
-        ["one_a", "one_b", "two_a"]
-
-    """
-
-    def gen(iter: Union[list, dict, ChainMap, str, int, float]):
-        if isinstance(iter, (dict, ChainMap)):
-            yield from flatten_nested(list(iter.values()))
-        elif isinstance(iter, list):
-            for item in iter:
-                yield from flatten_nested(item)
-        else:
-            yield iter
-
-    return list(gen(content))
