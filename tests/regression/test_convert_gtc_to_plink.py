@@ -3,8 +3,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from cgr_gwas_qc.cli.gtc2plink import app
 from cgr_gwas_qc.testing import file_hashes_equal
+from cgr_gwas_qc.workflow.scripts.gtc2plink import app
 
 runner = CliRunner()
 
