@@ -42,6 +42,7 @@ rstcheck = "^3.3.1"
 ipykernel = "^5.3.4"
 
 [tool.poetry.scripts]
+cgr = "cgr_gwas_qc.cli:app"
 say_hi = "cgr_gwas_qc.cli.hello_cli:main"
 gtc2plink = "cgr_gwas_qc.cli.gtc2plink:app"
 bpm2abf = "cgr_gwas_qc.cli.bpm2abf:app"
