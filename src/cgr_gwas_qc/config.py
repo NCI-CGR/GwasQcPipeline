@@ -49,7 +49,7 @@ class ConfigMgr:
 
         self._config = Config(**yaml.load(self.user_config))
 
-        self.sample_sheet_file = self.config.reference_paths.sample_sheet
+        self.sample_sheet_file = self.config.sample_sheet
         self._sample_sheet = SampleSheet(self.sample_sheet_file)
 
     @staticmethod

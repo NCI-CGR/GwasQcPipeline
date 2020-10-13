@@ -12,30 +12,10 @@ class ReferenceFiles(BaseModel):
     thousand_genome_tbi: Valid path to 1KG TBI
     """
 
-    sample_sheet: FilePath
-    illumina_array_manifest: FilePath
+    illumina_array_manifest: FilePath = "/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm"
     # illumina_cluster_file: FilePath
-    thousand_genome_vcf: FilePath
-    thousand_genome_tbi: FilePath
-
-    @validator("sample_sheet")
-    def is_sample_sheet(cls, v):
-        data = v.read_text()
-        # Containes [Header], [Manifests], [Data]
-        if "[Header]" not in data:
-            raise ValueError("Missing the 'Header' section")
-        if "[Manifests]" not in data:
-            raise ValueError("Missing the 'Manifests' section")
-        if "[Data]" not in data:
-            raise ValueError("Missing the 'Data' section")
-
-        try:
-            rows = data.split("\n")
-            assert rows[0].count(",") > rows[-1].count(",")
-        except AssertionError:
-            raise AssertionError("Last row is missing fields.")
-
-        return v
+    thousand_genome_vcf: FilePath = "/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz"
+    thousand_genome_tbi: FilePath = "/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi"
 
     @validator("illumina_array_manifest")
     def is_bpm(cls, v):
@@ -77,8 +57,8 @@ class ReferenceFiles(BaseModel):
 class Idat(BaseModel):
     """Each sample has an Idat file in two color channels."""
 
-    red: str
-    green: str
+    red: str = "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat"
+    green: str = "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat"
 
     @validator("*")
     def is_gtc_pattern(cls, v):
@@ -102,8 +82,8 @@ class UserDataPatterns(BaseModel):
     The GWAS QC Pipeline requires GTC or IDAT files.
     """
 
-    gtc: str  # File pattern for *.gtc
-    idat: Idat  # File pattern for *.idat
+    gtc: str = "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}.gtc"
+    idat: Idat
 
     @validator("gtc")
     def is_gtc_pattern(cls, v):
@@ -130,5 +110,26 @@ class Config(BaseModel):
     """
 
     project_name: str  # Project title
-    reference_paths: ReferenceFiles  # Paths to various reference files
+    pipeline_version: str
+    sample_sheet: FilePath
+    reference_paths: ReferenceFiles  # Pths to various reference files
     user_data_patterns: UserDataPatterns  # File name pattern for user data files
+
+    @validator("sample_sheet")
+    def is_sample_sheet(cls, v):
+        data = v.read_text()
+        # Containes [Header], [Manifests], [Data]
+        if "[Header]" not in data:
+            raise ValueError("Missing the 'Header' section")
+        if "[Manifests]" not in data:
+            raise ValueError("Missing the 'Manifests' section")
+        if "[Data]" not in data:
+            raise ValueError("Missing the 'Data' section")
+
+        try:
+            rows = data.split("\n")
+            assert rows[0].count(",") > rows[-1].count(",")
+        except AssertionError:
+            raise AssertionError("Last row is missing fields.")
+
+        return v
