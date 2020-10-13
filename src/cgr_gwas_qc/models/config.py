@@ -1,21 +1,26 @@
 """Configuration system data models."""
-from pydantic import BaseModel, FilePath, validator
+from pydantic import BaseModel, Field, FilePath, validator
 
 
 class ReferenceFiles(BaseModel):
-    """A number of reference files are required by the pipeline.
+    """A list of reference files used by the pipeline."""
 
-    sample_sheet: Valid path to CSV exported from LIMS
-    illumina_array_manifest: Valid path to array's BPM
-    illumina_cluster_file: Valid path to EGT file
-    thousand_genome_vcf: Valid path to 1KG VCF
-    thousand_genome_tbi: Valid path to 1KG TBI
-    """
+    illumina_array_manifest: FilePath = Field(
+        "/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm",
+        description="Path to the array BPM file.",
+    )
 
-    illumina_array_manifest: FilePath = "/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm"
-    # illumina_cluster_file: FilePath
-    thousand_genome_vcf: FilePath = "/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz"
-    thousand_genome_tbi: FilePath = "/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi"
+    # illumina_cluster_file: FilePath = Field("", description="Path to the array cluster EGT file.")
+
+    thousand_genome_vcf: FilePath = Field(
+        "/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz",
+        description="Path to the 1KG VCF file.",
+    )
+
+    thousand_genome_tbi: FilePath = Field(
+        "/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi",
+        description="Path to the corresponding index for the 1KG VCF file.",
+    )
 
     @validator("illumina_array_manifest")
     def is_bpm(cls, v):
@@ -57,8 +62,15 @@ class ReferenceFiles(BaseModel):
 class Idat(BaseModel):
     """Each sample has an Idat file in two color channels."""
 
-    red: str = "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat"
-    green: str = "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat"
+    red: str = Field(
+        "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
+        description="File name pattern for Red Channel Idat. Wildcards are columns in the sample sheet.",
+    )
+
+    green: str = Field(
+        "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat",
+        description="File name pattern for Green Channel Idat. Wildcards are columns in the sample sheet.",
+    )
 
     @validator("*")
     def is_gtc_pattern(cls, v):
@@ -82,8 +94,12 @@ class UserDataPatterns(BaseModel):
     The GWAS QC Pipeline requires GTC or IDAT files.
     """
 
-    gtc: str = "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}.gtc"
-    idat: Idat
+    gtc: str = Field(
+        "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
+        description="File name pattern for GTC file. Wildcards are columns in the sample sheet.",
+    )
+
+    idat: Idat  # Refers to Idat class above.
 
     @validator("gtc")
     def is_gtc_pattern(cls, v):
@@ -109,11 +125,11 @@ class Config(BaseModel):
     schema and implementing data validation.
     """
 
-    project_name: str  # Project title
-    pipeline_version: str
-    sample_sheet: FilePath
-    reference_paths: ReferenceFiles  # Pths to various reference files
-    user_data_patterns: UserDataPatterns  # File name pattern for user data files
+    project_name: str = Field(..., description="The project title.")
+    pipeline_version: str = Field(..., description="The version of the pipeline to use.")
+    sample_sheet: FilePath = Field(..., description="Path to the sample manifest from LIMs.")
+    reference_paths: ReferenceFiles  # Refers to ReferenceFiles above.
+    user_data_patterns: UserDataPatterns  # Refers to UserDataPatterns above.
 
     @validator("sample_sheet")
     def is_sample_sheet(cls, v):
