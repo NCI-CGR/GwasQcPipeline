@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from cgr_gwas_qc.cli.bim_filter_vcf import app
 from cgr_gwas_qc.testing import file_hashes_equal
+from cgr_gwas_qc.workflow.scripts.bim_filter_vcf import app
 
 runner = CliRunner()
 
@@ -101,7 +101,12 @@ bim_rows = [
 
 @pytest.mark.parametrize("row,expected_call,status", bim_rows)
 def test_no_match(vcf, row, expected_call, status):
-    from cgr_gwas_qc.cli.bim_filter_vcf import BimRecord, counter, no_match, unique_snps
+    from cgr_gwas_qc.workflow.scripts.bim_filter_vcf import (
+        BimRecord,
+        counter,
+        no_match,
+        unique_snps,
+    )
 
     # WARNING: counter is created at import and is shared within the test session.
     # Here I clear it to remove any count artifacts.

@@ -9,8 +9,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from cgr_gwas_qc.cli.bpm2abf import app
 from cgr_gwas_qc.testing import file_rows_almost_equal
+from cgr_gwas_qc.workflow.scripts.bpm2abf import app
 
 runner = CliRunner()
 
