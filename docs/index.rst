@@ -6,7 +6,7 @@ GwasQcPipeline Documentation
 Getting Started
 ---------------
 
-In this section we walk you through installing the required software using either ``conda`` or ``docker`` and running the workflow.
+In this section we walk you through installing the required software using ``conda``.
 
 QC Modules
 ----------
@@ -29,8 +29,7 @@ This is a guide meant to help other work on this project.
    :hidden:
    :maxdepth: 1
 
-   getting_started/conda
-   getting_started/docker
+   getting_started/installation
    getting_started/running_pipeline
 
 .. toctree::
