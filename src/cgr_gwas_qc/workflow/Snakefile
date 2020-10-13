@@ -1,0 +1,13 @@
+from snakemake.rules import expand
+
+from cgr_gwas_qc import load_config
+
+cfg = load_config()
+
+
+rule all:
+    input: expand("output/{Sample_ID}.txt", **cfg.ss.to_dict("list"))
+
+
+rule touch:
+    output: touch("output/{Sample_ID}.txt")
