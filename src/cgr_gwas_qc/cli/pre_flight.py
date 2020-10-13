@@ -10,9 +10,14 @@ app = typer.Typer(add_completion=False)
 
 @app.command()
 def main(gtc_check: bool = True, idat_check: bool = True):
-    """Run pre-flight checks to make sure all inputs are safe."""
-    cfg = load_config()  # This already does pre-flight checks on Reference files in the config
-    typer.echo("Reference Files OK.")
+    """Pre-flight checks to make sure user input files are readable and complete.
+
+    Pre-flight checks include the Sample Sheet, reference files, Idat files,
+    and GTC files. For Idat and GTC files, the user provided file name
+    pattern is extended using the columns in the sample sheet.
+    """
+    cfg = load_config()  # This already validates all Reference files in the config
+    typer.echo("Sample Sheet and Reference Files OK.")
 
     if idat_check:
         try:

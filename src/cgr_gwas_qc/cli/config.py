@@ -17,7 +17,7 @@ def main(
         ..., prompt="Path to LIMs Sample Sheet", exists=True, readable=True, file_okay=True
     ),
 ):
-    """Creates a config file."""
+    """Creates a Gwas Qc Pipeline config file in the current working directory."""
     cfg = schema_to_dict(Config.schema())
     cfg["project_name"] = project_name
     cfg["pipeline_version"] = cgr_gwas_qc.__version__
