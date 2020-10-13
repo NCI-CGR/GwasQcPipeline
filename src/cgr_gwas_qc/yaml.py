@@ -5,6 +5,7 @@ from typing import List, Optional, Union
 from ruamel.yaml import YAML
 
 yaml_reader = YAML(typ="rt")
+yaml_writer = YAML()
 
 
 def load(files: Union[Path, List[Optional[Path]]]) -> ChainMap:
@@ -24,3 +25,9 @@ def load(files: Union[Path, List[Optional[Path]]]) -> ChainMap:
     if isinstance(files, Path):
         files = [files]
     return ChainMap(*[yaml_reader.load(file.open()) for file in files if file and file.exists()])
+
+
+def write(data: dict, file_name: Union[str, Path]) -> None:
+    file_name = Path(file_name)
+    with file_name.open("w") as fh:
+        yaml_writer.dump(data, fh)
