@@ -52,5 +52,11 @@ def working_dir(tmp_path_factory):
     shutil.copyfile(
         "tests/data/illumina/gtc/small_genotype.gtc", tmp_path / "SB00002_PB0001_B01.gtc"
     )
+    shutil.copyfile(
+        "tests/data/illumina/gtc/small_genotype.gtc", tmp_path / "SB00003_PB0001_C01.gtc"
+    )
+    shutil.copyfile(
+        "tests/data/illumina/gtc/small_genotype.gtc", tmp_path / "SB00004_PB0001_D01.gtc"
+    )
 
     return tmp_path
