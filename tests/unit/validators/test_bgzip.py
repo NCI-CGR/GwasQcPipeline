@@ -8,6 +8,9 @@ import pytest
 from cgr_gwas_qc.validators.bgzip import BgzipMagicNumberError, BgzipTruncatedFileError, validate
 
 
+################################################################################
+# Good VCF and TBI files validate ok
+################################################################################
 def test_good_vcf_file_vaidates(vcf_file):
     validate(vcf_file)
 
@@ -16,11 +19,17 @@ def test_good_tbi_file_vaidates(vcf_file):
     validate(vcf_file.with_suffix(".gz.tbi"))
 
 
+################################################################################
+# Error if not a BGZIP file (BgzipMagicNumberError)
+################################################################################
 def test_bad_magic_number(bpm_file):
     with pytest.raises(BgzipMagicNumberError):
         validate(bpm_file)
 
 
+################################################################################
+# Error if file is truncated (BgzipTruncatedFileError)
+################################################################################
 @pytest.fixture(params=[1, 2, 4])
 def truncated_vcf(tmp_path, vcf_file, request):
     data = vcf_file.read_bytes()
