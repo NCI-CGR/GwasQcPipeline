@@ -23,6 +23,8 @@ def validate(file_name: Path):
             raise BpmNormalizationError(name)
         elif err.args[0].startswith("Manifest format error: read invalid number of assay entries"):
             raise BpmEntryError(name)
+        else:
+            raise err
 
 
 ################################################################################

@@ -19,6 +19,8 @@ def validate(file_name: Path):
             raise GtcVersionError(name)
         elif err.args[0] == "GTC file is incomplete":
             raise GtcTuncatedFileError(name)
+        else:
+            raise err
 
 
 ################################################################################
