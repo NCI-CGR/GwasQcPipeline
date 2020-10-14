@@ -142,6 +142,8 @@ class Config(BaseModel):
         try:
             validate(v)
         except NullRowError:
+            # Most of the time I don't care about empty rows. The parser will
+            # drop them automatically. Just warn me if there are any.
             logger.warn(f"{v.name} contains empty rows.")
 
         return v
