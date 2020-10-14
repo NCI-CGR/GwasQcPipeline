@@ -27,13 +27,10 @@ class ReferenceFiles(BaseModel):
     )
 
     @validator("illumina_array_manifest")
-    def is_bpm(cls, v):
-        with v.open("rb") as fh:
-            try:
-                assert fh.read(3) == b"BPM"
-            except AssertionError:
-                raise AssertionError("Does not contain BPM magic number.")
+    def validate_bpm(cls, v):
+        from cgr_gwas_qc.validators.bpm import validate
 
+        validate(v)
         return v
 
     # @validator("illumina_cluster_filer")
