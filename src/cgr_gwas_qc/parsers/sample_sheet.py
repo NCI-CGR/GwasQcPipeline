@@ -4,20 +4,7 @@ from io import StringIO
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
-import numpy as np
 import pandas as pd
-
-
-class SampleSheetError(Exception):
-    """A problem loading the sample sheet."""
-
-    pass
-
-
-class MissingSampleIdError(SampleSheetError):
-    """Sample_ID is required"""
-
-    pass
 
 
 class SampleSheet:
@@ -98,16 +85,7 @@ class SampleSheet:
     @staticmethod
     def _clean_data(data) -> pd.DataFrame:
         """Converts Data section into a dataframe."""
-        df = pd.read_csv(StringIO(data)).dropna(how="all")
-
-        missing_sample_ids = df.Sample_ID.isnull()
-        if any(missing_sample_ids):
-            missing_idx = "\n".join([str(idx) for idx in np.where(missing_sample_ids)[0]])
-            raise MissingSampleIdError(
-                f"The Sample_IDs are missing at the following rows:\n  - {missing_idx}"
-            )
-
-        return df
+        return pd.read_csv(StringIO(data)).dropna(how="all")
 
 
 def _strip_terminal_commas(data: str) -> str:

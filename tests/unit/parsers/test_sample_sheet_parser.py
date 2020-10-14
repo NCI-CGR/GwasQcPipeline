@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 
 from cgr_gwas_qc.parsers.sample_sheet import (
-    MissingSampleIdError,
     SampleSheet,
     _convert_to_key_value_pair,
     _strip_terminal_commas,
@@ -67,30 +66,14 @@ def test_empty_row_in_sample_sheet_data(tmpdir):
     sample_sheet.write_text(
         dedent(
             """\
-        [data],,,
+        [Data],,,
         Sample_ID,col2,col3,col4
         SB001,001,002,004
         SB002,001,002,003
-        ,,,"""
+        ,,,
+        """
         )
     )
 
     ss = SampleSheet(sample_sheet)
     assert ss.data.shape[0] == 2
-
-
-def test_missing_sample_id_in_sample_sheet_data(tmpdir):
-    sample_sheet = Path(tmpdir) / "sample_sheet.csv"
-    sample_sheet.write_text(
-        dedent(
-            """\
-        [data],,,
-        Sample_ID,col2,col3,col4
-        SB001,001,002,004
-        SB002,001,002,003
-        ,001,002,003"""
-        )
-    )
-
-    with pytest.raises(MissingSampleIdError):
-        SampleSheet(sample_sheet)

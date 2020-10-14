@@ -1,5 +1,9 @@
 """Configuration system data models."""
+from logging import getLogger
+
 from pydantic import BaseModel, Field, FilePath, validator
+
+logger = getLogger(__name__)
 
 
 class ReferenceFiles(BaseModel):
@@ -132,20 +136,12 @@ class Config(BaseModel):
     user_data_patterns: UserDataPatterns  # Refers to UserDataPatterns above.
 
     @validator("sample_sheet")
-    def is_sample_sheet(cls, v):
-        data = v.read_text()
-        # Containes [Header], [Manifests], [Data]
-        if "[Header]" not in data:
-            raise ValueError("Missing the 'Header' section")
-        if "[Manifests]" not in data:
-            raise ValueError("Missing the 'Manifests' section")
-        if "[Data]" not in data:
-            raise ValueError("Missing the 'Data' section")
+    def validate_sample_sheet(cls, v):
+        from cgr_gwas_qc.validators.sample_sheet import NullRowError, validate
 
         try:
-            rows = data.split("\n")
-            assert rows[0].count(",") > rows[-1].count(",")
-        except AssertionError:
-            raise AssertionError("Last row is missing fields.")
+            validate(v)
+        except NullRowError:
+            logger.warn(f"{v.name} contains empty rows.")
 
         return v
