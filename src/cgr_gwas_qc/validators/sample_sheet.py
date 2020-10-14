@@ -89,8 +89,6 @@ def check_missing_values_required_columns(name: str, ss: SampleSheet):
 ################################################################################
 # Custom Exceptions
 ################################################################################
-
-
 class SampleSheetError(GwasQcValidationError):
     pass
 

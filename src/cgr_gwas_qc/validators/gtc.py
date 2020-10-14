@@ -1,69 +1,46 @@
-from collections import defaultdict
 from pathlib import Path
-from textwrap import indent
-from typing import Dict, List, Union
-
-import typer
 
 from cgr_gwas_qc.parsers.illumina import GenotypeCalls
-from cgr_gwas_qc.paths import make_path_list
-from cgr_gwas_qc.validators import check_file
+from cgr_gwas_qc.validators import GwasQcValidationError
 
 
-class GTCFileError(Exception):
+def validate(file_name: Path):
+    name = file_name.name
+
+    try:
+        # Illumina's parser has a bunch of different error checks, so I am just
+        # using those to validate the file. However, I will throw custom errors
+        # for clarity.
+        GenotypeCalls(file_name.as_posix())
+    except Exception as err:
+        if err.args[0] == "GTC format error: bad format identifier":
+            raise GtcMagicNumberError(name)
+        elif err.args[0] == "Unsupported GTC File version":
+            raise GtcVersionError(name)
+        elif err.args[0] == "GTC file is incomplete":
+            raise GtcTuncatedFileError(name)
+
+
+################################################################################
+# Custom Exceptions
+################################################################################
+class GtcError(GwasQcValidationError):
     pass
 
 
-def check_gtc_files(files: Union[str, Path, List[Union[str, Path]]]) -> None:
-    counter = defaultdict(set)
-    for file_ in make_path_list(files):
-        try:
-            check_file(file_)
-        except FileNotFoundError:
-            counter["exception"].add(file_.as_posix())
-            counter["FileNotFoundError"].add(file_.as_posix())
-        except PermissionError:
-            counter["exception"].add(file_.as_posix())
-            counter["PermissionError"].add(file_.as_posix())
-
-        try:
-            GenotypeCalls(file_)
-        except Exception as err:
-            if err.args[0].startswith("GTC format error"):
-                counter["exception"].add(file_.as_posix())
-                counter["Not GTC File"].add(file_.as_posix())
-            elif err.args[0].startswith("GTC file is incomplete"):
-                counter["exception"].add(file_.as_posix())
-                counter["Incomplete File"].add(file_.as_posix())
-            elif err.args[0].startswith("Unsupported GTC File version"):
-                counter["exception"].add(file_.as_posix())
-                counter["Unsupported GTC Version"].add(file_.as_posix())
-
-    gtc_summary(counter)
+class GtcMagicNumberError(GtcError):
+    def __init__(self, name):
+        message = f"{name} has missing or wrong GTC magic number."
+        super().__init__(message)
 
 
-def gtc_summary(counter: Dict[str, set]):
-    """Check the exception counter and print out issues.
+class GtcVersionError(GtcError):
+    def __init__(self, name):
+        message = f"{name} has unknown or unsupported BPM version."
+        super().__init__(message)
 
-    Raises:
-        GTCFileError
-    """
-    if not counter["exception"]:
-        return
 
-    message_strings = {
-        "FileNotFoundError": "Missing GTC Files",
-        "PermissionError": "GTC files cannot be read",
-        "Not GTC File": "Not a GTC file",
-        "Incomplete File": "Incomplete GTC file",
-        "Unsupported GTC Version": "Unsupported GTC version",
-    }
-
-    for key, files in counter.items():
-        if not files:
-            continue
-
-        file_string = indent("\n".join(files), "  - ")
-        typer.echo(f"{message_strings[key]} (n = {len(files):,}):\n{file_string}")
-
-    raise GTCFileError
+class GtcTuncatedFileError(GtcError):
+    def __init__(self, name):
+        message = f"{name} is missing the EOF mark."
+        super().__init__(message)
