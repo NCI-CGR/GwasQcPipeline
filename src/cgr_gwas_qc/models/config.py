@@ -59,16 +59,12 @@ class Idat(BaseModel):
     )
 
     @validator("*")
-    def is_gtc_pattern(cls, v):
-        try:
-            assert v.endswith(".idat")
-        except AssertionError:
-            raise AssertionError("IDAT suffix should be *.idat")
+    def validate_idat_pattern(cls, v):
+        if not v.endswith(".idat"):
+            raise ValueError("Idat suffix should be *.idat")
 
-        try:
-            assert "{" in v and "}" in v
-        except AssertionError:
-            raise AssertionError(
+        if "{" not in v or "}" not in v:
+            raise ValueError(
                 "This dose not look like a file pattern. Add wildcards, corresponding "
                 "to column names in the sample sheet, surrounded by '{}'."
             )
@@ -88,16 +84,12 @@ class UserDataPatterns(BaseModel):
     idat: Idat  # Refers to Idat class above.
 
     @validator("gtc")
-    def is_gtc_pattern(cls, v):
-        try:
-            assert v.endswith(".gtc")
-        except AssertionError:
-            raise AssertionError("GTC suffix should be *.gtc")
+    def validate_gtc_pattern(cls, v):
+        if not v.endswith(".gtc"):
+            raise ValueError("GTC suffix should be *.gtc")
 
-        try:
-            assert "{" in v and "}" in v
-        except AssertionError:
-            raise AssertionError(
+        if "{" not in v or "}" not in v:
+            raise ValueError(
                 "This dose not look like a file pattern. Add wildcards, corresponding "
                 "to column names in the sample sheet, surrounded by '{}'."
             )
