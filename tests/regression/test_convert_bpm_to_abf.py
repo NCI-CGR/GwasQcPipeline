@@ -15,6 +15,9 @@ from cgr_gwas_qc.workflow.scripts.bpm2abf import app
 runner = CliRunner()
 
 
+################################################################################
+# Compare to outputs from old script.
+################################################################################
 @pytest.mark.regression
 def test_bpm2abf_AF(bpm_file, vcf_file, tmpdir):
     file_out = Path(tmpdir) / bpm_file.with_suffix(".abf.txt").name
@@ -28,6 +31,9 @@ def test_bpm2abf_AF(bpm_file, vcf_file, tmpdir):
     assert file_rows_almost_equal(obs_abf, exp_abf, fuzzy_col=1, sep="\t", header=True)
 
 
+################################################################################
+# Error if population is not in the VCF.
+################################################################################
 @pytest.mark.regression
 def test_bpm2abf_unknown_population(bpm_file, vcf_file, tmpdir):
     """Check what happens if the given population is not in the VCF

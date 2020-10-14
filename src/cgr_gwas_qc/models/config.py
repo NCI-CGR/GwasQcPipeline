@@ -1,5 +1,9 @@
 """Configuration system data models."""
+from logging import getLogger
+
 from pydantic import BaseModel, Field, FilePath, validator
+
+logger = getLogger(__name__)
 
 
 class ReferenceFiles(BaseModel):
@@ -23,13 +27,10 @@ class ReferenceFiles(BaseModel):
     )
 
     @validator("illumina_array_manifest")
-    def is_bpm(cls, v):
-        with v.open("rb") as fh:
-            try:
-                assert fh.read(3) == b"BPM"
-            except AssertionError:
-                raise AssertionError("Does not contain BPM magic number.")
+    def validate_bpm(cls, v):
+        from cgr_gwas_qc.validators.bpm import validate
 
+        validate(v)
         return v
 
     # @validator("illumina_cluster_filer")
@@ -37,25 +38,10 @@ class ReferenceFiles(BaseModel):
     #     return v
 
     @validator("thousand_genome_vcf", "thousand_genome_tbi")
-    def is_bgzip(cls, v):
-        with v.open("rb") as fh:
-            try:
-                gzip_magic_number = b"\x1f\x8b"
-                assert fh.read(2) == gzip_magic_number
-            except AssertionError:
-                raise AssertionError("Missing Gzip magic number.")
+    def validate_bgzip(cls, v):
+        from cgr_gwas_qc.validators.bgzip import validate
 
-            # Note: each record of a VCF/TBI starts with \x42\x43\02 but their
-            # location is variable so I have not included their check here for
-            # simplicity.
-
-            try:
-                eof_magic_number = b"\x1f\x8b\x08\x04\x00\x00\x00\x00\x00\xff\x06\x00\x42\x43\x02\x00\x1b\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-                fh.seek(-28, 2)
-                assert fh.read(28) == eof_magic_number
-            except AssertionError:
-                raise AssertionError("Truncated file, missing EOF magic number.")
-
+        validate(v)
         return v
 
 
@@ -73,16 +59,12 @@ class Idat(BaseModel):
     )
 
     @validator("*")
-    def is_gtc_pattern(cls, v):
-        try:
-            assert v.endswith(".idat")
-        except AssertionError:
-            raise AssertionError("IDAT suffix should be *.idat")
+    def validate_idat_pattern(cls, v):
+        if not v.endswith(".idat"):
+            raise ValueError("Idat suffix should be *.idat")
 
-        try:
-            assert "{" in v and "}" in v
-        except AssertionError:
-            raise AssertionError(
+        if "{" not in v or "}" not in v:
+            raise ValueError(
                 "This dose not look like a file pattern. Add wildcards, corresponding "
                 "to column names in the sample sheet, surrounded by '{}'."
             )
@@ -102,16 +84,12 @@ class UserDataPatterns(BaseModel):
     idat: Idat  # Refers to Idat class above.
 
     @validator("gtc")
-    def is_gtc_pattern(cls, v):
-        try:
-            assert v.endswith(".gtc")
-        except AssertionError:
-            raise AssertionError("GTC suffix should be *.gtc")
+    def validate_gtc_pattern(cls, v):
+        if not v.endswith(".gtc"):
+            raise ValueError("GTC suffix should be *.gtc")
 
-        try:
-            assert "{" in v and "}" in v
-        except AssertionError:
-            raise AssertionError(
+        if "{" not in v or "}" not in v:
+            raise ValueError(
                 "This dose not look like a file pattern. Add wildcards, corresponding "
                 "to column names in the sample sheet, surrounded by '{}'."
             )
@@ -132,20 +110,14 @@ class Config(BaseModel):
     user_data_patterns: UserDataPatterns  # Refers to UserDataPatterns above.
 
     @validator("sample_sheet")
-    def is_sample_sheet(cls, v):
-        data = v.read_text()
-        # Containes [Header], [Manifests], [Data]
-        if "[Header]" not in data:
-            raise ValueError("Missing the 'Header' section")
-        if "[Manifests]" not in data:
-            raise ValueError("Missing the 'Manifests' section")
-        if "[Data]" not in data:
-            raise ValueError("Missing the 'Data' section")
+    def validate_sample_sheet(cls, v):
+        from cgr_gwas_qc.validators.sample_sheet import SampleSheetNullRowError, validate
 
         try:
-            rows = data.split("\n")
-            assert rows[0].count(",") > rows[-1].count(",")
-        except AssertionError:
-            raise AssertionError("Last row is missing fields.")
+            validate(v)
+        except SampleSheetNullRowError:
+            # Most of the time I don't care about empty rows. The parser will
+            # drop them automatically. Just warn me if there are any.
+            logger.warn(f"{v.name} contains empty rows.")
 
         return v

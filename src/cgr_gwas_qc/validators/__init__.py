@@ -1,6 +1,10 @@
 from pathlib import Path
 
 
+class GwasQcValidationError(Exception):
+    pass
+
+
 def check_file(file_name: Path) -> None:
     """A series of common checks to make sure a file is there and readable
 
