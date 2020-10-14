@@ -2,8 +2,8 @@ import typer
 from snakemake.rules import expand
 
 from cgr_gwas_qc import load_config
-from cgr_gwas_qc.data_validation.gtc import GTCFileError, check_gtc_files
-from cgr_gwas_qc.data_validation.idat import IdatFileError, check_idat_files
+from cgr_gwas_qc.validators.gtc import GTCFileError, check_gtc_files
+from cgr_gwas_qc.validators.idat import IdatFileError, check_idat_files
 
 app = typer.Typer(add_completion=False)
 

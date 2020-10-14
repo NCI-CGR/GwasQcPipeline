@@ -5,9 +5,9 @@ from typing import Dict, List, Union
 
 import typer
 
-from cgr_gwas_qc.data_validation import check_file
 from cgr_gwas_qc.parsers.illumina import GenotypeCalls
 from cgr_gwas_qc.paths import make_path_list
+from cgr_gwas_qc.validators import check_file
 
 
 class GTCFileError(Exception):
