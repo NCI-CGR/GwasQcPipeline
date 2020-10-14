@@ -69,6 +69,8 @@ class Idat(BaseModel):
                 "to column names in the sample sheet, surrounded by '{}'."
             )
 
+        return v
+
 
 class UserDataPatterns(BaseModel):
     """File name patterns for user provided data.
@@ -93,6 +95,8 @@ class UserDataPatterns(BaseModel):
                 "This dose not look like a file pattern. Add wildcards, corresponding "
                 "to column names in the sample sheet, surrounded by '{}'."
             )
+
+        return v
 
 
 class Config(BaseModel):
