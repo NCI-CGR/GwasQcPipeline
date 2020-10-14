@@ -2,11 +2,11 @@ import pytest
 
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 from cgr_gwas_qc.validators.sample_sheet import (
-    MissingRequiredColumnsError,
-    MissingSectionHeaderError,
-    MissingValueRequiredColumnsError,
-    NullRowError,
-    TruncatedFileError,
+    SampleSheetMissingRequiredColumnsError,
+    SampleSheetMissingSectionHeaderError,
+    SampleSheetMissingValueRequiredColumnsError,
+    SampleSheetNullRowError,
+    SampleSheetTruncatedFileError,
     check_file_truncation,
     check_missing_values_required_columns,
     check_null_rows,
@@ -51,7 +51,7 @@ missing_sections = [
 
 @pytest.mark.parametrize("data", missing_sections)
 def test_missing_sections(data: str):
-    with pytest.raises(MissingSectionHeaderError):
+    with pytest.raises(SampleSheetMissingSectionHeaderError):
         check_section_headers("mock.csv", data)
 
 
@@ -86,7 +86,7 @@ truncated_files = [
 @pytest.mark.parametrize("data", truncated_files)
 def test_truncated_file(data):
     """If file appears truncated should raise an error."""
-    with pytest.raises(TruncatedFileError):
+    with pytest.raises(SampleSheetTruncatedFileError):
         check_file_truncation("mock.csv", data)
 
 
@@ -121,7 +121,7 @@ null_data_rows = [
 @pytest.mark.parametrize("data", null_data_rows)
 def test_null_row_in_data_section(data):
     """If emptry row in the Data section, then raise an error."""
-    with pytest.raises(NullRowError):
+    with pytest.raises(SampleSheetNullRowError):
         check_null_rows("mock.csv", data)
 
 
@@ -191,7 +191,7 @@ def missing_data_req_column(tmp_path, request):
 
 
 def test_check_required_columns(missing_data_req_column):
-    with pytest.raises(MissingRequiredColumnsError):
+    with pytest.raises(SampleSheetMissingRequiredColumnsError):
         check_required_columns("mock.csv", SampleSheet(missing_data_req_column))
 
 
@@ -228,5 +228,5 @@ def missing_data_values(tmp_path, request):
 
 
 def test_null_columns(missing_data_values):
-    with pytest.raises(MissingValueRequiredColumnsError):
+    with pytest.raises(SampleSheetMissingValueRequiredColumnsError):
         check_missing_values_required_columns("mock.csv", SampleSheet(missing_data_values))

@@ -37,7 +37,7 @@ def check_section_headers(name: str, data: str):
         missing_headers.append("Data")
 
     if missing_headers:
-        raise MissingSectionHeaderError(name, missing_headers)
+        raise SampleSheetMissingSectionHeaderError(name, missing_headers)
 
 
 def check_file_truncation(name: str, data: str):
@@ -48,7 +48,7 @@ def check_file_truncation(name: str, data: str):
     """
     rows = data.splitlines()
     if rows[0].count(",") != rows[-1].count(",") or not data.endswith("\n"):
-        raise TruncatedFileError(name)
+        raise SampleSheetTruncatedFileError(name)
 
 
 def check_null_rows(name: str, data: str):
@@ -60,7 +60,7 @@ def check_null_rows(name: str, data: str):
     data_rows = rows[data_idx:]
     null_row = "," * num_delim
     if null_row in data_rows:
-        raise NullRowError(name)
+        raise SampleSheetNullRowError(name)
 
 
 def check_required_columns(name: str, ss: SampleSheet):
@@ -71,7 +71,7 @@ def check_required_columns(name: str, ss: SampleSheet):
     ]
 
     if missing_required_columns:
-        raise MissingRequiredColumnsError(name, missing_required_columns)
+        raise SampleSheetMissingRequiredColumnsError(name, missing_required_columns)
 
 
 def check_missing_values_required_columns(name: str, ss: SampleSheet):
@@ -83,7 +83,7 @@ def check_missing_values_required_columns(name: str, ss: SampleSheet):
     ]
 
     if col_w_missing_values:
-        raise MissingValueRequiredColumnsError(name, col_w_missing_values)
+        raise SampleSheetMissingValueRequiredColumnsError(name, col_w_missing_values)
 
 
 ################################################################################
@@ -93,7 +93,7 @@ class SampleSheetError(GwasQcValidationError):
     pass
 
 
-class MissingSectionHeaderError(SampleSheetError):
+class SampleSheetMissingSectionHeaderError(SampleSheetError):
     def __init__(self, name: str, missing_headers: List[str]):
         self.missing_headers = missing_headers
         header_str = ", ".join(missing_headers)
@@ -101,26 +101,26 @@ class MissingSectionHeaderError(SampleSheetError):
         super().__init__(message)
 
 
-class TruncatedFileError(SampleSheetError):
+class SampleSheetTruncatedFileError(SampleSheetError):
     def __init__(self, name: str):
         message = f"{name} is truncated."
         super().__init__(message)
 
 
-class NullRowError(SampleSheetError):
+class SampleSheetNullRowError(SampleSheetError):
     def __init__(self, name: str):
         message = f"{name} has completely empty rows."
         super().__init__(message)
 
 
-class MissingRequiredColumnsError(SampleSheetError):
+class SampleSheetMissingRequiredColumnsError(SampleSheetError):
     def __init__(self, name: str, missing_required_columns: List[str]):
         col_str = ", ".join(missing_required_columns)
         message = f"{name} is missing the required columns: {col_str}"
         super().__init__(message)
 
 
-class MissingValueRequiredColumnsError(SampleSheetError):
+class SampleSheetMissingValueRequiredColumnsError(SampleSheetError):
     def __init__(self, name: str, col_w_missing_values: List[str]):
         col_str = ", ".join(col_w_missing_values)
         message = f"{name} had missing values in required columns: {col_str}"
