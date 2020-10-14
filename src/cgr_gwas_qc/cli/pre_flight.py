@@ -1,15 +1,18 @@
+from logging import getLogger
+from pathlib import Path
+
 import typer
 from snakemake.rules import expand
 
 from cgr_gwas_qc import load_config
-from cgr_gwas_qc.validators.gtc import GTCFileError, check_gtc_files
-from cgr_gwas_qc.validators.idat import IdatFileError, check_idat_files
+from cgr_gwas_qc.validators.gtc import validate as gtc_validate
 
 app = typer.Typer(add_completion=False)
+logger = getLogger(__name__)
 
 
 @app.command()
-def main(gtc_check: bool = True, idat_check: bool = True):
+def main(gtc_check: bool = True, idat_check: bool = False):
     """Pre-flight checks to make sure user input files are readable and complete.
 
     Pre-flight checks include the Sample Sheet, reference files, Idat files,
@@ -20,23 +23,12 @@ def main(gtc_check: bool = True, idat_check: bool = True):
     typer.echo("Sample Sheet and Reference Files OK.")
 
     if idat_check:
-        try:
-            check_idat_files(
-                expand(cfg.config.user_data_patterns.idat.green, **cfg.ss.as_dict("list"))
-            )
-            check_idat_files(
-                expand(cfg.config.user_data_patterns.idat.red, **cfg.ss.as_dict("list"))
-            )
-            typer.echo("Idat Files OK.")
-        except IdatFileError:
-            typer.Exit(1)
+        logger.warn("Idat pre-flight is not impelmented yet.")
 
     if gtc_check:
-        try:
-            check_gtc_files(expand(cfg.config.user_data_patterns.gtc, **cfg.ss.as_dict("list")))
-            typer.echo("GTC Files OK.")
-        except GTCFileError:
-            typer.Exit(1)
+        for gtc in expand(cfg.config.user_data_patterns.gtc, **cfg.ss.to_dict("list")):
+            gtc_validate(Path(gtc))
+        typer.echo("GTC Files OK.")
 
 
 if __name__ == "__main__":
