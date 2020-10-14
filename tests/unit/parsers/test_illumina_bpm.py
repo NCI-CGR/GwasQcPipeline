@@ -9,6 +9,10 @@ def bpm(bpm_file) -> BeadPoolManifest:
     return BeadPoolManifest(bpm_file)
 
 
+################################################################################
+# Most BPM attrributes have an entry for each loci. Check that these entries
+# are equal to the number of loci.
+################################################################################
 bpm_list_attributes = [
     "names",
     "snps",

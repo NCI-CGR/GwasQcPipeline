@@ -6,6 +6,9 @@ import pytest
 from cgr_gwas_qc.config import ConfigMgr, scan_for_yaml
 from cgr_gwas_qc.testing import chdir
 
+################################################################################
+# Make sure both `config.yml` or `config.yaml` are found.
+################################################################################
 yaml_extensions = [
     ("config", "yml"),
     ("config", "yaml"),
@@ -23,6 +26,9 @@ def test_scan_for_yaml(tmp_path, name, ext):
     assert found_config.as_posix() == cfg_file.as_posix()
 
 
+################################################################################
+# Sanity check that ConfigMgr loads the yaml correctly.
+################################################################################
 def test_config_loads(working_dir: Path):
     with chdir(working_dir):
         cfg = ConfigMgr.instance()
@@ -31,6 +37,10 @@ def test_config_loads(working_dir: Path):
         assert isinstance(cfg.ss, pd.DataFrame)
 
 
+################################################################################
+# Make sure if we call ConfigMgr multiple times it only creates a single
+# instance.
+################################################################################
 def test_config_only_uses_one_instance(working_dir: Path):
     with chdir(working_dir):
         cfg = ConfigMgr.instance()
