@@ -38,25 +38,10 @@ class ReferenceFiles(BaseModel):
     #     return v
 
     @validator("thousand_genome_vcf", "thousand_genome_tbi")
-    def is_bgzip(cls, v):
-        with v.open("rb") as fh:
-            try:
-                gzip_magic_number = b"\x1f\x8b"
-                assert fh.read(2) == gzip_magic_number
-            except AssertionError:
-                raise AssertionError("Missing Gzip magic number.")
+    def validate_bgzip(cls, v):
+        from cgr_gwas_qc.validators.bgzip import validate
 
-            # Note: each record of a VCF/TBI starts with \x42\x43\02 but their
-            # location is variable so I have not included their check here for
-            # simplicity.
-
-            try:
-                eof_magic_number = b"\x1f\x8b\x08\x04\x00\x00\x00\x00\x00\xff\x06\x00\x42\x43\x02\x00\x1b\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-                fh.seek(-28, 2)
-                assert fh.read(28) == eof_magic_number
-            except AssertionError:
-                raise AssertionError("Truncated file, missing EOF magic number.")
-
+        validate(v)
         return v
 
 
