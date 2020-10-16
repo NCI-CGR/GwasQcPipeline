@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import pandas as pd
 from snakemake.rules import expand
@@ -96,9 +96,23 @@ class ConfigMgr:
     ################################################################################
     # Helper functions for snakemake
     ################################################################################
-    def expand(self, file_pattern, combination=zip) -> List[str]:
-        """Use sample sheet columns to fill in file pattern"""
-        return expand(file_pattern, combination, **self.ss.to_dict("list"))
+    def expand(
+        self, file_pattern: str, combination: Callable = zip, query: Optional[str] = None
+    ) -> List[str]:
+        """Use sample sheet columns to fill in file pattern
+
+        Args:
+            file_pattern: A snakemake compatable file name pattern.
+            combination: The combinatorial method to use (see
+              snakemake.rules.expand). Defaults to zip.
+            query: A pandas.DataFrame.query to use to filter before
+              expansion. Defaults to None.
+
+        Returns:
+            A list of expanded file names.
+        """
+        df = self.ss.query(query) if query else self.ss
+        return expand(file_pattern, combination, **df.to_dict("list"))
 
     def envmodules(self, module_name: str) -> str:
         """Returns the HPC environment module from user's config.
