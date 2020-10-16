@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import pandas as pd
 from snakemake.rules import expand
@@ -33,6 +33,8 @@ class ConfigMgr:
         config : Workflow configuration settings.
         ss: User's sample sheet data.
 
+    Methods:
+        expand: Uses columns from the user's sample sheet to expand a file pattern.
     """
 
     SRC_DIR = Path(__file__).parent.absolute()
@@ -86,8 +88,13 @@ class ConfigMgr:
         """Access the sample sheet DataFrame."""
         return self._sample_sheet.data
 
-    def expand(self, pattern, combination=zip, **kwargs):
-        return expand(pattern, combination, **self.ss.to_dict("list"), **kwargs)
+    ################################################################################
+    # Helper functions for snakemake
+    ################################################################################
+    def expand(self, file_pattern, combination=zip) -> List[str]:
+        """Use sample sheet columns to fill in file pattern"""
+        return expand(file_pattern, combination, **self.ss.to_dict("list"))
+
 
 
 ################################################################################
