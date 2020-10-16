@@ -40,7 +40,8 @@ Currently, the install able wheel is only available on ``cgems``. You could copy
 
 You can download and install from the GitLab repository with the following directions.
 
-Again setup a ``conda`` environment but this time install ``poetry`` instead of ``pip``.
+Again setup a ``conda`` environment but this time install ``poetry`` instead of ``pip``::
+
     $ conda create -n GwasQcPipeline -y python=3.8 poetry
     $ conda activate GwasQcPipeline
 
@@ -50,7 +51,7 @@ Clone the development version of GwasQcPipeline. Major development is occurring 
     $ git clone -b restructure --recursive http://10.133.130.114/jfear/GwasQcPipeline.git
     $ cd GwasQcPipeline
 
-Install the package using ``poetry``
+Install the package using ``poetry``::
 
     $ poetry install --no-dev
 
