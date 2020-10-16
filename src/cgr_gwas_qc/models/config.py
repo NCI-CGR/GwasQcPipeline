@@ -76,7 +76,7 @@ class Idat(BaseModel):
         return v
 
 
-class UserDataPatterns(BaseModel):
+class FilePatterns(BaseModel):
     """File name patterns for user provided data.
 
     The GWAS QC Pipeline requires GTC or IDAT files.
@@ -114,8 +114,8 @@ class Config(BaseModel):
     project_name: str = Field(..., description="The project title.")
     pipeline_version: str = Field(..., description="The version of the pipeline to use.")
     sample_sheet: FilePath = Field(..., description="Path to the sample manifest from LIMs.")
-    reference_paths: ReferenceFiles  # Refers to ReferenceFiles above.
-    user_data_patterns: UserDataPatterns  # Refers to UserDataPatterns above.
+    reference_files: ReferenceFiles  # Refers to ReferenceFiles above.
+    file_patterns: FilePatterns  # Refers to FilePatterns above.
 
     @validator("sample_sheet")
     def validate_sample_sheet(cls, v):

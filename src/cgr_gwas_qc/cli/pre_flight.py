@@ -25,33 +25,33 @@ def main(reference_check: bool = True, gtc_check: bool = True, idat_check: bool 
     cfg = load_config()  # This already validates the sample sheet
     typer.secho(f"Sample Sheet OK ({cfg.config.sample_sheet})", fg=typer.colors.GREEN)
     if reference_check:
-        check_reference_files(cfg.config.reference_paths)
+        check_reference_files(cfg.config.reference_files)
 
     if idat_check:
         typer.secho("Idat pre-flight is not impelmented yet.", fg=typer.colors.YELLOW)
-        # check_idat_files(expand(cfg.config.user_data_patterns.idat.red, **cfg.ss.to_dict("list")), "Red")
-        # check_idat_files(expand(cfg.config.user_data_patterns.idat.grn, **cfg.ss.to_dict("list")), "Green")
+        # check_idat_files(expand(cfg.config.file_patterns.idat.red, **cfg.ss.to_dict("list")), "Red")
+        # check_idat_files(expand(cfg.config.file_patterns.idat.grn, **cfg.ss.to_dict("list")), "Green")
 
     if gtc_check:
-        check_gtc_files(expand(cfg.config.user_data_patterns.gtc, zip, **cfg.ss.to_dict("list")))
+        check_gtc_files(expand(cfg.config.file_patterns.gtc, zip, **cfg.ss.to_dict("list")))
 
 
-def check_reference_files(reference_paths: ReferenceFiles):
-    bpm_ = reference_paths.illumina_array_manifest
+def check_reference_files(reference_files: ReferenceFiles):
+    bpm_ = reference_files.illumina_array_manifest
     try:
         bpm.validate(bpm_)
         typer.secho(f"BPM OK ({bpm_})", fg=typer.colors.GREEN)
     except Exception:
         typer.secho(f"BPM FAILED ({bpm_})", fg=typer.colors.RED)
 
-    vcf_ = reference_paths.thousand_genome_vcf
+    vcf_ = reference_files.thousand_genome_vcf
     try:
         bgzip.validate(vcf_)
         typer.secho(f"VCF OK ({vcf_})", fg=typer.colors.GREEN)
     except Exception:
         typer.secho(f"VCF FAILED ({vcf_})", fg=typer.colors.RED)
 
-    tbi_ = reference_paths.thousand_genome_tbi
+    tbi_ = reference_files.thousand_genome_tbi
     try:
         bgzip.validate(tbi_)
         typer.secho(f"VCF.TBI OK ({tbi_})", fg=typer.colors.GREEN)
