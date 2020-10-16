@@ -37,7 +37,7 @@ def main(reference_check: bool = True, gtc_check: bool = True, idat_check: bool 
 
 
 def check_reference_files(reference_files: ReferenceFiles):
-    bpm_ = reference_files.illumina_array_manifest
+    bpm_ = reference_files.illumina_manifest_file
     try:
         bpm.validate(bpm_)
         typer.secho(f"BPM OK ({bpm_})", fg=typer.colors.GREEN)

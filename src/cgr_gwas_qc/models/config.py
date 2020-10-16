@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 class ReferenceFiles(BaseModel):
     """A list of reference files used by the pipeline."""
 
-    illumina_array_manifest: FilePath = Field(
+    illumina_manifest_file: FilePath = Field(
         "/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm",
         description="Path to the array BPM file.",
     )
@@ -29,7 +29,7 @@ class ReferenceFiles(BaseModel):
         description="Path to the corresponding index for the 1KG VCF file.",
     )
 
-    @validator("illumina_array_manifest")
+    @validator("illumina_manifest_file")
     def validate_bpm(cls, v):
         assert v.exists()
         assert v.suffix == ".bpm"
