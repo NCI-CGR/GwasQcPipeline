@@ -35,6 +35,8 @@ class ConfigMgr:
 
     Methods:
         expand: Uses columns from the user's sample sheet to expand a file pattern.
+        rules: Creates the full path to snakemake rule.
+        scripts: Screates the full path to an internal script.
     """
 
     SRC_DIR = Path(__file__).parent.absolute()
@@ -95,6 +97,19 @@ class ConfigMgr:
         """Use sample sheet columns to fill in file pattern"""
         return expand(file_pattern, combination, **self.ss.to_dict("list"))
 
+    def rules(self, file_name: str) -> str:
+        """Return the path to a rule file.
+
+        Given a rule file_name, prepends the full path to that rule.
+        """
+        return (self.RULE_DIR / file_name).as_posix()
+
+    def scripts(self, file_name: str) -> str:
+        """Return the path to an interal script.
+
+        Given a script file_name, prepends the full path to that script.
+        """
+        return (self.SCRIPTS_DIR / file_name).as_posix() + " "
 
 
 ################################################################################
