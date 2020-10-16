@@ -35,6 +35,7 @@ class ConfigMgr:
 
     Methods:
         expand: Uses columns from the user's sample sheet to expand a file pattern.
+        conda: Creates the full path to conda environment.
         rules: Creates the full path to snakemake rule.
         scripts: Screates the full path to an internal script.
     """
@@ -42,6 +43,7 @@ class ConfigMgr:
     SRC_DIR = Path(__file__).parent.absolute()
     WORKFLOW_DIR = SRC_DIR / "workflow"
 
+    CONDA_DIR = WORKFLOW_DIR / "conda"
     RULE_DIR = WORKFLOW_DIR / "rules"
     SCRIPTS_DIR = WORKFLOW_DIR / "scripts"
     SNAKEFILE = WORKFLOW_DIR / "Snakefile"
@@ -96,6 +98,13 @@ class ConfigMgr:
     def expand(self, file_pattern, combination=zip) -> List[str]:
         """Use sample sheet columns to fill in file pattern"""
         return expand(file_pattern, combination, **self.ss.to_dict("list"))
+
+    def conda(self, file_name: str) -> str:
+        """Return path to a conda env file.
+
+        Given a conda env file_name, prepends the full path to that file.
+        """
+        return (self.CONDA_DIR / file_name).as_posix()
 
     def rules(self, file_name: str) -> str:
         """Return the path to a rule file.
