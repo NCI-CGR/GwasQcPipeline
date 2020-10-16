@@ -43,30 +43,34 @@ class ConfigMgr:
 
     __instance = None
 
-    def __init__(self, root: Path, user_config: Path):
+    ################################################################################
+    # Set-up
+    ################################################################################
+    def __init__(self, root: Path, user_config: Path, validate=True):
         self.root = root
         self.user_config = user_config
 
-        self._config = Config(**yaml.load(self.user_config))
-
-        self.sample_sheet_file = self.config.sample_sheet
-        self._sample_sheet = SampleSheet(self.sample_sheet_file)
-
-    @staticmethod
-    def find_configs() -> Tuple[Path, Path]:
-        root = Path.cwd().absolute()
-        user_config = scan_for_yaml(root, "config")
-
-        if user_config is None:
-            raise FileNotFoundError("Please run with a `config.yml` in your working directory.")
-
-        return root, user_config
+        if validate:
+            self._config = Config(**yaml.load(self.user_config))
+            self.sample_sheet_file = self.config.sample_sheet
+            self._sample_sheet = SampleSheet(self.sample_sheet_file)
+        else:
+            # Force loading without validation. Use this only for debugging
+            self._config = Config.construct(**yaml.load(self.user_config))
+            try:
+                self.sample_sheet_file = self.config.sample_sheet
+                self._sample_sheet = SampleSheet(self.sample_sheet_file)
+            except (AttributeError, FileNotFoundError):
+                pass
 
     @classmethod
-    def instance(cls):
-        """Returns the active ConfigMgr instance."""
+    def instance(cls, validate=True):
+        """Returns the active ConfigMgr instance.
+
+        This ensures that only 1 ConfigMgr is created per python session.
+        """
         if cls.__instance is None:
-            cls.__instance = cls(*cls.find_configs())
+            cls.__instance = cls(*find_configs(), validate)
         return cls.__instance
 
     @property
@@ -99,3 +103,13 @@ def scan_for_yaml(base_dir: Path, name: str) -> Optional[Path]:
         return base_dir / f"{name}.yaml"
 
     return None
+
+
+def find_configs() -> Tuple[Path, Path]:
+    root = Path.cwd().absolute()
+    user_config = scan_for_yaml(root, "config")
+
+    if user_config is None:
+        raise FileNotFoundError("Please run with a `config.yml` in your working directory.")
+
+    return root, user_config
