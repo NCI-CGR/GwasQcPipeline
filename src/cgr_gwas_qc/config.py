@@ -78,8 +78,8 @@ class ConfigMgr:
         """Access the sample sheet DataFrame."""
         return self._sample_sheet.data
 
-    def expand(self, pattern, combination=zip):
-        return expand(pattern, combination, **self.ss.to_dict())
+    def expand(self, pattern, combination=zip, **kwargs):
+        return expand(pattern, combination, **self.ss.to_dict("list"), **kwargs)
 
 
 def scan_for_yaml(base_dir: Path, name: str) -> Optional[Path]:
