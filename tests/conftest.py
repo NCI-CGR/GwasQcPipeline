@@ -36,7 +36,7 @@ def vcf(vcf_file):
     return pysam.VariantFile(vcf_file, "r")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def working_dir(tmp_path_factory):
     tmp_path = tmp_path_factory.mktemp("user_currdir")
 
