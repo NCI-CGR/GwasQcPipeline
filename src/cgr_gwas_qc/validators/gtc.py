@@ -1,7 +1,7 @@
 from pathlib import Path
 
+from cgr_gwas_qc.exceptions import GtcMagicNumberError, GtcTuncatedFileError, GtcVersionError
 from cgr_gwas_qc.parsers.illumina import GenotypeCalls
-from cgr_gwas_qc.validators import GwasQcValidationError
 
 
 def validate(file_name: Path):
@@ -21,28 +21,3 @@ def validate(file_name: Path):
             raise GtcTuncatedFileError(name)
         else:
             raise err
-
-
-################################################################################
-# Custom Exceptions
-################################################################################
-class GtcError(GwasQcValidationError):
-    pass
-
-
-class GtcMagicNumberError(GtcError):
-    def __init__(self, name):
-        message = f"{name} has missing or wrong GTC magic number."
-        super().__init__(message)
-
-
-class GtcVersionError(GtcError):
-    def __init__(self, name):
-        message = f"{name} has unknown or unsupported BPM version."
-        super().__init__(message)
-
-
-class GtcTuncatedFileError(GtcError):
-    def __init__(self, name):
-        message = f"{name} is missing the EOF mark."
-        super().__init__(message)

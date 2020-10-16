@@ -1,8 +1,6 @@
 from pathlib import Path
 
-
-class GwasQcValidationError(Exception):
-    pass
+from . import bgzip, bpm, gtc, sample_sheet  # noqa: F401
 
 
 def check_file(file_name: Path) -> None:

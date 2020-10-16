@@ -1,7 +1,12 @@
 from pathlib import Path
 
+from cgr_gwas_qc.exceptions import (
+    BpmEntryError,
+    BpmMagicNumberError,
+    BpmNormalizationError,
+    BpmVersionError,
+)
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
-from cgr_gwas_qc.validators import GwasQcValidationError
 
 
 def validate(file_name: Path):
@@ -25,36 +30,3 @@ def validate(file_name: Path):
             raise BpmEntryError(name)
         else:
             raise err
-
-
-################################################################################
-# Custom Exceptions
-################################################################################
-
-
-class BpmError(GwasQcValidationError):
-    pass
-
-
-class BpmMagicNumberError(BpmError):
-    def __init__(self, name):
-        message = f"{name} has missing or wrong BPM magic number."
-        super().__init__(message)
-
-
-class BpmVersionError(BpmError):
-    def __init__(self, name):
-        message = f"{name} has unknown or unsupported BPM version."
-        super().__init__(message)
-
-
-class BpmNormalizationError(BpmError):
-    def __init__(self, name):
-        message = f"{name} has an invalid normalization ID."
-        super().__init__(message)
-
-
-class BpmEntryError(BpmError):
-    def __init__(self, name):
-        message = f"{name} has an invalid number of assay entries."
-        super().__init__(message)

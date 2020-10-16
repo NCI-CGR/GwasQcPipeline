@@ -5,7 +5,7 @@ VCF.gz.tbi.
 """
 from pathlib import Path
 
-from cgr_gwas_qc.validators import GwasQcValidationError
+from cgr_gwas_qc.exceptions import BgzipMagicNumberError, BgzipTruncatedFileError
 
 
 def validate(file_name: Path):
@@ -43,22 +43,3 @@ def check_eof_marker(name: str, file_name: Path):
         fh.seek(-28, 2)
         if fh.read(28) != eof_mark:
             raise BgzipTruncatedFileError(name)
-
-
-################################################################################
-# Custom Exceptions
-################################################################################
-class BgzipError(GwasQcValidationError):
-    pass
-
-
-class BgzipMagicNumberError(BgzipError):
-    def __init__(self, name):
-        message = f"{name} is missing the GZIP magic number."
-        super().__init__(message)
-
-
-class BgzipTruncatedFileError(BgzipError):
-    def __init__(self, name):
-        message = f"{name} is missing the EOF mark."
-        super().__init__(message)

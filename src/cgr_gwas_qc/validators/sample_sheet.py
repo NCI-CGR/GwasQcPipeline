@@ -1,9 +1,14 @@
 """Validate that file is a LIMs Sample Sheet."""
 from pathlib import Path
-from typing import List
 
+from cgr_gwas_qc.exceptions import (
+    SampleSheetMissingRequiredColumnsError,
+    SampleSheetMissingSectionHeaderError,
+    SampleSheetMissingValueRequiredColumnsError,
+    SampleSheetNullRowError,
+    SampleSheetTruncatedFileError,
+)
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
-from cgr_gwas_qc.validators import GwasQcValidationError
 
 REQUIRED_COLUMNS = ["Sample_ID", "LIMS_Individual_ID"]
 
@@ -84,44 +89,3 @@ def check_missing_values_required_columns(name: str, ss: SampleSheet):
 
     if col_w_missing_values:
         raise SampleSheetMissingValueRequiredColumnsError(name, col_w_missing_values)
-
-
-################################################################################
-# Custom Exceptions
-################################################################################
-class SampleSheetError(GwasQcValidationError):
-    pass
-
-
-class SampleSheetMissingSectionHeaderError(SampleSheetError):
-    def __init__(self, name: str, missing_headers: List[str]):
-        self.missing_headers = missing_headers
-        header_str = ", ".join(missing_headers)
-        message = f"{name} is missing sections: {header_str}"
-        super().__init__(message)
-
-
-class SampleSheetTruncatedFileError(SampleSheetError):
-    def __init__(self, name: str):
-        message = f"{name} is truncated."
-        super().__init__(message)
-
-
-class SampleSheetNullRowError(SampleSheetError):
-    def __init__(self, name: str):
-        message = f"{name} has completely empty rows."
-        super().__init__(message)
-
-
-class SampleSheetMissingRequiredColumnsError(SampleSheetError):
-    def __init__(self, name: str, missing_required_columns: List[str]):
-        col_str = ", ".join(missing_required_columns)
-        message = f"{name} is missing the required columns: {col_str}"
-        super().__init__(message)
-
-
-class SampleSheetMissingValueRequiredColumnsError(SampleSheetError):
-    def __init__(self, name: str, col_w_missing_values: List[str]):
-        col_str = ", ".join(col_w_missing_values)
-        message = f"{name} had missing values in required columns: {col_str}"
-        super().__init__(message)
