@@ -35,6 +35,7 @@ class ConfigMgr:
 
     Methods:
         expand: Uses columns from the user's sample sheet to expand a file pattern.
+        envmodules: Pulls environmental module information from user's config.
         conda: Creates the full path to conda environment.
         rules: Creates the full path to snakemake rule.
         scripts: Screates the full path to an internal script.
@@ -98,6 +99,14 @@ class ConfigMgr:
     def expand(self, file_pattern, combination=zip) -> List[str]:
         """Use sample sheet columns to fill in file pattern"""
         return expand(file_pattern, combination, **self.ss.to_dict("list"))
+
+    def envmodules(self, module_name: str) -> str:
+        """Returns the HPC environment module from user's config.
+
+        On HPC systems you can use environment modules instead of conda. The
+        specific module versions are stored in the main config.
+        """
+        return self.config.dict().get("env_modules", {}).get(module_name, "")
 
     def conda(self, file_name: str) -> str:
         """Return path to a conda env file.

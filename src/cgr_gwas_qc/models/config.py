@@ -1,7 +1,10 @@
 """Configuration system data models."""
 from logging import getLogger
+from typing import Optional
 
 from pydantic import BaseModel, Field, FilePath, validator
+
+from .env_modules import EnvModules
 
 logger = getLogger(__name__)
 
@@ -116,6 +119,9 @@ class Config(BaseModel):
     sample_sheet: FilePath = Field(..., description="Path to the sample manifest from LIMs.")
     reference_files: ReferenceFiles  # Refers to ReferenceFiles above.
     file_patterns: FilePatterns  # Refers to FilePatterns above.
+    env_modules: Optional[
+        EnvModules
+    ]  # Module information if using an HPC with environemntal modules."
 
     @validator("sample_sheet")
     def validate_sample_sheet(cls, v):
