@@ -30,8 +30,9 @@ class ConfigMgr:
         user_config (Optional[Path]): The config.yml in the current working directory.
         user_patterns (Optional[Path]): The patterns.yml in the current working directory.
 
-        config (Dict-Like): Workflow configuration settings.
-        patterns (Dict-Like): Workflow file name patterns.
+        config : Workflow configuration settings.
+        ss: User's sample sheet data.
+
     """
 
     SRC_DIR = Path(__file__).parent.absolute()
@@ -73,6 +74,9 @@ class ConfigMgr:
             cls.__instance = cls(*find_configs(), validate)
         return cls.__instance
 
+    ################################################################################
+    # Access to the user's config and Sample Sheet
+    ################################################################################
     @property
     def config(self) -> Config:
         return self._config
@@ -86,6 +90,9 @@ class ConfigMgr:
         return expand(pattern, combination, **self.ss.to_dict("list"), **kwargs)
 
 
+################################################################################
+# Helper functions for Set-up
+################################################################################
 def scan_for_yaml(base_dir: Path, name: str) -> Optional[Path]:
     """Scans a directory for Yaml configs.
 
