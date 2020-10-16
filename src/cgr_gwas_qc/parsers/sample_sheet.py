@@ -65,16 +65,21 @@ class SampleSheet:
             values = self._clean_header(section[1])
         elif header == "manifests":
             values = self._clean_manifest(section[1])
-        else:  # header == "data"
+        elif header == "data":
             values = self._clean_data(section[1])
+        else:
+            values = _strip_terminal_commas(section[1])
 
         return header, values
 
     @staticmethod
-    def _clean_header(data) -> Dict[str, str]:
+    def _clean_header(data) -> Union[Dict[str, str], str]:
         """Converts Header section into a key-value pairs."""
         stripped = _strip_terminal_commas(data)
-        return _convert_to_key_value_pair(stripped)
+        try:
+            return _convert_to_key_value_pair(stripped)
+        except Exception:
+            return stripped
 
     @staticmethod
     def _clean_manifest(data) -> Dict[str, str]:
