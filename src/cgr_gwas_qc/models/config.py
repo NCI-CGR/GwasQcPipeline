@@ -28,20 +28,24 @@ class ReferenceFiles(BaseModel):
 
     @validator("illumina_array_manifest")
     def validate_bpm(cls, v):
-        from cgr_gwas_qc.validators.bpm import validate
-
-        validate(v)
+        assert v.exists()
+        assert v.suffix == ".bpm"
         return v
 
     # @validator("illumina_cluster_filer")
     # def is_egt(cls, v):
     #     return v
 
-    @validator("thousand_genome_vcf", "thousand_genome_tbi")
-    def validate_bgzip(cls, v):
-        from cgr_gwas_qc.validators.bgzip import validate
+    @validator("thousand_genome_vcf")
+    def validate_vcf(cls, v):
+        assert v.exists()
+        assert v.suffix == ".gz"
+        return v
 
-        validate(v)
+    @validator("thousand_genome_tbi")
+    def validate_tbi(cls, v):
+        assert v.exists()
+        assert v.suffix == ".tbi"
         return v
 
 
