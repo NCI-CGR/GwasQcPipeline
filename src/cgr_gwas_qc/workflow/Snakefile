@@ -6,7 +6,7 @@ cfg = load_config()
 
 
 rule all:
-    input: expand("output/{Sample_ID}.txt", **cfg.ss.to_dict("list"))
+    input: cfg.expand("output/{Sample_ID}.txt")
 
 
 rule touch:
