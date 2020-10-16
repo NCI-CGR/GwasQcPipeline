@@ -106,7 +106,8 @@ class ConfigMgr:
         On HPC systems you can use environment modules instead of conda. The
         specific module versions are stored in the main config.
         """
-        return self.config.dict().get("env_modules", {}).get(module_name, "")
+        modules = self.config.dict().get("env_modules")
+        return modules.get(module_name, "") if modules else ""
 
     def conda(self, file_name: str) -> str:
         """Return path to a conda env file.
