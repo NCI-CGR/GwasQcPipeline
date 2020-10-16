@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, Field, FilePath, validator
 
 from .env_modules import EnvModules
+from .software_params import SoftwareParams
 
 logger = getLogger(__name__)
 
@@ -119,6 +120,7 @@ class Config(BaseModel):
     sample_sheet: FilePath = Field(..., description="Path to the sample manifest from LIMs.")
     reference_files: ReferenceFiles  # Refers to ReferenceFiles above.
     file_patterns: FilePatterns  # Refers to FilePatterns above.
+    software_params: SoftwareParams  # Various software parameters used throughout.
     env_modules: Optional[
         EnvModules
     ]  # Module information if using an HPC with environemntal modules."
