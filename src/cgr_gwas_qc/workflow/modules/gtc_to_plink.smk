@@ -14,7 +14,7 @@ rule gtc_to_ped:
     input:
         gtc=lambda wc: cfg.expand(
             cfg.config.file_patterns.gtc, query=f"Sample_ID == '{wc.Sample_ID}'"
-        ),
+        )[0],
         bpm=cfg.config.reference_files.illumina_manifest_file,
     params:
         strand=cfg.config.software_params.strand,
@@ -22,7 +22,7 @@ rule gtc_to_ped:
         ped=temp("per_sample_plink_files/{Sample_ID}.ped"),
         map_=temp("per_sample_plink_files/{Sample_ID}.map"),
     script:
-        "scripts/gtc2plink.py"
+        "../scripts/gtc2plink.py"
 
 
 rule sample_ped_merge_list:
