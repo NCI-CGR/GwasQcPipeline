@@ -46,6 +46,7 @@ class ConfigMgr:
 
     CONDA_DIR = WORKFLOW_DIR / "conda"
     RULE_DIR = WORKFLOW_DIR / "rules"
+    MODULE_DIR = WORKFLOW_DIR / "modules"
     SCRIPTS_DIR = WORKFLOW_DIR / "scripts"
     SNAKEFILE = WORKFLOW_DIR / "Snakefile"
 
@@ -137,12 +138,19 @@ class ConfigMgr:
         """
         return (self.RULE_DIR / file_name).as_posix()
 
+    def modules(self, file_name: str) -> str:
+        """Return the path to a module file.
+
+        Given a rule file_name, prepends the full path to that module.
+        """
+        return (self.MODULE_DIR / file_name).as_posix()
+
     def scripts(self, file_name: str) -> str:
         """Return the path to an interal script.
 
         Given a script file_name, prepends the full path to that script.
         """
-        return (self.SCRIPTS_DIR / file_name).as_posix() + " "
+        return (self.SCRIPTS_DIR / file_name).as_posix()
 
 
 ################################################################################
