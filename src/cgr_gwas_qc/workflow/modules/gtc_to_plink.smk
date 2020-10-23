@@ -17,14 +17,12 @@ rule gtc_to_ped:
         ),
         bpm=cfg.config.reference_files.illumina_manifest_file,
     params:
-        script=cfg.scripts("gtc2plink.py"),
-        outdir="per_sample_plink_files",
         strand=cfg.config.software_params.strand,
     output:
         ped=temp("per_sample_plink_files/{Sample_ID}.ped"),
         map_=temp("per_sample_plink_files/{Sample_ID}.map"),
-    shell:
-        "{params.script} {input.gtc} {input.bpm} {wildcards.Sample_ID} {params.outdir} --strand {params.strand}"
+    script:
+        "scripts/gtc2plink.py"
 
 
 rule sample_ped_merge_list:
