@@ -1,7 +1,11 @@
 """Configuration system data models."""
 from logging import getLogger
+from typing import Optional
 
 from pydantic import BaseModel, Field, FilePath, validator
+
+from .env_modules import EnvModules
+from .software_params import SoftwareParams
 
 logger = getLogger(__name__)
 
@@ -9,7 +13,7 @@ logger = getLogger(__name__)
 class ReferenceFiles(BaseModel):
     """A list of reference files used by the pipeline."""
 
-    illumina_array_manifest: FilePath = Field(
+    illumina_manifest_file: FilePath = Field(
         "/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm",
         description="Path to the array BPM file.",
     )
@@ -26,7 +30,7 @@ class ReferenceFiles(BaseModel):
         description="Path to the corresponding index for the 1KG VCF file.",
     )
 
-    @validator("illumina_array_manifest")
+    @validator("illumina_manifest_file")
     def validate_bpm(cls, v):
         assert v.exists()
         assert v.suffix == ".bpm"
@@ -76,7 +80,7 @@ class Idat(BaseModel):
         return v
 
 
-class UserDataPatterns(BaseModel):
+class FilePatterns(BaseModel):
     """File name patterns for user provided data.
 
     The GWAS QC Pipeline requires GTC or IDAT files.
@@ -114,8 +118,12 @@ class Config(BaseModel):
     project_name: str = Field(..., description="The project title.")
     pipeline_version: str = Field(..., description="The version of the pipeline to use.")
     sample_sheet: FilePath = Field(..., description="Path to the sample manifest from LIMs.")
-    reference_paths: ReferenceFiles  # Refers to ReferenceFiles above.
-    user_data_patterns: UserDataPatterns  # Refers to UserDataPatterns above.
+    reference_files: ReferenceFiles  # Refers to ReferenceFiles above.
+    file_patterns: FilePatterns  # Refers to FilePatterns above.
+    software_params: SoftwareParams  # Various software parameters used throughout.
+    env_modules: Optional[
+        EnvModules
+    ]  # Module information if using an HPC with environemntal modules."
 
     @validator("sample_sheet")
     def validate_sample_sheet(cls, v):

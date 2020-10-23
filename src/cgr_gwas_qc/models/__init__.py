@@ -8,7 +8,7 @@ def schema_to_dict(schema: dict) -> dict:
     Example:
         >>> from cgr_gwas_qc.models.config import Config
         >>> res = schema_to_dict(Config.schema())
-        >>> res["reference_paths"]["thousand_genome_vcf"]
+        >>> res.reference_files.thousand_genome_vcf
         "/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz"
     """
 

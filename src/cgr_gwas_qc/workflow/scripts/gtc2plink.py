@@ -128,4 +128,14 @@ def convert_base_call(base_call: str, flag_no_call: bool) -> str:
 
 
 if __name__ == "__main__":
-    app()
+    if "snakemake" in locals():
+        main(
+            Path(snakemake.input.gtc),  # type: ignore # noqa
+            Path(snakemake.input.bpm),  # type: ignore # noqa
+            snakemake.wildcards["Sample_ID"],  # type: ignore # noqa
+            Path(snakemake.output[0]).parent,  # type: ignore # noqa
+            snakemake.params.strand,  # type: ignore # noqa
+            snakemake.params.get("threshold", None),  # type: ignore # noqa
+        )
+    else:
+        app()
