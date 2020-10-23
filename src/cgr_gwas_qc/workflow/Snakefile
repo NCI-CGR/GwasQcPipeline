@@ -4,10 +4,9 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
+include: cfg.rules("gtc_to_plink.smk")
+
 
 rule all:
-    input: cfg.expand("output/{Sample_ID}.txt")
-
-
-rule touch:
-    output: touch("output/{Sample_ID}.txt")
+    input:
+        expand("plink_start/samples.{ext}", ext=["bed", "bim", "fam"])
