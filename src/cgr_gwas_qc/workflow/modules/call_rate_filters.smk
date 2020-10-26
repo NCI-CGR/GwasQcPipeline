@@ -13,8 +13,10 @@ rule call_rate_filter_1:
         bim="plink_start/samples.bim",
         fam="plink_start/samples.fam",
     params:
-        mind=1 - cfg.software_params.samp_cr_1,
-        geno=1 - cfg.software_params.snp_cr_1,
+        mind=1 - cfg.config.software_params.samp_cr_1,
+        geno=1 - cfg.config.software_params.snp_cr_1,
+        in_prefix="plink_start/samples",
+        out_prefix="plink_filter_call_rate_1/samples",
     output:
         bed="plink_filter_call_rate_1/samples.bed",
         bim="plink_filter_call_rate_1/samples.bim",
@@ -29,12 +31,12 @@ rule call_rate_filter_1:
         mem=10000,
     shell:
         "plink "
-        "--bfile $(dirname {input[0]}) "
+        "--bfile {params.in_prefix} "
         "--mind {params.mind} "
         "--geno {params.geno} "
         "--make-bed "
         "--memory {resources.mem} "
-        "--out $(dirname {output[0]})"
+        "--out {params.out_prefix}"
 
 
 rule call_rate_filter_2:
@@ -51,8 +53,10 @@ rule call_rate_filter_2:
         bim="plink_filter_call_rate_1/samples.bim",
         fam="plink_filter_call_rate_1/samples.fam",
     params:
-        mind=1 - cfg.software_params.samp_cr_2,
-        geno=1 - cfg.software_params.snp_cr_2,
+        mind=1 - cfg.config.software_params.samp_cr_2,
+        geno=1 - cfg.config.software_params.snp_cr_2,
+        in_prefix="plink_filter_call_rate_1/samples",
+        out_prefix="plink_filter_call_rate_2/samples",
     output:
         bed="plink_filter_call_rate_2/samples.bed",
         bim="plink_filter_call_rate_2/samples.bim",
@@ -67,9 +71,9 @@ rule call_rate_filter_2:
         mem=10000,
     shell:
         "plink "
-        "--bfile $(dirname {input[0]}) "
+        "--bfile {params.in_prefix} "
         "--mind {params.mind} "
         "--geno {params.geno} "
         "--make-bed "
         "--memory {resources.mem} "
-        "--out $(dirname {output[0]})"
+        "--out {params.out_prefix}"
