@@ -28,8 +28,8 @@ def test_call_rate_filter1(tmp_path: Path, working_dir: Path):
 
     cfg = load_config()
 
-    include: cfg.modules("gtc_to_plink.smk")
-    include: cfg.modules("call_rate_filters.smk")
+    include: cfg.rules("entry_points.smk")
+    include: cfg.rules("call_rate_filters.smk")
 
     rule all:
         input:
@@ -56,8 +56,8 @@ def test_call_rate_filter2(tmp_path: Path, working_dir: Path):
 
     cfg = load_config()
 
-    include: cfg.modules("gtc_to_plink.smk")
-    include: cfg.modules("call_rate_filters.smk")
+    include: cfg.rules("entry_points.smk")
+    include: cfg.rules("call_rate_filters.smk")
 
     rule all:
         input:
