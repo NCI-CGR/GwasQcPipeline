@@ -9,18 +9,28 @@ class UserFiles(BaseModel):
     The GWAS QC Pipeline requires GTC or IDAT files.
     """
 
+    idat_pattern: Optional["Idat"]
+
     gtc_pattern: Optional[str] = Field(
         "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
         description="File name pattern for GTC file. Wildcards are columns in the sample sheet.",
     )
-
-    idat_pattern: Optional["Idat"]
 
     ped: Optional[str] = Field(
         None, description="Aggregated PED file if sample level GTC files are not available.",
     )
     map: Optional[str] = Field(
         None, description="Aggregated MAP file if sample level GTC files are not available.",
+    )
+
+    bed: Optional[str] = Field(
+        None, description="Aggregated BED file if sample level GTC files are not available.",
+    )
+    bim: Optional[str] = Field(
+        None, description="Aggregated BIM file if sample level GTC files are not available.",
+    )
+    fam: Optional[str] = Field(
+        None, description="Aggregated FAM file if sample level GTC files are not available.",
     )
 
     @validator("gtc_pattern")
@@ -37,6 +47,51 @@ class UserFiles(BaseModel):
                 "to column names in the sample sheet, surrounded by '{}'."
             )
 
+        return v
+
+    @validator("ped")
+    def validate_ped(cls, v):
+        if v is None:
+            return v
+
+        if not v.endswith(".ped"):
+            raise ValueError("PED suffix should be *.ped")
+        return v
+
+    @validator("map")
+    def validate_map(cls, v):
+        if v is None:
+            return v
+
+        if not v.endswith(".map"):
+            raise ValueError("MAP suffix should be *.map")
+        return v
+
+    @validator("bed")
+    def validate_bed(cls, v):
+        if v is None:
+            return v
+
+        if not v.endswith(".bed"):
+            raise ValueError("BED suffix should be *.bed")
+        return v
+
+    @validator("bim")
+    def validate_bim(cls, v):
+        if v is None:
+            return v
+
+        if not v.endswith(".bim"):
+            raise ValueError("BIM suffix should be *.bim")
+        return v
+
+    @validator("fam")
+    def validate_fam(cls, v):
+        if v is None:
+            return v
+
+        if not v.endswith(".fam"):
+            raise ValueError("FAM suffix should be *.fam")
         return v
 
 
