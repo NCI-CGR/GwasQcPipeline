@@ -83,3 +83,81 @@ def gtc_working_dir(tmp_path_factory):
         )
 
     return tmp_path
+
+
+@pytest.fixture(scope="session")
+def ped_working_dir(tmp_path_factory):
+    """Testing working directory with aggregated PED and MAP.
+
+    This is another entry point where the user has pre-aggregated PED and MAP
+    files.
+    """
+    tmp_path = tmp_path_factory.mktemp("data_w_ped_")
+
+    # copy test data to working dir
+    shutil.copy2("tests/data/example_sample_sheet.csv", tmp_path)
+    shutil.copy2("tests/data/illumina/bpm/small_manifest.bpm", tmp_path)
+    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz", tmp_path)
+    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz.tbi", tmp_path)
+    shutil.copyfile("tests/data/plink/samples.ped", tmp_path / "samples.ped")
+    shutil.copyfile("tests/data/plink/samples.map", tmp_path / "samples.map")
+
+    # Create a test config
+    with chdir(tmp_path):
+        create_yaml_config(
+            project_name="Test Project",
+            sample_sheet="example_sample_sheet.csv",
+            reference_files={
+                "illumina_manifest_file": "small_manifest.bpm",
+                "thousand_genome_vcf": "small_1KG.vcf.gz",
+                "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
+            },
+            user_files={
+                "gtc_pattern": None,
+                "idat_pattern": None,
+                "ped": "samples.ped",
+                "map": "samples.map",
+            },
+        )
+
+    return tmp_path
+
+
+@pytest.fixture(scope="session")
+def bed_working_dir(tmp_path_factory):
+    """Testing working directory with aggregated BED, BIM, and FAM.
+
+    This is another entry point where the user has pre-aggregated BED, BIM,
+    and FAM files.
+    """
+    tmp_path = tmp_path_factory.mktemp("data_w_bed_")
+
+    # copy test data to working dir
+    shutil.copy2("tests/data/example_sample_sheet.csv", tmp_path)
+    shutil.copy2("tests/data/illumina/bpm/small_manifest.bpm", tmp_path)
+    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz", tmp_path)
+    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz.tbi", tmp_path)
+    shutil.copyfile("tests/data/plink/samples.bed", tmp_path / "samples.bed")
+    shutil.copyfile("tests/data/plink/samples.bim", tmp_path / "samples.bim")
+    shutil.copyfile("tests/data/plink/samples.fam", tmp_path / "samples.fam")
+
+    # Create a test config
+    with chdir(tmp_path):
+        create_yaml_config(
+            project_name="Test Project",
+            sample_sheet="example_sample_sheet.csv",
+            reference_files={
+                "illumina_manifest_file": "small_manifest.bpm",
+                "thousand_genome_vcf": "small_1KG.vcf.gz",
+                "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
+            },
+            user_files={
+                "gtc_pattern": None,
+                "idat_pattern": None,
+                "bed": "samples.bed",
+                "bim": "samples.bim",
+                "fam": "samples.fam",
+            },
+        )
+
+    return tmp_path
