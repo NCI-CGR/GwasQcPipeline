@@ -40,8 +40,13 @@ def vcf(vcf_file):
 
 
 @pytest.fixture(scope="session")
-def working_dir(tmp_path_factory):
-    tmp_path = tmp_path_factory.mktemp("user_currdir")
+def gtc_working_dir(tmp_path_factory):
+    """Testing working directory with per sample GTC files.
+
+    This is the most common situation where the user is start with GTC and
+    BPM files.
+    """
+    tmp_path = tmp_path_factory.mktemp("data_w_gtc_")
 
     # copy test data to working dir
     shutil.copy2("tests/data/example_sample_sheet.csv", tmp_path)

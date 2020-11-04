@@ -29,10 +29,10 @@ def test_scan_for_yaml(tmp_path, name, ext):
 ################################################################################
 # Sanity check that ConfigMgr loads the yaml correctly.
 ################################################################################
-def test_config_loads(working_dir: Path):
-    with chdir(working_dir):
+def test_config_loads(gtc_working_dir: Path):
+    with chdir(gtc_working_dir):
         cfg = ConfigMgr.instance()
-        assert cfg.user_config == (working_dir / "config.yml").absolute()
+        assert cfg.user_config == (gtc_working_dir / "config.yml").absolute()
         assert cfg.config.project_name == "Test Project"
         assert isinstance(cfg.ss, pd.DataFrame)
 
@@ -41,8 +41,8 @@ def test_config_loads(working_dir: Path):
 # Make sure if we call ConfigMgr multiple times it only creates a single
 # instance.
 ################################################################################
-def test_config_only_uses_one_instance(working_dir: Path):
-    with chdir(working_dir):
+def test_config_only_uses_one_instance(gtc_working_dir: Path):
+    with chdir(gtc_working_dir):
         cfg = ConfigMgr.instance()
     cfg2 = ConfigMgr.instance()
     assert cfg is cfg2

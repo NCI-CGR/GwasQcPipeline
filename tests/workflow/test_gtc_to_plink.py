@@ -9,8 +9,8 @@ from cgr_gwas_qc.testing import chdir
 
 
 @pytest.mark.workflow
-def test_gtc_to_plink(tmp_path: Path, working_dir: Path):
-    copytree(working_dir, tmp_path, dirs_exist_ok=True)
+def test_gtc_to_plink(tmp_path: Path, gtc_working_dir: Path):
+    copytree(gtc_working_dir, tmp_path, dirs_exist_ok=True)
     snake = tmp_path / "Snakefile"
     snake.write_text(
         dedent(

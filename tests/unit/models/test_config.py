@@ -5,8 +5,8 @@ from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.yaml import load
 
 
-def test_config_model(working_dir):
-    with chdir(working_dir):
+def test_config_model(gtc_working_dir):
+    with chdir(gtc_working_dir):
         cfg = Config(**load(Path("config.yml")))
         assert cfg.project_name == "Test Project"
         assert cfg.sample_sheet == Path("example_sample_sheet.csv")
