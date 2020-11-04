@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple, Union
 
 import pandas as pd
 from snakemake.rules import expand
@@ -183,3 +183,12 @@ def find_configs() -> Tuple[Path, Path]:
         raise FileNotFoundError("Please run with a `config.yml` in your working directory.")
 
     return root, user_config
+
+
+def create_yaml_config(
+    project_name: str, sample_sheet: Union[str, Path], yaml_file: str = "config.yml", **kwargs
+) -> None:
+    cfg = Config(
+        project_name=project_name, sample_sheet=sample_sheet, **kwargs
+    )
+    yaml.write(cfg.to_dict(), yaml_file)
