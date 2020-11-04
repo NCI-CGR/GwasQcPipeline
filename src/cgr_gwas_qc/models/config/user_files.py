@@ -9,14 +9,21 @@ class UserFiles(BaseModel):
     The GWAS QC Pipeline requires GTC or IDAT files.
     """
 
-    gtc: Optional[str] = Field(
+    gtc_pattern: Optional[str] = Field(
         "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
         description="File name pattern for GTC file. Wildcards are columns in the sample sheet.",
     )
 
-    idat: Optional["Idat"]
+    idat_pattern: Optional["Idat"]
 
-    @validator("gtc")
+    ped: Optional[str] = Field(
+        None, description="Aggregated PED file if sample level GTC files are not available.",
+    )
+    map: Optional[str] = Field(
+        None, description="Aggregated MAP file if sample level GTC files are not available.",
+    )
+
+    @validator("gtc_pattern")
     def validate_gtc_pattern(cls, v):
         if v is None:
             return v

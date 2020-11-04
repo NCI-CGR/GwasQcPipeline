@@ -28,7 +28,7 @@ class Config(BaseModel):
     pipeline_version: str = Field(__version__, description="The version of the pipeline to use.")
     sample_sheet: FilePath = Field(..., description="Path to the sample manifest from LIMs.")
     reference_files: ReferenceFiles = ReferenceFiles()  # Paths to reference files.
-    file_patterns: UserFiles = UserFiles()  # Paths to user provided files.
+    user_files: UserFiles = UserFiles()  # Paths to user provided files.
     software_params: SoftwareParams = SoftwareParams()  # Various software parameters.
     workflow_params: WorkflowParams = WorkflowParams()  # Parameters to control how the workflow is run.
     env_modules: Optional[EnvModules] = EnvModules()  # Use these HPC environmental modules."

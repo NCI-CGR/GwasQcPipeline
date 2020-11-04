@@ -71,9 +71,9 @@ def working_dir(tmp_path_factory):
                 "thousand_genome_vcf": "small_1KG.vcf.gz",
                 "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
             },
-            file_patterns={
-                "gtc": "{Sample_ID}.gtc",
-                "idat": {"red": "{Sample_ID}_Red.idat", "green": "{Sample_ID}_Grn.idat"},
+            user_files={
+                "gtc_pattern": "{Sample_ID}.gtc",
+                "idat_pattern": {"red": "{Sample_ID}_Red.idat", "green": "{Sample_ID}_Grn.idat"},
             },
         )
 
