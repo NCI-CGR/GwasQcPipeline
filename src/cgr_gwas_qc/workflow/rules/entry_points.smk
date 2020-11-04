@@ -1,30 +1,36 @@
-"""Convert genotype calls to a ``plink`` compatible format.
+"""Entry points into the workflow.
 
-Converts GTC + BPM for all samples and then merges them into the binary
-``plink`` format (BED + BIM + FAM).
+This module will contain all the different data entry points into the
+workflow. The most common case is a set of GTC files provided by the user.
 """
 
+if cfg.config["file_patterns"]["gtc"]:
+    ################################################################################
+    # GTC To Plink
+    ################################################################################
+    rule gtc_to_ped:
+        """Converts a sample's GTC + BPM to PED + MAP.
 
-rule gtc_to_ped:
-    """Converts a sample's GTC + BPM to PED + MAP.
-
-    .. warning::
-        This is a submission hot spot creating 1 job per sample.
-    """
-    input:
-        gtc=lambda wc: cfg.expand(
-            cfg.config.file_patterns.gtc, query=f"Sample_ID == '{wc.Sample_ID}'"
-        )[0],
-        bpm=cfg.config.reference_files.illumina_manifest_file,
-    params:
-        strand=cfg.config.software_params.strand,
-    output:
-        ped=temp("per_sample_plink_files/{Sample_ID}.ped"),
-        map_=temp("per_sample_plink_files/{Sample_ID}.map"),
-    script:
-        "../scripts/gtc2plink.py"
+        .. warning::
+            This is a submission hot spot creating 1 job per sample.
+        """
+        input:
+            gtc=lambda wc: cfg.expand(
+                cfg.config.file_patterns.gtc, query=f"Sample_ID == '{wc.Sample_ID}'"
+            )[0],
+            bpm=cfg.config.reference_files.illumina_manifest_file,
+        params:
+            strand=cfg.config.software_params.strand,
+        output:
+            ped=temp("per_sample_plink_files/{Sample_ID}.ped"),
+            map_=temp("per_sample_plink_files/{Sample_ID}.map"),
+        script:
+            "../scripts/gtc2plink.py"
 
 
+################################################################################
+# Merge Samples
+################################################################################
 rule sample_ped_merge_list:
     input:
         ped=cfg.expand("per_sample_plink_files/{Sample_ID}.ped"),
