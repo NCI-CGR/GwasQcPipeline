@@ -3,6 +3,10 @@ from pathlib import Path
 
 import pytest
 
+from cgr_gwas_qc.config import create_yaml_config
+from cgr_gwas_qc.models.config import reference_files
+from cgr_gwas_qc.testing import chdir
+
 
 @pytest.fixture(scope="session")
 def gtc_file():
@@ -41,7 +45,6 @@ def working_dir(tmp_path_factory):
     tmp_path = tmp_path_factory.mktemp("user_currdir")
 
     # copy test data to working dir
-    shutil.copy2("tests/data/config.yml", tmp_path)
     shutil.copy2("tests/data/example_sample_sheet.csv", tmp_path)
     shutil.copy2("tests/data/illumina/bpm/small_manifest.bpm", tmp_path)
     shutil.copy2("tests/data/1KG/small_1KG.vcf.gz", tmp_path)
@@ -58,5 +61,21 @@ def working_dir(tmp_path_factory):
     shutil.copyfile(
         "tests/data/illumina/gtc/small_genotype.gtc", tmp_path / "SB00004_PB0001_D01.gtc"
     )
+
+    # Create a test config
+    with chdir(tmp_path):
+        create_yaml_config(
+            project_name="Test Project",
+            sample_sheet="example_sample_sheet.csv",
+            reference_files={
+                "illumina_manifest_file": "small_manifest.bpm",
+                "thousand_genome_vcf": "small_1KG.vcf.gz",
+                "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
+            },
+            file_patterns={
+                "gtc": "{Sample_ID}.gtc",
+                "idat": {"red": "{Sample_ID}_Red.idat", "green": "{Sample_ID}_Grn.idat"},
+            },
+        )
 
     return tmp_path
