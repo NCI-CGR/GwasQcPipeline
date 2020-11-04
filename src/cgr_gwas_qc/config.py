@@ -188,7 +188,5 @@ def find_configs() -> Tuple[Path, Path]:
 def create_yaml_config(
     project_name: str, sample_sheet: Union[str, Path], yaml_file: str = "config.yml", **kwargs
 ) -> None:
-    cfg = Config(
-        project_name=project_name, sample_sheet=sample_sheet, **kwargs
-    )
+    cfg = Config(project_name=project_name, sample_sheet=sample_sheet, **kwargs)
     yaml.write(cfg.to_dict(), yaml_file)

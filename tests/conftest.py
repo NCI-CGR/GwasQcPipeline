@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 
 from cgr_gwas_qc.config import create_yaml_config
-from cgr_gwas_qc.models.config import reference_files
 from cgr_gwas_qc.testing import chdir
 
 

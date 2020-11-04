@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, FilePath, validator
 
+
 class ReferenceFiles(BaseModel):
     """A list of reference files used by the pipeline."""
 

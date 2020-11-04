@@ -1,11 +1,12 @@
 """Configuration system data models."""
+from json import loads
 from logging import getLogger
 from typing import Optional
-from json import loads
 
 from pydantic import BaseModel, Field, FilePath, validator
 
 from cgr_gwas_qc.version import __version__
+
 from .env_modules import EnvModules
 from .reference_files import ReferenceFiles
 from .software_params import SoftwareParams
