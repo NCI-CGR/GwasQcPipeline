@@ -7,7 +7,7 @@ class SoftwareParams(BaseModel):
     samp_cr_2: float = Field(0.95, description="Sample call rate filter 2", gt=0, le=1)
     snp_cr_2: float = Field(0.95, description="Marker call rate filter 2", gt=0, le=1)
 
-    ld_prune_r2: float = Field(0.1, description="r-squred threshold for LD pruning.", gt=0, le=1)
+    ld_prune_r2: float = Field(0.1, description="r-squared threshold for LD pruning.", gt=0, le=1)
     maf_for_ibd: float = Field(0.2, description="Minor allele frequency threshold", gt=0, le=1)
     ibd_pi_hat_cutoff: float = Field(0.95, description="IBD pi hat threshold.", gt=0, le=1)
     dup_concordance_cutoff: float = Field(
@@ -19,8 +19,8 @@ class SoftwareParams(BaseModel):
         "AF", description="Population from 1KG to use for contamination testing."
     )
 
-    pi_hat_theshold: float = Field(0.2, description="pi hat threshold.", gt=0, le=1)
-    autosomal_het_theshold: float = Field(
+    pi_hat_threshold: float = Field(0.2, description="pi hat threshold.", gt=0, le=1)
+    autosomal_het_threshold: float = Field(
         0.1, description="Autosomal heterozygosity threshold.", gt=0, le=1
     )
 

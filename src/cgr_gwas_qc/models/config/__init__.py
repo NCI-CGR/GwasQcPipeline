@@ -30,7 +30,7 @@ class Config(BaseModel):
     file_patterns: UserFiles = UserFiles()  # Paths to user provided files.
     software_params: SoftwareParams = SoftwareParams()  # Various software parameters.
     workflow_params: WorkflowParams = WorkflowParams()  # Parameters to control how the workflow is run.
-    env_modules: Optional[EnvModules] = EnvModules()  # Use these HPC environemntal modules."
+    env_modules: Optional[EnvModules] = EnvModules()  # Use these HPC environmental modules."
 
     @validator("pipeline_version")
     def validate_pipeline_version(cls, v):
@@ -55,10 +55,10 @@ class Config(BaseModel):
         return v
 
     def to_dict(self):
-        """Create serializable dictionary and remove depricated options.
+        """Create serializable dictionary and remove deprecated options.
 
-        With the .dict() method Path objects were not being serlized to
-        strings for writing out. However, the .json() method does seriealize
+        With the .dict() method Path objects were not being serialized to
+        strings for writing out. However, the .json() method does serialize
         path objects to strings. This just converts to JSON and then to dict
         for easier export to YAML.
         """
@@ -68,7 +68,7 @@ class Config(BaseModel):
             for k, v in data.items():
                 if isinstance(v, dict):
                     cleaned[k] = remove_deprecated(v)
-                elif v != "Depricated":
+                elif v != "Deprecated":
                     cleaned[k] = v
             return cleaned
 

@@ -38,7 +38,7 @@ class ConfigMgr:
         envmodules: Pulls environmental module information from user's config.
         conda: Creates the full path to conda environment.
         rules: Creates the full path to snakemake rule.
-        scripts: Screates the full path to an internal script.
+        scripts: Creates the full path to an internal script.
     """
 
     SRC_DIR = Path(__file__).parent.absolute()
@@ -146,7 +146,7 @@ class ConfigMgr:
         return (self.MODULE_DIR / file_name).as_posix()
 
     def scripts(self, file_name: str) -> str:
-        """Return the path to an interal script.
+        """Return the path to an internal script.
 
         Given a script file_name, prepends the full path to that script.
         """

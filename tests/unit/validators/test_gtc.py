@@ -6,13 +6,13 @@ am just testing that a good file passes.
 """
 import pytest
 
-from cgr_gwas_qc.validators.gtc import GtcMagicNumberError, GtcTuncatedFileError, validate
+from cgr_gwas_qc.validators.gtc import GtcMagicNumberError, GtcTruncatedFileError, validate
 
 
 ################################################################################
 # Good GTC file validates
 ################################################################################
-def test_good_gtc_file_vaidates(gtc_file):
+def test_good_gtc_file_validates(gtc_file):
     validate(gtc_file)
 
 
@@ -37,5 +37,5 @@ def truncated_gtc(tmp_path, gtc_file, request):
 
 
 def test_truncated_file(truncated_gtc):
-    with pytest.raises(GtcTuncatedFileError):
+    with pytest.raises(GtcTruncatedFileError):
         validate(truncated_gtc)

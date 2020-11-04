@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from cgr_gwas_qc.exceptions import GtcMagicNumberError, GtcTuncatedFileError, GtcVersionError
+from cgr_gwas_qc.exceptions import GtcMagicNumberError, GtcTruncatedFileError, GtcVersionError
 from cgr_gwas_qc.parsers.illumina import GenotypeCalls
 
 
@@ -18,6 +18,6 @@ def validate(file_name: Path):
         elif err.args[0] == "Unsupported GTC File version":
             raise GtcVersionError(name)
         elif err.args[0] == "GTC file is incomplete":
-            raise GtcTuncatedFileError(name)
+            raise GtcTruncatedFileError(name)
         else:
             raise err
