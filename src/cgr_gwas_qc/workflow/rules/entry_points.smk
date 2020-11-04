@@ -4,7 +4,7 @@ This module will contain all the different data entry points into the
 workflow. The most common case is a set of GTC files provided by the user.
 """
 
-if cfg.config["file_patterns"]["gtc"]:
+if cfg.config.file_patterns.gtc:
     ################################################################################
     # GTC To Plink
     ################################################################################
@@ -66,7 +66,7 @@ rule merge_sample_peds:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        "../conda/plink2.yml"
     threads: 20
     resources:
         mem=24000,

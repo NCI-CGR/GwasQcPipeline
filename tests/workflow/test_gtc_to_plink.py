@@ -19,7 +19,7 @@ def test_gtc_to_plink(tmp_path: Path, working_dir: Path):
 
     cfg = load_config()
 
-    include: cfg.modules("gtc_to_plink.smk")
+    include: cfg.rules("entry_points.smk")
 
     rule all:
         input:
