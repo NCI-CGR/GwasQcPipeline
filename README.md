@@ -1,3 +1,14 @@
+[![Docs](https://img.shields.io/badge/Check%20Out-The%20Docs-blue.svg)](https://storage.googleapis.com/cgr_gwas_qc_docs/html/index.html)
+
+
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+[![made-with-sphinx-doc](https://img.shields.io/badge/Made%20with-Sphinx-1f425f.svg)](https://www.sphinx-doc.org/)
+[![Snakemake](https://img.shields.io/badge/snakemake-≥5.25.0-brightgreen.svg?style=flat)](https://snakemake.readthedocs.io)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Code style: snakefmt](https://img.shields.io/badge/code%20style-snakefmt-000000.svg)](https://github.com/snakemake/snakefmt)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+
+
 # GwasQcPipeline
 QC pipeline for Illumina SNP Array data generated at CGR
 
