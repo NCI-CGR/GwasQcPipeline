@@ -2,10 +2,7 @@ from pathlib import Path
 
 import typer
 
-import cgr_gwas_qc
-import cgr_gwas_qc.yaml
-from cgr_gwas_qc.models import schema_to_dict
-from cgr_gwas_qc.models.config import Config
+from cgr_gwas_qc.config import create_yaml_config
 
 app = typer.Typer(add_completion=False)
 
@@ -18,12 +15,7 @@ def main(
     ),
 ):
     """Creates a Gwas Qc Pipeline config file in the current working directory."""
-    cfg = schema_to_dict(Config.schema())
-    cfg["project_name"] = project_name
-    cfg["pipeline_version"] = cgr_gwas_qc.__version__
-    cfg["sample_sheet"] = sample_sheet.expanduser().absolute().as_posix()
-
-    cgr_gwas_qc.yaml.write(cfg, "config.yml")
+    create_yaml_config(project_name, sample_sheet.expanduser().absolute())
 
 
 if __name__ == "__main__":
