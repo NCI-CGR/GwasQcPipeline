@@ -12,7 +12,7 @@ class UserFiles(BaseModel):
     idat_pattern: Optional["Idat"]
 
     gtc_pattern: Optional[str] = Field(
-        "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
+        None,
         description="File name pattern for GTC file. Wildcards are columns in the sample sheet.",
     )
 
@@ -99,12 +99,12 @@ class Idat(BaseModel):
     """Each sample has an Idat file in two color channels."""
 
     red: str = Field(
-        "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
+        ...,
         description="File name pattern for Red Channel Idat. Wildcards are columns in the sample sheet.",
     )
 
     green: str = Field(
-        "/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat",
+        ...,
         description="File name pattern for Green Channel Idat. Wildcards are columns in the sample sheet.",
     )
 
