@@ -1,5 +1,4 @@
 """Configuration system data models."""
-from json import loads
 from logging import getLogger
 from typing import Optional
 
@@ -65,22 +64,5 @@ class Config(BaseModel):
 
         return v
 
-    def to_dict(self):
-        """Create serializable dictionary and remove deprecated options.
 
-        With the .dict() method Path objects were not being serialized to
-        strings for writing out. However, the .json() method does serialize
-        path objects to strings. This just converts to JSON and then to dict
-        for easier export to YAML.
-        """
-
-        def remove_deprecated(data):
-            cleaned = {}
-            for k, v in data.items():
-                if isinstance(v, dict):
-                    cleaned[k] = remove_deprecated(v)
-                elif v != "Deprecated":
-                    cleaned[k] = v
-            return cleaned
-
-        return remove_deprecated(loads(self.json()))
+Config.update_forward_refs()
