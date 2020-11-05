@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple
 
 import pandas as pd
 from snakemake.rules import expand
@@ -185,8 +185,17 @@ def find_configs() -> Tuple[Path, Path]:
     return root, user_config
 
 
-def create_yaml_config(
-    project_name: str, sample_sheet: Union[str, Path], yaml_file: str = "config.yml", **kwargs
-) -> None:
-    cfg = Config(project_name=project_name, sample_sheet=sample_sheet, **kwargs)
-    yaml.write(cfg.to_dict(), yaml_file)
+def config_to_yaml(cfg: Config, yaml_file: str = "config.yml", exclude_none=True, **kwargs) -> None:
+    def serialize(data):
+        """Scan for path objects and convert to strings."""
+        cleaned = {}
+        for k, v in data.items():
+            if isinstance(v, dict):
+                cleaned[k] = serialize(v)
+            elif isinstance(v, Path):
+                cleaned[k] = v.as_posix()
+            else:
+                cleaned[k] = v
+        return cleaned
+
+    yaml.write(serialize(cfg.dict(exclude_none=exclude_none, **kwargs)), yaml_file)
