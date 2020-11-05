@@ -115,6 +115,6 @@ elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user
             bim="plink_start/samples.bim",
             fam="plink_start/samples.fam",
         shell:
-            "ln -s {input.bed} {output.bed} && "
-            "ln -s {input.bim} {output.bim} && "
-            "ln -s {input.fam} {output.fam}"
+            "ln -s $(readlink -f {input.bed}) {output.bed} && "
+            "ln -s $(readlink -f {input.bim}) {output.bim} && "
+            "ln -s $(readlink -f {input.fam}) {output.fam}"
