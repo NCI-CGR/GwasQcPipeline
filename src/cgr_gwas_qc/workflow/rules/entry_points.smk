@@ -64,6 +64,7 @@ if cfg.config.user_files.gtc_pattern:
             bed="plink_start/samples.bed",
             bim="plink_start/samples.bim",
             fam="plink_start/samples.fam",
+            nosex="plink_start/samples.nosex",
         log: "plink_start/samples.log",
         group:
             "merge_gtc_sample_peds"
@@ -92,6 +93,7 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
             bed="plink_start/samples.bed",
             bim="plink_start/samples.bim",
             fam="plink_start/samples.fam",
+            nosex="plink_start/samples.nosex",
         envmodules:
             cfg.envmodules("plink2"),
         conda:
