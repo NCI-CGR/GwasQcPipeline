@@ -10,8 +10,18 @@ from cgr_gwas_qc.version import __version__
 from .env_modules import EnvModules
 from .reference_files import ReferenceFiles
 from .software_params import SoftwareParams
-from .user_files import UserFiles
+from .user_files import Idat, UserFiles
 from .workflow_params import WorkflowParams
+
+__all__ = [
+    "Config",
+    "EnvModules",
+    "Idat",
+    "ReferenceFiles",
+    "SoftwareParams",
+    "UserFiles",
+    "WorkflowParams",
+]
 
 logger = getLogger(__name__)
 
