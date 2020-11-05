@@ -8,7 +8,7 @@ class WorkflowParams(BaseModel):
     """This set of parameters control what parts and how the workflow is run."""
 
     subject_id_to_use: Optional[str] = Field(
-        "Deprecated", description="[Deprecated] The column which identifies unique subjects.",
+        None, description="[Deprecated] The column which identifies unique subjects.",
     )
     expected_sex_col_name: str = Field(
         "Expected_Sex", description="Column in the sample sheet that describes the expected sex."
