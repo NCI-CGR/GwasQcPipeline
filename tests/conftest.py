@@ -3,7 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from cgr_gwas_qc.config import create_yaml_config
+from cgr_gwas_qc.config import config_to_yaml
+from cgr_gwas_qc.models import config as cfg_models
 from cgr_gwas_qc.testing import chdir
 
 
@@ -68,19 +69,24 @@ def gtc_working_dir(tmp_path_factory):
 
     # Create a test config
     with chdir(tmp_path):
-        create_yaml_config(
+        cfg = cfg_models.Config(
             project_name="Test Project",
             sample_sheet="example_sample_sheet.csv",
-            reference_files={
-                "illumina_manifest_file": "small_manifest.bpm",
-                "thousand_genome_vcf": "small_1KG.vcf.gz",
-                "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
-            },
-            user_files={
-                "gtc_pattern": "{Sample_ID}.gtc",
-                "idat_pattern": {"red": "{Sample_ID}_Red.idat", "green": "{Sample_ID}_Grn.idat"},
-            },
+            reference_files=cfg_models.ReferenceFiles(
+                illumina_manifest_file="small_manifest.bpm",
+                thousand_genome_vcf="small_1KG.vcf.gz",
+                thousand_genome_tbi="small_1KG.vcf.gz.tbi",
+            ),
+            user_files=cfg_models.UserFiles(
+                gtc_pattern="{Sample_ID}.gtc",
+                idat_pattern=cfg_models.Idat(
+                    red="{Sample_ID}_Red.idat", green="{Sample_ID}_Grn.idat"
+                ),
+            ),
+            software_params=cfg_models.SoftwareParams(),
+            workflow_params=cfg_models.WorkflowParams(),
         )
+        config_to_yaml(cfg)
 
     return tmp_path
 
@@ -104,21 +110,19 @@ def ped_working_dir(tmp_path_factory):
 
     # Create a test config
     with chdir(tmp_path):
-        create_yaml_config(
+        cfg = cfg_models.Config(
             project_name="Test Project",
             sample_sheet="example_sample_sheet.csv",
-            reference_files={
-                "illumina_manifest_file": "small_manifest.bpm",
-                "thousand_genome_vcf": "small_1KG.vcf.gz",
-                "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
-            },
-            user_files={
-                "gtc_pattern": None,
-                "idat_pattern": None,
-                "ped": "samples.ped",
-                "map": "samples.map",
-            },
+            reference_files=cfg_models.ReferenceFiles(
+                illumina_manifest_file="small_manifest.bpm",
+                thousand_genome_vcf="small_1KG.vcf.gz",
+                thousand_genome_tbi="small_1KG.vcf.gz.tbi",
+            ),
+            user_files=cfg_models.UserFiles(ped="samples.ped", map="samples.map",),
+            software_params=cfg_models.SoftwareParams(),
+            workflow_params=cfg_models.WorkflowParams(),
         )
+        config_to_yaml(cfg)
 
     return tmp_path
 
@@ -143,21 +147,20 @@ def bed_working_dir(tmp_path_factory):
 
     # Create a test config
     with chdir(tmp_path):
-        create_yaml_config(
+        cfg = cfg_models.Config(
             project_name="Test Project",
             sample_sheet="example_sample_sheet.csv",
-            reference_files={
-                "illumina_manifest_file": "small_manifest.bpm",
-                "thousand_genome_vcf": "small_1KG.vcf.gz",
-                "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
-            },
-            user_files={
-                "gtc_pattern": None,
-                "idat_pattern": None,
-                "bed": "samples.bed",
-                "bim": "samples.bim",
-                "fam": "samples.fam",
-            },
+            reference_files=cfg_models.ReferenceFiles(
+                illumina_manifest_file="small_manifest.bpm",
+                thousand_genome_vcf="small_1KG.vcf.gz",
+                thousand_genome_tbi="small_1KG.vcf.gz.tbi",
+            ),
+            user_files=cfg_models.UserFiles(
+                bed="samples.bed", bim="samples.bim", fam="samples.fam",
+            ),
+            software_params=cfg_models.SoftwareParams(),
+            workflow_params=cfg_models.WorkflowParams(),
         )
+        config_to_yaml(cfg)
 
     return tmp_path
