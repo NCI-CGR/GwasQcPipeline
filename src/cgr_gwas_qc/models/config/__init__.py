@@ -33,8 +33,8 @@ class Config(BaseModel):
     schema and implementing data validation.
     """
 
-    project_name: str = Field(..., description="The project title.")
     pipeline_version: str = Field(__version__, description="The version of the pipeline to use.")
+    project_name: str = Field(..., description="The project title.")
     sample_sheet: FilePath = Field(..., description="Path to the sample manifest from LIMs.")
     reference_files: ReferenceFiles = ReferenceFiles()  # Paths to reference files.
     user_files: UserFiles = UserFiles()  # Paths to user provided files.
