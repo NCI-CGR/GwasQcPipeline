@@ -28,3 +28,7 @@ repos:
     rev: v1.0.0
     hooks:
     -   id: check-poetry
+-   repo: https://github.com/jfear/snakefmt
+    rev: b4e365145107371a20e24dc3808230fef24feacf
+    hooks:
+    -   id: snakefmt
