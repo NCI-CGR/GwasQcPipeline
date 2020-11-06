@@ -1,9 +1,11 @@
-"""Entry points into the workflow.
+"""Entry points into the QC workflow.
 
-This module will contain all the different data entry points into the
-workflow. The most common case is a set of GTC files provided by the user.
+This module contains all the different data entry points into the QC
+workflow. The most common case is a set of sample level GTC files provided by
+the user.
 
-The major output of the module should be:
+All entry points should create:
+
     - plink_start/samples.bed
     - plink_start/samples.bim
     - plink_start/samples.fam
@@ -14,7 +16,7 @@ if cfg.config.user_files.gtc_pattern:
     # GTC To Plink
     ################################################################################
     rule gtc_to_ped:
-        """Converts a sample's GTC + BPM to PED + MAP.
+        """Converts a sample's GTC/BPM to PED/MAP.
 
         .. warning::
             This is a submission hot spot creating 1 job per sample.
@@ -35,7 +37,8 @@ if cfg.config.user_files.gtc_pattern:
     rule create_gtc_sample_merge_list:
         """Makes a list of samples to merge together.
 
-        Plink needs a list of (PEDs, MAPs) to merge together.
+        Plink needs a list of samples (PEDs, MAPs) to merge together. This is
+        a simple space delimited file where each sample is on it's own row.
         """
         input:
             ped=cfg.expand("per_sample_plink_files/{Sample_ID}.ped"),
@@ -50,9 +53,10 @@ if cfg.config.user_files.gtc_pattern:
                     fh.write(f"{ped} {map_}\n")
 
     rule merge_gtc_sample_peds:
-        """Merges multiple ``plink`` samples.
+        """Merges multiple samples using ``plink --merge-list``.
 
-        Merge and convert sample(s) into the ``plink`` binary format.
+        Merge and convert sample(s) into an aggregated binary ``plink``
+        format.
         """
         input:
             ped=cfg.expand("per_sample_plink_files/{Sample_ID}.ped"),
@@ -76,14 +80,19 @@ if cfg.config.user_files.gtc_pattern:
         resources:
             mem=24000,
         shell:
-            "plink --merge-list {input.merge_list} --make-bed --out {params.prefix} --threads {threads} --memory {resources.mem}"
+            "plink "
+            "--merge-list {input.merge_list} "
+            "--make-bed "
+            "--out {params.prefix} "
+            "--threads {threads} "
+            "--memory {resources.mem}"
 
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
     ################################################################################
     # Aggregated PED/MAPs
     ################################################################################
     rule plink_make_bed:
-        """Converts PED + MAP into ``plink`` binary format."""
+        """Converts aggregated PED/MAP into binary ``plink`` format."""
         input:
             ped=cfg.config.user_files.ped,
             map_=cfg.config.user_files.map,
@@ -101,11 +110,25 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
         resources:
             mem=10000,
         shell:
-            "plink --ped {input.ped} --map {input.map_} --make-bed --out {params.prefix} --memory {resources.mem}"
+            "plink "
+            "--ped {input.ped} "
+            "--map {input.map_} "
+            "--make-bed "
+            "--out {params.prefix} "
+            "--memory {resources.mem}"
 
 elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user_files.fam:
+    ################################################################################
+    # Aggregated BED/BIM/FAM
+    ################################################################################
     rule link_binary_plink_to_expected_loction:
-        """Links the BED + BIM + FAM to the expected location."""
+        """Creates symbolic links BED/BIM/FAM.
+
+        BED/BIM/FAM files are expected to be at
+        ``plink_start/samples.{bed,bim,fam}``. Since the user is providing
+        these files, we are using symbolic links to place them in the correct
+        location.
+        """
         input:
             bed=cfg.config.user_files.bed,
             bim=cfg.config.user_files.bim,
