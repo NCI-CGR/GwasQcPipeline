@@ -33,7 +33,7 @@ def main(reference_check: bool = True, gtc_check: bool = True, idat_check: bool 
         # check_idat_files(expand(cfg.config.file_patterns.idat.grn, **cfg.ss.to_dict("list")), "Green")
 
     if gtc_check:
-        check_gtc_files(expand(cfg.config.file_patterns.gtc, zip, **cfg.ss.to_dict("list")))
+        check_gtc_files(expand(cfg.config.user_files.gtc_pattern, zip, **cfg.ss.to_dict("list")))
 
 
 def check_reference_files(reference_files: ReferenceFiles):

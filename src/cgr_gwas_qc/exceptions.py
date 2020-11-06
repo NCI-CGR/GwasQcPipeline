@@ -74,7 +74,7 @@ class GtcVersionError(GtcError):
         super().__init__(message)
 
 
-class GtcTuncatedFileError(GtcError):
+class GtcTruncatedFileError(GtcError):
     def __init__(self, name):
         message = f"{name} is missing the EOF mark."
         super().__init__(message)

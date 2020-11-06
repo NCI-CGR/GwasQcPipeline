@@ -3,6 +3,10 @@ from pathlib import Path
 
 import pytest
 
+from cgr_gwas_qc.config import config_to_yaml
+from cgr_gwas_qc.models import config as cfg_models
+from cgr_gwas_qc.testing import chdir
+
 
 @pytest.fixture(scope="session")
 def gtc_file():
@@ -37,11 +41,15 @@ def vcf(vcf_file):
 
 
 @pytest.fixture(scope="session")
-def working_dir(tmp_path_factory):
-    tmp_path = tmp_path_factory.mktemp("user_currdir")
+def gtc_working_dir(tmp_path_factory):
+    """Testing working directory with per sample GTC files.
+
+    This is the most common situation where the user is start with GTC and
+    BPM files.
+    """
+    tmp_path = tmp_path_factory.mktemp("data_w_gtc_")
 
     # copy test data to working dir
-    shutil.copy2("tests/data/config.yml", tmp_path)
     shutil.copy2("tests/data/example_sample_sheet.csv", tmp_path)
     shutil.copy2("tests/data/illumina/bpm/small_manifest.bpm", tmp_path)
     shutil.copy2("tests/data/1KG/small_1KG.vcf.gz", tmp_path)
@@ -58,5 +66,101 @@ def working_dir(tmp_path_factory):
     shutil.copyfile(
         "tests/data/illumina/gtc/small_genotype.gtc", tmp_path / "SB00004_PB0001_D01.gtc"
     )
+
+    # Create a test config
+    with chdir(tmp_path):
+        cfg = cfg_models.Config(
+            project_name="Test Project",
+            sample_sheet="example_sample_sheet.csv",
+            reference_files=cfg_models.ReferenceFiles(
+                illumina_manifest_file="small_manifest.bpm",
+                thousand_genome_vcf="small_1KG.vcf.gz",
+                thousand_genome_tbi="small_1KG.vcf.gz.tbi",
+            ),
+            user_files=cfg_models.UserFiles(
+                gtc_pattern="{Sample_ID}.gtc",
+                idat_pattern=cfg_models.Idat(
+                    red="{Sample_ID}_Red.idat", green="{Sample_ID}_Grn.idat"
+                ),
+            ),
+            software_params=cfg_models.SoftwareParams(),
+            workflow_params=cfg_models.WorkflowParams(),
+        )
+        config_to_yaml(cfg)
+
+    return tmp_path
+
+
+@pytest.fixture(scope="session")
+def ped_working_dir(tmp_path_factory):
+    """Testing working directory with aggregated PED and MAP.
+
+    This is another entry point where the user has pre-aggregated PED and MAP
+    files.
+    """
+    tmp_path = tmp_path_factory.mktemp("data_w_ped_")
+
+    # copy test data to working dir
+    shutil.copy2("tests/data/example_sample_sheet.csv", tmp_path)
+    shutil.copy2("tests/data/illumina/bpm/small_manifest.bpm", tmp_path)
+    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz", tmp_path)
+    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz.tbi", tmp_path)
+    shutil.copyfile("tests/data/plink/samples.ped", tmp_path / "samples.ped")
+    shutil.copyfile("tests/data/plink/samples.map", tmp_path / "samples.map")
+
+    # Create a test config
+    with chdir(tmp_path):
+        cfg = cfg_models.Config(
+            project_name="Test Project",
+            sample_sheet="example_sample_sheet.csv",
+            reference_files=cfg_models.ReferenceFiles(
+                illumina_manifest_file="small_manifest.bpm",
+                thousand_genome_vcf="small_1KG.vcf.gz",
+                thousand_genome_tbi="small_1KG.vcf.gz.tbi",
+            ),
+            user_files=cfg_models.UserFiles(ped="samples.ped", map="samples.map",),
+            software_params=cfg_models.SoftwareParams(),
+            workflow_params=cfg_models.WorkflowParams(),
+        )
+        config_to_yaml(cfg)
+
+    return tmp_path
+
+
+@pytest.fixture(scope="session")
+def bed_working_dir(tmp_path_factory):
+    """Testing working directory with aggregated BED, BIM, and FAM.
+
+    This is another entry point where the user has pre-aggregated BED, BIM,
+    and FAM files.
+    """
+    tmp_path = tmp_path_factory.mktemp("data_w_bed_")
+
+    # copy test data to working dir
+    shutil.copy2("tests/data/example_sample_sheet.csv", tmp_path)
+    shutil.copy2("tests/data/illumina/bpm/small_manifest.bpm", tmp_path)
+    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz", tmp_path)
+    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz.tbi", tmp_path)
+    shutil.copyfile("tests/data/plink/samples.bed", tmp_path / "samples.bed")
+    shutil.copyfile("tests/data/plink/samples.bim", tmp_path / "samples.bim")
+    shutil.copyfile("tests/data/plink/samples.fam", tmp_path / "samples.fam")
+
+    # Create a test config
+    with chdir(tmp_path):
+        cfg = cfg_models.Config(
+            project_name="Test Project",
+            sample_sheet="example_sample_sheet.csv",
+            reference_files=cfg_models.ReferenceFiles(
+                illumina_manifest_file="small_manifest.bpm",
+                thousand_genome_vcf="small_1KG.vcf.gz",
+                thousand_genome_tbi="small_1KG.vcf.gz.tbi",
+            ),
+            user_files=cfg_models.UserFiles(
+                bed="samples.bed", bim="samples.bim", fam="samples.fam",
+            ),
+            software_params=cfg_models.SoftwareParams(),
+            workflow_params=cfg_models.WorkflowParams(),
+        )
+        config_to_yaml(cfg)
 
     return tmp_path

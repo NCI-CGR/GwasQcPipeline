@@ -22,6 +22,8 @@ def schema_to_dict(schema: dict) -> dict:
             if "$ref" in v.keys():
                 v = parse_ref(v)
                 res[k] = parse_properties(v, comments)
+            elif v.get("default", "") == "Deprecated":
+                continue
             else:
                 res[k] = v.get("description", "") if comments else v.get("default", "")
         return res

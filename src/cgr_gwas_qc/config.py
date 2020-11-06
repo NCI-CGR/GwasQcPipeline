@@ -38,7 +38,7 @@ class ConfigMgr:
         envmodules: Pulls environmental module information from user's config.
         conda: Creates the full path to conda environment.
         rules: Creates the full path to snakemake rule.
-        scripts: Screates the full path to an internal script.
+        scripts: Creates the full path to an internal script.
     """
 
     SRC_DIR = Path(__file__).parent.absolute()
@@ -146,7 +146,7 @@ class ConfigMgr:
         return (self.MODULE_DIR / file_name).as_posix()
 
     def scripts(self, file_name: str) -> str:
-        """Return the path to an interal script.
+        """Return the path to an internal script.
 
         Given a script file_name, prepends the full path to that script.
         """
@@ -183,3 +183,19 @@ def find_configs() -> Tuple[Path, Path]:
         raise FileNotFoundError("Please run with a `config.yml` in your working directory.")
 
     return root, user_config
+
+
+def config_to_yaml(cfg: Config, yaml_file: str = "config.yml", exclude_none=True, **kwargs) -> None:
+    def serialize(data):
+        """Scan for path objects and convert to strings."""
+        cleaned = {}
+        for k, v in data.items():
+            if isinstance(v, dict):
+                cleaned[k] = serialize(v)
+            elif isinstance(v, Path):
+                cleaned[k] = v.as_posix()
+            else:
+                cleaned[k] = v
+        return cleaned
+
+    yaml.write(serialize(cfg.dict(exclude_none=exclude_none, **kwargs)), yaml_file)

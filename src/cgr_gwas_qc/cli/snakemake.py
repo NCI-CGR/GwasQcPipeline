@@ -45,7 +45,7 @@ def main(
     quiet: bool = typer.Option(
         False, "--quiet", "-q", help="do not print any default job information"
     ),
-    keepgoing: bool = typer.Option(False, "--keep-going", "-k", help=" keep goind upon errors"),
+    keepgoing: bool = typer.Option(False, "--keep-going", "-k", help=" keep going upon errors"),
     unlock: bool = typer.Option(False, help=" just unlock the working directory"),
     conda_cleanup_envs: bool = typer.Option(
         False, "--conda-cleanup-envs", help="just cleanup unused conda environments"
