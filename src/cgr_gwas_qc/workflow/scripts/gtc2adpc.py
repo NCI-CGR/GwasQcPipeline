@@ -88,4 +88,12 @@ def fix_genotype_codes(genotypes: List[int]) -> Generator[int, None, None]:
 
 
 if __name__ == "__main__":
-    app()
+    if "snakemake" in locals():
+        main(
+            Path(snakemake.input.gtc),  # type: ignore # noqa
+            Path(snakemake.input.bpm),  # type: ignore # noqa
+            Path(snakemake.output.adpc),  # type: ignore # noqa
+            Path(snakemake.output.snp_count),  # type: ignore # noqa
+        )
+    else:
+        app()
