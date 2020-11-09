@@ -1,10 +1,49 @@
 """This module contains sample level filters."""
 
-if cfg.config.user_files.gtc_patterns and cfg.config.workflow_params.remove_contam:
+if (
+    cfg.config.user_files.idat_pattern
+    and cfg.config.user_files.gtc_pattern
+    and cfg.config.workflow_params.remove_contam
+):
 
     ################################################################################
     # Contaminated Samples
     ################################################################################
+
+    rule idat_intensity:
+        """Calculate the median intensity overall intensity (Red + Green).
+
+        .. warning::
+            This is a submission hot-spot creating one job per sample. Each output file contains a
+            single number, the median intensity.
+        """
+        input:
+            red=cfg.config.user_files.idat_pattern.red,
+            green=cfg.config.user_files.idat_pattern.green,
+        output:
+            temp("idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.txt"),
+        envmodules:
+            cfg.envmodules("r"),
+        conda:
+            "../conda/illuminaio.yml"
+        script:
+            "../scripts/median_idat_intensity.R"
+
+    rule combine_idat_intensity:
+        """Aggregates sample level median intensity values into a single table."""
+        input:
+            cfg.expand(rules.idat_intensity.output[0]),
+        output:
+            "all_sample_idat_intensity/idat_intensity.csv",
+        run:
+            with open(output[0], "w") as out:
+                out.write("SampId,ChipId,MedianIntensity\n")
+                for i in input:
+                    pth = Path(i)
+                    sample_id, barcode, position = pth.stem.split(".")
+                    median_intensity = pth.read_text().strip()
+                    out.write(f"{sample_id},{barcode}_{position},{median_intensity}\n")
+
     rule gtc_to_adpc:
         """Converts a sample's GTC/BPM to an Illumina ADPC.BIN.
 
@@ -73,3 +112,48 @@ if cfg.config.user_files.gtc_patterns and cfg.config.workflow_params.remove_cont
             "../conda/verifyidintensity.yml"
         shell:
             "verifyIDintensity -m {params.snps} -n 1 -b {input.abf} -v -p -i {input.adpc} > {output}"
+
+    rule combine_sample_level_contam_test:
+        """Aggregate sample contamination scores.
+
+        Aggregates sample level contamination scores into a single file (each row is a sample). The
+        script sets `%Mix` to `NA` if the intensity is below the threshold and the file is not in the
+        `imiss3` file.
+        """
+        input:
+            contam=cfg.expand("one_samp_b_1000g_contam/{Sample_ID}.contam.out"),
+            intens="all_sample_idat_intensity/idat_intensity.csv",
+            imiss3="plink_filter_call_rate_2/samples_filter2.imiss",
+        params:
+            intensThresh=6000,
+        output:
+            "all_contam/contam.csv",
+        run:
+            crDict3 = makeCallRateDict(input.imiss3)
+            intensDict = {}
+            with open(input.intens) as f:
+                head = f.readline()
+                line = f.readline()
+                while line != "":
+                    (samp, chipId, intensity) = line.rstrip().split(",")
+                    intensDict[samp] = float(intensity)
+                    line = f.readline()
+            with open(output[0], "w") as out:
+                out.write("ID,%Mix,LLK,LLK0\n")
+                for i in input.contam:
+                    samp = os.path.basename(i).split(".")[0]
+                    intens = intensDict[samp]
+                    with open(i) as f:
+                        head = f.readline()
+                        while "%Mix" not in head and head != "":
+                            head = f.readline()
+                        if head == "":
+                            print("strange file format: " + i)
+                            sys.exit(1)
+                        head = f.readline()
+                        line = f.readline()
+                        line_list = line.split()
+                        line_list[0] = samp
+                        if intens < params.intensThresh and not crDict3.get(samp):
+                            line_list[1] = "NA"
+                        out.write(",".join(line_list) + "\n")

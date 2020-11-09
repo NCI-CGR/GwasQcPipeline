@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from snakemake.rules import expand
 
 from cgr_gwas_qc import load_config
