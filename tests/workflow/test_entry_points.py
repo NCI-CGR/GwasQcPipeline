@@ -81,7 +81,8 @@ def test_bed_entry(tmp_path: Path, bed_working_dir: Path):
     snake.write_text(snakefile)
     run_and_check_for_plink_start_samples(tmp_path)
 
-    # Check files are symbolic links
-    assert Path("plink_start/samples.bed").is_symlink()
-    assert Path("plink_start/samples.bim").is_symlink()
-    assert Path("plink_start/samples.fam").is_symlink()
+    with chdir(tmp_path):
+        # Check files are symbolic links
+        assert Path("plink_start/samples.bed").is_symlink()
+        assert Path("plink_start/samples.bim").is_symlink()
+        assert Path("plink_start/samples.fam").is_symlink()
