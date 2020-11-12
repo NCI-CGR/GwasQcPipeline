@@ -24,12 +24,11 @@ def test_call_rate_filters(tmp_path: Path, bed_working_dir: Path):
             cfg = load_config()
 
             include: cfg.rules("entry_points.smk")
-            include: cfg.rules("snp_filters.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.rules("call_rate_filters.smk")
 
             rule all:
                 input:
-                    expand("plink_filter_call_rate_2/snps.{ext}", ext=["bed", "bim", "fam"])
+                    expand("plink_filter_call_rate_2/samples.{ext}", ext=["bed", "bim", "fam"])
             """
         )
     )
@@ -40,7 +39,19 @@ def test_call_rate_filters(tmp_path: Path, bed_working_dir: Path):
         assert Path("plink_filter_call_rate_1/snps.bed").exists()
         assert Path("plink_filter_call_rate_1/snps.bim").exists()
         assert Path("plink_filter_call_rate_1/snps.fam").exists()
+        assert Path("plink_filter_call_rate_1/snps.log").exists()
+
+        assert Path("plink_filter_call_rate_1/samples.bed").exists()
+        assert Path("plink_filter_call_rate_1/samples.bim").exists()
+        assert Path("plink_filter_call_rate_1/samples.fam").exists()
+        assert Path("plink_filter_call_rate_1/samples.log").exists()
 
         assert Path("plink_filter_call_rate_2/snps.bed").exists()
         assert Path("plink_filter_call_rate_2/snps.bim").exists()
         assert Path("plink_filter_call_rate_2/snps.fam").exists()
+        assert Path("plink_filter_call_rate_2/snps.log").exists()
+
+        assert Path("plink_filter_call_rate_2/samples.bed").exists()
+        assert Path("plink_filter_call_rate_2/samples.bim").exists()
+        assert Path("plink_filter_call_rate_2/samples.fam").exists()
+        assert Path("plink_filter_call_rate_2/samples.log").exists()
