@@ -144,32 +144,5 @@ if (
             intensity_threshold=cfg.config.software_params.intensity_threshold,
         output:
             "sample_filters/agg_contamination_test.csv",
-        run:
-            crDict3 = makeCallRateDict(input.imiss3)
-            intensDict = {}
-            with open(input.intens) as f:
-                head = f.readline()
-                line = f.readline()
-                while line != "":
-                    (samp, chipId, intensity) = line.rstrip().split(",")
-                    intensDict[samp] = float(intensity)
-                    line = f.readline()
-            with open(output[0], "w") as out:
-                out.write("ID,%Mix,LLK,LLK0\n")
-                for i in input.contam:
-                    samp = os.path.basename(i).split(".")[0]
-                    intens = intensDict[samp]
-                    with open(i) as f:
-                        head = f.readline()
-                        while "%Mix" not in head and head != "":
-                            head = f.readline()
-                        if head == "":
-                            print("strange file format: " + i)
-                            sys.exit(1)
-                        head = f.readline()
-                        line = f.readline()
-                        line_list = line.split()
-                        line_list[0] = samp
-                        if intens < params.intensThresh and not crDict3.get(samp):
-                            line_list[1] = "NA"
-                        out.write(",".join(line_list) + "\n")
+        script:
+            "../scripts/agg_contamination_test.py"
