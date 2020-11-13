@@ -139,7 +139,7 @@ if (
         input:
             contamination=cfg.expand(rules.contamination_test.output),
             median_idat_intensity=rules.agg_median_idat_intensity.output[0],
-            imiss3="plink_filter_call_rate_2/samples_filter2.imiss",
+            imiss="plink_filter_call_rate_2/samples.imiss",
         params:
             intensity_threshold=cfg.config.software_params.intensity_threshold,
         output:
