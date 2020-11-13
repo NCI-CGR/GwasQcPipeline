@@ -93,15 +93,17 @@ if (
         """
         input:
             bpm=cfg.config.reference_files.illumina_manifest_file,
+            vcf=cfg.config.reference_files.thousand_genome_vcf,
+            tbi=cfg.config.reference_files.thousand_genome_tbi,
         params:
             population=cfg.config.software_params.contam_population,
         output:
-            "sample_filters/{}.{}.abf.txt".format(
+            abf="sample_filters/{}.{}.abf.txt".format(
                 cfg.config.reference_files.illumina_manifest_file.stem,
                 cfg.config.software_params.contam_population,
             ),
         script:
-            "bpm2abf.py"
+            "../scripts/bpm2abf.py"
 
     rule contamination_test:
         """Find contaminated samples using allele intensities.
