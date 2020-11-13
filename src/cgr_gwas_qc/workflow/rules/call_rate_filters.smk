@@ -182,3 +182,36 @@ rule sample_call_rate_filter_2:
         "--threads {threads} "
         "--memory {resources.mem} "
         "--out {params.out_prefix}"
+
+
+rule plink_call_rate_stats:
+    """Runs ``plink`` missingness statistics.
+
+    .. rubric:: Statistics
+        :imiss`: sample-based missing data report
+        :lmiss`: variant-based missing data report
+    """
+    input:
+        bed="{prefix}/samples.bed",
+        bim="{prefix}/samples.bim",
+        fam="{prefix}/samples.fam",
+    params:
+        in_prefix="{prefix}/samples",
+        out_prefix="{prefix}/samples",
+    output:
+        imiss="{prefix}/samples.imiss",
+        lmiss="{prefix}/samples.lmiss",
+    group:
+        "call_rate_filters"
+    resources:
+        mem=10000,
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    shell:
+        "plink "
+        "--bfile {params.in_prefix} "
+        "--missing "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
