@@ -173,14 +173,13 @@ if (
         output:
             "sample_filters/contaminated_samples.txt",
         run:
-            from pathlib import Path
-
             import pandas as pd
 
-            contaminated_samples = (
-                pd.read_csv(input[0]).query(f"`%Mix` > {params[0]}").Sample_ID.to_list()
+            (
+                pd.read_csv(input[0])
+                .query(f"`%Mix` > {params[0]}")
+                .Sample_ID.to_csv(output[0], index=False, header=False)
             )
-            Path(output[0]).write_text("\n".join(contaminated_samples))
 
     rule remove_contaminated_samples:
         input:
