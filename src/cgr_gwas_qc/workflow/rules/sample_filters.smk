@@ -1,25 +1,35 @@
 """This module contains sample level filters."""
+################################################################################
+# Remove Samples with high contamination.
+################################################################################
+"""
+If we have IDAT and GTC files we can estimate sample contamination by
+modeling SNP intensities. Here we remove samples that have a high
+estimated contamination rate (config.software_params.contam_threshold)
+[default: 0.2].
 
+For contamination estimation we ignore samples whose median intensity is
+<6,000. We also use B-allele frequencies from the 1,000 genomes project
+as part of the modeling (config.software_params.contam_population)
+[default: AF].
+
+Inputs:
+    - Sample level IDAT files
+    - Sample level GTC files
+    - Illumina array manifest file (BPM)
+    - 1KG SNPs with population level allele frequencies (VCF)
+
+Outputs:
+    - ``sample_filters/agg_contamination_test.csv``
+
+.. warning::
+    The default contamination rate of 20% seems really high.
+"""
 if (
     cfg.config.user_files.idat_pattern
     and cfg.config.user_files.gtc_pattern
     and cfg.config.workflow_params.remove_contam
 ):
-    # Remove Samples with high contamination.
-    #
-    # If we have IDAT and GTC files we can estimated sample contamination by
-    # modeling SNP intensities. Here we remove samples that have a high
-    # estimated contamination rate (config.software_params.contam_threshold)
-    # [default: 0.2].
-    #
-    # For contamination estimation we ignore samples whose median intensity is
-    # <6,000. We also use B-allele frequencies from the 1,000 genomes project
-    # as part of the modeling (config.software_params.contam_population)
-    # [default: AF].
-    #
-    # .. warning::
-    #     The default contamination rate of 20% seems really high.
-    #
 
     rule median_idat_intensity:
         """Calculate median intensity overall intensity of Red + Green channels.
@@ -134,9 +144,9 @@ if (
     rule agg_contamination_test:
         """Aggregate sample contamination scores.
 
-        Aggregates sample level contamination scores into a single file (each row is a sample). The
-        script sets `%Mix` to `NA` if the intensity is below the threshold and the file is not in the
-        `imiss3` file.
+        Aggregates sample level contamination scores into a single file (each
+        row is a sample). The script sets ``%Mix`` to ``NA`` if the intensity
+        is below the threshold and the file is not in the ``imiss`` file.
         """
         input:
             contamination=cfg.expand(rules.contamination_test.output),
@@ -148,3 +158,62 @@ if (
             "sample_filters/agg_contamination_test.csv",
         script:
             "../scripts/agg_contamination_test.py"
+
+    rule Sample_IDs_above_contam_threshold:
+        """Creates a list of contaminated Sample_IDs.
+
+        Compares the %Mix from ``verifyIDintensity`` to the contamination
+        threshold from the config. If %Mix is greater than this threshold
+        Sample_IDs are saved to a list.
+        """
+        input:
+            rules.agg_contamination_test.output[0],
+        params:
+            cfg.config.software_params.contam_threshold,
+        output:
+            "sample_filters/contaminated_samples.txt",
+        run:
+            from pathlib import Path
+
+            import pandas as pd
+
+            contaminated_samples = (
+                pd.read_csv(input[0]).query(f"`%Mix` > {params[0]}").Sample_ID.to_list()
+            )
+            Path(output[0]).write_text("\n".join(contaminated_samples))
+
+    rule remove_contaminated_samples:
+        input:
+            bed="plink_filter_call_rate_2/samples.bed",
+            bim="plink_filter_call_rate_2/samples.bim",
+            fam="plink_filter_call_rate_2/samples.fam",
+            contaminated_Sample_IDs=rules.Sample_IDs_above_contam_threshold.output[0],
+        params:
+            in_prefix="plink_filter_call_rate_2/samples",
+            out_prefix="sample_filters/not_contaminated/samples",
+        output:
+            bed="sample_filters/not_contaminated/samples.bed",
+            bim="sample_filters/not_contaminated/samples.bim",
+            fam="sample_filters/not_contaminated/samples.fam",
+            nosex="sample_filters/not_contaminated/samples.nosex",
+        log:
+            "sample_filters/not_contaminated/samples.log",
+        envmodules:
+            cfg.envmodules("plink2"),
+        conda:
+            cfg.conda("plink2.yml")
+        threads: 2
+        resources:
+            mem=10000,
+        shell:
+            "plink "
+            "--bfile {params.in_prefix} "
+            "--remove {input.contaminated_Sample_IDs} "
+            "--make-bed "
+            "--threads {threads} "
+            "--memory {resources.mem} "
+            "--out {params.out_prefix}"
+
+
+################################################################################
+################################################################################
