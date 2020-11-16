@@ -29,8 +29,14 @@ def test_load_config_from_yml(gtc_working_dir):
         # User Files
         # Since we are using the ``gtc_working_dir`` only GTC and IDAT should be defined.
         assert cfg.config.user_files.gtc_pattern == "{Sample_ID}.gtc"
-        assert cfg.config.user_files.idat_pattern.red == "{Sample_ID}_Red.idat"
-        assert cfg.config.user_files.idat_pattern.green == "{Sample_ID}_Grn.idat"
+        assert (
+            cfg.config.user_files.idat_pattern.red
+            == "{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat"
+        )
+        assert (
+            cfg.config.user_files.idat_pattern.green
+            == "{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat"
+        )
 
         assert cfg.config.user_files.ped is None
         assert cfg.config.user_files.map is None
