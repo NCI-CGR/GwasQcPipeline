@@ -169,7 +169,7 @@ if (
         input:
             rules.agg_contamination_test.output[0],
         params:
-            cfg.config.software_params.contam_threshold,
+            contam_threshold=cfg.config.software_params.contam_threshold,
         output:
             "sample_filters/contaminated_samples.txt",
         run:
@@ -177,7 +177,7 @@ if (
 
             (
                 pd.read_csv(input[0])
-                .query(f"`%Mix` > {params[0]}")
+                .query(f"`%Mix` > {params.contam_threshold}")
                 .Sample_ID.to_csv(output[0], index=False, header=False)
             )
 
