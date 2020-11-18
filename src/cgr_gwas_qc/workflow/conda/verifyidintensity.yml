@@ -1,0 +1,4 @@
+channels:
+  - bioconda
+dependencies:
+  - verifyidintensity=0.0.1

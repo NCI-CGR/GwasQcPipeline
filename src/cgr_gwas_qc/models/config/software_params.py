@@ -14,6 +14,7 @@ class SoftwareParams(BaseModel):
         0.95, description="Duplicate concordance cutoff", gt=0, le=1
     )
 
+    intensity_threshold: int = Field(6000, description="IDAT intensity threshold.", gt=0)
     contam_threshold: float = Field(0.2, description="Contamination threshold.", gt=0, le=1)
     contam_population: str = Field(
         "AF", description="Population from 1KG to use for contamination testing."

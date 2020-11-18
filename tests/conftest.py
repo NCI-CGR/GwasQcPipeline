@@ -51,9 +51,13 @@ def gtc_working_dir(tmp_path_factory):
 
     # copy test data to working dir
     shutil.copy2("tests/data/example_sample_sheet.csv", tmp_path)
+
     shutil.copy2("tests/data/illumina/bpm/small_manifest.bpm", tmp_path)
+
     shutil.copy2("tests/data/1KG/small_1KG.vcf.gz", tmp_path)
     shutil.copy2("tests/data/1KG/small_1KG.vcf.gz.tbi", tmp_path)
+
+    # GTC Files
     shutil.copyfile(
         "tests/data/illumina/gtc/small_genotype.gtc", tmp_path / "SB00001_PB0001_A01.gtc"
     )
@@ -65,6 +69,32 @@ def gtc_working_dir(tmp_path_factory):
     )
     shutil.copyfile(
         "tests/data/illumina/gtc/small_genotype.gtc", tmp_path / "SB00004_PB0001_D01.gtc"
+    )
+
+    # IDAT Files
+    shutil.copyfile(
+        "tests/data/illumina/idat/small_intensity.idat", tmp_path / "201274900048_R01C01_Red.idat"
+    )
+    shutil.copyfile(
+        "tests/data/illumina/idat/small_intensity.idat", tmp_path / "201274900048_R01C01_Grn.idat"
+    )
+    shutil.copyfile(
+        "tests/data/illumina/idat/small_intensity.idat", tmp_path / "201274900048_R03C01_Red.idat"
+    )
+    shutil.copyfile(
+        "tests/data/illumina/idat/small_intensity.idat", tmp_path / "201274900048_R03C01_Grn.idat"
+    )
+    shutil.copyfile(
+        "tests/data/illumina/idat/small_intensity.idat", tmp_path / "201274900048_R05C01_Red.idat"
+    )
+    shutil.copyfile(
+        "tests/data/illumina/idat/small_intensity.idat", tmp_path / "201274900048_R05C01_Grn.idat"
+    )
+    shutil.copyfile(
+        "tests/data/illumina/idat/small_intensity.idat", tmp_path / "201274900048_R07C01_Red.idat"
+    )
+    shutil.copyfile(
+        "tests/data/illumina/idat/small_intensity.idat", tmp_path / "201274900048_R07C01_Grn.idat"
     )
 
     # Create a test config
@@ -80,7 +110,8 @@ def gtc_working_dir(tmp_path_factory):
             user_files=cfg_models.UserFiles(
                 gtc_pattern="{Sample_ID}.gtc",
                 idat_pattern=cfg_models.Idat(
-                    red="{Sample_ID}_Red.idat", green="{Sample_ID}_Grn.idat"
+                    red="{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
+                    green="{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat",
                 ),
             ),
             software_params=cfg_models.SoftwareParams(),

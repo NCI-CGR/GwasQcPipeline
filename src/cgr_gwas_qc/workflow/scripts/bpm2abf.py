@@ -123,4 +123,12 @@ def get_abf_from_vcf(vcf: pysam.VariantFile, population: str, variant: Variant) 
 
 
 if __name__ == "__main__":
-    app()
+    if "snakemake" in locals():
+        main(
+            Path(snakemake.input.bpm),  # type: ignore # noqa
+            Path(snakemake.input.vcf),  # type: ignore # noqa
+            snakemake.params.population,  # type: ignore # noqa
+            Path(snakemake.output.abf),  # type: ignore # noqa
+        )
+    else:
+        app()
