@@ -27,9 +27,9 @@ def test_snp_filters(tmp_path: Path, bed_working_dir: Path):
 
         rule all:
             input:
-                "snp_filters/maf/samples.bed",
-                "snp_filters/maf/samples.bim",
-                "snp_filters/maf/samples.fam",
+                "snp_filters/ld_prune/samples.bed",
+                "snp_filters/ld_prune/samples.bim",
+                "snp_filters/ld_prune/samples.fam",
         """
         )
     )
@@ -43,3 +43,10 @@ def test_snp_filters(tmp_path: Path, bed_working_dir: Path):
         assert Path("snp_filters/maf/samples.bed").exists()
         assert Path("snp_filters/maf/samples.bim").exists()
         assert Path("snp_filters/maf/samples.fam").exists()
+
+        assert Path("snp_filters/ld_prune/ldPruneList.prune.in").exists()
+        assert Path("snp_filters/ld_prune/ldPruneList.prune.out").exists()
+
+        assert Path("snp_filters/ld_prune/samples.bed").exists()
+        assert Path("snp_filters/ld_prune/samples.bim").exists()
+        assert Path("snp_filters/ld_prune/samples.fam").exists()
