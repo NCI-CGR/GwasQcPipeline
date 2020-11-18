@@ -19,7 +19,15 @@ First we need to download the development version of GwasQcPipeline. Major devel
 Create a virtual environment (``conda``)
 ----------------------------------------
 
-We recommend you to use virtual environments. There are a number of ways to do this, but since ``conda`` is needed to run the workflow we suggest you just use a ``conda`` environment. If you need to install ``conda`` see the `Miniconda website`_. To create our ``conda`` environment run::
+We recommend you to use virtual environments. There are a number of ways to do this, but since ``conda`` is needed to run the workflow we suggest you just use a ``conda`` environment. If you need to install ``conda`` see the `Miniconda website`_.
+
+Next you need to add two repositories to your conda config by running the following::
+
+    $ conda config --add channels defaults
+    $ conda config --add channels bioconda
+    $ conda config --add channels conda-forge
+
+Next, To create our ``conda`` environment run::
 
     $ conda create -n GwasQcPipeline python=3.8 poetry psutil pysam make -y
     $ conda activate GwasQcPipeline        # Activates virtual environment
