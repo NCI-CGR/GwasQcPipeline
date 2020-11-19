@@ -64,13 +64,9 @@ if (
         output:
             "sample_filters/agg_median_idat_intensity.csv",
         run:
-            with open(output[0], "w") as out:
-                out.write("Sample_ID,Chip_ID,median_intensity\n")
-                for i in input:
-                    pth = Path(i)
-                    sample_id, barcode, position = pth.stem.split(".")
-                    median_intensity = pth.read_text().strip()
-                    out.write(f"{sample_id},{barcode}_{position},{median_intensity}\n")
+            pd.concat([pd.read_csv(file_name) for file_name in input]).to_csv(
+                output[0], index=False
+            )
 
     rule convert_gtc_to_illumina_adpc:
         """Converts a sample's GTC/BPM to an Illumina ADPC.BIN.
