@@ -46,3 +46,36 @@ def test_filter_contamination(small_gtc_working_dir: Path, conda_envs):
         assert Path("sample_filters/not_contaminated/samples.bed").exists()
         assert Path("sample_filters/not_contaminated/samples.bim").exists()
         assert Path("sample_filters/not_contaminated/samples.fam").exists()
+
+
+@pytest.mark.workflow
+def test_ibd(tmp_path: Path, bed_working_dir: Path):
+    """Test sample IBD."""
+    copytree(bed_working_dir, tmp_path, dirs_exist_ok=True)
+    snake = tmp_path / "Snakefile"
+    snake.write_text(
+        dedent(
+            """\
+        from cgr_gwas_qc import load_config
+
+        cfg = load_config()
+
+        include: cfg.rules("common.smk")
+        include: cfg.rules("entry_points.smk")
+        include: cfg.rules("call_rate_filters.smk")
+        include: cfg.rules("snp_filters.smk")
+        include: cfg.rules("sample_filters.smk")
+
+        rule all:
+            input:
+                "sample_filters/ibd/samples.genome",
+        """
+        )
+    )
+
+    with chdir(tmp_path):
+        run(
+            ["snakemake", "-j1", "--use-conda", "--nocolor", "--conda-frontend", "mamba"],
+            check=True,
+        )
+        assert Path("sample_filters/ibd/samples.genome").exists()
