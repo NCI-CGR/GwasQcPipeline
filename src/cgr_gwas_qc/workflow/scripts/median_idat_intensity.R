@@ -1,35 +1,45 @@
 # Parse IDAT files and calculate median intensity.
 require(illuminaio)
 
-calc_median_intensity <- function(redIdat, greenIdat, output){
+calc_median_intensity <- function(
+                                  sample_id,
+                                  chip_id,
+                                  red_idat,
+                                  green_idat,
+                                  output) {
 
-    red <- readIDAT(redIdat)
-    green <- readIDAT(greenIdat)
+  # Calculate median intenisty of red and green channels
+  red <- illuminaio::readIDAT(red_idat)
+  green <- illuminaio::readIDAT(green_idat)
 
-    intensity <- red$Quants[,1] + green$Quants[,1]
-    med_intensity <- median(intensity)
+  intensity <- red$Quants[, 1] + green$Quants[, 1]
+  med_intensity <- median(intensity)
 
-    write.table(med_intensity, file = output, quote = F, col.names = F, row.names = F)
+  # Save a csv "Sample_ID,Chip_ID,median_intensity"
+  df <- data.frame(
+    Sample_ID = sample_id,
+    Chip_ID = chip_id,
+    median_intensity = med_intensity
+  )
 
+  write.csv(df, file = output, quote = F, row.names = F)
 }
 
-if(exists("snakemake")){
-    # The script was run using snakemake
+if (exists("snakemake")) {
+  sample_id <- snakemake@wildcards[["Sample_ID"]]
+  chip_id <- paste(
+    snakemake@wildcards[["SentrixBarcode_A"]],
+    snakemake@wildcards[["SentrixPosition_A"]],
+    sep = "_"
+  )
 
-    calc_median_intensity(snakemake@input[["red"]], snakemake@input[["green"]], snakemake@output[[1]])
-
+  calc_median_intensity(
+    sample_id,
+    chip_id,
+    snakemake@input[["red"]],
+    snakemake@input[["green"]],
+    snakemake@output[[1]]
+  )
 } else {
-    # The script was run from command line
-
-    library("optparse")
-    option_list = list(
-        make_option("--red", type="character", default=NULL, help="Red intensities.", metavar="character"),
-        make_option("--green", type="character", default=NULL, help="Green intensities.", metavar="character"),
-        make_option("--out", type="character", default=NULL, help="Output file", metavar="character")
-    )
-    opt_parser = OptionParser(option_list = option_list)
-    opt = parse_args(opt_parser)
-
-    calc_median_intensity(opt$red, opt$green, opt$out)
-
+  print("This script must be run using Snakemake.")
 }

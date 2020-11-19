@@ -36,6 +36,9 @@ if (
     rule median_idat_intensity:
         """Calculate median intensity overall intensity of Red + Green channels.
 
+        Output:
+            csv table for each sample "Sample_ID,Chip_ID,median_intensity"
+
         .. warning::
             This is a submission hot-spot creating one job per sample. Each output file contains a
             single number, the median intensity.
@@ -45,7 +48,7 @@ if (
             green=cfg.config.user_files.idat_pattern.green,
         output:
             temp(
-                "sample_filters/median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.txt"
+                "sample_filters/median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
             ),
         envmodules:
             cfg.envmodules("r"),
