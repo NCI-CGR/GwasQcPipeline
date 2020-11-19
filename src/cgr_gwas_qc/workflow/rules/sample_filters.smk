@@ -1,4 +1,6 @@
 """This module contains sample level filters."""
+import pandas as pd
+
 ################################################################################
 # Remove Samples with high contamination.
 ################################################################################
@@ -173,8 +175,6 @@ if (
         output:
             "sample_filters/contaminated_samples.txt",
         run:
-            import pandas as pd
-
             (
                 pd.read_csv(input[0])
                 .query(f"`%Mix` > {params.contam_threshold}")
