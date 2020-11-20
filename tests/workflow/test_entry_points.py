@@ -20,6 +20,7 @@ from subprocess import run
 import pytest
 
 from cgr_gwas_qc.testing import chdir
+from cgr_gwas_qc.testing.conda import CondaEnv
 
 snakefile = """\
 from cgr_gwas_qc import load_config
@@ -49,6 +50,7 @@ def test_gtc_entry(tmp_path: Path, gtc_working_dir: Path):
 
     This is the primary entry point and requires sample level GTC files.
     """
+    CondaEnv().copy_env("plink2", tmp_path)
     copytree(gtc_working_dir, tmp_path, dirs_exist_ok=True)
     snake = tmp_path / "Snakefile"
     snake.write_text(snakefile)
@@ -61,6 +63,7 @@ def test_ped_entry(tmp_path: Path, ped_working_dir: Path):
 
     This entry point expects an aggregated (multi-sample) PED/MAP file.
     """
+    CondaEnv().copy_env("plink2", tmp_path)
     copytree(ped_working_dir, tmp_path, dirs_exist_ok=True)
     snake = tmp_path / "Snakefile"
     snake.write_text(snakefile)
