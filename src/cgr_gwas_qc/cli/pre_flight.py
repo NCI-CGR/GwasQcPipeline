@@ -9,7 +9,7 @@ from snakemake.rules import expand
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.exceptions import GwasQcValidationError
 from cgr_gwas_qc.models.config import ReferenceFiles
-from cgr_gwas_qc.validators import bgzip, bpm, gtc
+from cgr_gwas_qc.validators import bgzip, bpm, gtc, sample_sheet
 
 app = typer.Typer(add_completion=False)
 
@@ -22,8 +22,9 @@ def main(reference_check: bool = True, gtc_check: bool = True, idat_check: bool 
     and GTC files. For Idat and GTC files, the user provided file name
     pattern is extended using the columns in the sample sheet.
     """
-    cfg = load_config()  # This already validates the sample sheet
-    typer.secho(f"Sample Sheet OK ({cfg.config.sample_sheet})", fg=typer.colors.GREEN)
+    cfg = load_config()
+    check_sample_sheet(cfg.sample_sheet_file)
+
     if reference_check:
         check_reference_files(cfg.config.reference_files)
 
@@ -34,6 +35,14 @@ def main(reference_check: bool = True, gtc_check: bool = True, idat_check: bool 
 
     if gtc_check:
         check_gtc_files(expand(cfg.config.user_files.gtc_pattern, zip, **cfg.ss.to_dict("list")))
+
+
+def check_sample_sheet(ss: Path):
+    try:
+        sample_sheet.validate(ss)
+        typer.secho(f"Sample Sheet OK ({ss.as_posix()})", fg=typer.colors.GREEN)
+    except sample_sheet.SampleSheetNullRowError:
+        typer.secho(f"Sample Sheet Contains Empty Rows ({ss.as_posix()})", fg=typer.colors.YELLOW)
 
 
 def check_reference_files(reference_files: ReferenceFiles):

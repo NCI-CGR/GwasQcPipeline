@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, FilePath, validator
+from pydantic import BaseModel, Field, FilePath
 
 
 class ReferenceFiles(BaseModel):
@@ -13,25 +13,3 @@ class ReferenceFiles(BaseModel):
     thousand_genome_tbi: FilePath = Field(
         ..., description="Path to the corresponding index for the 1KG VCF file."
     )
-
-    @validator("illumina_manifest_file")
-    def validate_bpm(cls, v):
-        assert v.exists()
-        assert v.suffix == ".bpm"
-        return v
-
-    # @validator("illumina_cluster_filer")
-    # def is_egt(cls, v):
-    #     return v
-
-    @validator("thousand_genome_vcf")
-    def validate_vcf(cls, v):
-        assert v.exists()
-        assert v.suffix == ".gz"
-        return v
-
-    @validator("thousand_genome_tbi")
-    def validate_tbi(cls, v):
-        assert v.exists()
-        assert v.suffix == ".tbi"
-        return v

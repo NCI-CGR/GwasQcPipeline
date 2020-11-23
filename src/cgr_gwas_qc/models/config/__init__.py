@@ -51,18 +51,5 @@ class Config(BaseModel):
             )
         return v
 
-    @validator("sample_sheet")
-    def validate_sample_sheet(cls, v):
-        from cgr_gwas_qc.validators.sample_sheet import SampleSheetNullRowError, validate
-
-        try:
-            validate(v)
-        except SampleSheetNullRowError:
-            # Most of the time I don't care about empty rows. The parser will
-            # drop them automatically. Just warn me if there are any.
-            logger.warn(f"{v.name} contains empty rows.")
-
-        return v
-
 
 Config.update_forward_refs()
