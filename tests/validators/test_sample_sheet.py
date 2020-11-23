@@ -120,7 +120,7 @@ null_data_rows = [
 
 @pytest.mark.parametrize("data", null_data_rows)
 def test_null_row_in_data_section(data):
-    """If emptry row in the Data section, then raise an error."""
+    """If empty row in the Data section, then raise an error."""
     with pytest.raises(SampleSheetNullRowError):
         check_null_rows("mock.csv", data)
 

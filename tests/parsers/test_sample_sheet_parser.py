@@ -28,7 +28,7 @@ def test_strip_terminal_commas(data, expected):
 
 ################################################################################
 # In the Header and Manifests section we want to convert to key-value pairs.
-# This tests the converion of two comma separated values into a dictionary.
+# This tests the conversion of two comma separated values into a dictionary.
 ################################################################################
 strings_without_extra_commas = [
     ("key1,value1\nkey2,value2\n", {"key1": "value1", "key2": "value2"}),
