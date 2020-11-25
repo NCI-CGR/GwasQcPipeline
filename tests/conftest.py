@@ -110,7 +110,7 @@ def small_working_dir(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def small_gtc_working_dir(working_dir: Path) -> Path:
+def small_gtc_working_dir(small_working_dir: Path) -> Path:
     """Testing working directory with per sample GTC files.
 
     This is the most common situation where the user is start with GTC and
@@ -126,7 +126,7 @@ def small_gtc_working_dir(working_dir: Path) -> Path:
     ]
 
     for file_name in gtc_samples:
-        shutil.copyfile("tests/data/illumina/gtc/small_genotype.gtc", working_dir / file_name)
+        shutil.copyfile("tests/data/illumina/gtc/small_genotype.gtc", small_working_dir / file_name)
 
     # create idat files for multiple samples
     idat_samples = [
@@ -141,53 +141,92 @@ def small_gtc_working_dir(working_dir: Path) -> Path:
     ]
 
     for file_name in idat_samples:
-        shutil.copyfile("tests/data/illumina/idat/small_intensity.idat", working_dir / file_name)
+        shutil.copyfile(
+            "tests/data/illumina/idat/small_intensity.idat", small_working_dir / file_name
+        )
 
-    # create config.yml
-    user_files = dict(
-        gtc_pattern="{Sample_ID}.gtc",
-        idat_pattern=dict(
-            red="{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
-            green="{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat",
-        ),
-    )
-    make_config(working_dir, user_files)
+    # create small test data config
+    cfg = {
+        "project_name": "Small Test Project",
+        "sample_sheet": "example_sample_sheet.csv",
+        "reference_files": {
+            "illumina_manifest_file": "small_manifest.bpm",
+            "thousand_genome_vcf": "small_1KG.vcf.gz",
+            "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
+        },
+        "user_files": {
+            "gtc_pattern": "{Sample_ID}.gtc",
+            "idat_pattern": {
+                "red": "{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
+                "green": "{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat",
+            },
+        },
+    }
+    make_config(small_working_dir, cfg)
 
-    return working_dir
+    return small_working_dir
 
 
 @pytest.fixture
-def small_ped_working_dir(working_dir: Path) -> Path:
+def small_ped_working_dir(small_working_dir: Path) -> Path:
     """Testing working directory with aggregated PED and MAP.
 
     This is another entry point where the user has pre-aggregated PED and MAP
     files.
     """
-    # copy ped/map to working_dir
-    shutil.copyfile("tests/data/plink/samples.ped", working_dir / "samples.ped")
-    shutil.copyfile("tests/data/plink/samples.map", working_dir / "samples.map")
+    # copy ped/map to small_working_dir
+    shutil.copyfile("tests/data/plink/samples.ped", small_working_dir / "samples.ped")
+    shutil.copyfile("tests/data/plink/samples.map", small_working_dir / "samples.map")
 
-    # create config.yml
-    user_files = dict(ped="samples.ped", map="samples.map")
-    make_config(working_dir, user_files)
+    # create small test data config
+    cfg = {
+        "project_name": "Small Test Project",
+        "sample_sheet": "example_sample_sheet.csv",
+        "reference_files": {
+            "illumina_manifest_file": "small_manifest.bpm",
+            "thousand_genome_vcf": "small_1KG.vcf.gz",
+            "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
+        },
+        "user_files": {"ped": "samples.ped", "map": "samples.map"},
+    }
+    make_config(small_working_dir, cfg)
 
-    return working_dir
+    return small_working_dir
 
 
 @pytest.fixture
-def small_bed_working_dir(working_dir: Path) -> Path:
+def small_bed_working_dir(small_working_dir: Path) -> Path:
     """Testing working directory with aggregated BED, BIM, and FAM.
 
     This is another entry point where the user has pre-aggregated BED, BIM,
     and FAM files.
     """
-    # copy bed/bim/fam to working_dir
-    shutil.copyfile("tests/data/plink/samples.bed", working_dir / "samples.bed")
-    shutil.copyfile("tests/data/plink/samples.bim", working_dir / "samples.bim")
-    shutil.copyfile("tests/data/plink/samples.fam", working_dir / "samples.fam")
+    # copy bed/bim/fam to small_working_dir
+    shutil.copyfile("tests/data/plink/samples.bed", small_working_dir / "samples.bed")
+    shutil.copyfile("tests/data/plink/samples.bim", small_working_dir / "samples.bim")
+    shutil.copyfile("tests/data/plink/samples.fam", small_working_dir / "samples.fam")
 
-    # create config.yml
-    user_files = dict(bed="samples.bed", bim="samples.bim", fam="samples.fam")
-    make_config(working_dir, user_files)
+    # create small test data config
+    cfg = {
+        "project_name": "Small Test Project",
+        "sample_sheet": "example_sample_sheet.csv",
+        "reference_files": {
+            "illumina_manifest_file": "small_manifest.bpm",
+            "thousand_genome_vcf": "small_1KG.vcf.gz",
+            "thousand_genome_tbi": "small_1KG.vcf.gz.tbi",
+        },
+        "user_files": {"bed": "samples.bed", "bim": "samples.bim", "fam": "samples.fam"},
+    }
+    make_config(small_working_dir, cfg)
 
-    return working_dir
+    return small_working_dir
+
+
+##################################################################################
+# Example Data (From Plink Website)
+##################################################################################
+
+
+##################################################################################
+# Real Data (Only use internally)
+##################################################################################

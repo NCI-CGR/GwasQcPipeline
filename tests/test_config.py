@@ -5,6 +5,7 @@ import pytest
 
 from cgr_gwas_qc.config import ConfigMgr, scan_for_yaml
 from cgr_gwas_qc.testing import chdir
+from cgr_gwas_qc.version import __version__
 
 ################################################################################
 # Make sure both `config.yml` or `config.yaml` are found.
@@ -32,7 +33,7 @@ def test_scan_for_yaml(tmp_path, name, ext):
 def test_manually_loading_config(small_bed_working_dir: Path):
     with chdir(small_bed_working_dir):
         cfg = ConfigMgr.instance()
-        assert cfg.config.project_name == "Test Project"
+        assert cfg.config.pipeline_version == __version__
         assert isinstance(cfg.ss, pd.DataFrame)
 
 
@@ -41,7 +42,7 @@ def test_load_config(small_bed_working_dir: Path):
 
     with chdir(small_bed_working_dir):
         cfg = load_config()
-        assert cfg.config.project_name == "Test Project"
+        assert cfg.config.pipeline_version == __version__
         assert isinstance(cfg.ss, pd.DataFrame)
 
 
