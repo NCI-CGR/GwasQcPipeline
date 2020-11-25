@@ -9,6 +9,31 @@ from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.conda import CondaEnv
 
 
+##################################################################################
+# Pytest Configuration and Hooks
+##################################################################################
+def pytest_addoption(parser):
+    """Add pytest command line options."""
+    parser.addoption(
+        "--real-data", action="store_true", default=False, help="Run tests with real data."
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Modify tests based on command line options.
+
+    Based on an example from the pytest website:
+        https://docs.pytest.org/en/6.0.1/example/simple.html#control-skipping-of-tests-according-to-command-line-option
+    """
+    if not config.getoption("--real-data"):
+        # Skip test that are marked with `real_data` unless the command line
+        # flag `--real-data` is provided
+        skip_real_data = pytest.mark.skip(reason="need --real-data option to run")
+        for item in items:
+            if "real_data" in item.keywords:
+                item.add_marker(skip_real_data)
+
+
 @pytest.fixture(scope="session")
 def gtc_file():
     return Path("tests/data/illumina/gtc/small_genotype.gtc")

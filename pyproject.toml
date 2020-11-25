@@ -57,7 +57,8 @@ line-length = 100
 [tool.pytest.ini_options]
 markers = [
     "regression: Functional tests to compare with outputs from legacy workflow.",
-    "workflow: Snakemake workflow tests, partial integration tests for snakemake modules."
+    "workflow: Snakemake workflow tests, partial integration tests for snakemake modules.",
+    "real_data: Mark test to run if we can use real internal data."
 ]
 
 [build-system]
