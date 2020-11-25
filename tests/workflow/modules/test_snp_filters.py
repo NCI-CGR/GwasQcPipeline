@@ -1,21 +1,18 @@
 from pathlib import Path
-from shutil import copytree
 from subprocess import run
 from textwrap import dedent
 
 import pytest
 
 from cgr_gwas_qc.testing import chdir
-from cgr_gwas_qc.testing.conda import CondaEnv
 
 
 @pytest.mark.xfail
 @pytest.mark.workflow
-def test_snp_filters(tmp_path: Path, bed_working_dir: Path):
+def test_snp_filters(small_bed_working_dir: Path, conda_envs):
     """Test sample contamination filter."""
-    CondaEnv().copy_env("plink2", tmp_path)
-    copytree(bed_working_dir, tmp_path, dirs_exist_ok=True)
-    snake = tmp_path / "Snakefile"
+    conda_envs.copy_all_envs(small_bed_working_dir)
+    snake = small_bed_working_dir / "Snakefile"
     snake.write_text(
         dedent(
             """\
@@ -37,7 +34,7 @@ def test_snp_filters(tmp_path: Path, bed_working_dir: Path):
         )
     )
 
-    with chdir(tmp_path):
+    with chdir(small_bed_working_dir):
         run(
             ["snakemake", "-j1", "--use-conda", "--nocolor", "--conda-frontend", "mamba"],
             check=True,

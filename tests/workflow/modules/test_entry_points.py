@@ -14,13 +14,11 @@ For testing entry points we need to make sure that the entry point files are
 present in the working directory and that they are referenced in the config.
 """
 from pathlib import Path
-from shutil import copytree
 from subprocess import run
 
 import pytest
 
 from cgr_gwas_qc.testing import chdir
-from cgr_gwas_qc.testing.conda import CondaEnv
 
 snakefile = """\
 from cgr_gwas_qc import load_config
@@ -45,33 +43,31 @@ def run_and_check_for_plink_start_samples(tmp_path):
 
 
 @pytest.mark.workflow
-def test_gtc_entry(tmp_path: Path, gtc_working_dir: Path):
+def test_gtc_entry(small_gtc_working_dir: Path, conda_envs):
     """GTC entry point.
 
     This is the primary entry point and requires sample level GTC files.
     """
-    CondaEnv().copy_env("plink2", tmp_path)
-    copytree(gtc_working_dir, tmp_path, dirs_exist_ok=True)
-    snake = tmp_path / "Snakefile"
+    conda_envs.copy_all_envs(small_gtc_working_dir)
+    snake = small_gtc_working_dir / "Snakefile"
     snake.write_text(snakefile)
-    run_and_check_for_plink_start_samples(tmp_path)
+    run_and_check_for_plink_start_samples(small_gtc_working_dir)
 
 
 @pytest.mark.workflow
-def test_ped_entry(tmp_path: Path, ped_working_dir: Path):
+def test_ped_entry(small_ped_working_dir: Path, conda_envs):
     """Aggregated PED entry point.
 
     This entry point expects an aggregated (multi-sample) PED/MAP file.
     """
-    CondaEnv().copy_env("plink2", tmp_path)
-    copytree(ped_working_dir, tmp_path, dirs_exist_ok=True)
-    snake = tmp_path / "Snakefile"
+    conda_envs.copy_all_envs(small_ped_working_dir)
+    snake = small_ped_working_dir / "Snakefile"
     snake.write_text(snakefile)
-    run_and_check_for_plink_start_samples(tmp_path)
+    run_and_check_for_plink_start_samples(small_ped_working_dir)
 
 
 @pytest.mark.workflow
-def test_bed_entry(tmp_path: Path, bed_working_dir: Path):
+def test_bed_entry(small_bed_working_dir: Path):
     """Aggregated BED entry point.
 
     This entry point expects an aggregated (multi-sample) BED/BIM/FAM file.
@@ -79,12 +75,11 @@ def test_bed_entry(tmp_path: Path, bed_working_dir: Path):
     are just symbolically linked to the expected location
     ``plink_start/samples.{bed,bim,fam}``.
     """
-    copytree(bed_working_dir, tmp_path, dirs_exist_ok=True)
-    snake = tmp_path / "Snakefile"
+    snake = small_bed_working_dir / "Snakefile"
     snake.write_text(snakefile)
-    run_and_check_for_plink_start_samples(tmp_path)
+    run_and_check_for_plink_start_samples(small_bed_working_dir)
 
-    with chdir(tmp_path):
+    with chdir(small_bed_working_dir):
         # Check files are symbolic links
         assert Path("plink_start/samples.bed").is_symlink()
         assert Path("plink_start/samples.bim").is_symlink()
