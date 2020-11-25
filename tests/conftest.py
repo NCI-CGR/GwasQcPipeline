@@ -34,6 +34,23 @@ def pytest_collection_modifyitems(config, items):
                 item.add_marker(skip_real_data)
 
 
+##################################################################################
+# Helper Functions
+##################################################################################
+def make_config(current_dir: Path, config: dict) -> None:
+    # adding defaults for software and workflow params
+    config["software_params"] = cfg_models.SoftwareParams().dict()
+    config["workflow_params"] = cfg_models.WorkflowParams().dict()
+
+    # write out the config to `current_dir/config.yml`
+    with chdir(current_dir):
+        cfg = cfg_models.Config.parse_obj(config)
+        config_to_yaml(cfg)
+
+
+##################################################################################
+# Small Test Data (Fake)
+##################################################################################
 @pytest.fixture(scope="session")
 def gtc_file():
     return Path("tests/data/illumina/gtc/small_genotype.gtc")
@@ -77,28 +94,8 @@ def conda_envs() -> CondaEnv:
     return CondaEnv()
 
 
-def make_config(current_dir: Path, user_files: dict) -> None:
-    with chdir(current_dir):
-        cfg = cfg_models.Config(
-            project_name="Test Project",
-            sample_sheet="example_sample_sheet.csv",
-            reference_files=cfg_models.ReferenceFiles(
-                illumina_manifest_file="small_manifest.bpm",
-                thousand_genome_vcf="small_1KG.vcf.gz",
-                thousand_genome_tbi="small_1KG.vcf.gz.tbi",
-            ),
-            user_files=cfg_models.UserFiles(**user_files),
-            software_params=cfg_models.SoftwareParams(),
-            workflow_params=cfg_models.WorkflowParams(),
-        )
-        config_to_yaml(cfg)
-
-
-##################################################################################
-# Small Test Data (Fake)
-##################################################################################
 @pytest.fixture
-def working_dir(tmp_path: Path) -> Path:
+def small_working_dir(tmp_path: Path) -> Path:
     """Base working directory for fake data.
 
     Directory small test reference data files.
