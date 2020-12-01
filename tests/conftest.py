@@ -50,6 +50,20 @@ def make_config(current_dir: Path, config: dict) -> None:
 
 
 ##################################################################################
+# Common Fixtures
+##################################################################################
+@pytest.fixture(scope="session")
+def conda_envs() -> CondaEnv:
+    """Build conda env object.
+
+    If a conda environment does not exists then it will build it. Then I can
+    use this object to copy conda environments around my temporary
+    test directories.
+    """
+    return CondaEnv()
+
+
+##################################################################################
 # Small Test Data (Fake)
 ##################################################################################
 @pytest.fixture(scope="session")
@@ -82,17 +96,6 @@ def vcf(vcf_file):
     import pysam
 
     return pysam.VariantFile(vcf_file, "r")
-
-
-@pytest.fixture(scope="session")
-def conda_envs() -> CondaEnv:
-    """Build conda env object.
-
-    If a conda environment does not exists then it will build it. Then I can
-    use this object to copy conda environments around my temporary
-    test directories.
-    """
-    return CondaEnv()
 
 
 @pytest.fixture
