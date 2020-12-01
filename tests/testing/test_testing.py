@@ -2,7 +2,14 @@ import os
 from pathlib import Path
 from textwrap import dedent
 
-from cgr_gwas_qc.testing import chdir, file_hashes_equal, file_rows_almost_equal, make_snakefile
+from cgr_gwas_qc import load_config
+from cgr_gwas_qc.testing import (
+    chdir,
+    file_hashes_equal,
+    file_rows_almost_equal,
+    make_snakefile,
+    make_test_config,
+)
 
 
 def test_chdir(tmp_path):
@@ -61,6 +68,17 @@ def test_files_almost_not_equal(tmp_path):
     file2.write_text("foo\t0.015\nbar\t0.05")
 
     assert file_rows_almost_equal(file1, file2, fuzzy_col=1) is False
+
+
+def test_make_test_config(tmp_path):
+    make_test_config(tmp_path)
+
+    with chdir(tmp_path):
+        cfg = load_config(validate=False)
+
+    assert cfg.config.sample_sheet == "sample_sheet.csv"
+    assert cfg.config.user_files.gtc_pattern is not None
+    assert cfg.config.user_files.idat_pattern is not None
 
 
 def test_make_snakefile(tmp_path):
