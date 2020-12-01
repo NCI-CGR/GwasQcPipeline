@@ -5,7 +5,14 @@ import pandas as pd
 from snakemake.rules import expand
 
 import cgr_gwas_qc.yaml as yaml
-from cgr_gwas_qc.models.config import Config
+from cgr_gwas_qc.models.config import (
+    Config,
+    Idat,
+    ReferenceFiles,
+    SoftwareParams,
+    UserFiles,
+    WorkflowParams,
+)
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 
 
@@ -60,12 +67,12 @@ class ConfigMgr:
         self.user_config = user_config
 
         if validate:
-            self._config = Config(**yaml.load(self.user_config))
+            self._config = self._load_with_validation()
             self.sample_sheet_file = self.config.sample_sheet
             self._sample_sheet = SampleSheet(self.sample_sheet_file)
         else:
             # Force loading without validation. Use this only for debugging
-            self._config = Config.construct(**yaml.load(self.user_config))
+            self._config = self._load_without_validation()
             try:
                 self.sample_sheet_file = self.config.sample_sheet
                 self._sample_sheet = SampleSheet(self.sample_sheet_file)
@@ -81,6 +88,31 @@ class ConfigMgr:
         if cls.__instance is None:
             cls.__instance = cls(*find_configs(), validate)
         return cls.__instance
+
+    def _load_with_validation(self) -> Config:
+        """Load config object and validate."""
+        data = yaml.load(self.user_config)
+        return Config(**data)
+
+    def _load_without_validation(self) -> Config:
+        """Load config object without validation."""
+        data = yaml.load(self.user_config)
+
+        user_files = UserFiles.construct(**data.pop("user_files"))
+        if user_files.idat_pattern:
+            user_files.idat_pattern = Idat.construct(**user_files.idat_pattern)
+
+        reference_files = ReferenceFiles.construct(**data.pop("reference_files"))
+        software_params = SoftwareParams.construct(**data.pop("software_params"))
+        workflow_params = WorkflowParams.construct(**data.pop("workflow_params"))
+
+        return Config.construct(
+            reference_files=reference_files,
+            user_files=user_files,
+            software_params=software_params,
+            workflow_params=workflow_params,
+            **data,
+        )
 
     ################################################################################
     # Access to the user's config and Sample Sheet
@@ -103,7 +135,7 @@ class ConfigMgr:
         """Use sample sheet columns to fill in file pattern
 
         Args:
-            file_pattern: A snakemake compatable file name pattern.
+            file_pattern: A snakemake compatible file name pattern.
             combination: The combinatorial method to use (see
               snakemake.rules.expand). Defaults to zip.
             query: A pandas.DataFrame.query to use to filter before
