@@ -3,6 +3,7 @@ import os
 from hashlib import sha256
 from math import isclose
 from pathlib import Path
+from textwrap import dedent
 from typing import Union
 
 
@@ -48,3 +49,8 @@ def file_rows_almost_equal(
                 results.append(isclose(float(c1), float(c2), rel_tol=1e-4))
 
     return all(results)
+
+
+def make_snakefile(working_dir: Path, contents: str):
+    snakefile = working_dir / "Snakefile"
+    snakefile.write_text(dedent(contents))
