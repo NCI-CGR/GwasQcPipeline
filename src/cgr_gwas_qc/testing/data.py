@@ -4,6 +4,7 @@ We have a set of real data for use in regression testing. Currently, we are
 keeping these data private and will only be used for testing on NIH machines.
 """
 import os
+import shutil
 import subprocess
 from logging import getLogger
 from pathlib import Path
@@ -77,6 +78,14 @@ class RealDataCache:
             subprocess.run(cmd, shell=True, check=True, stderr=subprocess.STDOUT)
         except subprocess.SubprocessError:
             logger.warn(f"Could not connect to {SERVER}.")
+
+    def copy(self, source: str, destination: Path):
+        if (self / source).is_dir():
+            shutil.copytree(self / source, destination.absolute())
+        elif (self / source).is_file():
+            shutil.copyfile(self / source, destination.absolute())
+        else:
+            raise FileNotFoundError(f"{(self / source).as_posix()} does not exist.")
 
     def __truediv__(self, value):
         """Override division operator to build paths."""
