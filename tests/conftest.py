@@ -7,6 +7,7 @@ from cgr_gwas_qc.config import config_to_yaml
 from cgr_gwas_qc.models import config as cfg_models
 from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.conda import CondaEnv
+from cgr_gwas_qc.testing.data import RealDataCache
 
 
 ##################################################################################
@@ -230,3 +231,7 @@ def small_bed_working_dir(small_working_dir: Path) -> Path:
 ##################################################################################
 # Real Data (Only use internally)
 ##################################################################################
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def real_data_cache() -> RealDataCache:
+    return RealDataCache()
