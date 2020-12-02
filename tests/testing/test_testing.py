@@ -74,11 +74,9 @@ def test_make_test_config(tmp_path):
     make_test_config(tmp_path)
 
     with chdir(tmp_path):
-        cfg = load_config(validate=False)
+        cfg = load_config()
 
-    assert cfg.config.sample_sheet == "sample_sheet.csv"
-    assert cfg.config.user_files.gtc_pattern is not None
-    assert cfg.config.user_files.idat_pattern is not None
+    assert cfg.config.sample_sheet == Path("sample_sheet.csv")
 
 
 def test_make_snakefile(tmp_path):
