@@ -1,8 +1,9 @@
 """Configuration system data models."""
 from logging import getLogger
+from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseModel, Field, FilePath, validator
+from pydantic import BaseModel, Field, validator
 
 from cgr_gwas_qc.version import __version__
 
@@ -34,13 +35,15 @@ class Config(BaseModel):
     """
 
     pipeline_version: str = Field(__version__, description="The version of the pipeline to use.")
-    project_name: str = Field(..., description="The project title.")
-    sample_sheet: FilePath = Field(..., description="Path to the sample manifest from LIMs.")
-    reference_files: ReferenceFiles  # Paths to reference files.
-    user_files: UserFiles  # Paths to user provided files.
-    software_params: SoftwareParams  # Various software parameters.
-    workflow_params: WorkflowParams  # Parameters to control how the workflow is run.
-    env_modules: Optional[EnvModules] = None  # Use these HPC environmental modules."
+    project_name: str = Field("Example Project Name", description="The project title.")
+    sample_sheet: Path = Field(
+        Path("sample_sheet.csv"), description="Path to the sample manifest from LIMs."
+    )
+    reference_files: ReferenceFiles = ReferenceFiles()  # Paths to reference files.
+    user_files: UserFiles = UserFiles()  # Paths to user provided files.
+    software_params: SoftwareParams = SoftwareParams()  # Various software parameters.
+    workflow_params: WorkflowParams = WorkflowParams()  # Parameters to control how the workflow is run.
+    env_modules: Optional[EnvModules]  # Use these HPC environmental modules."
 
     @validator("pipeline_version")
     def validate_pipeline_version(cls, v):
