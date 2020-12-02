@@ -5,37 +5,25 @@ from pydantic import ValidationError
 
 from cgr_gwas_qc.models.config import (
     Config,
+    Idat,
     ReferenceFiles,
     SoftwareParams,
     UserFiles,
     WorkflowParams,
 )
-from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.version import __version__
 
 
-def test_reference_files_must_exist():
-    with pytest.raises(ValidationError):
-        ReferenceFiles(
-            illumina_manifest_file="test.bpm",
-            thousand_genome_vcf="test.vcf.gz",
-            thousand_genome_tbi="test.vcf.gz.tbi",
-        )
+def test_reference_files():
+    refs = ReferenceFiles(
+        illumina_manifest_file="test.bpm",
+        thousand_genome_vcf="test.vcf.gz",
+        thousand_genome_tbi="test.vcf.gz.tbi",
+    )
 
-
-def test_reference_files(tmp_path):
-    with chdir(tmp_path):
-        [Path(x).touch() for x in ("test.bpm", "test.vcf.gz", "test.vcf.gz.tbi")]
-
-        refs = ReferenceFiles(
-            illumina_manifest_file="test.bpm",
-            thousand_genome_vcf="test.vcf.gz",
-            thousand_genome_tbi="test.vcf.gz.tbi",
-        )
-
-        assert refs.illumina_manifest_file == Path("test.bpm")
-        assert refs.thousand_genome_vcf == Path("test.vcf.gz")
-        assert refs.thousand_genome_tbi == Path("test.vcf.gz.tbi")
+    assert refs.illumina_manifest_file == Path("test.bpm")
+    assert refs.thousand_genome_vcf == Path("test.vcf.gz")
+    assert refs.thousand_genome_tbi == Path("test.vcf.gz.tbi")
 
 
 def test_user_files_defaults():
@@ -47,6 +35,55 @@ def test_user_files_defaults():
     assert user_files.bed is None
     assert user_files.bim is None
     assert user_files.fam is None
+
+
+def test_user_files_gtc_pattern():
+    UserFiles(gtc_pattern="{test}.gtc")
+
+    with pytest.raises(ValidationError):
+        UserFiles(gtc_pattern="test.gtc")
+
+    with pytest.raises(ValidationError):
+        UserFiles(gtc_pattern="{test}.txt")
+
+
+def test_user_files_ped_map():
+    UserFiles(ped="test.ped", map="test.map")
+
+    with pytest.raises(ValidationError):
+        UserFiles(map="test.map")
+
+    with pytest.raises(ValidationError):
+        UserFiles(ped="test.ped")
+
+
+def test_user_files_bed_bim_fam():
+    UserFiles(bed="test.bed", bim="test.bim", fam="test.fam")
+
+    with pytest.raises(ValidationError):
+        UserFiles(bim="test.bim", fam="test.fam")
+
+    with pytest.raises(ValidationError):
+        UserFiles(bed="test.bed", fam="test.fam")
+
+    with pytest.raises(ValidationError):
+        UserFiles(bed="test.bed", bim="test.bim")
+
+
+def test_idat():
+    Idat(red="{test}_Red.idat", green="{test}_Grn.idat")
+
+    with pytest.raises(ValidationError):
+        Idat()
+
+    with pytest.raises(ValidationError):
+        Idat(red="{test}_Red.idat")
+
+    with pytest.raises(ValidationError):
+        Idat(red="test_Red.idat", green="{test}_Grn.idat")
+
+    with pytest.raises(ValidationError):
+        Idat(red="{test}_Red.txt", green="{test}_Grn.idat")
 
 
 def test_software_params_defaults():
@@ -77,28 +114,28 @@ def test_workflow_params_defaults():
     assert workflow_params.remove_unexpected_rep is True
 
 
-def test_basic_config(tmp_path):
-    with chdir(tmp_path):
-        [
-            Path(x).touch()
-            for x in ("test.bpm", "test.vcf.gz", "test.vcf.gz.tbi", "sample_sheet.csv")
-        ]
-        cfg = Config(
-            project_name="Test Project",
-            sample_sheet="sample_sheet.csv",
-            reference_files=ReferenceFiles(
-                illumina_manifest_file="test.bpm",
-                thousand_genome_vcf="test.vcf.gz",
-                thousand_genome_tbi="test.vcf.gz.tbi",
-            ),
-            user_files=UserFiles(),
-            software_params=SoftwareParams(),
-            workflow_params=WorkflowParams(),
-        )
+def test_basic_config():
+    cfg = Config()
 
-        assert cfg.project_name == "Test Project"
-        assert cfg.sample_sheet == Path("sample_sheet.csv")
-        assert cfg.pipeline_version == __version__
+    assert cfg.project_name == "Example Project Name"
+    assert cfg.sample_sheet == Path("sample_sheet.csv")
+    assert cfg.pipeline_version == __version__
+
+
+def test_basic_config_with_reference_files():
+    cfg = Config(reference_files=dict(illumina_manifest_file="test.bpm"))
+    assert cfg.reference_files.illumina_manifest_file == Path("test.bpm")
+
+
+def test_basic_config_with_user_files():
+    cfg = Config(
+        user_files={
+            "idat_pattern": {"red": "{test}_Red.idat", "green": "{test}_Grn.idat"},
+            "gtc_pattern": "{test}.gtc",
+        }
+    )
+    assert cfg.user_files.idat_pattern.red == "{test}_Red.idat"
+    assert cfg.user_files.gtc_pattern == "{test}.gtc"
 
 
 @pytest.mark.parametrize("value", [-0.01, 0, 1.01])
