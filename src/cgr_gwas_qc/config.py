@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
+from warnings import warn
 
 import pandas as pd
 from snakemake.rules import expand
@@ -56,13 +57,18 @@ class ConfigMgr:
     # Set-up
     ################################################################################
     def __init__(self, root: Path, user_config: Path):
-        self.root = root
-        self.user_config = user_config
+        self.root: Path = root
+        self.user_config: Path = user_config
 
         data = yaml.load(self.user_config)
         self._config = Config.parse_obj(data)
-        self.sample_sheet_file = self.config.sample_sheet
-        self._sample_sheet = SampleSheet(self.sample_sheet_file)
+        self.sample_sheet_file: Path = self.config.sample_sheet
+        self._sample_sheet: Optional[SampleSheet] = None
+
+        try:
+            self._sample_sheet = SampleSheet(self.sample_sheet_file)
+        except Exception:
+            warn(f"Sample Sheet: {self.sample_sheet_file} could not be loaded.", RuntimeWarning)
 
     @classmethod
     def instance(cls):
@@ -84,6 +90,10 @@ class ConfigMgr:
     @property
     def ss(self) -> pd.DataFrame:
         """Access the sample sheet DataFrame."""
+        if self._sample_sheet is None:
+            warn(f"Sample Sheet: {self.sample_sheet_file} was not loaded.", RuntimeWarning)
+            return None
+
         return self._sample_sheet.data
 
     ################################################################################

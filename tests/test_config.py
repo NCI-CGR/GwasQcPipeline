@@ -3,8 +3,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr, scan_for_yaml
-from cgr_gwas_qc.testing import chdir
+from cgr_gwas_qc.testing import chdir, make_test_config
 from cgr_gwas_qc.version import __version__
 
 ################################################################################
@@ -38,12 +39,24 @@ def test_manually_loading_config(small_bed_working_dir: Path):
 
 
 def test_load_config(small_bed_working_dir: Path):
-    from cgr_gwas_qc import load_config
-
     with chdir(small_bed_working_dir):
         cfg = load_config()
         assert cfg.config.pipeline_version == __version__
         assert isinstance(cfg.ss, pd.DataFrame)
+
+
+def test_load_config_missing_sample_sheet(tmp_path):
+    make_test_config(tmp_path)
+    with chdir(tmp_path):
+        with pytest.warns(RuntimeWarning):
+            """Warn that sample_sheet.csv is not there"""
+            cfg = load_config()
+
+        with pytest.warns(RuntimeWarning):
+            """Trying to access sample raises warning and gives None"""
+            val = cfg.ss
+
+        assert val is None
 
 
 ################################################################################
