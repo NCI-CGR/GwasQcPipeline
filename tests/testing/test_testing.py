@@ -70,7 +70,9 @@ def test_files_almost_not_equal(tmp_path):
     assert file_rows_almost_equal(file1, file2, fuzzy_col=1) is False
 
 
-def test_make_test_config(tmp_path):
+def test_make_test_config(test_data, tmp_path):
+    test_data.copy_sample_sheet(tmp_path)
+
     make_test_config(tmp_path)
 
     with chdir(tmp_path):
