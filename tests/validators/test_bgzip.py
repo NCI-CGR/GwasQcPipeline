@@ -32,6 +32,11 @@ def test_bad_magic_number(bpm_file):
 ################################################################################
 @pytest.fixture(params=[1, 2, 4])
 def truncated_vcf(tmp_path, vcf_file, request):
+    """Returns the path to a truncated VCF file.
+
+    Removes the last ``request.param`` bytes from a test VCF file and save
+    it. Then returns the path to this file.
+    """
     data = vcf_file.read_bytes()
     trunc_file = tmp_path / "truncated.vcf.gz"
     with trunc_file.open("wb") as fh:

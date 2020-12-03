@@ -39,23 +39,42 @@ def pytest_collection_modifyitems(config, items):
 ##################################################################################
 @pytest.fixture(scope="session")
 def conda_envs() -> CondaEnv:
-    """Build conda env object.
+    """Returns a ``CondaEnv`` object.
 
-    If a conda environment does not exists then it will build it. Then I can
-    use this object to copy conda environments around my temporary
-    test directories.
+    If a conda environment does not exists then it will build it in a central
+    cache. To copy all conda environments into the working directory ``working_dir`` use:
+
+        >>> conda_envs.copy_all_envs(working_dir)
     """
     return CondaEnv()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def test_data() -> TestData:
+    """Returns a ``TestData`` object.
+
+    The ``TestData`` object is used to copy various pieces of test data into a working dir.
+
+    Example::
+
+        >>> (
+        ...     test_data
+        ...     .copy_sample_sheet(working_dir)  # Copy the Sample Sheet
+        ...     .copy_reference_files(working_dir)  # Copy all reference files
+        ...     .copy_user_files(working_dir, entry_point="gtc")  # Create GTC/IDAT test files
+        ...     .make_config(working_dir)  # Create a config based on the copied files
+        ... )
+    """
     return TestData()
 
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
 def real_data() -> RealDataCache:
+    """Returns a ``RealDataCache`` object.
+
+    Syncs real data locally into a cache. Then makes copying data from the cache easier.
+    """
     return RealDataCache()
 
 
@@ -85,44 +104,57 @@ def mock_ConfigMgr(monkeypatch):
 ##################################################################################
 @pytest.fixture(scope="session")
 def gtc_file() -> Path:
-    return Path("tests/data/illumina/gtc/small_genotype.gtc")
+    """Returns the path to a test gtc file."""
+    return Path("tests/data/illumina/gtc/small_genotype.gtc").absolute()
 
 
 @pytest.fixture(scope="session")
 def gtc(gtc_file) -> GenotypeCalls:
+    """Returns an ``Illumina.GenotypeCalls`` object."""
     return GenotypeCalls(gtc_file)
 
 
 @pytest.fixture(scope="session")
 def vcf_file() -> Path:
-    return Path("tests/data/1KG/small_1KG.vcf.gz")
+    """Returns the path to a test vcf file."""
+    return Path("tests/data/1KG/small_1KG.vcf.gz").absolute()
 
 
 @pytest.fixture(scope="session")
 def bpm_file():
-    return Path("tests/data/illumina/bpm/small_manifest.bpm")
+    """Returns the path to a test bpm file."""
+    return Path("tests/data/illumina/bpm/small_manifest.bpm").absolute()
 
 
 @pytest.fixture(scope="session")
 def bpm(bpm_file) -> BeadPoolManifest:
+    """Returns an ``Illumina.BeadPoolManifest`` object."""
     return BeadPoolManifest(bpm_file)
 
 
 @pytest.fixture(scope="session")
 def sample_sheet_file() -> Path:
-    return Path("tests/data/example_sample_sheet.csv")
+    """Returns the path to a test sample sheet."""
+    return Path("tests/data/example_sample_sheet.csv").absolute()
 
 
 @pytest.fixture(scope="session")
 def sample_sheet(sample_sheet_file) -> SampleSheet:
+    """Returns a ``SampleSheet`` object.
+
+    The data section in the sample sheet can be accessed as a
+    ``pandas.DataFrame`` using ``sample_sheet.data``.
+    """
     return SampleSheet(sample_sheet_file)
 
 
 @pytest.fixture(scope="session")
 def bim_file() -> Path:
-    return Path("tests/data/plink/samples.bim")
+    """Returns the path to a test bpm file."""
+    return Path("tests/data/plink/samples.bim").absolute()
 
 
 @pytest.fixture(scope="session")
 def vcf(vcf_file) -> pysam.VariantFile:
+    """Returns a ``pysam.VariantFile``."""
     return pysam.VariantFile(vcf_file, "r")

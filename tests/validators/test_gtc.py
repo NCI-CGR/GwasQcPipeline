@@ -29,6 +29,11 @@ def test_bad_magic_number(bpm_file):
 ################################################################################
 @pytest.fixture(params=[1, 2, 4])
 def truncated_gtc(tmp_path, gtc_file, request):
+    """Returns the path to a truncated GTC file.
+
+    Removes the last ``request.param`` bytes from a test GTC file and save
+    it. Then returns the path to this file.
+    """
     data = gtc_file.read_bytes()
     trunc_file = tmp_path / "truncated.gtc"
     with trunc_file.open("wb") as fh:

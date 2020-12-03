@@ -185,6 +185,11 @@ missing_req_column = [
 
 @pytest.fixture(params=missing_req_column)
 def missing_data_req_column(tmp_path, request):
+    """Returns the path to a sample sheet with missing required column.
+
+    Currently, ``Sample_ID`` and ``LIMS_Individual_ID`` are required columns.
+    This creates a sample sheet without these columns.
+    """
     sample_sheet = tmp_path / "sample_sheet.csv"
     sample_sheet.write_text(request.param)
     return sample_sheet
@@ -222,6 +227,11 @@ missing_values_in_req_column = [
 
 @pytest.fixture(params=missing_values_in_req_column)
 def missing_data_values(tmp_path, request):
+    """Returns the path to a sample sheet with missing data in a required column.
+
+    Currently, ``Sample_ID`` and ``LIMS_Individual_ID`` are required columns.
+    This creates a sample sheet with missind data in these columns.
+    """
     sample_sheet = tmp_path / "sample_sheet.csv"
     sample_sheet.write_text(request.param)
     return sample_sheet

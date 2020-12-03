@@ -11,6 +11,12 @@ from cgr_gwas_qc.version import __version__
 
 @pytest.fixture
 def example_working_dir(tmp_path, test_data):
+    """Returns an test working directory.
+
+    The working directory contains:
+        - Sample Sheet
+        - Config File
+    """
     test_data.copy_sample_sheet(tmp_path).make_config(tmp_path)
     return tmp_path
 
