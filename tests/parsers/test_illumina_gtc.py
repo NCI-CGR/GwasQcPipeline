@@ -1,17 +1,4 @@
 import numpy as np
-import pytest
-
-from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
-
-
-@pytest.fixture(scope="module")
-def gtc(gtc_file) -> GenotypeCalls:
-    return GenotypeCalls(gtc_file)
-
-
-@pytest.fixture(scope="module")
-def bpm(bpm_file) -> BeadPoolManifest:
-    return BeadPoolManifest(bpm_file)
 
 
 ################################################################################

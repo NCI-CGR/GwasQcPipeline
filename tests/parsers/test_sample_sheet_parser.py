@@ -55,11 +55,6 @@ def test_load_str_or_path(file_name):
     assert sorted(_sample_sheet._sections.keys()) == sorted(["header", "manifests", "data"])
 
 
-@pytest.fixture(scope="module")
-def sample_sheet(sample_sheet_file):
-    return SampleSheet(sample_sheet_file)
-
-
 ################################################################################
 # The parsed Header and Manifest should be dictionaries while the Data section
 # should be a pandas.DataFrame.

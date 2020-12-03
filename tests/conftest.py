@@ -1,11 +1,12 @@
-import shutil
 from pathlib import Path
 
+import pysam
 import pytest
 
-from cgr_gwas_qc.testing import make_test_config
+from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
+from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 from cgr_gwas_qc.testing.conda import CondaEnv
-from cgr_gwas_qc.testing.data import RealDataCache
+from cgr_gwas_qc.testing.data import RealDataCache, TestData
 
 
 ##################################################################################
@@ -47,16 +48,53 @@ def conda_envs() -> CondaEnv:
     return CondaEnv()
 
 
+@pytest.fixture(scope="session")
+def test_data() -> TestData:
+    return TestData()
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def real_data() -> RealDataCache:
+    return RealDataCache()
+
+
+@pytest.fixture(autouse=True)
+def mock_ConfigMgr(monkeypatch):
+    """Monkeypatch the ``ConfigMgr``.
+
+    The ``ConfigMgr`` is designed to create only a single instance. If a
+    ``ConfigMgr`` object already exists in the python session it should just
+    return that object. This is important to make sure we only have one
+    ``ConfigMgr`` object when running the workflow. However, when testing we
+    want to create a new object for each test because they all have different
+    working directories and configs. Here I monkeypatch the
+    ``ConfigMgr.instance()`` method to change it so it always returns a new
+    ``ConfigMgr`` object.
+    """
+    from cgr_gwas_qc.config import ConfigMgr, find_configs
+
+    def mock_instance(*args, **kwargs):
+        return ConfigMgr(*find_configs(), **kwargs)
+
+    monkeypatch.setattr(ConfigMgr, "instance", mock_instance)
+
+
 ##################################################################################
 # Small Test Data (Fake)
 ##################################################################################
 @pytest.fixture(scope="session")
-def gtc_file():
+def gtc_file() -> Path:
     return Path("tests/data/illumina/gtc/small_genotype.gtc")
 
 
 @pytest.fixture(scope="session")
-def vcf_file():
+def gtc(gtc_file) -> GenotypeCalls:
+    return GenotypeCalls(gtc_file)
+
+
+@pytest.fixture(scope="session")
+def vcf_file() -> Path:
     return Path("tests/data/1KG/small_1KG.vcf.gz")
 
 
@@ -66,124 +104,25 @@ def bpm_file():
 
 
 @pytest.fixture(scope="session")
-def sample_sheet_file():
+def bpm(bpm_file) -> BeadPoolManifest:
+    return BeadPoolManifest(bpm_file)
+
+
+@pytest.fixture(scope="session")
+def sample_sheet_file() -> Path:
     return Path("tests/data/example_sample_sheet.csv")
 
 
 @pytest.fixture(scope="session")
-def bim_file():
+def sample_sheet(sample_sheet_file) -> SampleSheet:
+    return SampleSheet(sample_sheet_file)
+
+
+@pytest.fixture(scope="session")
+def bim_file() -> Path:
     return Path("tests/data/plink/samples.bim")
 
 
 @pytest.fixture(scope="session")
-def vcf(vcf_file):
-    import pysam
-
+def vcf(vcf_file) -> pysam.VariantFile:
     return pysam.VariantFile(vcf_file, "r")
-
-
-@pytest.fixture
-def small_working_dir(tmp_path: Path) -> Path:
-    """Base working directory for fake data.
-
-    Directory small test reference data files.
-    """
-    # copy reference data
-    shutil.copyfile("tests/data/example_sample_sheet.csv", tmp_path / "sample_sheet.csv")
-    shutil.copy2("tests/data/illumina/bpm/small_manifest.bpm", tmp_path)
-    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz", tmp_path)
-    shutil.copy2("tests/data/1KG/small_1KG.vcf.gz.tbi", tmp_path)
-
-    return tmp_path
-
-
-@pytest.fixture
-def small_gtc_working_dir(small_working_dir: Path) -> Path:
-    """Testing working directory with per sample GTC files.
-
-    This is the most common situation where the user is start with GTC and
-    BPM files.
-    """
-
-    # create gtc file for multiple samples
-    gtc_samples = [
-        "SB00001_PB0001_A01.gtc",
-        "SB00002_PB0001_B01.gtc",
-        "SB00003_PB0001_C01.gtc",
-        "SB00004_PB0001_D01.gtc",
-    ]
-
-    for file_name in gtc_samples:
-        shutil.copyfile("tests/data/illumina/gtc/small_genotype.gtc", small_working_dir / file_name)
-
-    # create idat files for multiple samples
-    idat_samples = [
-        "201274900048_R01C01_Red.idat",
-        "201274900048_R01C01_Grn.idat",
-        "201274900048_R03C01_Red.idat",
-        "201274900048_R03C01_Grn.idat",
-        "201274900048_R05C01_Red.idat",
-        "201274900048_R05C01_Grn.idat",
-        "201274900048_R07C01_Red.idat",
-        "201274900048_R07C01_Grn.idat",
-    ]
-
-    for file_name in idat_samples:
-        shutil.copyfile(
-            "tests/data/illumina/idat/small_intensity.idat", small_working_dir / file_name
-        )
-
-    make_test_config(small_working_dir)
-
-    return small_working_dir
-
-
-@pytest.fixture
-def small_ped_working_dir(small_working_dir: Path) -> Path:
-    """Testing working directory with aggregated PED and MAP.
-
-    This is another entry point where the user has pre-aggregated PED and MAP
-    files.
-    """
-    # copy ped/map to small_working_dir
-    shutil.copyfile("tests/data/plink/samples.ped", small_working_dir / "samples.ped")
-    shutil.copyfile("tests/data/plink/samples.map", small_working_dir / "samples.map")
-
-    make_test_config(
-        small_working_dir, user_files=dict(ped="samples.ped", map="samples.map"),
-    )
-
-    return small_working_dir
-
-
-@pytest.fixture
-def small_bed_working_dir(small_working_dir: Path) -> Path:
-    """Testing working directory with aggregated BED, BIM, and FAM.
-
-    This is another entry point where the user has pre-aggregated BED, BIM,
-    and FAM files.
-    """
-    # copy bed/bim/fam to small_working_dir
-    shutil.copyfile("tests/data/plink/samples.bed", small_working_dir / "samples.bed")
-    shutil.copyfile("tests/data/plink/samples.bim", small_working_dir / "samples.bim")
-    shutil.copyfile("tests/data/plink/samples.fam", small_working_dir / "samples.fam")
-
-    make_test_config(
-        small_working_dir, user_files=dict(bed="samples.bed", bim="samples.bim", fam="samples.fam"),
-    )
-
-    return small_working_dir
-
-
-##################################################################################
-# Example Data (From Plink Website)
-##################################################################################
-
-
-##################################################################################
-# Real Data (Only use internally)
-##################################################################################
-@pytest.mark.real_data
-@pytest.fixture(scope="session")
-def real_data_cache() -> RealDataCache:
-    return RealDataCache()
