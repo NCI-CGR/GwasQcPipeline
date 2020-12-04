@@ -6,7 +6,7 @@ import pytest
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 from cgr_gwas_qc.testing.conda import CondaEnv
-from cgr_gwas_qc.testing.data import RealDataCache, TestData
+from cgr_gwas_qc.testing.data import RealData
 
 
 ##################################################################################
@@ -25,7 +25,9 @@ def pytest_collection_modifyitems(config, items):
     Based on an example from the pytest website:
         https://docs.pytest.org/en/6.0.1/example/simple.html#control-skipping-of-tests-according-to-command-line-option
     """
-    if not config.getoption("--real-data"):
+    if config.getoption("--real-data"):
+        RealData(sync=True)  # Make sure real data is downloaded
+    else:
         # Skip test that are marked with `real_data` unless the command line
         # flag `--real-data` is provided
         skip_real_data = pytest.mark.skip(reason="need --real-data option to run")
@@ -49,38 +51,9 @@ def conda_envs() -> CondaEnv:
     return CondaEnv()
 
 
-@pytest.fixture
-def test_data() -> TestData:
-    """Returns a ``TestData`` object.
-
-    The ``TestData`` object is used to copy various pieces of test data into a working dir.
-
-    Example::
-
-        >>> (
-        ...     test_data
-        ...     .copy_sample_sheet(working_dir)  # Copy the Sample Sheet
-        ...     .copy_reference_files(working_dir)  # Copy all reference files
-        ...     .copy_user_files(working_dir, entry_point="gtc")  # Create GTC/IDAT test files
-        ...     .make_config(working_dir)  # Create a config based on the copied files
-        ... )
-    """
-    return TestData()
-
-
-@pytest.mark.real_data
-@pytest.fixture(scope="session")
-def real_data() -> RealDataCache:
-    """Returns a ``RealDataCache`` object.
-
-    Syncs real data locally into a cache. Then makes copying data from the cache easier.
-    """
-    return RealDataCache()
-
-
 @pytest.fixture(autouse=True)
-def mock_ConfigMgr(monkeypatch):
-    """Monkeypatch the ``ConfigMgr``.
+def change_default_behavior_of_ConfigMgr(monkeypatch):
+    """Monkeypatch the ``ConfigMgr.instance()`` method.
 
     The ``ConfigMgr`` is designed to create only a single instance. If a
     ``ConfigMgr`` object already exists in the python session it should just
