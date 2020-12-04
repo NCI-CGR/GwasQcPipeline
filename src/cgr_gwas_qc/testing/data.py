@@ -281,11 +281,11 @@ class DataRepo(ABC):
         raise FileNotFoundError(pth.as_posix())
 
 
-class TestData(DataRepo):
+class FakeData(DataRepo):
     """A repository of synthetic data stored in ``tests/data``.
 
     Example:
-        >>> cache = TestData(working_dir)
+        >>> cache = FakeData(working_dir)
 
         >>> cache / existing_file.txt  # If file exists then returns path to the file
         Path(".../existing_file.txt")
@@ -299,7 +299,7 @@ class TestData(DataRepo):
         >>> cache.make_config()  # make the config for files added using cache
     """
 
-    _data_type = "Test Data"
+    _data_type = "Fake Data"
     _data_path = (Path(__file__).parents[3] / "tests/data").absolute()
 
     _sample_sheet = "example_sample_sheet.csv"
