@@ -6,18 +6,19 @@ import pytest
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr, scan_for_yaml
 from cgr_gwas_qc.testing import chdir, make_test_config
+from cgr_gwas_qc.testing.data import FakeData
 from cgr_gwas_qc.version import __version__
 
 
 @pytest.fixture
-def example_working_dir(tmp_path, test_data):
+def example_working_dir(tmp_path):
     """Returns an test working directory.
 
     The working directory contains:
         - Sample Sheet
         - Config File
     """
-    test_data.copy_sample_sheet(tmp_path).make_config(tmp_path)
+    FakeData(tmp_path).add_sample_sheet().make_config()
     return tmp_path
 
 
