@@ -267,7 +267,7 @@ class DataRepo(ABC):
             raise ValueError("You need to have set ``self.working_dir``.")
 
         if source_path.is_dir():
-            shutil.copytree(source_path, destination_path)
+            shutil.copytree(source_path, destination_path, copy_function=shutil.copy)
         elif source_path.is_file():
             shutil.copyfile(source_path, destination_path)
         else:
