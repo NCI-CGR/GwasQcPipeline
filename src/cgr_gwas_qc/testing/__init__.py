@@ -1,8 +1,10 @@
 import contextlib
 import os
+import shutil
 from hashlib import sha256
 from math import isclose
 from pathlib import Path
+from subprocess import run
 from textwrap import dedent
 from typing import Union
 
@@ -64,3 +66,13 @@ def make_test_config(current_dir: Path, **kwargs) -> None:
 def make_snakefile(working_dir: Path, contents: str):
     snakefile = working_dir / "Snakefile"
     snakefile.write_text(dedent(contents))
+
+
+def run_snakemake(working_dir: Path, keep_temp: bool = False):
+    notemp = "--notemp" if keep_temp else ""
+    conda = "mamba" if shutil.which("mamba") else "conda"
+    with chdir(working_dir):
+        run(
+            ["snakemake", "-j1", "--use-conda", "--nocolor", notemp, "--conda-frontend", conda],
+            check=True,
+        )
