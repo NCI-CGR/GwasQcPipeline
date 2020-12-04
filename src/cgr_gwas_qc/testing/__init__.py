@@ -4,7 +4,7 @@ import shutil
 from hashlib import sha256
 from math import isclose
 from pathlib import Path
-from subprocess import run
+from subprocess import PIPE, STDOUT, run
 from textwrap import dedent
 from typing import Union
 
@@ -68,11 +68,17 @@ def make_snakefile(working_dir: Path, contents: str):
     snakefile.write_text(dedent(contents))
 
 
-def run_snakemake(working_dir: Path, keep_temp: bool = False):
-    notemp = "--notemp" if keep_temp else ""
+def run_snakemake(working_dir: Path, keep_temp: bool = False, print_stdout: bool = False):
     conda = "mamba" if shutil.which("mamba") else "conda"
+    cmd = ["snakemake", "-j1", "--use-conda", "--nocolor", "--conda-frontend", conda]
+
+    if keep_temp:
+        cmd.append("--notemp")
+
     with chdir(working_dir):
-        run(
-            ["snakemake", "-j1", "--use-conda", "--nocolor", notemp, "--conda-frontend", conda],
-            check=True,
-        )
+        stdout = run(cmd, check=True, stdout=PIPE, stderr=STDOUT).stdout.decode()
+
+    if print_stdout:
+        print(stdout)
+
+    return stdout
