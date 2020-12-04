@@ -13,7 +13,7 @@ from cgr_gwas_qc.models.config import Config
 
 
 @contextlib.contextmanager
-def chdir(dirname: Path):
+def chdir(dirname: Union[str, Path]):
     curdir = Path().cwd()
     try:
         os.chdir(dirname)
