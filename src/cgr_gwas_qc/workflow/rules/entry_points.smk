@@ -12,6 +12,7 @@ All entry points should create:
 """
 
 if cfg.config.user_files.gtc_pattern:
+
     ################################################################################
     # GTC To Plink
     ################################################################################
@@ -69,7 +70,8 @@ if cfg.config.user_files.gtc_pattern:
             bim="plink_start/samples.bim",
             fam="plink_start/samples.fam",
             nosex="plink_start/samples.nosex",
-        log: "plink_start/samples.log",
+        log:
+            "plink_start/samples.log",
         group:
             "merge_gtc_sample_peds"
         envmodules:
@@ -87,7 +89,9 @@ if cfg.config.user_files.gtc_pattern:
             "--threads {threads} "
             "--memory {resources.mem}"
 
+
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
+
     ################################################################################
     # Aggregated PED/MAPs
     ################################################################################
@@ -117,11 +121,13 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
             "--out {params.prefix} "
             "--memory {resources.mem}"
 
+
 elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user_files.fam:
+
     ################################################################################
     # Aggregated BED/BIM/FAM
     ################################################################################
-    rule link_binary_plink_to_expected_loction:
+    rule link_binary_plink_to_expected_location:
         """Creates symbolic links BED/BIM/FAM.
 
         BED/BIM/FAM files are expected to be at
