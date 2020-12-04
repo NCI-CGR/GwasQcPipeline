@@ -1,8 +1,10 @@
 import pytest
 
+from cgr_gwas_qc.testing.data import FakeData
+
 
 @pytest.fixture
-def example_working_dir(tmp_path, test_data):
+def test_data(tmp_path) -> FakeData:
     """Returns an test working directory.
 
     The working directory contains:
@@ -15,10 +17,10 @@ def example_working_dir(tmp_path, test_data):
             - Genotype Calls (GRC)
         - Config File
     """
-    (
-        test_data.copy_sample_sheet(tmp_path)
-        .copy_reference_files(tmp_path)
-        .copy_user_files(tmp_path, entry_point="gtc")
-        .make_config(tmp_path)
+    return (
+        FakeData(tmp_path)
+        .add_sample_sheet()
+        .add_reference_files()
+        .add_user_files(entry_point="gtc")
+        .make_config()
     )
-    return tmp_path
