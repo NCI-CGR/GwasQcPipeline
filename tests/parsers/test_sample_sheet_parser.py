@@ -23,12 +23,14 @@ strings_with_extra_commas = [
 
 @pytest.mark.parametrize("data,expected", strings_with_extra_commas)
 def test_strip_terminal_commas(data, expected):
+    # GIVEN: a multi-lined string with multiple-commas on the end
+    # WHEN-THEN: we strip those commas they will match the string without the terminal commas
     assert _strip_terminal_commas(data) == expected
 
 
 ################################################################################
 # In the Header and Manifests section we want to convert to key-value pairs.
-# This tests the converion of two comma separated values into a dictionary.
+# This tests the conversion of two comma separated values into a dictionary.
 ################################################################################
 strings_without_extra_commas = [
     ("key1,value1\nkey2,value2\n", {"key1": "value1", "key2": "value2"}),
@@ -38,6 +40,8 @@ strings_without_extra_commas = [
 
 @pytest.mark.parametrize("data,expected", strings_without_extra_commas)
 def test_convert_to_key_value_pair(data, expected):
+    # GIVEN: a multi-lined string with a key-value pair separated by a comma
+    # WHEN-THEN: they can be converted to a dictionary of kye-value pairs
     assert _convert_to_key_value_pair(data) == expected
 
 
@@ -51,13 +55,11 @@ example_sample_sheet = "tests/data/example_sample_sheet.csv"
 @pytest.mark.parametrize("file_name", [example_sample_sheet, Path(example_sample_sheet)])
 def test_load_str_or_path(file_name):
     """Make sure SampleSheet works with strings or paths."""
-    _sample_sheet = SampleSheet(file_name)
-    assert sorted(_sample_sheet._sections.keys()) == sorted(["header", "manifests", "data"])
+    # GIVEN-WHEN: we load an example sample sheet
+    sample_sheet = SampleSheet(file_name)
 
-
-@pytest.fixture(scope="module")
-def sample_sheet(sample_sheet_file):
-    return SampleSheet(sample_sheet_file)
+    # THEN: we apture the three section headers.
+    assert sorted(sample_sheet._sections.keys()) == sorted(["header", "manifests", "data"])
 
 
 ################################################################################
@@ -65,8 +67,13 @@ def sample_sheet(sample_sheet_file):
 # should be a pandas.DataFrame.
 ################################################################################
 def test_sample_sheet_properties_right_type(sample_sheet):
+    # GIVEN: A parsed sample sheet object
+    # THEN: that from each section is the correct type
+    # header data is a dictionary of key-value pairs
     assert isinstance(sample_sheet.header, dict)
+    # manifests data is a dictionary of key-value pairs
     assert isinstance(sample_sheet.manifests, dict)
+    # data data is a dataframe
     assert isinstance(sample_sheet.data, pd.DataFrame)
 
 
@@ -75,7 +82,11 @@ def test_sample_sheet_properties_right_type(sample_sheet):
 ################################################################################
 def test_sample_sheet_data(sample_sheet):
     """Test dataframe functionality."""
+    # GIVEN: A parsed sample sheet object
+    # THEN: the dataframe from the data section behaves as expected
+    # has the same number of rows as the example sample sheet data section
     assert sample_sheet.data.shape[0] == 4
+    # Allows querying by different fields and returns the right number of results
     assert sample_sheet.data.query("Identifiler_Sex == 'M'").shape[0] == 2
     assert sample_sheet.data.query("`Case/Control_Status` == 'Case'").shape[0] == 2
 
@@ -83,8 +94,9 @@ def test_sample_sheet_data(sample_sheet):
 ################################################################################
 # Check that empty rows in the data section are  removed.
 ################################################################################
-def test_empty_row_in_sample_sheet_data(tmpdir):
-    sample_sheet = Path(tmpdir) / "sample_sheet.csv"
+def test_empty_row_in_sample_sheet_data(tmp_path):
+    # GIVEN: A data section with an empty row
+    sample_sheet = Path(tmp_path) / "sample_sheet.csv"
     sample_sheet.write_text(
         dedent(
             """\
@@ -97,5 +109,8 @@ def test_empty_row_in_sample_sheet_data(tmpdir):
         )
     )
 
+    # WHEN: we parse that sample sheet
     ss = SampleSheet(sample_sheet)
+
+    # THEN: we automatically drop that empty row
     assert ss.data.shape[0] == 2

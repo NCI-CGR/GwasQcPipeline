@@ -31,7 +31,7 @@ class SoftwareParams(BaseModel):
     control_hwp_threshold: int = Field(50, description="Control samples HWP threshold.", gt=0)
 
     strand: str = Field(
-        "TOP",
+        "top",
         description="Which strand to use when converting GTC to plink {TOP, FWD, PLUS}. default TOP",
     )
 

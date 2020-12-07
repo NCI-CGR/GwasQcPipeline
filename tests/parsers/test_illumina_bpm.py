@@ -1,14 +1,6 @@
 """Test parsing of Illumina BPM files."""
 import pytest
 
-from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
-
-
-@pytest.fixture(scope="module")
-def bpm(bpm_file) -> BeadPoolManifest:
-    return BeadPoolManifest(bpm_file)
-
-
 ################################################################################
 # Most BPM attrributes have an entry for each loci. Check that these entries
 # are equal to the number of loci.
@@ -30,4 +22,7 @@ bpm_list_attributes = [
 @pytest.mark.parametrize("attribute", bpm_list_attributes)
 def test_bpm_attribute_lengths(bpm, attribute):
     """Check that the list element attributes all have the same length."""
+    # GIVEN: attributes of the Illumina BeadPoolManifest
+    # WHEN: these attributes are a list (i.e. a column of values from the file)
+    # THEN: the number of values is equal to the number of SNPs in the file (i.e., number of rows)
     assert len(bpm.__dict__[attribute]) == bpm.num_loci

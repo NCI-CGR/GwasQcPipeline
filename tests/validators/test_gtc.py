@@ -12,14 +12,18 @@ from cgr_gwas_qc.validators.gtc import GtcMagicNumberError, GtcTruncatedFileErro
 ################################################################################
 # Good GTC file validates
 ################################################################################
-def test_good_gtc_file_validates(gtc_file):
+def test_gtc_good_gtc_file(gtc_file):
+    # GIVEN: a good gtc file
+    # WHEN-THEN: we validate the file it raises no errors
     validate(gtc_file)
 
 
 ################################################################################
 # Error if not a GTC file (GtcMagicNumberError)
 ################################################################################
-def test_bad_magic_number(bpm_file):
+def test_gtc_bad_magic_number(bpm_file):
+    # GIVEN: a good bpm file
+    # WHEN-THEN: we validate it as a GTC file it raises an error
     with pytest.raises(GtcMagicNumberError):
         validate(bpm_file)
 
@@ -29,6 +33,11 @@ def test_bad_magic_number(bpm_file):
 ################################################################################
 @pytest.fixture(params=[1, 2, 4])
 def truncated_gtc(tmp_path, gtc_file, request):
+    """Returns the path to a truncated GTC file.
+
+    Removes the last ``request.param`` bytes from a test GTC file and save
+    it. Then returns the path to this file.
+    """
     data = gtc_file.read_bytes()
     trunc_file = tmp_path / "truncated.gtc"
     with trunc_file.open("wb") as fh:
@@ -37,5 +46,7 @@ def truncated_gtc(tmp_path, gtc_file, request):
 
 
 def test_truncated_file(truncated_gtc):
+    # GIVEN: a truncated GTC file missing a few bytes from the end
+    # WHEN-THEN: we validate the file it raises a truncation error
     with pytest.raises(GtcTruncatedFileError):
         validate(truncated_gtc)

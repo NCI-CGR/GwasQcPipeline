@@ -32,7 +32,7 @@ def test_gtc2plink_top(bpm_file, gtc_file, tmpdir):
     assert f"Saving MAP file: {obs_map}" in results.stdout
     assert f"Saving PED file: {obs_ped}" in results.stdout
 
-    # Make sure observed and expecte results are exactly identical
+    # Make sure observed and expected results are exactly identical
     assert file_hashes_equal(obs_map, exp_map)
     assert file_hashes_equal(obs_ped, exp_ped)
 
@@ -59,7 +59,7 @@ def test_gtc2plink_fwd(bpm_file, gtc_file, tmpdir):
     assert f"Saving MAP file: {obs_map}" in results.stdout
     assert f"Saving PED file: {obs_ped}" in results.stdout
 
-    # Make sure observed and expecte results are exactly identical
+    # Make sure observed and expected results are exactly identical
     assert file_hashes_equal(obs_map, exp_map)
     assert file_hashes_equal(obs_ped, exp_ped)
 

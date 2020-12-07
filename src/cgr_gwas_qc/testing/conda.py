@@ -125,3 +125,21 @@ class CondaEnv:
 
         shutil.copytree(cache_path, new_path)
         shutil.copyfile(env_file_name, new_path.as_posix() + ".yaml")
+
+    def copy_all_envs(self, working_dir: Union[str, Path]) -> None:
+        """Copy all conda environments into a new working directory.
+
+        Snakemake tries to enforce reproducibility to encode not only the
+        environment file content but also the full path into the environment.
+        Here we are mocking this by copying the cached env to the expected
+        location by snakemake.
+
+        ``{working_dir}/.snakemake/conda/{hash}``
+        ``{working_dir}/.snakemake/conda/{hash}.yaml``
+
+        Where ``{hash}`` is the md5sum of the full path
+        ``{working_dir}/.snakemake/conda`` and the contents of the
+        environment YAML file.
+        """
+        for env_config in self.conda_env_path.glob("*.yml"):
+            self.copy_env(env_config.stem, working_dir)

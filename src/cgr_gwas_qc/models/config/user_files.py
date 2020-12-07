@@ -1,6 +1,7 @@
+from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, root_validator, validator
 
 
 class UserFiles(BaseModel):
@@ -11,25 +12,28 @@ class UserFiles(BaseModel):
 
     idat_pattern: Optional["Idat"]
 
+    # GTC
     gtc_pattern: Optional[str] = Field(
         None,
         description="File name pattern for GTC file. Wildcards are columns in the sample sheet.",
     )
 
-    ped: Optional[str] = Field(
+    # PED/MAP
+    ped: Optional[Path] = Field(
         None, description="Aggregated PED file if sample level GTC files are not available.",
     )
-    map: Optional[str] = Field(
+    map: Optional[Path] = Field(
         None, description="Aggregated MAP file if sample level GTC files are not available.",
     )
 
-    bed: Optional[str] = Field(
+    # BED/BIM/FAM
+    bed: Optional[Path] = Field(
         None, description="Aggregated BED file if sample level GTC files are not available.",
     )
-    bim: Optional[str] = Field(
+    bim: Optional[Path] = Field(
         None, description="Aggregated BIM file if sample level GTC files are not available.",
     )
-    fam: Optional[str] = Field(
+    fam: Optional[Path] = Field(
         None, description="Aggregated FAM file if sample level GTC files are not available.",
     )
 
@@ -49,50 +53,31 @@ class UserFiles(BaseModel):
 
         return v
 
-    @validator("ped")
-    def validate_ped(cls, v):
-        if v is None:
-            return v
+    @root_validator
+    def check_ped_map(cls, values):
+        ped, map_ = values.get("ped"), values.get("map")
+        if ped is not None and map_ is None:
+            raise ValueError("If you provide PED you have to provide a MAP too.")
 
-        if not v.endswith(".ped"):
-            raise ValueError("PED suffix should be *.ped")
-        return v
+        if ped is None and map_ is not None:
+            raise ValueError("If you provide MAP you have to provide PED too.")
 
-    @validator("map")
-    def validate_map(cls, v):
-        if v is None:
-            return v
+        return values
 
-        if not v.endswith(".map"):
-            raise ValueError("MAP suffix should be *.map")
-        return v
+    @root_validator
+    def check_bed_bim_fam(cls, values):
+        bed, bim, fam = values.get("bed"), values.get("bim"), values.get("fam")
 
-    @validator("bed")
-    def validate_bed(cls, v):
-        if v is None:
-            return v
+        if bed is not None and (bim is None or fam is None):
+            raise ValueError("If you provide BED you have to provide a BIM and FAM too.")
 
-        if not v.endswith(".bed"):
-            raise ValueError("BED suffix should be *.bed")
-        return v
+        if bim is not None and (bed is None or fam is None):
+            raise ValueError("If you provide BIM you have to provide a BED and FAM too.")
 
-    @validator("bim")
-    def validate_bim(cls, v):
-        if v is None:
-            return v
+        if fam is not None and (bed is None or bim is None):
+            raise ValueError("If you provide FAM you have to provide a BED and BIM too.")
 
-        if not v.endswith(".bim"):
-            raise ValueError("BIM suffix should be *.bim")
-        return v
-
-    @validator("fam")
-    def validate_fam(cls, v):
-        if v is None:
-            return v
-
-        if not v.endswith(".fam"):
-            raise ValueError("FAM suffix should be *.fam")
-        return v
+        return values
 
 
 class Idat(BaseModel):

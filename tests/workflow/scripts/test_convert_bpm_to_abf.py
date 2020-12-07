@@ -1,4 +1,4 @@
-"""Test the convertion of BPM to ABF.
+"""Test the conversion of BPM to ABF.
 
 For contamination checking we need to have the population level allele
 frequencies. We pull these allele frequencies from the 1KG project for each

@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
+from warnings import warn
 
 import pandas as pd
 from snakemake.rules import expand
@@ -55,31 +56,28 @@ class ConfigMgr:
     ################################################################################
     # Set-up
     ################################################################################
-    def __init__(self, root: Path, user_config: Path, validate=True):
-        self.root = root
-        self.user_config = user_config
+    def __init__(self, root: Path, user_config: Path):
+        self.root: Path = root
+        self.user_config: Path = user_config
 
-        if validate:
-            self._config = Config(**yaml.load(self.user_config))
-            self.sample_sheet_file = self.config.sample_sheet
+        data = yaml.load(self.user_config)
+        self._config = Config.parse_obj(data)
+        self.sample_sheet_file: Path = self.config.sample_sheet
+        self._sample_sheet: Optional[SampleSheet] = None
+
+        try:
             self._sample_sheet = SampleSheet(self.sample_sheet_file)
-        else:
-            # Force loading without validation. Use this only for debugging
-            self._config = Config.construct(**yaml.load(self.user_config))
-            try:
-                self.sample_sheet_file = self.config.sample_sheet
-                self._sample_sheet = SampleSheet(self.sample_sheet_file)
-            except (AttributeError, FileNotFoundError):
-                pass
+        except Exception:
+            warn(f"Sample Sheet: {self.sample_sheet_file} could not be loaded.", RuntimeWarning)
 
     @classmethod
-    def instance(cls, validate=True):
+    def instance(cls):
         """Returns the active ConfigMgr instance.
 
         This ensures that only 1 ConfigMgr is created per python session.
         """
         if cls.__instance is None:
-            cls.__instance = cls(*find_configs(), validate)
+            cls.__instance = cls(*find_configs())
         return cls.__instance
 
     ################################################################################
@@ -92,6 +90,10 @@ class ConfigMgr:
     @property
     def ss(self) -> pd.DataFrame:
         """Access the sample sheet DataFrame."""
+        if self._sample_sheet is None:
+            warn(f"Sample Sheet: {self.sample_sheet_file} was not loaded.", RuntimeWarning)
+            return None
+
         return self._sample_sheet.data
 
     ################################################################################
@@ -103,7 +105,7 @@ class ConfigMgr:
         """Use sample sheet columns to fill in file pattern
 
         Args:
-            file_pattern: A snakemake compatable file name pattern.
+            file_pattern: A snakemake compatible file name pattern.
             combination: The combinatorial method to use (see
               snakemake.rules.expand). Defaults to zip.
             query: A pandas.DataFrame.query to use to filter before
