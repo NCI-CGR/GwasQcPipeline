@@ -1,111 +1,149 @@
-from pathlib import Path
-from subprocess import run
-from textwrap import dedent
+import re
+from typing import Tuple
 
 import pytest
 
-from cgr_gwas_qc.testing import chdir, make_snakefile, make_test_config
+from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
+from cgr_gwas_qc.testing.data import RealData
 
 
 ################################################################################
 # MAF Filtering
 ################################################################################
+def parse_plink_log_for_maf_counts(file_name) -> int:
+    m = re.findall(r"\n(\d+) variants removed due to minor allele threshold", file_name.read_text())
+    return int(m[0])
+
+
 @pytest.mark.real_data
-@pytest.fixture
-def maf_filter_setup(conda_envs, real_data_cache, tmp_path) -> Path:
-    conda_envs.copy_all_envs(tmp_path)
-
-    real_data_cache.copy("original_data/manifest_full.csv", tmp_path / "manifest_full.csv")
-    real_data_cache.copy(
-        "production_outputs/plink_filter_call_rate_2", tmp_path / "plink_filter_call_rate_2"
-    )
-
-    make_test_config(tmp_path, data_type="real", sample_sheet="manifest_full.csv")
-
-    make_snakefile(
-        tmp_path,
-        """
-        from cgr_gwas_qc import load_config
-
-
-        cfg = load_config()
-
-        include: cfg.rules("common.smk")
-        include: cfg.rules("snp_filters.smk")
-
-        rule all:
-            input:
-                expand("snp_filters/maf/samples.{ext}", ext=["bed", "bim", "fam", "nosex"])
-        """,
-    )
-
-    return tmp_path
-
-
 @pytest.mark.regression
-@pytest.mark.real_data
 @pytest.mark.workflow
-def test_maf_filter(maf_filter_setup):
-    # GIVEN
-    # - Snakefile, manifest.csv, conda-envs
-    # - plink_filter_call_rate_2/samples.bed
-    # - plink_filter_call_rate_2/samples.bim
-    # - plink_filter_call_rate_2/samples.fam
+def test_maf_filter(tmp_path, conda_envs):
+    # GIVEN: A real data repository and a plink2 conda environmet
+    conda_envs.copy_env("plink2", tmp_path)
+    data_store = (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .copy("production_outputs/plink_filter_call_rate_2", "plink_filter_call_rate_2")
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
 
-    # WHEN run snakemake
-    with chdir(maf_filter_setup):
-        run(
-            ["snakemake", "-j1", "--use-conda", "--nocolor", "--conda-frontend", "mamba"],
-            check=True,
-        )
+            cfg = load_config()
 
-        # THEN
-        assert (maf_filter_setup / "snp_filters/maf/samples.bed").exists()
-        assert (maf_filter_setup / "snp_filters/maf/samples.bim").exists()
-        assert (maf_filter_setup / "snp_filters/maf/samples.fam").exists()
-        assert (maf_filter_setup / "snp_filters/maf/samples.nosex").exists()
+            include: cfg.rules("snp_filters.smk")
 
-
-@pytest.mark.xfail
-@pytest.mark.workflow
-def test_snp_filters(small_bed_working_dir: Path, conda_envs):
-    """Test sample contamination filter."""
-    conda_envs.copy_all_envs(small_bed_working_dir)
-    snake = small_bed_working_dir / "Snakefile"
-    snake.write_text(
-        dedent(
-            """\
-        from cgr_gwas_qc import load_config
-
-        cfg = load_config()
-
-        include: cfg.rules("common.smk")
-        include: cfg.rules("entry_points.smk")
-        include: cfg.rules("call_rate_filters.smk")
-        include: cfg.rules("snp_filters.smk")
-
-        rule all:
-            input:
-                "snp_filters/ld_prune/samples.bed",
-                "snp_filters/ld_prune/samples.bim",
-                "snp_filters/ld_prune/samples.fam",
-        """
+            rule all:
+                input: expand("snp_filters/maf/samples.{ext}", ext=["bed", "bim", "fam"])
+            """
         )
     )
 
-    with chdir(small_bed_working_dir):
-        run(
-            ["snakemake", "-j1", "--use-conda", "--nocolor", "--conda-frontend", "mamba"],
-            check=True,
+    # WHEN: I run snakemake
+    run_snakemake(tmp_path)
+
+    # THEN: The number of MAF filtered snps should be the same as the legacy run
+    # Note: the legacy workflow does multiple filtering steps at the same time,
+    # so I need to parse the log and just pull out the MAF filtering.
+    obs_maf_count = parse_plink_log_for_maf_counts(tmp_path / "snp_filters/maf/samples.log")
+    exp_maf_count = parse_plink_log_for_maf_counts(
+        data_store / "production_outputs/ld_prune/ldPruneList.log"
+    )
+    assert obs_maf_count == exp_maf_count
+
+
+################################################################################
+# LD Pruning
+################################################################################
+def parse_plink_log_for_ld_pruning(file_name) -> Tuple[int, int]:
+    m = re.findall(r"Pruning complete.\s+(\d+) of (\d+) variants removed.", file_name.read_text())
+    pruned, kept = m[0]
+    return int(pruned), int(kept)
+
+
+@pytest.mark.real_data
+@pytest.mark.regression
+@pytest.mark.workflow
+def test_approx_ld_estimate(tmp_path, conda_envs):
+    # GIVEN: A real data repository and a plink2 conda environmet
+    # and running ld pruning
+    conda_envs.copy_env("plink2", tmp_path)
+    data_store = (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .copy("production_outputs/plink_filter_call_rate_2", "plink_filter_call_rate_2")
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.rules("snp_filters.smk")
+
+            rule all:
+                input: expand("snp_filters/ld_prune/ldPruneList.{ext}", ext=["prune.in", "prune.out"])
+            """
         )
+    )
 
-        assert Path("snp_filters/maf/samples.bed").exists()
-        assert Path("snp_filters/maf/samples.bim").exists()
-        assert Path("snp_filters/maf/samples.fam").exists()
+    # WHEN: I run snakemake
+    run_snakemake(tmp_path)
 
-        assert Path("snp_filters/ld_prune/ldPruneList.prune.in").exists()
-        assert Path("snp_filters/ld_prune/ldPruneList.prune.out").exists()
+    # THEN: I expect the number of pruned snps to be the same.
+    obs_pruned, _ = parse_plink_log_for_ld_pruning(
+        tmp_path / "snp_filters/ld_prune/ldPruneList.log"
+    )
+    exp_pruned, _ = parse_plink_log_for_ld_pruning(
+        data_store / "production_outputs/ld_prune/ldPruneList.log"
+    )
+    assert obs_pruned == exp_pruned
 
-        assert Path("snp_filters/ld_prune/samples.bed").exists()
-        assert Path("snp_filters/ld_prune/samples.bim").exists()
-        assert Path("snp_filters/ld_prune/samples.fam").exists()
+
+@pytest.mark.real_data
+@pytest.mark.regression
+@pytest.mark.workflow
+def test_extract_ld_prune(tmp_path, conda_envs):
+    # GIVEN:
+    conda_envs.copy_env("plink2", tmp_path)
+    data_store = (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.rules("snp_filters.smk")
+
+            rule all:
+                input: expand("snp_filters/ld_prune/samples.{ext}", ext=["bed", "bim", "fam"])
+            """
+        )
+    )
+    (tmp_path / "snp_filters").mkdir(exist_ok=True)
+    data_store.copy("production_outputs/plink_filter_call_rate_2", "snp_filters/maf")
+
+    (tmp_path / "snp_filters/ld_prune").mkdir(exist_ok=True)
+    data_store.copy(
+        "production_outputs/ld_prune/ldPruneList.prune.in",
+        "snp_filters/ld_prune/ldPruneList.prune.in",
+    )
+    data_store.copy(
+        "production_outputs/ld_prune/ldPruneList.prune.out",
+        "snp_filters/ld_prune/ldPruneList.prune.out",
+    )
+    data_store.copy(
+        "production_outputs/ld_prune/ldPruneList.nosex", "snp_filters/ld_prune/ldPruneList.nosex"
+    )
+
+    # WHEN: I run snakemake
+    run_snakemake(tmp_path)
+
+    # THEN:
+    obs_bed = tmp_path / "snp_filters/ld_prune/samples.bed"
+    exp_bed = data_store / "production_outputs/ld_prune/samples.bed"
+    assert file_hashes_equal(obs_bed, exp_bed)
