@@ -247,7 +247,7 @@ class DataRepo(ABC):
             raise ValueError("You need to have set ``self.working_dir``.")
         return self
 
-    def copy(self, source: str, destination: str) -> None:
+    def copy(self, source: str, destination: str) -> U:
         """Copy folder or file to a new directory
 
         Args:
@@ -272,6 +272,8 @@ class DataRepo(ABC):
             shutil.copyfile(source_path, destination_path)
         else:
             raise ValueError(f"{source_path.as_posix()} is not a file or directory.")
+
+        return self
 
     def __truediv__(self, value) -> Path:
         """Override division operator to build paths."""
