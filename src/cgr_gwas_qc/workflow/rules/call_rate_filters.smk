@@ -55,9 +55,9 @@ rule snp_call_rate_filter_1:
         in_prefix="plink_start/samples",
         out_prefix="plink_filter_call_rate_1/snps",
     output:
-        bed="plink_filter_call_rate_1/snps.bed",
-        bim="plink_filter_call_rate_1/snps.bim",
-        fam="plink_filter_call_rate_1/snps.fam",
+        bed=temp("plink_filter_call_rate_1/snps.bed"),
+        bim=temp("plink_filter_call_rate_1/snps.bim"),
+        fam=temp("plink_filter_call_rate_1/snps.fam"),
     group:
         "call_rate_filters"
     log:
@@ -126,9 +126,9 @@ rule snp_call_rate_filter_2:
         in_prefix=rules.sample_call_rate_filter_1.params.out_prefix,
         out_prefix="plink_filter_call_rate_2/snps",
     output:
-        bed="plink_filter_call_rate_2/snps.bed",
-        bim="plink_filter_call_rate_2/snps.bim",
-        fam="plink_filter_call_rate_2/snps.fam",
+        bed=temp("plink_filter_call_rate_2/snps.bed"),
+        bim=temp("plink_filter_call_rate_2/snps.bim"),
+        fam=temp("plink_filter_call_rate_2/snps.fam"),
     group:
         "call_rate_filters"
     log:
