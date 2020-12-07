@@ -10,6 +10,7 @@ from cgr_gwas_qc.testing.data import RealData
 
 @pytest.mark.real_data
 @pytest.mark.regression
+@pytest.mark.workflow
 def test_split_call_rate_filters(tmp_path, conda_envs):
     """Check call rate filter order.
 
@@ -104,6 +105,7 @@ def parse_call_rate_log(file_name: Path) -> Tuple[int, int]:
 
 @pytest.mark.real_data
 @pytest.mark.regression
+@pytest.mark.workflow
 def test_call_rate_filter_1(tmp_path, conda_envs):
     """Check call rate filter 1. """
     # GIVEN: A real data repo and plink2 conda env
@@ -155,6 +157,7 @@ def test_call_rate_filter_1(tmp_path, conda_envs):
 
 @pytest.mark.real_data
 @pytest.mark.regression
+@pytest.mark.workflow
 def test_call_rate_filter_2(tmp_path, conda_envs):
     """Check call rate filter 2. """
     # GIVEN: A real data repo and plink2 conda env
@@ -206,6 +209,7 @@ def test_call_rate_filter_2(tmp_path, conda_envs):
 
 @pytest.mark.real_data
 @pytest.mark.regression
+@pytest.mark.workflow
 @pytest.mark.parametrize(
     "prefix", ["plink_start", "plink_filter_call_rate_1", "plink_filter_call_rate_2"]
 )

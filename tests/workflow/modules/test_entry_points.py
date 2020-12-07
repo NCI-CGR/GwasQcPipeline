@@ -19,8 +19,9 @@ from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
 from cgr_gwas_qc.testing.data import FakeData, RealData
 
 
-@pytest.mark.regression
 @pytest.mark.real_data
+@pytest.mark.regression
+@pytest.mark.workflow
 def test_gtc_to_ped_conversion(tmp_path):
     # GIVEN: A DataRepo with GTC files and the following snakefile
     (
@@ -57,6 +58,7 @@ def test_gtc_to_ped_conversion(tmp_path):
 
 
 @pytest.mark.real_data
+@pytest.mark.workflow
 def test_create_gtc_merge_list(tmp_path):
     # GIVEN: A RealData repo with the following Snakefile
     data_repo = (
@@ -91,6 +93,7 @@ def test_create_gtc_merge_list(tmp_path):
 
 
 @pytest.mark.real_data
+@pytest.mark.workflow
 def test_merge_gtc_sample_peds(tmp_path, conda_envs):
     # GIVEN: The plink conda env and the following RealData repo
     conda_envs.copy_env("plink2", tmp_path)
@@ -134,6 +137,7 @@ def test_merge_gtc_sample_peds(tmp_path, conda_envs):
 
 
 @pytest.mark.regression
+@pytest.mark.workflow
 def test_ped_entry(tmp_path, conda_envs):
     """Aggregated PED entry point.
 
@@ -185,6 +189,7 @@ def test_ped_entry(tmp_path, conda_envs):
     assert obs_fam == exp_fam
 
 
+@pytest.mark.workflow
 def test_bed_entry(tmp_path):
     """Aggregated BED entry point.
 
