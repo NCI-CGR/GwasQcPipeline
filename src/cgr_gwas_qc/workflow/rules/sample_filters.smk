@@ -174,11 +174,12 @@ if (
         output:
             "sample_filters/contaminated_samples.txt",
         run:
-            (
-                pd.read_csv(input[0])
-                .query(f"`%Mix` > {params.contam_threshold}")
-                .Sample_ID.to_csv(output[0], index=False, header=False)
+            sample_ids = (
+                pd.read_csv(input[0]).query(f"`%Mix` > {params.contam_threshold}").Sample_ID.values
             )
+            with open(output[0], "w") as fh:
+                for sample_id in sample_ids:
+                    fh.write("{} {}\n".format(sample_id, sample_id))
 
     rule remove_contaminated_samples:
         input:
