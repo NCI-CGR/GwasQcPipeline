@@ -18,6 +18,13 @@ def pytest_addoption(parser):
         "--real-data", action="store_true", default=False, help="Run tests with real data."
     )
 
+    parser.addoption(
+        "--sync-real-data",
+        action="store_true",
+        default=False,
+        help="Synchronize with real data store.",
+    )
+
 
 def pytest_collection_modifyitems(config, items):
     """Modify tests based on command line options.
@@ -25,9 +32,10 @@ def pytest_collection_modifyitems(config, items):
     Based on an example from the pytest website:
         https://docs.pytest.org/en/6.0.1/example/simple.html#control-skipping-of-tests-according-to-command-line-option
     """
-    if config.getoption("--real-data"):
+    if config.getoption("--sync-real-data"):
         RealData(sync=True)  # Make sure real data is downloaded
-    else:
+
+    if not config.getoption("--real-data"):
         # Skip test that are marked with `real_data` unless the command line
         # flag `--real-data` is provided
         skip_real_data = pytest.mark.skip(reason="need --real-data option to run")
