@@ -66,8 +66,9 @@ class ConfigMgr:
         self._sample_sheet: Optional[SampleSheet] = None
 
         try:
-            self._sample_sheet = SampleSheet(self.sample_sheet_file)
-            self._add_group_by_column()
+            self._sample_sheet = SampleSheet(self.sample_sheet_file).add_group_by_column(
+                self.config.workflow_params.subject_id_to_use
+            )
         except Exception:
             warn(f"Sample Sheet: {self.sample_sheet_file} could not be loaded.", RuntimeWarning)
 
@@ -80,15 +81,6 @@ class ConfigMgr:
         if cls.__instance is None:
             cls.__instance = cls(*find_configs())
         return cls.__instance
-
-    def _add_group_by_column(self):
-        if "Group_By" not in self.ss.columns:
-            if self.config.workflow_params.subject_id_to_use:
-                self.ss["Group_By"] = self.config.workflow_params.subject_id_to_use
-            else:
-                self.ss["Group_By"] = "LIMS_Individual_ID"
-
-        self.ss["Group_By_Subject_ID"] = self.ss.apply(lambda df: df[df.Group_By], axis=1)
 
     ################################################################################
     # Access to the user's config and Sample Sheet

@@ -2,7 +2,7 @@
 import re
 from io import StringIO
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 
@@ -91,6 +91,17 @@ class SampleSheet:
     def _clean_data(data) -> pd.DataFrame:
         """Converts Data section into a dataframe."""
         return pd.read_csv(StringIO(data)).dropna(how="all")
+
+    def add_group_by_column(self, col_name: Optional[str]) -> "SampleSheet":
+        if "Group_By" not in self.data.columns:
+            if col_name:
+                self.data["Group_By"] = col_name
+            else:
+                self.data["Group_By"] = "LIMS_Individual_ID"
+
+        self.data["Group_By_Subject_ID"] = self.data.apply(lambda df: df[df.Group_By], axis=1)
+
+        return self
 
 
 def _strip_terminal_commas(data: str) -> str:
