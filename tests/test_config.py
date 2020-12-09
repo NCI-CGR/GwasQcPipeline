@@ -1,4 +1,5 @@
 from pathlib import Path
+from textwrap import dedent
 
 import pandas as pd
 import pytest
@@ -111,3 +112,76 @@ def test_load_config(example_working_dir: Path):
     # THEN: We have a working ``ConfigMgr``
     assert cfg.config.pipeline_version == __version__
     assert isinstance(cfg.ss, pd.DataFrame)
+
+
+################################################################################
+# Assign grouping column (see Issue #32)
+################################################################################
+def test_group_by_column_default(tmp_path):
+    """Populate the Group_By_Subject_ID column with default
+
+    The default value should be the same as LIMS_Individual_ID.
+    """
+    # GIVEN: Fake sample sheet and config
+    FakeData(tmp_path).add_sample_sheet().make_config()
+
+    # WHEN: I load the config and sample sheet
+    with chdir(tmp_path):
+        cfg = load_config()
+
+    # THEN: The `Group_By_Subject_ID` column is populated by the
+    # `LIMS_Individual_ID` by default.
+    assert all(cfg.ss.Group_By_Subject_ID == cfg.ss.LIMS_Individual_ID)
+
+
+def test_group_by_column_config_option(tmp_path):
+    """Populate Group_By_Subject_ID column with config option.
+
+    The value should be the same as the column specified in
+    `workflow_params.subject_id_to_use`.
+    """
+    # GIVEN: Fake sample sheet and a config where I set the `subject_id_to_use`
+    FakeData(tmp_path).add_sample_sheet().make_config(
+        workflow_params=dict(subject_id_to_use="Sample_ID")
+    )
+
+    # WHEN: I load the config and sample sheet
+    with chdir(tmp_path):
+        cfg = load_config()
+
+    # THEN: The `Group_By_Subject_ID` column is populated by the
+    # which ever column is specified here.
+    assert all(cfg.ss.Group_By_Subject_ID == cfg.ss.Sample_ID)
+
+
+def test_group_by_column(tmp_path):
+    """Populate Group_By_Subject_ID column with config option.
+
+    The value should be the same as the column specified in
+    `workflow_params.subject_id_to_use`.
+    """
+    # GIVEN: Fake sample sheet and config
+    FakeData(tmp_path).add_sample_sheet().make_config()
+    # and the sample sheet has the `Group_By` column set
+    (tmp_path / "sample_sheet.csv").write_text(
+        dedent(
+            """\
+            [Header],,
+            test,data,
+            [Manifests],,
+            test,data,
+            [Data]
+            Sample_ID,LIMS_Individual_ID,Group_By
+            T0001,L0001,Sample_ID
+            T0002,L0002,LIMS_Individual_ID
+            """
+        )
+    )
+
+    # WHEN: I load the config and sample sheet
+    with chdir(tmp_path):
+        cfg = load_config()
+
+    # THEN: The `Group_By_Subject_ID` column is populated by the
+    # which ever column is specified for each sample separately.
+    assert all(cfg.ss.Group_By_Subject_ID == ["T0001", "L0002"])
