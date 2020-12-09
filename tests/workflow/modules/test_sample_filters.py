@@ -377,3 +377,40 @@ def test_remove_contaminated_samples(tmp_path, conda_envs):
         tmp_path / "sample_filters/not_contaminated/samples.log"
     )
     assert (n_start - n_remaining) == 1
+
+
+@pytest.mark.real_data
+@pytest.mark.regression
+@pytest.mark.workflow
+def test_plink_ibd(tmp_path, conda_envs):
+    # GIVEN:
+    conda_envs.copy_env("plink2", tmp_path)
+    data_store = (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .add_reference_files(copy=False)
+        .make_config()
+        .copy("production_outputs/ld_prune", "snp_filters/ld_prune")
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.rules("common.smk")
+            include: cfg.rules("sample_filters.smk")
+
+            rule all:
+                input:
+                    expand("sample_filters/ibd/samples.{ext}", ext=["genome", "nosex"])
+            """
+        )
+    )
+
+    # WHEN:
+    run_snakemake(tmp_path)
+
+    # THEN:
+    obs_file = tmp_path / "sample_filters/ibd/samples.genome"
+    exp_file = data_store / "production_outputs/ibd/samples.genome"
+    assert file_hashes_equal(obs_file, exp_file)
