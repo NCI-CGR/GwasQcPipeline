@@ -263,3 +263,25 @@ rule plink_ibd:
         "--threads {threads} "
         "--memory {resources.mem} "
         "--out {params.out_prefix}"
+
+
+rule output_replicates:
+    """Summarize sample concordance using IBS/IBD.
+
+    Calculates the proportion of shared homozygous markers (IBS2 / (IBS0 + IBS1 + IBS2)) as a
+    measure of sample concordance. Then outputs concordance measures for samples that are known
+    to be replicates and samples that are thought to be unrelated/independent with a concordance
+    > dup_concordance_cutoff (currently 0.95).
+    """
+    input:
+        sampSheet=cfg.config.sample_sheet,
+        imiss3="plink_filter_call_rate_2/samples.imiss",
+        ibd="sample_filters/ibd/samples.genome",
+    params:
+        subject_id_override=cfg.config.workflow_params.subject_id_to_use,
+        concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
+    output:
+        known="sample_filters/concordance/KnownReplicates.csv",
+        unknown="sample_filters/concordance/UnknownReplicates.csv",
+    script:
+        "../scripts/known_concordant_samples.py"
