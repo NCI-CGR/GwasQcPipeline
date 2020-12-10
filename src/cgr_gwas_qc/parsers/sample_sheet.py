@@ -92,7 +92,7 @@ class SampleSheet:
         """Converts Data section into a dataframe."""
         return pd.read_csv(StringIO(data)).dropna(how="all")
 
-    def add_group_by_column(self, col_name: Optional[str]) -> "SampleSheet":
+    def add_group_by_column(self, col_name: Optional[str] = None) -> "SampleSheet":
         if "Group_By" not in self.data.columns:
             if col_name:
                 self.data["Group_By"] = col_name
