@@ -114,3 +114,27 @@ def test_empty_row_in_sample_sheet_data(tmp_path):
 
     # THEN: we automatically drop that empty row
     assert ss.data.shape[0] == 2
+
+
+def test_add_group_by_column(tmp_path):
+    # GIVEN: A LIMS sample sheet with the `Group_By` column
+    (tmp_path / "sample_sheet.csv").write_text(
+        dedent(
+            """\
+            [Header],,
+            test,data,
+            [Manifests],,
+            test,data,
+            [Data]
+            Sample_ID,LIMS_Individual_ID,Group_By
+            T0001,L0001,Sample_ID
+            T0002,L0002,LIMS_Individual_ID
+            """
+        )
+    )
+    # WHEN: I parse the sample sheet and add the grouping column
+    sample_sheet = SampleSheet(tmp_path / "sample_sheet.csv").add_group_by_column()
+
+    # THEN: A new column `Group_By_Subject_ID` will have the values from the
+    # columns specified in the `Group_By` column.
+    assert all(sample_sheet.data.Group_By_Subject_ID == ["T0001", "L0002"])
