@@ -653,7 +653,7 @@ class NormalizationTransform:
 
     @staticmethod
     def rect_to_polar(x_y):
-        """Converts normalized x,y intensities to (pseudo) polar co-ordinates (R, theta)
+        """Converts normalized x,y intensities to (pseudo) polar coordinates (R, theta)
         Args:
             x_y (float, float): Normalized x,y intensities for probe
         Returns:
@@ -684,15 +684,8 @@ class NormalizationTransform:
         tempx3 = tempx2 - self.shear * tempy2
         tempy3 = tempy2
 
-        try:
-            xn = tempx3 / self.scale_x
-        except ZeroDivisionError:
-            xn = 0
-
-        try:
-            yn = tempy3 / self.scale_y
-        except ZeroDivisionError:
-            yn = 0
+        xn = tempx3 / self.scale_x
+        yn = tempy3 / self.scale_y
 
         if threshold:
             xn = 0 if 0 > xn else xn
@@ -726,7 +719,7 @@ class BeadPoolManifest:
         names (list of strings): Names of loci from manifest
         snps (list of strings) : SNP values of loci from manifest
         chroms (list of string) : Chromosome values for loci
-        map_infos = (list of ints) : Map infor values for loci
+        map_infos = (list of ints) : Map info values for loci
         addresses (list of ints): AddressA IDs of loci from manifest
         normalization_lookups (list of ints): Normalization lookups from manifest. This indexes into
                                          list of normalization transforms read from GTC file
