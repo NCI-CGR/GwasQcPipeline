@@ -414,3 +414,48 @@ def test_plink_ibd(tmp_path, conda_envs):
     obs_file = tmp_path / "sample_filters/ibd/samples.genome"
     exp_file = data_store / "production_outputs/ibd/samples.genome"
     assert file_hashes_equal(obs_file, exp_file)
+
+
+@pytest.mark.real_data
+@pytest.mark.workflow
+def test_sample_concordance(tmp_path):
+    # GIVEN: Real data
+    (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .add_reference_files(copy=False)
+        .make_config()
+        .copy(
+            "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
+            "plink_filter_call_rate_2/samples.imiss",
+        )
+        .copy("production_outputs/ibd/samples.genome", "sample_filters/ibd/samples.genome")
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.rules("common.smk")
+            include: cfg.rules("sample_filters.smk")
+
+            rule all:
+                input:
+                    "sample_filters/concordance/KnownReplicates.csv",
+                    "sample_filters/concordance/InternalQcKnown.csv",
+                    "sample_filters/concordance/StudySampleKnown.csv",
+                    "sample_filters/concordance/UnknownReplicates.csv",
+            """
+        )
+    )
+
+    # WHEN: we run snakemake looking for the replicate output files.
+    run_snakemake(tmp_path)
+
+    # THEN: these files are created.
+    # Note: regression tests are executed as part of the
+    # `known_concorant_samples.py` testing
+    assert (tmp_path / "sample_filters/concordance/KnownReplicates.csv").exists()
+    assert (tmp_path / "sample_filters/concordance/InternalQcKnown.csv").exists()
+    assert (tmp_path / "sample_filters/concordance/StudySampleKnown.csv").exists()
+    assert (tmp_path / "sample_filters/concordance/UnknownReplicates.csv").exists()
