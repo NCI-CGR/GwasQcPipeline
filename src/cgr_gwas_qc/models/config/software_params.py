@@ -9,7 +9,8 @@ class SoftwareParams(BaseModel):
 
     ld_prune_r2: float = Field(0.1, description="r-squared threshold for LD pruning.", gt=0, le=1)
     maf_for_ibd: float = Field(0.2, description="Minor allele frequency threshold", gt=0, le=1)
-    ibd_pi_hat_cutoff: float = Field(0.95, description="IBD pi hat threshold.", gt=0, le=1)
+    ibd_pi_hat_min: float = Field(0.05, description="Minimum IBD pi hat threshold.", ge=0, lt=1)
+    ibd_pi_hat_max: float = Field(1.0, description="Maximum IBD pi hat threshold.", gt=0, le=1)
     dup_concordance_cutoff: float = Field(
         0.95, description="Duplicate concordance cutoff", gt=0, le=1
     )

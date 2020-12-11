@@ -263,6 +263,7 @@ class DataRepo(ABC):
         if self.working_dir:
             source_path = (self._data_path / source).absolute()
             destination_path = (self.working_dir / destination).absolute()
+            destination_path.parent.mkdir(exist_ok=True, parents=True)  # Make parent dirs if needed
         else:
             raise ValueError("You need to have set ``self.working_dir``.")
 
