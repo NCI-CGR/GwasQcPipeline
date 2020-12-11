@@ -63,7 +63,14 @@ class AdpcRecord:
 
     def __str__(self):
         return "\t".join(
-            (self.x_raw, self.y_raw, self.x_norm, self.y_norm, self.genotype_score, self.genotype,)
+            (
+                str(self.x_raw),
+                str(self.y_raw),
+                str(self.x_norm),
+                str(self.y_norm),
+                str(self.genotype_score),
+                str(self.genotype),
+            )
         )
 
 
@@ -144,7 +151,7 @@ class AdpcWriter(AdpcBase):
         self.file_handler.write(self.record_struct.pack(*record))
 
     def _add_padding(self):
-        """The adpc.bin format has 16 bytes of padding at the begining of the file.
+        """The adpc.bin format has 16 bytes of padding at the beginning of the file.
 
         The Picard group did not know what this is for, but they said it is
         not needed so I will just add 8 0s at 2 bytes each.
