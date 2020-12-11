@@ -265,7 +265,7 @@ rule plink_ibd:
         "--out {params.out_prefix}"
 
 
-rule output_replicates:
+rule sample_concordance:
     """Summarize sample concordance using IBS/IBD.
 
     Calculates the proportion of shared homozygous markers (IBS2 / (IBS0 + IBS1 + IBS2)) as a
@@ -274,14 +274,16 @@ rule output_replicates:
     > dup_concordance_cutoff (currently 0.95).
     """
     input:
-        sampSheet=cfg.config.sample_sheet,
-        imiss3="plink_filter_call_rate_2/samples.imiss",
+        sample_sheet=cfg.config.sample_sheet,
+        imiss="plink_filter_call_rate_2/samples.imiss",
         ibd="sample_filters/ibd/samples.genome",
     params:
         subject_id_override=cfg.config.workflow_params.subject_id_to_use,
         concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
     output:
         known="sample_filters/concordance/KnownReplicates.csv",
+        known_qc="sample_filters/concordance/InternalQcKnown.csv",
+        known_study="sample_filters/concordance/StudySampleKnown.csv",
         unknown="sample_filters/concordance/UnknownReplicates.csv",
     script:
         "../scripts/known_concordant_samples.py"
