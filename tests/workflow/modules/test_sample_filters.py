@@ -1,6 +1,7 @@
 import re
 from typing import Tuple
 
+import numpy as np
 import pandas as pd
 import pytest
 from numpy import isclose
@@ -76,7 +77,6 @@ def test_agg_median_idat_intensity(tmp_path, conda_envs):
     assert obs_n_samples == exp_n_samples
 
 
-@pytest.mark.xfail(reason="Very small floats are causing NaN. See issue #31")
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
@@ -119,10 +119,20 @@ def test_convert_gtc_to_illumina_adpc(tmp_path):
                 assert exp_row.y_raw == obs_row.y_raw
                 assert exp_row.genotype == obs_row.genotype
 
-                # floats should be really close
-                assert isclose(exp_row.x_norm, obs_row.x_norm)
-                assert isclose(exp_row.y_norm, obs_row.y_norm)
-                assert isclose(exp_row.genotype_score, obs_row.genotype_score)
+                if np.isnan(obs_row.x_norm) | np.isnan(obs_row.y_norm):
+                    # Note: the legacy workflow outputs (i.e., exp_row) will
+                    # have 0.0 instead of NA for x_norm and y_norm. This
+                    # difference is okay, see Issue #31 for details.
+
+                    # If normalized values are NA then the following should be true
+                    assert (obs_row.x_raw, obs_row.y_raw) == (0, 0)
+                    assert obs_row.genotype_score == 0.0
+                    assert obs_row.genotype == 3
+                else:
+                    # floats should be really close
+                    assert isclose(exp_row.x_norm, obs_row.x_norm)
+                    assert isclose(exp_row.y_norm, obs_row.y_norm)
+                    assert isclose(exp_row.genotype_score, obs_row.genotype_score)
 
         obs_counts = (
             tmp_path
@@ -211,6 +221,65 @@ def test_contamination_test(tmp_path, conda_envs):
 
     # THEN: The observed file should be identical to the expected file for each
     # sample.
+    for r in data_store.ss.data.itertuples(index=False):
+        obs_file = tmp_path / f"sample_filters/contamination_test/{r.Sample_ID}.contam.out"
+        exp_file = (
+            data_store / f"production_outputs/one_samp_b_1000g_contam/{r.Sample_ID}.contam.out"
+        )
+        assert file_hashes_equal(obs_file, exp_file)
+
+
+@pytest.mark.real_data
+@pytest.mark.regression
+@pytest.mark.workflow
+def test_contamination_test_with_missing_data(tmp_path, conda_envs):
+    """Does verifyIDintensity work when there are missing data.
+
+    In Issue #31 I determined that there is a small difference when building
+    the adpc files. The current scripts outputs normalized values as `nan`
+    when raw values are 0. The legacy outputs them as 0. I want to make sure
+    that verifyIDintensity does not change regardless of `nan` or 0.
+    """
+    # GIVEN: Real data with the 1KG B allele frequencies and verifyIDintensity
+    # conda environment.
+    conda_envs.copy_env("verifyidintensity", tmp_path)
+    data_store = (
+        RealData(tmp_path)
+        .add_sample_sheet(full_sample_sheet=False)
+        .add_reference_files(copy=False)
+        .add_user_files(entry_point="gtc", copy=False)
+        .copy(
+            "production_outputs/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
+            "sample_filters/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
+        )
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.rules("common.smk")
+            include: cfg.rules("sample_filters.smk")
+
+            rule all:
+                input:
+                    cfg.expand("sample_filters/contamination_test/{Sample_ID}.contam.out")
+            """
+        )
+    )
+
+    # WHEN: I run snakemake to create per sample contamination estimates
+    # (adpc.bin) and contamination estimates (contam.out)
+    run_snakemake(tmp_path, keep_temp=True)
+
+    # THEN: I created the adbc.bin files
+    for r in data_store.ss.data.itertuples(index=False):
+        assert (
+            tmp_path / f"sample_filters/convert_gtc_to_illumina_adpc/{r.Sample_ID}.adpc.bin"
+        ).exists()
+
+    # The observed contamination file is identical to the expected file for each sample.
     for r in data_store.ss.data.itertuples(index=False):
         obs_file = tmp_path / f"sample_filters/contamination_test/{r.Sample_ID}.contam.out"
         exp_file = (
