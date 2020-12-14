@@ -1,6 +1,7 @@
 import re
 from typing import Tuple
 
+import numpy as np
 import pandas as pd
 import pytest
 from numpy import isclose
@@ -76,7 +77,6 @@ def test_agg_median_idat_intensity(tmp_path, conda_envs):
     assert obs_n_samples == exp_n_samples
 
 
-@pytest.mark.xfail(reason="Very small floats are causing NaN. See issue #31")
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
@@ -119,10 +119,20 @@ def test_convert_gtc_to_illumina_adpc(tmp_path):
                 assert exp_row.y_raw == obs_row.y_raw
                 assert exp_row.genotype == obs_row.genotype
 
-                # floats should be really close
-                assert isclose(exp_row.x_norm, obs_row.x_norm)
-                assert isclose(exp_row.y_norm, obs_row.y_norm)
-                assert isclose(exp_row.genotype_score, obs_row.genotype_score)
+                if np.isnan(obs_row.x_norm) | np.isnan(obs_row.y_norm):
+                    # Note: the legacy workflow outputs (i.e., exp_row) will
+                    # have 0.0 instead of NA for x_norm and y_norm. This
+                    # difference is okay, see Issue #31 for details.
+
+                    # If normalized values are NA then the following should be true
+                    assert (obs_row.x_raw, obs_row.y_raw) == (0, 0)
+                    assert obs_row.genotype_score == 0.0
+                    assert obs_row.genotype == 3
+                else:
+                    # floats should be really close
+                    assert isclose(exp_row.x_norm, obs_row.x_norm)
+                    assert isclose(exp_row.y_norm, obs_row.y_norm)
+                    assert isclose(exp_row.genotype_score, obs_row.genotype_score)
 
         obs_counts = (
             tmp_path
