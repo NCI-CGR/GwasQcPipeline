@@ -33,7 +33,7 @@ def main(
     """Compares a plink BIM file with a VCF and flags SNPs for removal.
 
     This script creates a filter list that can be used with ``plink --exclude
-    <file>``. Filter critera include:
+    <file>``. Filter criteria include:
 
         - SNPs that don't match (and complement doesn't match) the VCF (typically from 1000G)
         - SNPs that are duplicated
@@ -220,4 +220,16 @@ class BimFile:
 
 
 if __name__ == "__main__":
-    app()
+    if "snakemake" in locals():
+        from contextlib import redirect_stdout
+
+        with open(str(snakemake.log), "w") as log:  # type: ignore # noqa
+            with redirect_stdout(log):
+                main(
+                    Path(snakemake.input.bim),  # type: ignore # noqa
+                    Path(snakemake.input.vcf),  # type: ignore # noqa
+                    Path(snakemake.output.snps_to_remove),  # type: ignore # noqa
+                    Path(snakemake.output.bim),  # type: ignore # noqa
+                )
+    else:
+        app()
