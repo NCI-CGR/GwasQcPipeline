@@ -7,7 +7,7 @@ import pytest
 from numpy import isclose
 
 from cgr_gwas_qc.parsers.illumina.adpc import AdpcReader
-from cgr_gwas_qc.testing import file_hashes_equal, file_rows_almost_equal, run_snakemake
+from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
 from cgr_gwas_qc.testing.data import FakeData, RealData
 
 
@@ -142,46 +142,6 @@ def test_convert_gtc_to_illumina_adpc(tmp_path):
         assert file_hashes_equal(obs_counts, exp_counts)
 
 
-@pytest.mark.xfail(reason="Bug causing difference. See issue #30")
-@pytest.mark.real_data
-@pytest.mark.regression
-@pytest.mark.workflow
-def test_pull_1KG_allele_b_freq(tmp_path):
-    # GIVEN: Real data using GTC entry point.
-    data_store = (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
-        .add_user_files(entry_point="gtc", copy=False)
-        .make_config()
-        .make_snakefile(
-            """
-            from cgr_gwas_qc import load_config
-
-            cfg = load_config()
-
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
-
-            rule all:
-                input:
-                    "sample_filters/{}.{}.abf.txt".format(
-                        cfg.config.reference_files.illumina_manifest_file.stem,
-                        cfg.config.software_params.contam_population,
-                    )
-            """
-        )
-    )
-    # WHEN: I run snakemake to pull out B allele frequencies from the 1KG
-    run_snakemake(tmp_path)
-
-    # THEN: The observed and expected abf files should be the same after
-    # accounting for small difference in floating point numbers.
-    obs_abf = tmp_path / "sample_filters/GSAMD-24v1-0_20011747_A1.AF.abf.txt"
-    exp_abf = data_store / "production_outputs/GSAMD-24v1-0_20011747_A1.AF.abf.txt"
-    assert file_rows_almost_equal(obs_abf, exp_abf, fuzzy_col=1, sep="\t", header=True)
-
-
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
@@ -232,7 +192,60 @@ def test_contamination_test(tmp_path, conda_envs):
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
-def test_contamination_test_with_missing_data(tmp_path, conda_envs):
+def test_contamination_test_with_missing_abf_values(tmp_path):
+    """Does verifyIDintensity run with missing abf values.
+
+    In issue #30 we found that the legacy pipeline was setting missing values
+    to 0.0 when converting BPM to abf. After looking at verifyIDintensity
+    code we found that these values should be `"NA"` to be excluded from the
+    contamination calculation. Here I am testing that everything runs and
+    generates similar outputs.
+    """
+    # GIVEN: Real data using GTC entry point and the per sample adpc files.
+    data_store = (
+        RealData(tmp_path)
+        .add_sample_sheet(full_sample_sheet=False)
+        .add_reference_files(copy=False)
+        .add_user_files(entry_point="gtc", copy=False)
+        .copy("production_outputs/contam", "sample_filters/convert_gtc_to_illumina_adpc")
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.rules("common.smk")
+            include: cfg.rules("sample_filters.smk")
+
+            rule all:
+                input:
+                    cfg.expand("sample_filters/contamination_test/{Sample_ID}.contam.out")
+            """
+        )
+    )
+
+    # WHEN: I run snakemake to calculate contamination
+    run_snakemake(tmp_path, keep_temp=True)
+
+    # THEN: The observed contamination file is similar to the expected file for each sample.
+    for r in data_store.ss.data.itertuples(index=False):
+        obs_file = tmp_path / f"sample_filters/contamination_test/{r.Sample_ID}.contam.out"
+        exp_file = (
+            data_store / f"production_outputs/one_samp_b_1000g_contam/{r.Sample_ID}.contam.out"
+        )
+
+        obs = obs_file.read_text().strip().split("\n")[-1].split()
+        exp_ = exp_file.read_text().strip().split("\n")[-1].split()
+        assert isclose(float(obs[1]), float(exp_[1]), atol=1e-5, rtol=0)
+        assert isclose(float(obs[2]), float(exp_[2]), atol=10, rtol=0)
+        assert isclose(float(obs[3]), float(exp_[3]), atol=10, rtol=0)
+
+
+@pytest.mark.real_data
+@pytest.mark.regression
+@pytest.mark.workflow
+def test_contamination_test_with_missing_adpc_values(tmp_path, conda_envs):
     """Does verifyIDintensity work when there are missing data.
 
     In Issue #31 I determined that there is a small difference when building

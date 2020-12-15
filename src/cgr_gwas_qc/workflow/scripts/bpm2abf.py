@@ -4,7 +4,6 @@
 B allele frequencies are used when examining sample contaminaton.
 """
 import re
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator, Optional
 
@@ -16,14 +15,23 @@ from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, complement
 app = typer.Typer(add_completion=False)
 
 
-@dataclass
 class Variant:
-    chrom: str
-    pos: int
-    name: str
-    snp: str
-    strand: int
-    b_allele: Optional[str] = None
+    def __init__(self, chrom: str, pos: int, name: str, snp: str, strand: int) -> None:
+        self.chrom = chrom
+        self.pos = pos
+        self.name = name
+        self.snp = snp
+        self.strand = strand
+        self.b_allele: Optional[str] = None
+        self.parse_snp_to_b_allele()
+
+    def parse_snp_to_b_allele(self):
+        """Parse the B allele from the BPM SNP string."""
+        try:
+            b_allele = re.findall(r"\[\w\/(\w)\]", self.snp)[0]
+            self.b_allele = complement(b_allele) if self.strand == 2 else b_allele
+        except IndexError:
+            typer.echo(f"Problem parsing SNP: {self.snp} @{self.chrom}:{self.pos}")
 
 
 @app.command()
@@ -61,10 +69,9 @@ def main(
     with abf_file.open("w") as f:
         f.write("SNP_ID\tABF\n")
         for variant in get_bpm_variants(bpm_file):
-            if variant.chrom in vcf.header.contigs.keys():
-                parse_out_b_allele(variant)
             abf = get_abf_from_vcf(vcf, population, variant)
-            f.write(f"{variant.name}\t{abf}\n")
+            abf_str = str(abf) if abf is not None else "NA"
+            f.write(f"{variant.name}\t{abf_str}\n")
     vcf.close()
 
 
@@ -75,31 +82,32 @@ def get_bpm_variants(bpm_file: Path) -> Generator[Variant, None, None]:
         yield Variant(*variant)
 
 
-def parse_out_b_allele(variant: Variant) -> None:
-    """Parses out the B allele."""
-    try:
-        b_allele = re.findall(r"\[\w\/(\w)\]", variant.snp)[0]
-        b_allele = complement(b_allele) if variant.strand == 2 else b_allele
-        variant.b_allele = b_allele
-    except IndexError:
-        typer.echo(f"Problem parsing SNP: {variant.snp} @{variant.chrom}:{variant.pos}")
-
-
-def get_abf_from_vcf(vcf: pysam.VariantFile, population: str, variant: Variant) -> float:
+def get_abf_from_vcf(vcf: pysam.VariantFile, population: str, variant: Variant) -> Optional[float]:
     """Pull the select popultion B allele frequency from the VCF.
 
-    Tries to find the given variant in the VCF. If the variant exists
-    then it returns the B allele frequency for the given population. If the
-    variant dose not exist then it returns an ABF of 0.0.
+    Tries to find the given variant in the VCF. If the variant exists then it
+    returns the B allele frequency for the given population. If the variant
+    is multiallelic or dose not exist then it returns `None`.
     """
     if variant.b_allele is None:
-        return 0.0
+        # No B allele
+        return None
+
+    if variant.chrom not in vcf.header.contigs.keys():
+        # Chromosome not in VCF
+        return None
 
     b_allele = variant.b_allele
     b_allele_c = complement(b_allele)
 
     for record in vcf.fetch(variant.chrom, variant.pos - 1, variant.pos + 1):
-        ref, alt = record.ref, record.alts[0]
+        ref, alts = record.ref, record.alts
+
+        if len(alts) > 1:
+            # Skip Multiallelic loci
+            continue
+
+        alt = alts[0]
 
         if variant.pos != record.pos or (
             b_allele not in [ref, alt] and b_allele_c not in [ref, alt]
@@ -119,7 +127,8 @@ def get_abf_from_vcf(vcf: pysam.VariantFile, population: str, variant: Variant) 
         if b_allele == ref or b_allele_c == ref:
             return round(1.0 - allele_freq, 8)
 
-    return 0.0
+    # No applicable VCF SNP found
+    return None
 
 
 if __name__ == "__main__":
