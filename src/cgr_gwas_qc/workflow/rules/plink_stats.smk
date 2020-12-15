@@ -1,40 +1,86 @@
+"""Plink Stats modules
 
-rule plink_sample_qc_stats:
-    """Runs ``plink`` statistics.
+Calculate a variety of statistics that are supported by plink.
 
-    ``plink`` will calculate a number of statistics by passing them as a flag.
+- sexcheck
+- allele frequency
+- HWE
+"""
 
-    .. rubric:: Statistics
 
-        :imiss`: sample-based missing data report
-        :lmiss`: variant-based missing data report
-        :sexcheck`: Runs X chromosome based sanity checks to verify sex
-        :frq`: The minor allele frequency (MAF)
-        :hwe`: Checks variants are in HWE
-
-    .. resources::
-        :memory: 10GB
-
-    """
+rule plink_stats_sexcheck:
     input:
         bed="{prefix}/samples.bed",
         bim="{prefix}/samples.bim",
         fam="{prefix}/samples.fam",
+    params:
+        in_prefix="{prefix}/samples",
+        out_prefix="{prefix}/samples",
     output:
-        imiss="{prefix}/samples{filter}.imiss",
-        lmiss="{prefix}/samples{filter}.lmiss",
-        sexcheck="{prefix}/samples{filter}.sexcheck",
-        frq="{prefix}/samples{filter}.frq",
-        hwe="{prefix}/samples{filter}.hwe",
+        sexcheck="{prefix}/samples.sexcheck",
+    group:
+        "plink_stats"
     resources:
         mem=10000,
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
     shell:
         "plink "
-        "--bfile $(dirname {input[0]}) "
-        "--freq "
-        "--missing "
-        "--hardy "
-        "--het "
+        "--bfile {params.in_prefix} "
         "--check-sex "
         "--memory {resources.mem} "
-        "--out $(dirname {output[0]}"
+        "--out {params.out_prefix}"
+
+
+rule plink_stats_allele_freq:
+    input:
+        bed="{prefix}/samples.bed",
+        bim="{prefix}/samples.bim",
+        fam="{prefix}/samples.fam",
+    params:
+        in_prefix="{prefix}/samples",
+        out_prefix="{prefix}/samples",
+    output:
+        sexcheck="{prefix}/samples.frq",
+    group:
+        "plink_stats"
+    resources:
+        mem=10000,
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    shell:
+        "plink "
+        "--bfile {params.in_prefix} "
+        "--freq "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
+
+
+rule plink_stats_hardy:
+    input:
+        bed="{prefix}/samples.bed",
+        bim="{prefix}/samples.bim",
+        fam="{prefix}/samples.fam",
+    params:
+        in_prefix="{prefix}/samples",
+        out_prefix="{prefix}/samples",
+    output:
+        sexcheck="{prefix}/samples.hwe",
+    group:
+        "plink_stats"
+    resources:
+        mem=10000,
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    shell:
+        "plink "
+        "--bfile {params.in_prefix} "
+        "--hardy "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
