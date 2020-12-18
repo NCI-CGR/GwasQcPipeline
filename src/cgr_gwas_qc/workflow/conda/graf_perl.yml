@@ -1,0 +1,8 @@
+channels:
+  - bioconda
+dependencies:
+  - perl-cgi
+  - perl-carp
+  - perl-gd
+  - perl-gdgraph
+  - perl-gdtextutil
