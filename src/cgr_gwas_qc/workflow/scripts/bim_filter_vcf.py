@@ -171,7 +171,14 @@ class BimRecord:
 
     @property
     def allele_complements(self) -> Tuple[str, str]:
-        return complement(self.allele_1), complement(self.allele_2)
+        def _complement(allele):
+            """Illumina's complement does not work when allele is "0"."""
+            try:
+                return complement(allele)
+            except ValueError:
+                return allele
+
+        return _complement(self.allele_1), _complement(self.allele_2)
 
     @property
     def chrom_decode(self):
