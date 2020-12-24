@@ -59,6 +59,18 @@ rule extract_graf_fingerprint_markers:
         "--out {params.out_prefix}"
 
 
+rule create_ssm:
+    output:
+        "ancestry/ssm.txt",
+    run:
+        (
+            cfg.ss[["Group_By_Subject_ID", "Sample_ID"]]
+            .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
+            .dropna()
+            .to_csv(output[0], sep="\t", index=False)
+        )
+
+
 rule convert_to_fpg:
     input:
         bed=rules.extract_graf_fingerprint_markers.output.bed,
@@ -74,21 +86,19 @@ rule convert_to_fpg:
         "-exfp {params.in_prefix} "
         "-out {output[0]} "
         "-type 4 "
-
         "|| exit_code=$?; if [ $exit_code -ne 1 ]; then exit $exit_code; fi" # GRAF returns an exit code of 1, this captures it so snakemake will actually run.
 
 
 rule graf_relatedness:
     input:
-        rules.convert_to_fpg.output[0],
+        fpg=rules.convert_to_fpg.output[0],
     output:
         "ancestry/graf_relatedness.txt",
     shell:
         f"export PATH={str(graf)}:$PATH; "
         "graf "
-        "-geno {input[0]} "
+        "-geno {input.fpg} "
         "-out {output[0]} "
-
         "|| exit_code=$?; if [ $exit_code -ne 1 ]; then exit $exit_code; fi" # GRAF returns an exit code of 1, this captures it so snakemake will actually run.
 
 
@@ -107,15 +117,15 @@ rule graf_relatedness_png:
 
 rule graf_ancestry:
     input:
-        rules.convert_to_fpg.output[0],
+        fpg=rules.convert_to_fpg.output[0],
+        ssm=rules.create_ssm.output[0],
     output:
         "ancestry/graf_pop.txt",
     shell:
         f"export PATH={str(graf)}:$PATH; "
         "graf "
-        "-geno {input[0]} "
+        "-geno {input.fpg} "
         "-pop {output[0]} "
-
         "|| exit_code=$?; if [ $exit_code -ne 1 ]; then exit $exit_code; fi" # GRAF returns an exit code of 1, this captures it so snakemake will actually run.
 
 
