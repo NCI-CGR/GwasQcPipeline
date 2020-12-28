@@ -2,8 +2,10 @@ import re
 from pathlib import Path
 from typing import Tuple
 
+import numpy as np
 import pandas as pd
 import pytest
+from pandas.testing import assert_series_equal
 
 from cgr_gwas_qc.testing import make_snakefile, run_snakemake
 from cgr_gwas_qc.testing.data import FakeData, RealData
@@ -195,11 +197,12 @@ def test_graf_relatedness(graf_module):
 def test_graf_ancestry(graf_module):
     data_store, tmp_path = graf_module
     # GIVEN: Real data with GRAF module outputs.
+
     # THEN: All of the files should exist
     assert (tmp_path / "ancestry/graf_pop.txt").exists()
     assert (tmp_path / "ancestry/graf_ancestry_calls.txt").exists()
 
-    # Ancestry calls should match SNPweights
+    # Percentages of AFR, EUR, and ASN should be similar
     sample2subject = (
         pd.read_csv(tmp_path / "ancestry/ssm.txt", sep="\t").set_index("Sample_ID").squeeze()
     )  # Mapping of Sample_ID to Subject_ID
@@ -209,36 +212,48 @@ def test_graf_ancestry(graf_module):
         .set_index("Subject")  # Values of Subject are really Sample_IDs
         .rename(sample2subject)  # Convert Subject (i.e., Sample_IDs) to Subject_IDs
         .rename_axis("Subject_ID")
-        .rename({"Computed population": "Ancestry"}, axis=1)
-        .Ancestry.replace(  # Subject_ID to Ancestry mapping
-            {
-                "European": "EUR",
-                "African": "AFR",
-                "East Asian": "ASN",
-                "African American": "ADMIXED_AFR",
-                "Hispanic1": "ADMIXED_AFR",
-            }
-        )  # Update Ancestries to match SNPweight names
+        .rename({"P_f (%)": "pct_AFR", "P_e (%)": "pct_EUR", "P_a (%)": "pct_ASN"}, axis=1)
+        .loc[:, ["pct_AFR", "pct_EUR", "pct_ASN"]]
         .sort_index()
-        .to_frame()
         .reset_index()
         .drop_duplicates()
-    )
+    )  # GRAF results
 
     exp_ancestry_by_Subject_ID = (
         pd.read_csv(data_store / "production_outputs/ancestry/subjects.snpweights.csv")
         .set_index("ID")
         .rename_axis("Subject_ID")
-        .Ancestry.sort_index()
-        .to_frame()
+        .assign(
+            pct_AFR=lambda x: x.AFR * 100,
+            pct_EUR=lambda x: x.EUR * 100,
+            pct_ASN=lambda x: x.ASN * 100,
+        )
+        .loc[:, ["pct_AFR", "pct_EUR", "pct_ASN"]]
+        .sort_index()
         .reset_index()
         .drop_duplicates()
-    )
+    )  # SNPweights results
 
     df = obs_ancestry_by_Subject_ID.merge(
         exp_ancestry_by_Subject_ID, on="Subject_ID", suffixes=["_obs", "_exp"]
+    )  # Merged together to simplify multiple comparisons
+
+    tolerance = 10  # Allow a difference of +/- 10
+    assert_series_equal(
+        df.pct_AFR_obs, df.pct_AFR_exp, check_names=False, check_exact=False, atol=tolerance
+    )
+    assert_series_equal(
+        df.pct_EUR_obs, df.pct_EUR_exp, check_names=False, check_exact=False, atol=tolerance
+    )
+    assert_series_equal(
+        df.pct_ASN_obs, df.pct_ASN_exp, check_names=False, check_exact=False, atol=tolerance
     )
 
-    # TODO: Why are there these 16 differences.
-    assert (df.Ancestry_obs == df.Ancestry_exp).sum() == 168
-    assert (df.Ancestry_obs != df.Ancestry_exp).sum() == 16
+    # The ancestry with the highest percentage should be the same.
+    assert_series_equal(
+        df[["pct_AFR_obs", "pct_EUR_obs", "pct_ASN_obs"]].apply(np.argmax, axis=1),
+        df[["pct_AFR_exp", "pct_EUR_exp", "pct_ASN_exp"]].apply(np.argmax, axis=1),
+        check_names=False,
+    )
+    # Note: Second/third place ancestries are not always the same b/c sometimes
+    # they are small values (<=1) and will switch place between methods.
