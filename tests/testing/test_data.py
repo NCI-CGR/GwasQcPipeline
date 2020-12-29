@@ -2,7 +2,7 @@ import pytest
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.testing import chdir
-from cgr_gwas_qc.testing.data import FakeData, RealData
+from cgr_gwas_qc.testing.data import FakeData, Graf, RealData
 
 
 def test_fake_data(tmp_path):
@@ -85,3 +85,26 @@ def test_copy_folder_to_tmp_dir(tmp_path):
     assert (tmp_path / "all_contam").is_dir() & (tmp_path / "all_contam").exists()
     # The files from that folder were copied too
     assert (tmp_path / "all_contam/contam.csv").exists()
+
+
+def test_download_graf(tmp_path, monkeypatch):
+    """Test GRAF cache mechanism.
+
+    GRAF is not in bioconda, so this is a hack to download GRAF and store it
+    in a cache. Here I am testing the download mechanism to make sure I have
+    it right.
+    """
+    # GIVEN: an empty cache folder
+    def mock_cache(name):
+        pth = tmp_path / name
+        pth.mkdir(exist_ok=True, parents=True)
+        return pth
+
+    monkeypatch.setattr("cgr_gwas_qc.testing.data._make_cgr_cache", mock_cache)
+
+    # WHEN: I create a Graf instance
+    graf = Graf()
+
+    # THEN: the cache should have the graf program downloaded
+    assert (graf / "graf").exists() & (graf / "graf").is_file()  # graf executable
+    assert (graf / "data").exists() & (graf / "data").is_dir()  # graf data
