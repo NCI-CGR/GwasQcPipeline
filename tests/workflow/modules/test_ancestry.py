@@ -45,6 +45,7 @@ def test_graf_shell_prefix(tmp_path):
 
 
 def test_graf_fingerprint_list(tmp_path):
+    """Pull out a list of rsIDs from GRAF's 1KG BIM file."""
     # GIVEN a fake config.yml
     (
         FakeData(tmp_path)
@@ -65,10 +66,10 @@ def test_graf_fingerprint_list(tmp_path):
         )
     )
 
-    # WHEN: run snakemake to get a list of graf fingerprint rsids
+    # WHEN: run snakemake to get a list of graf fingerprint rsIDs
     run_snakemake(tmp_path)
 
-    # THEN
+    # THEN: the output file contains a bunch of rsIDs.
     assert all(
         [
             x.startswith("rs")
@@ -78,61 +79,12 @@ def test_graf_fingerprint_list(tmp_path):
 
 
 @pytest.mark.real_data
-@pytest.mark.workflow
-def test_extract_graf_fingerprint_markers(tmp_path, conda_envs):
-    # GIVEN: Real data with level 2 call rates.
-    conda_envs.copy_env("plink2", tmp_path)
-    (
-        RealData(tmp_path)
-        .add_sample_sheet()
-        .add_reference_files(copy=False)
-        .copy("production_outputs/plink_filter_call_rate_2", "plink_filter_call_rate_2")
-        .make_config()
-        .make_snakefile(
-            """
-            from cgr_gwas_qc import load_config
-
-            cfg = load_config()
-            include: cfg.rules("ancestry.smk")
-
-            rule all:
-                input:
-                    expand("ancestry/samples.{ext}", ext=["bed", "bim", "fam"])
-            """
-        )
-    )
-
-    # WHEN: run snakemake to filter out file fingerprints.
-    run_snakemake(tmp_path)
-
-    # THEN: All of the files should exist
-    assert (tmp_path / "ancestry/samples.bed").exists()
-    assert (tmp_path / "ancestry/samples.bim").exists()
-    assert (tmp_path / "ancestry/samples.fam").exists()
-
-    # The BIM variant IDs should all be rsids.
-    assert all(
-        [
-            x.split()[1].startswith("rs")
-            for x in (tmp_path / "ancestry/samples.bim").read_text().strip().split("\n")
-        ]
-    )
-
-    # There should be 3,379 kept and reported variants in the plink log
-    num_variants_keep = int(
-        re.findall(
-            r"\n(\d+) variants and .* pass filters", (tmp_path / "ancestry/samples.log").read_text()
-        )[0]
-    )
-    assert num_variants_keep == 3379
-
-
-@pytest.mark.real_data
 @pytest.fixture(scope="session")
 def graf_module(tmp_path_factory, conda_envs) -> Tuple[RealData, Path]:
-    """Run the GRAF Module
+    """Run the GRAF module.
 
-    This step is really slow (~6 min).
+    This step is really slow (~6 min). I am just running the entire module
+    and then I will test the different outputs individually.
     """
     tmp_path = tmp_path_factory.mktemp("slow")
     conda_envs.copy_env("graf_perl", tmp_path)
@@ -165,12 +117,41 @@ def graf_module(tmp_path_factory, conda_envs) -> Tuple[RealData, Path]:
 
 
 @pytest.mark.real_data
+@pytest.mark.workflow
+def test_extract_graf_fingerprint_markers(graf_module):
+    # GIVEN: GRAF module outputs.
+    _, tmp_path = graf_module
+
+    # THEN: the filtered PLINK files should exist.
+    assert (tmp_path / "ancestry/samples.bed").exists()
+    assert (tmp_path / "ancestry/samples.bim").exists()
+    assert (tmp_path / "ancestry/samples.fam").exists()
+
+    # The BIM variant IDs should all be rsIDs.
+    assert all(
+        [
+            x.split()[1].startswith("rs")
+            for x in (tmp_path / "ancestry/samples.bim").read_text().strip().split("\n")
+        ]
+    )
+
+    # There should be 3,379 kept and reported variants in the plink log
+    num_variants_keep = int(
+        re.findall(
+            r"\n(\d+) variants and .* pass filters", (tmp_path / "ancestry/samples.log").read_text()
+        )[0]
+    )
+    assert num_variants_keep == 3379
+
+
+@pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
 def test_graf_relatedness(graf_module):
-    data_store, tmp_path = graf_module
     # GIVEN: Real data with GRAF module outputs.
-    # THEN: Relatedness outputs should exist
+    data_store, tmp_path = graf_module
+
+    # THEN: Relatedness outputs should existl
     assert (tmp_path / "ancestry/graf_relatedness.txt").exists()
     assert (tmp_path / "ancestry/graf_relatedness.png").exists()
 
@@ -181,13 +162,14 @@ def test_graf_relatedness(graf_module):
         for x in obs_graf.query("`geno relation` == 'ID'")[["sample1", "sample2"]].itertuples(
             index=False
         )
-    }
+    }  # Set of tuples of Sample_IDs that are identical
 
     exp_plink = pd.read_csv(data_store / "production_outputs/concordance/KnownReplicates.csv")
     exp_ = {
         tuple(sorted(x))
         for x in exp_plink.dropna()[["Sample_ID1", "Sample_ID2"]].itertuples(index=False)
-    }
+    }  # Set of tuples of Sample_IDs that are concordant
+
     assert obs == exp_
 
 
@@ -195,14 +177,14 @@ def test_graf_relatedness(graf_module):
 @pytest.mark.regression
 @pytest.mark.workflow
 def test_graf_ancestry(graf_module):
-    data_store, tmp_path = graf_module
     # GIVEN: Real data with GRAF module outputs.
+    data_store, tmp_path = graf_module
 
-    # THEN: All of the files should exist
+    # THEN: GRAF ancestry output files should exist.
     assert (tmp_path / "ancestry/graf_pop.txt").exists()
     assert (tmp_path / "ancestry/graf_ancestry_calls.txt").exists()
 
-    # Percentages of AFR, EUR, and ASN should be similar
+    # Percentages of AFR, EUR, and ASN should be similar between SNPweights and GRAF.
     sample2subject = (
         pd.read_csv(tmp_path / "ancestry/ssm.txt", sep="\t").set_index("Sample_ID").squeeze()
     )  # Mapping of Sample_ID to Subject_ID
