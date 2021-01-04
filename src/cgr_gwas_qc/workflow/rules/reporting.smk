@@ -31,6 +31,23 @@ rule sample_qc_report:
         unpack(sample_qc_report_inputs),
     output:
         all_qc="all_sample_qc.csv",
-        lims="{out_name}_LimsUpload_{sample_sheet_date}.csv",
+        lims=temp("qc_table_for_LimsUpload.csv"),
     script:
         "../scripts/sample_qc_report.py"
+
+
+def _rename_lims_upload():
+    ss_file = cfg.sample_sheet_file.stem
+    if "_AnalysisManifest_" in ss_file:
+        out_name, sheet_date = ss_file.split("_AnalysisManifest_")
+        return f"{out_name}_LimsUpload_{sheet_date}.csv"
+    return "all_sample_qc_LimsUpload.csv"
+
+
+rule rename_lims_upload:
+    input:
+        rules.sample_qc_report.output.lims,
+    output:
+        _rename_lims_upload(),
+    shell:
+        "cp {input[0]} {output[0]}"
