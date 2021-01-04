@@ -22,8 +22,8 @@ def main(
         ..., help="Path to plink_filter_call_rate_1/samples.sexcheck"
     ),
     ancestry: Path = typer.Argument(..., help="Path to ancestry/graf_ancestry_calls.txt"),
-    known_concordance: Path = typer.Argument(..., help=""),
-    unknown_concordance: Path = typer.Argument(..., help=""),
+    known_replicates: Path = typer.Argument(..., help=""),
+    unknown_replicates: Path = typer.Argument(..., help=""),
     # Optional inputs
     contam: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_contamination_test.csv"
@@ -33,46 +33,50 @@ def main(
     ),
     # Outputs
     all_qc: Path = typer.Argument("all_samples_qc.csv"),
-    lims: str = typer.Argument("{out_name}_LimsUpload_{sample_sheet_date}.csv"),
+    lims: Path = typer.Argument("all_sample_qc_LimsUpload.csv"),
 ):
 
     cfg = load_config()
     ss = _wrangle_sample_sheet(cfg.ss, cfg.config.workflow_params.expected_sex_col_name)
     Sample_IDs = ss.index
 
-    df = pd.concat(
-        [
-            ss,
-            _read_imiss_start(imiss_start, Sample_IDs),
-            _read_imiss_cr1(imiss_cr1, Sample_IDs),
-            _read_imiss_cr2(imiss_cr2, Sample_IDs),
-            _read_sexcheck_cr1(sexcheck_cr1, ss.Expected_Sex),
-            _read_ancestry(ancestry, Sample_IDs),
-            _read_known_replicates(
-                known_concordance, cfg.config.software_params.dup_concordance_cutoff, Sample_IDs
-            ),
-            _read_unknown_replicates(unknown_concordance, Sample_IDs),
-            _read_contam(contam, cfg.config.software_params.contam_threshold, Sample_IDs),
-            _read_intensity(intensity, Sample_IDs),
-            _check_idats_files(cfg),
-        ],
-        axis=1,
+    df = (
+        pd.concat(
+            [
+                ss,
+                _read_imiss_start(imiss_start, Sample_IDs),
+                _read_imiss_cr1(imiss_cr1, Sample_IDs),
+                _read_imiss_cr2(imiss_cr2, Sample_IDs),
+                _read_sexcheck_cr1(sexcheck_cr1, ss.Expected_Sex),
+                _read_ancestry(ancestry, Sample_IDs),
+                _read_known_replicates(
+                    known_replicates, cfg.config.software_params.dup_concordance_cutoff, Sample_IDs
+                ),
+                _read_unknown_replicates(unknown_replicates, Sample_IDs),
+                _read_contam(contam, cfg.config.software_params.contam_threshold, Sample_IDs),
+                _read_intensity(intensity, Sample_IDs),
+                _check_idats_files(cfg),
+            ],
+            axis=1,
+        )
+        .rename_axis("Sample_ID")
+        .reset_index()
     )
 
-    qc_summary_flags = (
+    qc_summary_flags = [
         "Low Call Rate",
         "Contaminated",
         "Sex Discordant",
         "Expected Replicate Discordance",
         "Unexpected Replicate",
-    )
+    ]
     df["Count_of_QC_Issue"] = df[qc_summary_flags].sum(axis=1)
 
     ################################################################################
     # Save Outputs
     ################################################################################
     _save_qc_table(df, all_qc)
-    _save_lims_table(df, lims, cfg.config.sample_sheet)
+    _save_lims_table(df, lims)
 
 
 def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
@@ -420,20 +424,10 @@ def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
         "Identifiler_Needed",
     ]
 
-    df.reset_index().loc[:, header_order].to_csv(file_name, index=False)
+    df.reindex(header_order, axis=1).to_csv(file_name, index=False)
 
 
-def _save_lims_table(df: pd.DataFrame, file_name_pattern: str, sample_sheet_path: Path) -> None:
-    if "AnalysisManifest" in sample_sheet_path.name:
-        # example file_name_pattern: "{out_name}_LimsUpload_{sample_sheet_date}.csv"
-        # example sample_sheet name: "SR0001-001_1_AnalysisManifest_999999999999_20200101.csv"
-        out_name, sample_sheet_date = sample_sheet_path.stem.split("_AnalysisManifest_")
-
-        # example file_name: "SR0001-001_1_LimsUpload_999999999999_20200101.csv"
-        file_name = file_name_pattern.format(out_name=out_name, sample_sheet_date=sample_sheet_date)
-    else:
-        file_name = f"{sample_sheet_path.stem}_LimsUpload.csv"
-
+def _save_lims_table(df: pd.DataFrame, file_name: Path) -> None:
     header_order = [
         "SR_Subject_ID",
         "LIMS_Individual_ID",
@@ -447,7 +441,7 @@ def _save_lims_table(df: pd.DataFrame, file_name_pattern: str, sample_sheet_path
         "Unexpected Replicate",
     ]
 
-    df.reset_index().loc[:, header_order].to_csv(file_name, index=False)
+    df.reindex(header_order, axis=1).to_csv(file_name, index=False)
 
 
 if __name__ == "__main__":
