@@ -1,0 +1,320 @@
+from io import StringIO
+from pathlib import Path
+from textwrap import dedent
+from typing import Tuple
+
+import numpy as np
+import pandas as pd
+import pytest
+from pandas.testing import assert_series_equal
+
+from cgr_gwas_qc import load_config
+from cgr_gwas_qc.config import ConfigMgr
+from cgr_gwas_qc.testing import chdir
+from cgr_gwas_qc.testing.data import RealData
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def real_data_cache(tmp_path_factory) -> Tuple[RealData, ConfigMgr]:
+    """Real data and config object for QC table unit tests."""
+    session_tmp_path: Path = tmp_path_factory.mktemp("data_for_sample_qc_report")
+    data_path = (
+        RealData(session_tmp_path)
+        .add_sample_sheet(full_sample_sheet=False)
+        .add_reference_files(copy=False)
+        .add_user_files(entry_point="gtc", copy=False)
+        .make_config()
+    )
+
+    with chdir(session_tmp_path):
+        cfg = load_config()
+
+    return data_path, cfg
+
+
+@pytest.mark.parametrize("expected_sex_col", ["Expected_Sex", "LIMS_Individual_ID"])
+def test_wrangle_sample_sheet(real_data_cache: Tuple[RealData, ConfigMgr], expected_sex_col):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _wrangle_sample_sheet
+
+    # GIVEN: A test sample sheet and column to use as `Expected_Sex`
+    _, cfg = real_data_cache
+
+    # WHEN: I wrangle the sample sheet
+    ss = _wrangle_sample_sheet(cfg.ss, expected_sex_col)
+
+    # THEN: Basic properties
+    assert isinstance(ss, pd.DataFrame)
+    assert ss.index.name == "Sample_ID"
+
+    # The `Expected_Sex` column should be the same as the column passed as `expected_sex_col`
+    assert_series_equal(
+        ss["Expected_Sex"], cfg.ss.set_index("Sample_ID")[expected_sex_col], check_names=False
+    )
+
+
+def test_read_imiss_start(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_start
+
+    # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
+    data_path, cfg = real_data_cache
+    file_name = data_path / "production_outputs/plink_start/samples_start.imiss"
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: I parse the imiss table.
+    sr = _read_imiss_start(file_name, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "Call_Rate_Initial"
+
+
+def test_read_imiss_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_cr1
+
+    # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
+    data_path, cfg = real_data_cache
+    file_name = data_path / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss"
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: I parse the imiss table.
+    df = _read_imiss_cr1(file_name, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(df, pd.DataFrame)
+    assert df.index.name == "Sample_ID"
+    assert "Call_Rate_1" in df.columns
+    assert "Call_Rate_1_filter" in df.columns
+
+
+def test_read_imiss_cr2(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_cr2
+
+    # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
+    data_path, cfg = real_data_cache
+    file_name = data_path / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: I parse the imiss table.
+    df = _read_imiss_cr2(file_name, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(df, pd.DataFrame)
+    assert df.index.name == "Sample_ID"
+    assert "Call_Rate_2" in df.columns
+    assert "Call_Rate_2_filter" in df.columns
+
+
+def test_read_sexcheck_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_sexcheck_cr1
+
+    # GIVEN: A test sample sheet, real production outputs, and the expected sex
+    # calls from the sample table
+    data_path, cfg = real_data_cache
+    file_name = data_path / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
+    expected_sex_calls = cfg.ss.set_index("Sample_ID")["Expected_Sex"]
+
+    # WHEN: read the sexcheck table
+    df = _read_sexcheck_cr1(file_name, expected_sex_calls)
+
+    # THEN: Basic properties
+    assert isinstance(df, pd.DataFrame)
+    assert df.index.name == "Sample_ID"
+    assert "ChrX_Inbreed_estimate" in df.columns
+    assert "Predicted_Sex" in df.columns
+    assert "SexMatch" in df.columns
+    assert "Sex Discordant" in df.columns
+    assert df.dtypes["Sex Discordant"] is np.dtype("bool")
+    assert df.dtypes["ChrX_Inbreed_estimate"] is np.dtype("float64")
+
+
+def test_read_ancestry(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_ancestry
+
+    # GIVEN: A test sample sheet, example outputs from GRAF -pop, and a list of Sample_IDs
+    _, cfg = real_data_cache
+    ancestry = StringIO(
+        dedent(
+            """
+            Subject\tSelf-reported ancestry\tGD1\tGD2\tGD3\tGD4\tP_f (%)\tP_e (%)\tP_a (%)\tPopID\tComputed population
+            SB034307_PC26469_B09\t\t1.63\t1.45\t0.81\t0.03\t0.6\t99.1\t0.2\t1\tEuropean
+            SB034327_PC26469_C09\t\t1.64\t1.47\t0.85\t0.02\t0.0\t100.0\t0.0\t1\tEuropean
+            """
+        )
+    )
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: Parse the GRAF output
+    df = _read_ancestry(ancestry, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(df, pd.DataFrame)
+    assert df.index.name == "Sample_ID"
+    assert "AFR" in df.columns
+    assert "EUR" in df.columns
+    assert "ASN" in df.columns
+    assert "Ancestry" in df.columns
+    assert df.dtypes["AFR"] is np.dtype("float64")
+    assert df.dtypes["EUR"] is np.dtype("float64")
+    assert df.dtypes["ASN"] is np.dtype("float64")
+
+    # Check the conversion from a percent to a proportion
+    assert df.loc["SB034307_PC26469_B09", "EUR"] == 0.991
+    assert df.loc["SB034327_PC26469_C09", "EUR"] == 1.0
+
+
+def test_read_known_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_known_replicates
+
+    # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
+    data_path, cfg = real_data_cache
+    cutoff = cfg.config.software_params.dup_concordance_cutoff
+    reps = data_path / "production_outputs/concordance/KnownReplicates.csv"
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: Check for discordant replicates
+    sr = _read_known_replicates(reps, cutoff, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "Expected Replicate Discordance"
+    assert sr.dtype is np.dtype("bool")
+
+
+def test_read_unknown_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_unknown_replicates
+
+    # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
+    data_path, cfg = real_data_cache
+    reps = data_path / "production_outputs/concordance/UnknownReplicates.csv"
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: I parse unknown concordant samples table.
+    sr = _read_unknown_replicates(reps, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "Unexpected Replicate"
+    assert sr.dtype is np.dtype("bool")
+
+
+def test_read_contam(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_contam
+
+    # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
+    data_path, cfg = real_data_cache
+    cutoff = cfg.config.software_params.contam_threshold
+    contam = data_path / "production_outputs/all_contam/contam.csv"
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: Parse the contamination table
+    df = _read_contam(contam, cutoff, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(df, pd.DataFrame)
+    assert df.index.name == "Sample_ID"
+    assert "Contamination_Rate" in df.columns
+    assert "Contaminated" in df.columns
+    assert df.dtypes["Contaminated"] is np.dtype("float64")  # bool is cast as float b/c of NaN
+    assert df.dtypes["Contamination_Rate"] is np.dtype("float64")
+
+
+def test_read_contam_file_name_none(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_contam
+
+    # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
+    _, cfg = real_data_cache
+    cutoff = cfg.config.software_params.contam_threshold
+    contam = None
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: Parse the contamination table.
+    df = _read_contam(contam, cutoff, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(df, pd.DataFrame)
+    assert df.index.name == "Sample_ID"
+    assert "Contamination_Rate" in df.columns
+    assert "Contaminated" in df.columns
+
+
+def test_read_intensity(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_intensity
+
+    # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
+    data_path, cfg = real_data_cache
+    intensity = data_path / "production_outputs/all_sample_idat_intensity/idat_intensity.csv"
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: Parse the read intensity table.
+    sr = _read_intensity(intensity, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "IdatIntensity"
+    assert sr.dtype is np.dtype("float64")
+
+
+def test_read_intensity_file_name_none(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_intensity
+
+    # GIVEN: A test sample sheet, No production outputs, and a list of Sample_IDs
+    _, cfg = real_data_cache
+    intensity = None
+    Sample_IDs = cfg.ss.set_index("Sample_ID").index
+
+    # WHEN: Parse the read intensity table with file name of None
+    sr = _read_intensity(intensity, Sample_IDs)
+
+    # THEN: Basic properties
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "IdatIntensity"
+
+
+def test_check_idat_files(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _check_idats_files
+
+    # GIVEN: A test sample sheet and real production outputs
+    _, cfg = real_data_cache
+
+    # WHEN: Scan the folder for Idat files.
+    sr = _check_idats_files(cfg)
+
+    # THEN: Basic properties
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "IdatsInProjectDir"
+
+    # All idat files should be found
+    assert all(sr == "YES")
+
+
+def test_check_idat_files_one_missing(real_data_cache: Tuple[RealData, ConfigMgr]):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _check_idats_files
+
+    # GIVEN: A test sample sheet, real production outputs, and a fake sample
+    # with missing Idat files.
+    _, cfg = real_data_cache
+
+    # fake entry
+    fake = cfg.ss.iloc[0, :].copy()
+    fake["Sample_ID"] = "fake_Sample_ID"
+    fake["SentrixBarcode_A"] = "fake_barcode"
+    cfg.ss = cfg.ss.append(fake, ignore_index=True)
+
+    # WHEN: Scan the folder for Idat files.
+    sr = _check_idats_files(cfg)
+
+    # THEN: Basic properties
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "IdatsInProjectDir"
+
+    # I should have 2 samples with idat files found and 1 missing these files.
+    assert sum(sr == "YES") == 2
+    assert sum(sr == "NO") == 1
