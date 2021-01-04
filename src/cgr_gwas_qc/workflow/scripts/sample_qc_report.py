@@ -94,13 +94,13 @@ def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.Da
             - Count_of_SR_SubjectID (int): Number of `Sample_ID`s per
               `SR_SubjectID`.
     """
-    return (
-        df.rename({expected_sex_col_name: "Expected_Sex"}, axis=1)
-        .merge(
-            df.groupby("SR_Subject_ID", dropna=False).size().rename("Count_of_SR_SubjectID"),
-            on="SR_Subject_ID",
-        )  # Count the number of samples per subject ID.
-        .set_index("Sample_ID")
+    _df = df.copy()
+    _df["Expected_Sex"] = _df[expected_sex_col_name]
+    return _df.merge(
+        df.groupby("SR_Subject_ID", dropna=False).size().rename("Count_of_SR_SubjectID"),
+        on="SR_Subject_ID",
+    ).set_index(  # Count the number of samples per subject ID.
+        "Sample_ID"
     )
 
 
@@ -199,14 +199,18 @@ def _read_sexcheck_cr1(file_name: Path, Expected_Sex: pd.Series) -> pd.DataFrame
         .loc[:, ["ChrX_Inbreed_estimate", "Predicted_Sex"]]
     )
 
-    # TODO: Decide if we want to keep this logic. See
+    # Update PLINK Predicted_Sex Calls
+    # TODO: Decide if we want to keep this logic from the legacy workflow. See
     # http://10.133.130.114/jfear/GwasQcPipeline/issues/35
     df.loc[df.ChrX_Inbreed_estimate < 0.5, "Predicted_Sex"] = "F"
     df.loc[df.ChrX_Inbreed_estimate >= 0.5, "Predicted_Sex"] = "M"
 
+    # Note: This seems redundant but the legacy workflow has both of these flags.
+    # indicator flag
     df["SexMatch"] = np.where(Expected_Sex == df.Predicted_Sex, "Y", "N")
     df.loc[df.Predicted_Sex == "U", "SexMatch"] = "U"  # If we could not predict sex then label as U
 
+    # bool flag
     df["Sex Discordant"] = df.SexMatch.replace({"N": True, "Y": False, "U": np.nan})
 
     return df
@@ -229,7 +233,7 @@ def _read_ancestry(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     """
     return (
         pd.read_csv(file_name, sep="\t")
-        .rename({"Subject": "Sample_ID", "Computed population": "Ancestry"})
+        .rename({"Subject": "Sample_ID", "Computed population": "Ancestry"}, axis=1)
         .assign(AFR=lambda x: x["P_f (%)"] / 100)
         .assign(EUR=lambda x: x["P_e (%)"] / 100)
         .assign(ASN=lambda x: x["P_a (%)"] / 100)
@@ -315,14 +319,14 @@ def _read_contam(
 
     df = (
         pd.read_csv(file_name)
-        .rename({"ID": "Sample_ID", "%Mix": "Contamination_Rate"})
+        .rename({"ID": "Sample_ID", "%Mix": "Contamination_Rate"}, axis=1)
         .set_index("Sample_ID")
     )
 
     df["Contaminated"] = df.Contamination_Rate > contam_threshold
     df.loc[df.Contamination_Rate.isna(), "Contaminated"] = np.nan
 
-    return df.reindex(Sample_IDs)[("Contamination_Rate", "Contaminated")]
+    return df.reindex(Sample_IDs)[["Contamination_Rate", "Contaminated"]]
 
 
 def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Series:
@@ -334,11 +338,11 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
             - IdatIntensity (float): The median Idat intensity.
     """
     if file_name is None:
-        return pd.Series(index=Sample_IDs).rename("IdatIntensity")
+        return pd.Series(index=Sample_IDs, dtype="float", name="IdatIntensity")
 
     return (
         pd.read_csv(file_name)
-        .rename({"SampId": "Sample_ID", "MedianIntensity": "IdatIntensity"})
+        .rename({"SampId": "Sample_ID", "MedianIntensity": "IdatIntensity"}, axis=1)
         .set_index("Sample_ID")
         .reindex(Sample_IDs)
         .IdatIntensity
@@ -360,7 +364,7 @@ def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
     """
     if cfg.config.user_files.idat_pattern is None:
         # No Idat path specified in config, return all NaN.
-        return pd.Series(index=cfg.ss.Sample_ID).rename("IdatsInProjectDir")
+        return pd.Series(index=cfg.ss.Sample_ID, dtype="object", name="IdatsInProjectDir")
 
     results = []
     for Sample_ID, red, green in zip(
