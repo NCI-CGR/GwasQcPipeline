@@ -7,11 +7,14 @@ import numpy as np
 import pandas as pd
 import pytest
 from pandas.testing import assert_series_equal
+from typer.testing import CliRunner
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr
 from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import RealData
+
+runner = CliRunner()
 
 
 @pytest.mark.real_data
@@ -53,6 +56,7 @@ def test_wrangle_sample_sheet(real_data_cache: Tuple[RealData, ConfigMgr], expec
     )
 
 
+@pytest.mark.real_data
 def test_read_imiss_start(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_start
 
@@ -70,6 +74,7 @@ def test_read_imiss_start(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert sr.name == "Call_Rate_Initial"
 
 
+@pytest.mark.real_data
 def test_read_imiss_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_cr1
 
@@ -88,6 +93,7 @@ def test_read_imiss_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert "Call_Rate_1_filter" in df.columns
 
 
+@pytest.mark.real_data
 def test_read_imiss_cr2(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_cr2
 
@@ -106,6 +112,7 @@ def test_read_imiss_cr2(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert "Call_Rate_2_filter" in df.columns
 
 
+@pytest.mark.real_data
 def test_read_sexcheck_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_sexcheck_cr1
 
@@ -129,6 +136,7 @@ def test_read_sexcheck_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert df.dtypes["ChrX_Inbreed_estimate"] is np.dtype("float64")
 
 
+@pytest.mark.real_data
 def test_read_ancestry(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_ancestry
 
@@ -164,6 +172,7 @@ def test_read_ancestry(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert df.loc["SB034327_PC26469_C09", "EUR"] == 1.0
 
 
+@pytest.mark.real_data
 def test_read_known_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_known_replicates
 
@@ -183,6 +192,7 @@ def test_read_known_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert sr.dtype is np.dtype("bool")
 
 
+@pytest.mark.real_data
 def test_read_unknown_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_unknown_replicates
 
@@ -201,6 +211,7 @@ def test_read_unknown_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert sr.dtype is np.dtype("bool")
 
 
+@pytest.mark.real_data
 def test_read_contam(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_contam
 
@@ -222,6 +233,7 @@ def test_read_contam(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert df.dtypes["Contamination_Rate"] is np.dtype("float64")
 
 
+@pytest.mark.real_data
 def test_read_contam_file_name_none(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_contam
 
@@ -241,6 +253,7 @@ def test_read_contam_file_name_none(real_data_cache: Tuple[RealData, ConfigMgr])
     assert "Contaminated" in df.columns
 
 
+@pytest.mark.real_data
 def test_read_intensity(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_intensity
 
@@ -259,6 +272,7 @@ def test_read_intensity(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert sr.dtype is np.dtype("float64")
 
 
+@pytest.mark.real_data
 def test_read_intensity_file_name_none(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_intensity
 
@@ -276,6 +290,7 @@ def test_read_intensity_file_name_none(real_data_cache: Tuple[RealData, ConfigMg
     assert sr.name == "IdatIntensity"
 
 
+@pytest.mark.real_data
 def test_check_idat_files(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _check_idats_files
 
@@ -294,6 +309,7 @@ def test_check_idat_files(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert all(sr == "YES")
 
 
+@pytest.mark.real_data
 def test_check_idat_files_one_missing(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _check_idats_files
 
@@ -318,3 +334,69 @@ def test_check_idat_files_one_missing(real_data_cache: Tuple[RealData, ConfigMgr
     # I should have 2 samples with idat files found and 1 missing these files.
     assert sum(sr == "YES") == 2
     assert sum(sr == "NO") == 1
+
+
+@pytest.mark.real_data
+def test_sample_qc_report(tmp_path: Path, monkeypatch):
+    """Integration test for the Internal Sample QC Report"""
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import app
+
+    # GIVEN: A real data store with the full sample table and config.
+    data_store = (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .add_reference_files(copy=False)
+        .add_user_files(entry_point="gtc", copy=False)
+        .make_config()
+    )
+
+    # I don't have GRAF output from the production workflow. I am hacking my
+    # way around this by:
+    # passing an empty file to the script
+    graf = tmp_path / "ancestry/graf_ancestry_calls.txt"
+    graf.parent.mkdir(parents=True, exist_ok=True)
+    graf.touch()
+
+    # monkeypatching the `_read_ancestry` function to just return None which is
+    # ignored by `pd.concat`
+    def mock_ancestry(*args, **kwargs):
+        return None
+
+    monkeypatch.setattr(
+        "cgr_gwas_qc.workflow.scripts.sample_qc_report._read_ancestry", mock_ancestry
+    )
+
+    # WHEN: I change directory (b/c I use `load_config` in the script) and run the script.
+    with chdir(tmp_path):
+        results = runner.invoke(
+            app,
+            [
+                (data_store / "production_outputs/plink_start/samples_start.imiss").as_posix(),
+                (
+                    data_store / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss"
+                ).as_posix(),
+                (
+                    data_store / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
+                ).as_posix(),
+                (
+                    data_store
+                    / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
+                ).as_posix(),
+                graf.as_posix(),  # This is an empty file
+                (data_store / "production_outputs/concordance/KnownReplicates.csv").as_posix(),
+                (data_store / "production_outputs/concordance/UnknownReplicates.csv").as_posix(),
+                "--contam",
+                (data_store / "production_outputs/all_contam/contam.csv").as_posix(),
+                "--intensity",
+                (
+                    data_store / "production_outputs/all_sample_idat_intensity/idat_intensity.csv"
+                ).as_posix(),
+                (tmp_path / "all_sample_qc.csv").as_posix(),
+                (tmp_path / "qc_table_for_LimsUpload").as_posix(),
+            ],
+            catch_exceptions=False,
+        )
+
+    # THEN: the script runs successfully
+    assert results.exit_code == 0  # Make sure it ran successfully
+    assert (tmp_path / "all_sample_qc.csv").exists()
