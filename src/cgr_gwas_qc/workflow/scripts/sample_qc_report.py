@@ -1,4 +1,12 @@
-"""Generate the internal sample QC report."""
+"""Generate the internal sample QC report.
+
+This script takes various outputs from the GwasQcPipeline and
+aggregates/summarizes results into an internal QC report. Here we use a
+functional approach to build up the QC report. Each file has it's own
+function to parse/summarize its content. This makes it easier to add new
+components or change the behavior. Search for `TO-ADD` comments for where you
+would have to make modifications to add new components.
+"""
 from pathlib import Path
 from typing import Optional
 
@@ -24,6 +32,8 @@ def main(
     ancestry: Path = typer.Argument(..., help="Path to ancestry/graf_ancestry_calls.txt"),
     known_replicates: Path = typer.Argument(..., help=""),
     unknown_replicates: Path = typer.Argument(..., help=""),
+    # TO-ADD: new file to include in QC report. You also need to add this file
+    # to the rule in `reporting.smk`
     # Optional inputs
     contam: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_contamination_test.csv"
@@ -40,6 +50,7 @@ def main(
     ss = _wrangle_sample_sheet(cfg.ss, cfg.config.workflow_params.expected_sex_col_name)
     Sample_IDs = ss.index
 
+    # Build up the Full QC Table
     df = (
         pd.concat(
             [
@@ -56,6 +67,7 @@ def main(
                 _read_contam(contam, cfg.config.software_params.contam_threshold, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
                 _check_idats_files(cfg),
+                # TO-ADD: call function you created to parse/summarize new file
             ],
             axis=1,
         )
@@ -63,14 +75,25 @@ def main(
         .reset_index()
     )
 
+    ################################################################################
+    # Summary Columns
+    ################################################################################
+    # Count the number of QC issues
     qc_summary_flags = [
         "Low Call Rate",
         "Contaminated",
         "Sex Discordant",
         "Expected Replicate Discordance",
         "Unexpected Replicate",
+        # TO-ADD: If you create a new summary binary flag you want to include
+        # in the count of QC issues then add the column here.
     ]
-    df["Count_of_QC_Issue"] = df[qc_summary_flags].sum(axis=1)
+    df["Count_of_QC_Issue"] = df[qc_summary_flags].sum(axis=1).astype(int)
+
+    # Add a flag to run identifiler based if any of these columns are True
+    df["Identifiler_Needed"] = df[["Contaminated", "Sex Discordant", "Unexpected Replicate"]].any(
+        axis=1
+    )
 
     ################################################################################
     # Save Outputs
@@ -99,13 +122,22 @@ def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.Da
               `SR_SubjectID`.
     """
     _df = df.copy()
+
+    # Set the user provided expected sex column as `Expected_Sex`. Note: by
+    # default this columns is already called `Expected_Sex`.
     _df["Expected_Sex"] = _df[expected_sex_col_name]
+
+    # For internal controls use the `Indentifiler_Sex` column as `Expected_Sex`
+    internal_control_mask = _df.Sample_Group == "sVALD-001"
+    _df.loc[internal_control_mask, "Expected_Sex"] = _df.loc[
+        internal_control_mask, "Identifiler_Sex"
+    ]
+
+    # Count the number of samples per subject ID and set Sample_ID as index
     return _df.merge(
         df.groupby("SR_Subject_ID", dropna=False).size().rename("Count_of_SR_SubjectID"),
         on="SR_Subject_ID",
-    ).set_index(  # Count the number of samples per subject ID.
-        "Sample_ID"
-    )
+    ).set_index("Sample_ID")
 
 
 def _read_imiss_start(file_name: Path, Sample_IDs: pd.Index) -> pd.Series:
@@ -328,7 +360,7 @@ def _read_contam(
     )
 
     df["Contaminated"] = df.Contamination_Rate > contam_threshold
-    df.loc[df.Contamination_Rate.isna(), "Contaminated"] = np.nan
+    df.loc[df.Contamination_Rate.isna(), "Contaminated"] = False
 
     return df.reindex(Sample_IDs)[["Contamination_Rate", "Contaminated"]]
 
@@ -386,7 +418,11 @@ def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
     return pd.Series(dict(results)).rename_axis("Sample_ID").rename("IdatsInProjectDir")
 
 
+# TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
+
+
 def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
+    """Save main QC table."""
     header_order = [
         "SR_Subject_ID",
         "Count_of_SR_SubjectID",
@@ -415,11 +451,13 @@ def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
         "Call_Rate_1",
         "Call_Rate_2_filter",
         "Call_Rate_2",
+        # TO-ADD: Any column names you want saved to the output table
         "Low Call Rate",
         "Contaminated",
         "Sex Discordant",
         "Expected Replicate Discordance",
         "Unexpected Replicate",
+        # TO-ADD: Any binary flags you want saved to the output table
         "Count_of_QC_Issue",
         "Identifiler_Needed",
     ]
@@ -428,6 +466,7 @@ def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
 
 
 def _save_lims_table(df: pd.DataFrame, file_name: Path) -> None:
+    """Save QC subset for LIMS upload."""
     header_order = [
         "SR_Subject_ID",
         "LIMS_Individual_ID",
@@ -439,6 +478,7 @@ def _save_lims_table(df: pd.DataFrame, file_name: Path) -> None:
         "Sex Discordant",
         "Expected Replicate Discordance",
         "Unexpected Replicate",
+        # TO-ADD: Any column names you want saved to the LIMS output table
     ]
 
     df.reindex(header_order, axis=1).to_csv(file_name, index=False)
