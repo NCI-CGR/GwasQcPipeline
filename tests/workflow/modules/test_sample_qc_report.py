@@ -6,7 +6,7 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 import pytest
-from pandas.testing import assert_series_equal
+from pandas.testing import assert_frame_equal, assert_series_equal
 from typer.testing import CliRunner
 
 from cgr_gwas_qc import load_config
@@ -229,7 +229,7 @@ def test_read_contam(real_data_cache: Tuple[RealData, ConfigMgr]):
     assert df.index.name == "Sample_ID"
     assert "Contamination_Rate" in df.columns
     assert "Contaminated" in df.columns
-    assert df.dtypes["Contaminated"] is np.dtype("float64")  # bool is cast as float b/c of NaN
+    assert df.dtypes["Contaminated"] is np.dtype("bool")
     assert df.dtypes["Contamination_Rate"] is np.dtype("float64")
 
 
@@ -336,6 +336,7 @@ def test_check_idat_files_one_missing(real_data_cache: Tuple[RealData, ConfigMgr
     assert sum(sr == "NO") == 1
 
 
+@pytest.mark.regression
 @pytest.mark.real_data
 def test_sample_qc_report(tmp_path: Path, monkeypatch):
     """Integration test for the Internal Sample QC Report"""
@@ -399,4 +400,23 @@ def test_sample_qc_report(tmp_path: Path, monkeypatch):
 
     # THEN: the script runs successfully
     assert results.exit_code == 0  # Make sure it ran successfully
-    assert (tmp_path / "all_sample_qc.csv").exists()
+
+    # Outputs (excluding Ancestry) should match with legacy workflow. GRAF is
+    # not part of the legacy workflow so I am ignoring Ancestry results.
+    exclude_cols = ["AFR", "ASN", "EUR", "Ancestry"]  # Ignore GRAF columns
+    exclude_cols.append(
+        "IdatsInProjectDir"
+    )  # Observed values will be wrong b/c Idats were not copied locally
+    obs_ = (
+        pd.read_csv(tmp_path / "all_sample_qc.csv")
+        .drop(exclude_cols, axis=1)
+        .sort_values("Sample_ID")
+        .reset_index(drop=True)
+    )
+    exp_ = (
+        pd.read_csv(data_store / "production_outputs/all_sample_qc.csv")
+        .drop(exclude_cols, axis=1)
+        .sort_values("Sample_ID")
+        .reset_index(drop=True)
+    )
+    assert_frame_equal(obs_, exp_)
