@@ -98,6 +98,15 @@ class ConfigMgr:
 
         return self._sample_sheet.data
 
+    @ss.setter
+    def ss(self, value: pd.DataFrame) -> None:
+        """Replace the sample sheet DataFrame."""
+        if self._sample_sheet is None:
+            warn(f"Sample Sheet: {self.sample_sheet_file} was not loaded.", RuntimeWarning)
+            return None
+
+        self._sample_sheet.data = value
+
     ################################################################################
     # Helper functions for snakemake
     ################################################################################

@@ -52,6 +52,10 @@ class SampleSheet:
     def data(self) -> pd.DataFrame:
         return self._sections["data"]
 
+    @data.setter
+    def data(self, value: pd.DataFrame) -> None:
+        self._sections["data"] = value
+
     def _split_sections(self) -> List[Tuple[str, str]]:
         with open(self.file_name, "r", encoding="utf-8") as fh:
             return re.findall(self.section_regex, fh.read().strip())
