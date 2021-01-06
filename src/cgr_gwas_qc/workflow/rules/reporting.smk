@@ -51,3 +51,12 @@ rule rename_lims_upload:
         _rename_lims_upload(),
     shell:
         "cp {input[0]} {output[0]}"
+
+
+rule summary_stats:
+    input:
+        "all_sample_qc.csv",
+    output:
+        "summary_stats.txt",
+    script:
+        "../scripts/sample_qc_report_summary_stats.py"

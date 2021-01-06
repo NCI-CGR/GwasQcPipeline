@@ -1,4 +1,3 @@
-from io import StringIO
 from pathlib import Path
 from textwrap import dedent
 from typing import Tuple
@@ -19,7 +18,7 @@ runner = CliRunner()
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def real_data_cache(tmp_path_factory) -> Tuple[RealData, ConfigMgr]:
+def real_data_cache(tmp_path_factory):
     """Real data and config object for QC table unit tests."""
     session_tmp_path: Path = tmp_path_factory.mktemp("data_for_sample_qc_report")
     data_path = (
@@ -142,7 +141,8 @@ def test_read_ancestry(real_data_cache: Tuple[RealData, ConfigMgr]):
 
     # GIVEN: A test sample sheet, example outputs from GRAF -pop, and a list of Sample_IDs
     _, cfg = real_data_cache
-    ancestry = StringIO(
+    ancestry = cfg.root / "graf.tsv"
+    ancestry.write_text(
         dedent(
             """
             Subject\tSelf-reported ancestry\tGD1\tGD2\tGD3\tGD4\tP_f (%)\tP_e (%)\tP_a (%)\tPopID\tComputed population
@@ -420,3 +420,35 @@ def test_sample_qc_report(tmp_path: Path, monkeypatch):
         .reset_index(drop=True)
     )
     assert_frame_equal(obs_, exp_)
+
+
+@pytest.mark.real_data
+def test_summary_stats(real_data_cache: Tuple[RealData, ConfigMgr]):
+    """Test the createion of summary_stats.txt
+
+    I am not able to perform regression testing because there are some issues
+    with the original script. First, they have the contamination threshold of
+    0.1 hardcoded so the summary stats don't match the sample_qc_table if
+    this threshold is changed by the user. Second, the fail call rate
+    includes NAs, where in the sample_qc_table these are converted to True.
+    Third, because I switched from R to python, there are some small
+    naming/formatting differences that I felt were not necessary to repeat.
+    """
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report_summary_stats import app
+
+    # GIVEN: A config and the all_sample_qc.csv file.
+    data_path, cfg = real_data_cache
+
+    # WHEN: I run in the same directory as the config.yml file.
+    with chdir(cfg.root):
+        results = runner.invoke(
+            app,
+            [(data_path / "production_outputs/all_sample_qc.csv").as_posix(), "summary_stats.txt"],
+        )
+
+    # THEN: The script runs to completion
+    assert results.exit_code == 0
+    # The file is created
+    assert (cfg.root / "summary_stats.txt").exists()
+    # The file is not empty
+    assert len((cfg.root / "summary_stats.txt").read_text().splitlines()) == 60
