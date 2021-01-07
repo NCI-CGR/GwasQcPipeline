@@ -481,6 +481,7 @@ def _save_lims_table(df: pd.DataFrame, file_name: Path) -> None:
         # TO-ADD: Any column names you want saved to the LIMS output table
     ]
 
+    df["Call Rate"] = df.Call_Rate_1
     df.reindex(header_order, axis=1).to_csv(file_name, index=False)
 
 
