@@ -42,8 +42,8 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Outputs
-    all_qc: Path = typer.Argument("all_samples_qc.csv"),
-    lims: Path = typer.Argument("all_sample_qc_LimsUpload.csv"),
+    all_qc: Path = typer.Argument(..., help="Path to all_samples_qc.csv"),
+    lims: Path = typer.Argument(..., help="Path to lims_upload.csv"),
 ):
 
     cfg = load_config()
