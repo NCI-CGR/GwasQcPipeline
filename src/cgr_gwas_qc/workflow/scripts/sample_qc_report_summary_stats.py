@@ -138,6 +138,6 @@ def _value_counts_w_na(sr: pd.Series) -> str:
 
 if __name__ == "__main__":
     if "snakemake" in locals():
-        main(**snakemake.input, **snakemake.output)  # type: ignore # noqa
+        main(Path(snakemake.input[0]), Path(snakemake.output[0]))  # type: ignore # noqa
     else:
         app()

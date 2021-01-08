@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr
-from cgr_gwas_qc.testing import chdir
+from cgr_gwas_qc.testing import chdir, run_snakemake
 from cgr_gwas_qc.testing.data import RealData
 
 runner = CliRunner()
@@ -136,7 +136,7 @@ def test_read_sexcheck_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_ancestry(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_ancestry_GRAF(real_data_cache: Tuple[RealData, ConfigMgr]):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_ancestry
 
     # GIVEN: A test sample sheet, example outputs from GRAF -pop, and a list of Sample_IDs
@@ -336,94 +336,171 @@ def test_check_idat_files_one_missing(real_data_cache: Tuple[RealData, ConfigMgr
     assert sum(sr == "NO") == 1
 
 
-@pytest.mark.regression
-@pytest.mark.real_data
-def test_sample_qc_report(tmp_path: Path, monkeypatch):
-    """Integration test for the Internal Sample QC Report"""
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import app
+def test_identifiler_reason():
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _identifiler_reason
 
-    # GIVEN: A real data store with the full sample table and config.
+    df = pd.DataFrame(
+        {
+            "Identifiler_Needed": [False, True, True, True],
+            "one": [False, True, False, True],
+            "two": [False, True, True, True],
+            "three": [False, False, False, True],
+        }
+    )
+
+    obs_ = _identifiler_reason(df, ["one", "two", "three"])
+    exp_ = pd.Series(["", "one;two", "two", "one;two;three"])
+    assert_series_equal(obs_, exp_)
+
+
+@pytest.mark.real_data
+@pytest.mark.workflow
+@pytest.fixture(scope="session")
+def reporting_module_outputs(tmp_path_factory):
+    """Run the reporting module."""
+    session_tmp_path: Path = tmp_path_factory.mktemp("reporting_module_outputs")
     data_store = (
-        RealData(tmp_path)
-        .add_sample_sheet()
+        RealData(session_tmp_path)
+        .add_sample_sheet(full_sample_sheet=True)
         .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
-        .make_config()
-    )
-
-    # I don't have GRAF output from the production workflow. I am hacking my
-    # way around this by:
-    # passing an empty file to the script
-    graf = tmp_path / "ancestry/graf_ancestry_calls.txt"
-    graf.parent.mkdir(parents=True, exist_ok=True)
-    graf.touch()
-
-    # monkeypatching the `_read_ancestry` function to just return None which is
-    # ignored by `pd.concat`
-    def mock_ancestry(*args, **kwargs):
-        return None
-
-    monkeypatch.setattr(
-        "cgr_gwas_qc.workflow.scripts.sample_qc_report._read_ancestry", mock_ancestry
-    )
-
-    # WHEN: I change directory (b/c I use `load_config` in the script) and run the script.
-    with chdir(tmp_path):
-        results = runner.invoke(
-            app,
-            [
-                (data_store / "production_outputs/plink_start/samples_start.imiss").as_posix(),
-                (
-                    data_store / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss"
-                ).as_posix(),
-                (
-                    data_store / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
-                ).as_posix(),
-                (
-                    data_store
-                    / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
-                ).as_posix(),
-                graf.as_posix(),  # This is an empty file
-                (data_store / "production_outputs/concordance/KnownReplicates.csv").as_posix(),
-                (data_store / "production_outputs/concordance/UnknownReplicates.csv").as_posix(),
-                "--contam",
-                (data_store / "production_outputs/all_contam/contam.csv").as_posix(),
-                "--intensity",
-                (
-                    data_store / "production_outputs/all_sample_idat_intensity/idat_intensity.csv"
-                ).as_posix(),
-                (tmp_path / "all_sample_qc.csv").as_posix(),
-                (tmp_path / "qc_table_for_LimsUpload").as_posix(),
-            ],
-            catch_exceptions=False,
+        .copy("production_outputs/plink_start/samples_start.imiss", "plink_start/samples.imiss")
+        .copy(
+            "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss",
+            "plink_filter_call_rate_1/samples.imiss",
         )
+        .copy(
+            "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
+            "plink_filter_call_rate_1/samples.sexcheck",
+        )
+        .copy(
+            "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
+            "plink_filter_call_rate_2/samples.imiss",
+        )
+        .copy(
+            "production_outputs/snpweights/samples.snpweights.csv",
+            "ancestry/graf_ancestry_calls.txt",
+        )  # NOTE: I am using SNPweights b/c I don't have production GRAF output
+        .copy(
+            "production_outputs/concordance/KnownReplicates.csv",
+            "sample_filters/concordance/KnownReplicates.csv",
+        )
+        .copy(
+            "production_outputs/concordance/UnknownReplicates.csv",
+            "sample_filters/concordance/UnknownReplicates.csv",
+        )
+        .copy(
+            "production_outputs/all_contam/contam.csv", "sample_filters/agg_contamination_test.csv"
+        )
+        .copy(
+            "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
+            "sample_filters/agg_median_idat_intensity.csv",
+        )
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
 
-    # THEN: the script runs successfully
-    assert results.exit_code == 0  # Make sure it ran successfully
+            cfg = load_config()
 
-    # Outputs (excluding Ancestry) should match with legacy workflow. GRAF is
-    # not part of the legacy workflow so I am ignoring Ancestry results.
-    exclude_cols = ["AFR", "ASN", "EUR", "Ancestry"]  # Ignore GRAF columns
-    exclude_cols.append(
-        "IdatsInProjectDir"
-    )  # Observed values will be wrong b/c Idats were not copied locally
+            include: cfg.rules("reporting.smk")
+
+            rule all:
+                input:
+                    "sample_qc_report/all_samples.csv",
+                    "sample_qc_report/lims_upload.csv",
+                    "sample_qc_report/summary_stats.txt",
+                    "sample_qc_report/identifiler_needed.csv",
+            """
+        )
+    )
+
+    run_snakemake(session_tmp_path)
+
+    return data_store, session_tmp_path
+
+
+@pytest.mark.regression
+@pytest.mark.workflow
+@pytest.mark.real_data
+def test_sample_qc_report(reporting_module_outputs):
+    # GIVEN: The outputs from the reporting module
+    data_store, tmp_path = reporting_module_outputs
+
+    # WHEN: Read in the all_samples table ignoring a couple of columns
+    exclude_cols = [
+        "IdatsInProjectDir",  # This column does not match b/c I did not have all the Idat files
+        "Identifiler_Reason",  # This is a new column not in the legacy table
+    ]
+
     obs_ = (
-        pd.read_csv(tmp_path / "all_sample_qc.csv")
-        .drop(exclude_cols, axis=1)
+        pd.read_csv(tmp_path / "sample_qc_report/all_samples.csv")
+        .drop(exclude_cols, axis=1, errors="ignore")
         .sort_values("Sample_ID")
         .reset_index(drop=True)
     )
     exp_ = (
         pd.read_csv(data_store / "production_outputs/all_sample_qc.csv")
-        .drop(exclude_cols, axis=1)
+        .drop(exclude_cols, axis=1, errors="ignore")
         .sort_values("Sample_ID")
         .reset_index(drop=True)
     )
+
+    # THEN: The tables are identical
     assert_frame_equal(obs_, exp_)
 
 
+@pytest.mark.regression
+@pytest.mark.workflow
 @pytest.mark.real_data
-def test_summary_stats(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_lims_upload(reporting_module_outputs):
+    # GIVEN: The outputs from the reporting module
+    data_store, tmp_path = reporting_module_outputs
+
+    # WHEN: Read in the lims upload table
+
+    obs_ = (
+        pd.read_csv(tmp_path / "sample_qc_report/lims_upload.csv")
+        .sort_values("Sample_ID")
+        .reset_index(drop=True)
+    )
+    exp_ = (
+        pd.read_csv(
+            data_store
+            / "production_outputs/SR0446-001_12_LimsUpload_1011201995419_casecontrol_20191011.csv"
+        )
+        .rename({"Sample ID": "Sample_ID"}, axis=1)  # Somehow the legacy workflow changed this
+        .sort_values("Sample_ID")
+        .reset_index(drop=True)
+    )
+
+    # THEN: The tables are identical
+    assert_frame_equal(obs_, exp_)
+
+
+@pytest.mark.workflow
+@pytest.mark.regression
+@pytest.mark.real_data
+def test_identifiler_needed(reporting_module_outputs):
+    """"""
+    # GIVEN: The outputs from the reporting module
+    data_path, tmp_path = reporting_module_outputs
+
+    obs_ = pd.read_csv(tmp_path / "sample_qc_report/identifiler_needed.csv").rename(
+        {"Identifiler_Reason": "Identifiler Reason"}, axis=1
+    )  # I had renamed one of the columns, I am renaming back for testing
+    exp_ = pd.read_csv(
+        data_path
+        / "production_outputs/files_for_lab/SR0446-001_12_Identifiler_1011201995419_casecontrol_20191011.csv"
+    )
+
+    # THEN: The summary stats ends with 203 17
+    assert_frame_equal(obs_, exp_)
+
+
+@pytest.mark.workflow
+@pytest.mark.real_data
+def test_sample_qc_report_summary_stats(reporting_module_outputs):
     """Test the createion of summary_stats.txt
 
     I am not able to perform regression testing because there are some issues
@@ -434,21 +511,11 @@ def test_summary_stats(real_data_cache: Tuple[RealData, ConfigMgr]):
     Third, because I switched from R to python, there are some small
     naming/formatting differences that I felt were not necessary to repeat.
     """
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report_summary_stats import app
+    # GIVEN: The outputs from the reporting module
+    _, tmp_path = reporting_module_outputs
 
-    # GIVEN: A config and the all_sample_qc.csv file.
-    data_path, cfg = real_data_cache
+    # NOTE: There are going to be a number of formatting difference with the
+    # production workflow so this is hard to run regression tests on.
 
-    # WHEN: I run in the same directory as the config.yml file.
-    with chdir(cfg.root):
-        results = runner.invoke(
-            app,
-            [(data_path / "production_outputs/all_sample_qc.csv").as_posix(), "summary_stats.txt"],
-        )
-
-    # THEN: The script runs to completion
-    assert results.exit_code == 0
-    # The file is created
-    assert (cfg.root / "summary_stats.txt").exists()
-    # The file is not empty
-    assert len((cfg.root / "summary_stats.txt").read_text().splitlines()) == 60
+    # THEN: The summary stats ends with 203 17
+    assert (tmp_path / "sample_qc_report/summary_stats.txt").read_text().endswith("203  17\n")
