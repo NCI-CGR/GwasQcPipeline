@@ -8,7 +8,8 @@ components or change the behavior. Search for `TO-ADD` comments for where you
 would have to make modifications to add new components.
 """
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
+from warnings import warn
 
 import numpy as np
 import pandas as pd
@@ -19,6 +20,65 @@ from cgr_gwas_qc.config import ConfigMgr
 from cgr_gwas_qc.validators import check_file
 
 app = typer.Typer(add_completion=False)
+
+QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
+    "Low Call Rate",
+    "Contaminated",
+    "Sex Discordant",
+    "Expected Replicate Discordance",
+    "Unexpected Replicate",
+    # TO-ADD: If you create a new summary binary flag you want to include
+    # in the count of QC issues then add the column here.
+]
+
+IDENTIFILER_FLAGS = [  # Set of binary flags used to determine if we need to run identifiler
+    "Contaminated",
+    "Sex Discordant",
+    "Expected Replicate Discordance",
+    "Unexpected Replicate",
+    # TO-ADD: If you create a new binary flag do determine if you run
+    # identifilder.
+]
+
+QC_HEADER = [  # Header for main QC table
+    "SR_Subject_ID",
+    "Count_of_SR_SubjectID",
+    "SR",
+    "Current_Subject_Status",
+    "Subject_Notes",
+    "LIMS_Individual_ID",
+    "Project",
+    "Sample_ID",
+    "Project-Sample ID",
+    "LIMSSample_ID",
+    "Sample_Status",
+    "IdatsInProjectDir",
+    "IdatIntensity",
+    "Expected_Sex",
+    "Predicted_Sex",
+    "SexMatch",
+    "ChrX_Inbreed_estimate",
+    "AFR",
+    "EUR",
+    "ASN",
+    "Ancestry",
+    "Contamination_Rate",
+    "Call_Rate_Initial",
+    "Call_Rate_1_filter",
+    "Call_Rate_1",
+    "Call_Rate_2_filter",
+    "Call_Rate_2",
+    # TO-ADD: Any column names you want saved to the output table
+    "Low Call Rate",
+    "Contaminated",
+    "Sex Discordant",
+    "Expected Replicate Discordance",
+    "Unexpected Replicate",
+    # TO-ADD: Any binary flags you want saved to the output table
+    "Count_of_QC_Issue",
+    "Identifiler_Needed",
+    "Identifiler_Reason",
+]
 
 
 @app.command()
@@ -42,15 +102,16 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Outputs
-    all_qc: Path = typer.Argument("all_samples_qc.csv"),
-    lims: Path = typer.Argument("all_sample_qc_LimsUpload.csv"),
+    all_samples: Path = typer.Argument(..., help="Path to all_samples_qc.csv"),
 ):
 
     cfg = load_config()
     ss = _wrangle_sample_sheet(cfg.ss, cfg.config.workflow_params.expected_sex_col_name)
     Sample_IDs = ss.index
 
-    # Build up the Full QC Table
+    ################################################################################
+    # Build QC Table
+    ################################################################################
     df = (
         pd.concat(
             [
@@ -76,30 +137,19 @@ def main(
     )
 
     ################################################################################
-    # Summary Columns
+    # Add Summary Columns
     ################################################################################
     # Count the number of QC issues
-    qc_summary_flags = [
-        "Low Call Rate",
-        "Contaminated",
-        "Sex Discordant",
-        "Expected Replicate Discordance",
-        "Unexpected Replicate",
-        # TO-ADD: If you create a new summary binary flag you want to include
-        # in the count of QC issues then add the column here.
-    ]
-    df["Count_of_QC_Issue"] = df[qc_summary_flags].sum(axis=1).astype(int)
+    df["Count_of_QC_Issue"] = df[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
 
     # Add a flag to run identifiler based if any of these columns are True
-    df["Identifiler_Needed"] = df[["Contaminated", "Sex Discordant", "Unexpected Replicate"]].any(
-        axis=1
-    )
+    df["Identifiler_Needed"] = df[IDENTIFILER_FLAGS].any(axis=1)
+    df["Identifiler_Reason"] = _identifiler_reason(df, IDENTIFILER_FLAGS)
 
     ################################################################################
-    # Save Outputs
+    # Save Output
     ################################################################################
-    _save_qc_table(df, all_qc)
-    _save_lims_table(df, lims)
+    _save_qc_table(df, all_samples)
 
 
 def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
@@ -253,6 +303,21 @@ def _read_sexcheck_cr1(file_name: Path, Expected_Sex: pd.Series) -> pd.DataFrame
 
 
 def _read_ancestry(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
+    """Read ancestry calls from GRAF or SNPweights.
+
+    Raises:
+        DeprecationWarning: SNPweights parsing is only maintained for testing
+          purposes please use GRAF.
+
+    """
+    if "P_f (%)" not in file_name.read_text():
+        warn("Please use GRAF instead of SNPweights.", DeprecationWarning)
+        return _read_SNPweights(file_name, Sample_IDs)
+
+    return _read_GRAF(file_name, Sample_IDs)
+
+
+def _read_GRAF(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     """Read GRAF's ancestry calls.
 
     Returns:
@@ -273,6 +338,29 @@ def _read_ancestry(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
         .assign(AFR=lambda x: x["P_f (%)"] / 100)
         .assign(EUR=lambda x: x["P_e (%)"] / 100)
         .assign(ASN=lambda x: x["P_a (%)"] / 100)
+        .set_index("Sample_ID")
+        .loc[:, ("AFR", "EUR", "ASN", "Ancestry")]
+        .reindex(Sample_IDs)
+    )
+
+
+def _read_SNPweights(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
+    """Read SNPweight's ancestry calls.
+
+    Returns:
+        pd.DataFrame:
+            - Sample_ID (pd.Index)
+            - AFR (float): The proportion African ancestry.
+            - EUR (float): The proportion African ancestry.
+            - ASN (float): The proportion African ancestry.
+            - Ancestry (str): The assigned ancestry label.
+
+    .. _manuscript: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3661048/
+
+    """
+    return (
+        pd.read_csv(file_name)
+        .rename({"ID": "Sample_ID"}, axis=1)
         .set_index("Sample_ID")
         .loc[:, ("AFR", "EUR", "ASN", "Ancestry")]
         .reindex(Sample_IDs)
@@ -385,6 +473,9 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
     )
 
 
+# TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
+
+
 def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
     """Check that red and green IDAT files exist.
 
@@ -418,74 +509,38 @@ def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
     return pd.Series(dict(results)).rename_axis("Sample_ID").rename("IdatsInProjectDir")
 
 
-# TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
+def _identifiler_reason(df: pd.DataFrame, cols: List[str]):
+    """Summary string of the reason for needing identifiler.
+
+    If `Identifiler_Needed` then, if the binary flag in `cols` is True, then
+    concatenate the column names.
+
+    Example:
+        >>> cols = ["Sex Discordant", "Contaminated"]
+        >>> df.values == np.ndarray([[True, True], [True, False], [False, False]])
+        >>> _identifiler_reason(df, cols)
+        pd.Series(["Sex Discordant;Contaminated", "Sex Discordant", ""])
+    """
+
+    def reason_string(row: pd.Series) -> str:
+        if row.Identifiler_Needed:
+            flags = row[cols].fillna(False)
+            return ";".join(flags.index[flags])
+        return ""
+
+    return df.apply(reason_string, axis=1)
 
 
 def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
     """Save main QC table."""
-    header_order = [
-        "SR_Subject_ID",
-        "Count_of_SR_SubjectID",
-        "SR",
-        "Current_Subject_Status",
-        "Subject_Notes",
-        "LIMS_Individual_ID",
-        "Project",
-        "Sample_ID",
-        "Project-Sample ID",
-        "LIMSSample_ID",
-        "Sample_Status",
-        "IdatsInProjectDir",
-        "IdatIntensity",
-        "Expected_Sex",
-        "Predicted_Sex",
-        "SexMatch",
-        "ChrX_Inbreed_estimate",
-        "AFR",
-        "EUR",
-        "ASN",
-        "Ancestry",
-        "Contamination_Rate",
-        "Call_Rate_Initial",
-        "Call_Rate_1_filter",
-        "Call_Rate_1",
-        "Call_Rate_2_filter",
-        "Call_Rate_2",
-        # TO-ADD: Any column names you want saved to the output table
-        "Low Call Rate",
-        "Contaminated",
-        "Sex Discordant",
-        "Expected Replicate Discordance",
-        "Unexpected Replicate",
-        # TO-ADD: Any binary flags you want saved to the output table
-        "Count_of_QC_Issue",
-        "Identifiler_Needed",
-    ]
-
-    df.reindex(header_order, axis=1).to_csv(file_name, index=False)
-
-
-def _save_lims_table(df: pd.DataFrame, file_name: Path) -> None:
-    """Save QC subset for LIMS upload."""
-    header_order = [
-        "SR_Subject_ID",
-        "LIMS_Individual_ID",
-        "Sample ID",
-        "Project-Sample ID",
-        "Call Rate",
-        "Low Call Rate",
-        "Contaminated",
-        "Sex Discordant",
-        "Expected Replicate Discordance",
-        "Unexpected Replicate",
-        # TO-ADD: Any column names you want saved to the LIMS output table
-    ]
-
-    df.reindex(header_order, axis=1).to_csv(file_name, index=False)
+    df.reindex(QC_HEADER, axis=1).to_csv(file_name, index=False)
 
 
 if __name__ == "__main__":
     if "snakemake" in locals():
-        main(**snakemake.input, **snakemake.output)  # type: ignore # noqa
+        defaults = {"contam": None, "intensity": None}
+        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
+        defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
+        main(**defaults)
     else:
         app()
