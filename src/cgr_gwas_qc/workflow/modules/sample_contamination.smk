@@ -17,7 +17,7 @@ Inputs:
     - 1KG SNPs with population level allele frequencies (VCF)
 
 Outputs:
-    - ``sample_filters/agg_contamination_test.csv``
+    - ``sample_contamination/agg_contamination_test.csv``
 
 .. warning::
     The default contamination rate of 20% seems really high.
@@ -46,7 +46,7 @@ if (
             green=cfg.config.user_files.idat_pattern.green,
         output:
             temp(
-                "sample_filters/median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
+                "sample_contamination/median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
             ),
         envmodules:
             cfg.envmodules("r"),
@@ -60,7 +60,7 @@ if (
         input:
             cfg.expand(rules.median_idat_intensity.output[0]),
         output:
-            "sample_filters/agg_median_idat_intensity.csv",
+            "sample_contamination/agg_median_idat_intensity.csv",
         run:
             pd.concat([pd.read_csv(file_name) for file_name in input]).to_csv(
                 output[0], index=False
@@ -82,9 +82,9 @@ if (
             )[0],
             bpm=cfg.config.reference_files.illumina_manifest_file,
         output:
-            adpc=temp("sample_filters/convert_gtc_to_illumina_adpc/{Sample_ID}.adpc.bin"),
+            adpc=temp("sample_contamination/convert_gtc_to_illumina_adpc/{Sample_ID}.adpc.bin"),
             snp_count=(
-                "sample_filters/convert_gtc_to_illumina_adpc/{Sample_ID}.adpc.bin.numSnps.txt"
+                "sample_contamination/convert_gtc_to_illumina_adpc/{Sample_ID}.adpc.bin.numSnps.txt"
             ),
         script:
             "../scripts/gtc2adpc.py"
@@ -107,7 +107,7 @@ if (
         params:
             population=cfg.config.software_params.contam_population,
         output:
-            abf="sample_filters/{}.{}.abf.txt".format(
+            abf="sample_contamination/{}.{}.abf.txt".format(
                 cfg.config.reference_files.illumina_manifest_file.stem,
                 cfg.config.software_params.contam_population,
             ),
@@ -134,7 +134,7 @@ if (
         params:
             snps=numSNPs,
         output:
-            temp("sample_filters/contamination_test/{Sample_ID}.contam.out"),
+            temp("sample_contamination/contamination_test/{Sample_ID}.contam.out"),
         conda:
             "../conda/verifyidintensity.yml"
         shell:
@@ -154,7 +154,7 @@ if (
         params:
             intensity_threshold=cfg.config.software_params.intensity_threshold,
         output:
-            "sample_filters/agg_contamination_test.csv",
+            "sample_contamination/agg_contamination_test.csv",
         script:
             "../scripts/agg_contamination_test.py"
 
@@ -170,7 +170,7 @@ if (
         params:
             contam_threshold=cfg.config.software_params.contam_threshold,
         output:
-            "sample_filters/contaminated_samples.txt",
+            "sample_contamination/contaminated_samples.txt",
         run:
             sample_ids = (
                 pd.read_csv(input[0]).query(f"`%Mix` > {params.contam_threshold}").Sample_ID.values
@@ -187,14 +187,14 @@ if (
             contaminated_Sample_IDs=rules.Sample_IDs_above_contam_threshold.output[0],
         params:
             in_prefix="plink_filter_call_rate_2/samples",
-            out_prefix="sample_filters/not_contaminated/samples",
+            out_prefix="sample_contamination/not_contaminated/samples",
         output:
-            bed="sample_filters/not_contaminated/samples.bed",
-            bim="sample_filters/not_contaminated/samples.bim",
-            fam="sample_filters/not_contaminated/samples.fam",
-            nosex="sample_filters/not_contaminated/samples.nosex",
+            bed="sample_contamination/not_contaminated/samples.bed",
+            bim="sample_contamination/not_contaminated/samples.bim",
+            fam="sample_contamination/not_contaminated/samples.fam",
+            nosex="sample_contamination/not_contaminated/samples.nosex",
         log:
-            "sample_filters/not_contaminated/samples.log",
+            "sample_contamination/not_contaminated/samples.log",
         envmodules:
             cfg.envmodules("plink2"),
         conda:
