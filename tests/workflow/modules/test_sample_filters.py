@@ -38,8 +38,8 @@ def test_agg_median_idat_intensity(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input: "sample_filters/agg_median_idat_intensity.csv"
@@ -94,8 +94,8 @@ def test_convert_gtc_to_illumina_adpc(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:
@@ -166,8 +166,8 @@ def test_contamination_test(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:
@@ -215,8 +215,8 @@ def test_contamination_test_with_missing_abf_values(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:
@@ -272,8 +272,8 @@ def test_contamination_test_with_missing_adpc_values(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:
@@ -327,8 +327,8 @@ def test_agg_contamination_test(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:
@@ -367,8 +367,8 @@ def test_Sample_IDs_above_contam_threshold(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:
@@ -426,8 +426,8 @@ def test_remove_contaminated_samples(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:
@@ -479,8 +479,8 @@ def test_plink_ibd(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:
@@ -518,8 +518,8 @@ def test_sample_concordance(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("common.smk")
-            include: cfg.rules("sample_filters.smk")
+            include: cfg.modules("common.smk")
+            include: cfg.modules("sample_filters.smk")
 
             rule all:
                 input:

@@ -122,7 +122,7 @@ def test_call_rate_filter_1(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("call_rate_filters.smk")
+            include: cfg.modules("call_rate_filters.smk")
 
             rule all:
                 input: expand("plink_filter_call_rate_1/samples.{ext}", ext=["bed", "bim", "fam"])
@@ -174,7 +174,7 @@ def test_call_rate_filter_2(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("call_rate_filters.smk")
+            include: cfg.modules("call_rate_filters.smk")
 
             rule all:
                 input: expand("plink_filter_call_rate_2/samples.{ext}", ext=["bed", "bim", "fam"])
@@ -229,7 +229,7 @@ def test_call_rate_stats(tmp_path, conda_envs, prefix):
 
             cfg = load_config()
 
-            include: cfg.rules("call_rate_filters.smk")
+            include: cfg.modules("call_rate_filters.smk")
 
             rule all:
                 input: expand("{prefix}/samples.{{ext}}", ext=["imiss", "lmiss"])

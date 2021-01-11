@@ -36,7 +36,7 @@ def test_gtc_to_ped_conversion(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input:
@@ -73,7 +73,7 @@ def test_create_gtc_merge_list(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input: "plink_start/mergeList.txt"
@@ -109,7 +109,7 @@ def test_merge_gtc_sample_peds(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input:
@@ -158,7 +158,7 @@ def test_ped_entry(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input:
@@ -211,7 +211,7 @@ def test_bed_entry(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input:

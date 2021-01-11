@@ -403,7 +403,7 @@ def reporting_module_outputs(tmp_path_factory):
 
             cfg = load_config()
 
-            include: cfg.rules("reporting.smk")
+            include: cfg.modules("reporting.smk")
 
             rule all:
                 input:

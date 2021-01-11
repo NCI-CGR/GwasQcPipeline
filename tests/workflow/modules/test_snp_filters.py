@@ -32,7 +32,7 @@ def test_maf_filter(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("snp_filters.smk")
+            include: cfg.modules("snp_filters.smk")
 
             rule all:
                 input: expand("snp_filters/maf/samples.{ext}", ext=["bed", "bim", "fam"])
@@ -80,7 +80,7 @@ def test_approx_ld_estimate(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("snp_filters.smk")
+            include: cfg.modules("snp_filters.smk")
 
             rule all:
                 input: expand("snp_filters/ld_prune/ldPruneList.{ext}", ext=["prune.in", "prune.out"])
@@ -117,7 +117,7 @@ def test_extract_ld_prune(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("snp_filters.smk")
+            include: cfg.modules("snp_filters.smk")
 
             rule all:
                 input: expand("snp_filters/ld_prune/samples.{ext}", ext=["bed", "bim", "fam"])
@@ -170,7 +170,7 @@ def test_thousG_match(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("snp_filters.smk")
+            include: cfg.modules("snp_filters.smk")
 
             rule all:
                 input: expand("snp_filters/plink_thousG_match/samples.{ext}", ext=["bed", "bim", "fam"])
