@@ -13,20 +13,19 @@ runner = CliRunner()
 
 
 @pytest.mark.real_data
-@pytest.fixture
-def unknown_concordant_sample(tmp_path, monkeypatch):
-    """Run the known concordance script while forcing nonconcordant samples.
+def test_unknown_concordant_samples(tmp_path, monkeypatch):
+    """Make sure an unknown can be saved out.
 
-    Currently, our test set has no unknown concordant samples. Here we use a
-    testing trick (monkeypatching) for set one pair of samples from different
-    subjects to be highly concordant.
+    I am forcing 1 unknown pair of concordant samples. Here I am just testing
+    that they are indeed written out.
     """
     # GIVEN: Real test data and the concordance threshold
     data_repo = RealData()
     threshold = str(Config().software_params.dup_concordance_cutoff)
 
     # Wrap the function that calculates concordance and replace the pair of
-    # samples with the least concordance with a concordance value of 0.99
+    # samples with the least concordance with a concordance value of 0.99. In
+    # other words, force one unknown concordant sample.
     def mock_get_concordance(*args, **kwargs):
         df = read_pairwise_sample_concordance(*args, **kwargs)
         df.loc[df.concordance.argmin(), "concordance"] = 0.99
@@ -38,6 +37,7 @@ def unknown_concordant_sample(tmp_path, monkeypatch):
         mock_get_concordance,
     )
 
+    # WHEN: I run the script with legacy inputs
     results = runner.invoke(
         app,
         [
@@ -46,27 +46,16 @@ def unknown_concordant_sample(tmp_path, monkeypatch):
                 data_repo / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
             ).as_posix(),
             (data_repo / "production_outputs/ibd/samples.genome").as_posix(),
-            threshold,
             (tmp_path / "known.csv").as_posix(),
             (tmp_path / "known_qc.csv").as_posix(),
             (tmp_path / "known_study.csv").as_posix(),
             (tmp_path / "unknown.csv").as_posix(),
+            threshold,
         ],
         catch_exceptions=False,
     )
     assert results.exit_code == 0  # Make sure it ran successfully
-    return data_repo, tmp_path
 
-
-@pytest.mark.real_data
-def test_unknown_concordant_samples(unknown_concordant_sample):
-    """Make sure an unknown can be saved out.
-
-    I am forcing 1 unknown pair of concordant samples. Here I am just testing
-    that they are indeed written out.
-    """
-    _, tmp_path = unknown_concordant_sample
-
-    # There should be 1 unknown concordant sample.
+    # THEN: There should be 1 unknown concordant sample.
     obs_unknown = pd.read_csv(tmp_path / "unknown.csv")
     assert obs_unknown.shape[0] == 1

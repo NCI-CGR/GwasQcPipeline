@@ -25,17 +25,17 @@ def main(
     sample_sheet: Path = typer.Argument(..., help="Path to the sample sheet CSV."),
     imiss: Path = typer.Argument(..., help="Path to the `plink_filter_call_rate_2/samples.imiss`"),
     ibd: Path = typer.Argument(..., help="Path to the `ibd/samples.genome` file."),
-    subject_id_override: Optional[str] = typer.Argument(
-        None,
-        help="Specify which column corresponds to subjects. [Deprecated: Use the `Group_By` column sample sheet]",
-    ),
-    concordance_threshold: float = typer.Argument(
-        ..., help="The concordance threshold for samples from different subjects."
-    ),
     known: Path = typer.Argument(..., help="Path to save known concordant samples."),
     known_qc: Path = typer.Argument(..., help="Path to save known concordant internal QC samples."),
     known_study: Path = typer.Argument(..., help="Path to save known concordant study samples."),
     unknown: Path = typer.Argument(..., help="Path to save unknown condorant samples."),
+    concordance_threshold: float = typer.Argument(
+        ..., help="The concordance threshold for samples from different subjects."
+    ),
+    subject_id_override: Optional[str] = typer.Argument(
+        None,
+        help="Specify which column corresponds to subjects. [Deprecated: Use the `Group_By` column sample sheet]",
+    ),
 ):
     ################################################################################
     # Pairwise sample concordance + sample metadata
