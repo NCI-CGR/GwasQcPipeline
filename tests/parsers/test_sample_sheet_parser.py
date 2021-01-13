@@ -138,3 +138,27 @@ def test_add_group_by_column(tmp_path):
     # THEN: A new column `Group_By_Subject_ID` will have the values from the
     # columns specified in the `Group_By` column.
     assert all(sample_sheet.data.Group_By_Subject_ID == ["T0001", "L0002"])
+
+
+def test_add_user_provided_group_by_column(tmp_path):
+    # GIVEN: A LIMS sample sheet with the `Group_By` column
+    (tmp_path / "sample_sheet.csv").write_text(
+        dedent(
+            """\
+            [Header],,
+            test,data,
+            [Manifests],,
+            test,data,
+            [Data]
+            Sample_ID,LIMS_Individual_ID,Group_By
+            T0001,L0001,Sample_ID
+            T0002,L0002,LIMS_Individual_ID
+            """
+        )
+    )
+    # WHEN: I parse the sample sheet and add the grouping column with a user selected column.
+    sample_sheet = SampleSheet(tmp_path / "sample_sheet.csv").add_group_by_column("Sample_ID")
+
+    # THEN: A new column `Group_By_Subject_ID` will have the values from the
+    # columns specified by the user.
+    assert all(sample_sheet.data.Group_By_Subject_ID == ["T0001", "T0002"])

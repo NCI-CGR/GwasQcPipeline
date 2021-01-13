@@ -97,13 +97,35 @@ class SampleSheet:
         return pd.read_csv(StringIO(data)).dropna(how="all")
 
     def add_group_by_column(self, col_name: Optional[str] = None) -> "SampleSheet":
-        if "Group_By" not in self.data.columns:
-            if col_name:
-                self.data["Group_By"] = col_name
-            else:
-                self.data["Group_By"] = "LIMS_Individual_ID"
+        """Select which column in the sample sheet to use for subject grouping.
 
-        self.data["Group_By_Subject_ID"] = self.data.apply(lambda df: df[df.Group_By], axis=1)
+        This function adds the column `Group_By_Subject_ID` to the sample
+        sheet object. The sample sheet contains multiple columns with subject
+        level information. This selects which column to use for subject
+        grouping. If `col_name` is provided and has a value then this will be
+        used. If the sample sheet has the new `Group_By` column, then this
+        column will be used if it has a value. Finally, the
+        `LIMS_Individual-ID` is used as the default if neither `col_name` or
+        `Group_By` are provided, or if their values are missing. Missing
+        values are common for internal controls. Ideally, the `Group_By`
+        column should be used in the sample sheet.
+
+        Args:
+            col_name: Typically, this is from the user config.yml
+            (`workflow_params.subject_id_to-use`).
+
+        """
+
+        def _get_subject_id(sr: pd.Series) -> str:
+            if col_name and (col_name in sr.dropna().index):
+                return sr[col_name]
+
+            if "Group_By" in sr.dropna().index:
+                return sr[sr.Group_By]
+
+            return sr["LIMS_Individual_ID"]
+
+        self.data["Group_By_Subject_ID"] = self.data.apply(_get_subject_id, axis=1)
 
         return self
 
