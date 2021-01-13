@@ -1,6 +1,7 @@
 import pytest
 
-from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
+from cgr_gwas_qc import load_config
+from cgr_gwas_qc.testing import chdir, file_hashes_equal, run_snakemake
 from cgr_gwas_qc.testing.data import RealData
 
 
@@ -108,3 +109,65 @@ def test_plink_stats_hardy(call_rate_2_stats):
         tmp_path / "sample_level/call_rate_2/samples.hwe",
         data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.hwe",
     )
+
+
+@pytest.mark.real_data
+@pytest.mark.regression
+@pytest.mark.workflow
+def test_plink_stats_ibd(tmp_path, conda_envs):
+    """IBD estimation
+
+    Unlike the other stats, IBD estimation needs to be done on LD-pruned
+    outputs.
+    """
+    # GIVEN: plink2, and real data and config
+    conda_envs.copy_env("plink2", tmp_path)
+    data_cache = (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.modules("plink_stats.smk")
+            include: cfg.modules("plink_filters.smk")
+
+            rule all:
+                input:
+                    "sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome".format(
+                        maf=cfg.config.software_params.maf_for_ibd,
+                        ld=cfg.config.software_params.ld_prune_r2
+                    )
+            """
+        )
+    )
+    with chdir(tmp_path):
+        cfg = load_config()
+        maf, ld = cfg.config.software_params.maf_for_ibd, cfg.config.software_params.ld_prune_r2
+
+    # And outputs from LD pruning
+    (
+        data_cache.copy(
+            "production_outputs/ld_prune/samples.bed",
+            f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.bed",
+        )
+        .copy(
+            "production_outputs/ld_prune/samples.bim",
+            f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.bim",
+        )
+        .copy(
+            "production_outputs/ld_prune/samples.fam",
+            f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.fam",
+        )
+    )
+
+    # WHEN: I run snakemake to generate IBD outputs
+    run_snakemake(tmp_path)
+
+    # THEN: The legacy and new outputs should match exactly
+    obs_ = tmp_path / f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome"
+    exp_ = data_cache / "production_outputs/ibd/samples.genome"
+    assert file_hashes_equal(obs_, exp_)

@@ -23,31 +23,25 @@ app = typer.Typer(add_completion=False)
 @app.command()
 def main(
     sample_sheet: Path = typer.Argument(..., help="Path to the sample sheet CSV."),
-    imiss_file: Path = typer.Argument(
-        ..., help="Path to the `plink_filter_call_rate_2/samples.imiss`"
-    ),
-    ibd_file: Path = typer.Argument(..., help="Path to the `ibd/samples.genome` file."),
+    imiss: Path = typer.Argument(..., help="Path to the `plink_filter_call_rate_2/samples.imiss`"),
+    ibd: Path = typer.Argument(..., help="Path to the `ibd/samples.genome` file."),
     subject_id_override: Optional[str] = typer.Argument(
         None,
         help="Specify which column corresponds to subjects. [Deprecated: Use the `Group_By` column sample sheet]",
     ),
-    dup_concordance_cutoff: float = typer.Argument(
+    concordance_threshold: float = typer.Argument(
         ..., help="The concordance threshold for samples from different subjects."
     ),
-    known_file: Path = typer.Argument(..., help="Path to save known concordant samples."),
-    known_internal_qc: Path = typer.Argument(
-        ..., help="Path to save known concordant internal QC samples."
-    ),
-    known_study_samples: Path = typer.Argument(
-        ..., help="Path to save known concordant study samples."
-    ),
-    unknown_file: Path = typer.Argument(..., help="Path to save unknown condorant samples."),
+    known: Path = typer.Argument(..., help="Path to save known concordant samples."),
+    known_qc: Path = typer.Argument(..., help="Path to save known concordant internal QC samples."),
+    known_study: Path = typer.Argument(..., help="Path to save known concordant study samples."),
+    unknown: Path = typer.Argument(..., help="Path to save unknown condorant samples."),
 ):
     ################################################################################
     # Pairwise sample concordance + sample metadata
     ################################################################################
-    sample_concordance = read_pairwise_sample_concordance(ibd_file)
-    sample_metadata = read_sample_metadata(sample_sheet, imiss_file, subject_id_override)
+    sample_concordance = read_pairwise_sample_concordance(ibd)
+    sample_metadata = read_sample_metadata(sample_sheet, imiss, subject_id_override)
 
     # Add metadata for Sample 1 and Sample 2 in pairwise table
     df = sample_concordance.merge(
@@ -60,21 +54,21 @@ def main(
     ################################################################################
     # Full Table
     known_df = create_known_concordant_table(df)
-    known_df.to_csv(known_file, index=False)  # Full table
+    known_df.to_csv(known, index=False)  # Full table
 
     # QC samples only
     qc_subjects = sample_metadata.query("Sample_Group == 'sVALD-001'").Subject_ID.values  # noqa
-    known_df.query("Subject_ID in @qc_subjects").to_csv(known_internal_qc, index=False)
+    known_df.query("Subject_ID in @qc_subjects").to_csv(known_qc, index=False)
 
     # Study samples only
-    known_df.query("Subject_ID not in @qc_subjects").to_csv(known_study_samples, index=False)
+    known_df.query("Subject_ID not in @qc_subjects").to_csv(known_study, index=False)
 
     ################################################################################
     # Save Unknown Concordant Samples
     # (i.e., highly concordant samples from different subjects)
     ################################################################################
-    unknown_df = create_unknown_concordant_table(df, dup_concordance_cutoff)
-    unknown_df.to_csv(unknown_file, index=False)
+    unknown_df = create_unknown_concordant_table(df, concordance_threshold)
+    unknown_df.to_csv(unknown, index=False)
 
 
 def read_sample_metadata(
@@ -172,16 +166,10 @@ def create_unknown_concordant_table(
 
 if __name__ == "__main__":
     if "snakemake" in locals():
-        main(
-            snakemake.input.sample_sheet,  # type: ignore # noqa
-            snakemake.input.imiss,  # type: ignore # noqa
-            snakemake.input.ibd,  # type: ignore # noqa
-            snakemake.params.subject_id_override,  # type: ignore # noqa
-            snakemake.params.concordance_threshold,  # type: ignore # noqa
-            snakemake.output.known,  # type: ignore # noqa
-            snakemake.output.known_qc,  # type: ignore # noqa
-            snakemake.output.known_study,  # type: ignore # noqa
-            snakemake.output.unknown,  # type: ignore # noqa
-        )
+        defaults = {"subject_id_override": None}
+        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
+        defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
+        defaults.update(snakemake.params)  # type: ignore # noqa
+        main(**defaults)
     else:
         app()

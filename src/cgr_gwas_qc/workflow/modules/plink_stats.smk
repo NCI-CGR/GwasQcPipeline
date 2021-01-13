@@ -122,3 +122,42 @@ rule plink_stats_hardy:
         "--threads {threads} "
         "--memory {resources.mem} "
         "--out {wildcards.prefix}"
+
+
+rule plink_stats_ibd:
+    """Calculates Identity-by-descent.
+
+    This step is trying to find relationships among the samples by
+    calculating IBS/IBD. This calculation is no LD-aware so we are doing the
+    LD pruning before. This calculation excludes non-autosomes.
+    """
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+    params:
+        ibd_min=cfg.config.software_params.ibd_pi_hat_min,
+        ibd_max=cfg.config.software_params.ibd_pi_hat_max,
+    output:
+        genome="{prefix}.genome",
+        nosex="{prefix}.nosex",
+    group:
+        "plink_stats"
+    threads: 2
+    resources:
+        mem=10000,
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--genome full "
+        "--min {params.ibd_min} "
+        "--max {params.ibd_max} "
+        "--threads {threads} "
+        "--memory {resources.mem} "
+        "--out {wildcards.prefix}"
