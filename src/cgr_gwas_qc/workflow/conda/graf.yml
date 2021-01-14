@@ -1,6 +1,9 @@
 channels:
+  - https://raw.githubusercontent.com/NCI-CGR/conda-cgr/default/conda-cgr
+  - conda-forge
   - bioconda
 dependencies:
+  - graf
   - perl-cgi
   - perl-carp
   - perl-gd
