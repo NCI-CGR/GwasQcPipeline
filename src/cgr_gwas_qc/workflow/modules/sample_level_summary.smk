@@ -1,55 +1,98 @@
-################################################################################
-# Remove Contaminated
-################################################################################
-rule Sample_IDs_above_contam_threshold:
-    """Creates a list of contaminated Sample_IDs.
+import pandas as pd
 
-    Compares the %Mix from ``verifyIDintensity`` to the contamination
-    threshold from the config. If %Mix is greater than this threshold
-    Sample_IDs are saved to a list.
-    """
+
+def sample_qc_report_inputs(wildcards):
+    inputs = {
+        "imiss_start": "sample_level/samples.imiss",
+        "imiss_cr1": "sample_level/call_rate_1/samples.imiss",
+        "imiss_cr2": "sample_level/call_rate_2/samples.imiss",
+        "sexcheck_cr1": "sample_level/call_rate_1/samples.sexcheck",
+        "ancestry": "sample_level/ancestry/graf_ancestry.txt",
+        "known_replicates": "sample_level/concordance/KnownReplicates.csv",
+        "unknown_replicates": "sample_level/concordance/UnknownReplicates.csv",
+    }
+
+    if (
+        cfg.config.user_files.idat_pattern
+        and cfg.config.user_files.gtc_pattern
+        and cfg.config.workflow_params.remove_contam
+    ):
+        inputs["contam"] = "sample_level/contamination/verifyIDintensity_contamination.csv"
+        inputs["intensity"] = "sample_level/median_idat_intensity.csv"
+
+    return inputs
+
+
+rule sample_qc_report:
     input:
-        rules.agg_contamination_test.output[0],
-    params:
-        contam_threshold=cfg.config.software_params.contam_threshold,
+        unpack(sample_qc_report_inputs),
     output:
-        "sample_contamination/contaminated_samples.txt",
+        all_samples="sample_level/qc_summary.csv",
+    script:
+        "../scripts/sample_qc_report.py"
+
+
+rule sample_qc_report_summary_stats:
+    input:
+        rules.sample_qc_report.output.all_samples,
+    output:
+        "sample_level/qc_summary_stats.txt",
+    script:
+        "../scripts/sample_qc_report_summary_stats.py"
+
+
+rule qc_failures:
+    input:
+        rules.sample_qc_report.output.all_samples,
+    output:
+        cr="sample_level/qc_failures/low_call_rate.txt",
+        contam="sample_level/qc_failures/contaminated.txt",
+        sex="sample_level/qc_failures/sex_discordant.txt",
+        rep="sample_level/qc_failures/replicate_discordant.txt",
     run:
-        sample_ids = (
-            pd.read_csv(input[0]).query(f"`%Mix` > {params.contam_threshold}").Sample_ID.values
-        )
-        with open(output[0], "w") as fh:
-            for sample_id in sample_ids:
-                fh.write("{} {}\n".format(sample_id, sample_id))
+        def _save(df, col, file_name):
+            (
+                df.fillna(False)  # If missing assume False
+                .query(f"`{col}`")
+                .reindex(["Sample_ID", "Sample_ID2"], axis=1)
+                .to_csv(file_name, index=False, header=False, sep=" ")
+            )
 
 
-rule remove_contaminated_samples:
+        df = pd.read_csv(input[0]).assign(Sample_ID2=lambda x: x.Sample_ID)
+        _save(df, "Low Call Rate", output.cr)
+        _save(df, "Contaminated", output.contam)
+        _save(df, "Sex Discordant", output.sex)
+        _save(df, "Expected Replicate Discordance", output.rep)
+
+
+rule remove_contaminated:
     input:
-        bed="plink_filter_call_rate_2/samples.bed",
-        bim="plink_filter_call_rate_2/samples.bim",
-        fam="plink_filter_call_rate_2/samples.fam",
-        contaminated_Sample_IDs=rules.Sample_IDs_above_contam_threshold.output[0],
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+        to_remove=rules.qc_failures.output.contam,
     params:
-        in_prefix="plink_filter_call_rate_2/samples",
-        out_prefix="sample_contamination/not_contaminated/samples",
+        out_prefix="{prefix}_contaminated_removed",
     output:
-        bed="sample_contamination/not_contaminated/samples.bed",
-        bim="sample_contamination/not_contaminated/samples.bim",
-        fam="sample_contamination/not_contaminated/samples.fam",
-        nosex="sample_contamination/not_contaminated/samples.nosex",
+        bed="{prefix}_contaminated_removed.bed",
+        bim="{prefix}_contaminated_removed.bim",
+        fam="{prefix}_contaminated_removed.fam",
     log:
-        "sample_contamination/not_contaminated/samples.log",
+        "{prefix}_contaminated_removed.log",
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 2
+    threads: 20
     resources:
         mem=10000,
     shell:
         "plink "
-        "--bfile {params.in_prefix} "
-        "--remove {input.contaminated_Sample_IDs} "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--remove {input.to_remove} "
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
