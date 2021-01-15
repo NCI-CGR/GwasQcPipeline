@@ -78,6 +78,8 @@ QC_HEADER = [  # Header for main QC table
     "Count_of_QC_Issue",
     "Identifiler_Needed",
     "Identifiler_Reason",
+    "Internal_Control",
+    "Group_By_Subject_ID",
 ]
 
 
@@ -177,11 +179,11 @@ def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.Da
     # default this columns is already called `Expected_Sex`.
     _df["Expected_Sex"] = _df[expected_sex_col_name]
 
+    # Add Internal_Control Flag
+    _df["Internal_Control"] = _df.Sample_Group == "sVALD-001"
+
     # For internal controls use the `Indentifiler_Sex` column as `Expected_Sex`
-    internal_control_mask = _df.Sample_Group == "sVALD-001"
-    _df.loc[internal_control_mask, "Expected_Sex"] = _df.loc[
-        internal_control_mask, "Identifiler_Sex"
-    ]
+    _df.loc[_df.Internal_Control, "Expected_Sex"] = _df.loc[_df.Internal_Control, "Identifiler_Sex"]
 
     # Count the number of samples per subject ID and set Sample_ID as index
     return _df.merge(
