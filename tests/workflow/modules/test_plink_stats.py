@@ -6,6 +6,7 @@ from cgr_gwas_qc.testing.data import RealData
 
 
 @pytest.mark.real_data
+@pytest.mark.workflow
 @pytest.fixture(scope="session")
 def call_rate_2_stats(tmp_path_factory, conda_envs):
     # GIVEN: A real data cache with samples after call rate 2 filtering.
