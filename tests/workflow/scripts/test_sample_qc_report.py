@@ -1,3 +1,4 @@
+from io import StringIO
 from pathlib import Path
 from textwrap import dedent
 
@@ -346,3 +347,76 @@ def test_identifiler_reason():
     obs_ = _identifiler_reason(df, ["one", "two", "three"])
     exp_ = pd.Series(["", "one;two", "two", "one;two;three"])
     assert_series_equal(obs_, exp_)
+
+
+def test_find_study_subject_representative():
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _find_study_subject_representative
+
+    # GIVEN: A slimmed down QC report
+    df = pd.read_csv(
+        StringIO(
+            dedent(
+                """
+        Group_By_Subject_ID,Sample_ID,Call_Rate_2,Low Call Rate,Contaminated,Expected Replicate Discordance,Internal_Control
+        SB001,S001,.98,False,False,False,False
+        SB002,S002,.98,False,False,False,False
+        SB002,S003,.99,False,False,False,False
+        IB001,I001,.99,False,False,False,True
+        SB003,S004,.90,False,True,False,False
+        SB003,S005,.91,False,False,False,False
+        SB003,S006,.89,False,False,False,False
+        SB004,S007,.89,False,False,False,True
+        SB004,S008,.9,False,False,False,True
+        """
+            )
+        ),
+        index_col="Sample_ID",
+    )
+
+    # WHEN: I loook for the representative sample for each Subject Group
+    # THEN: observed should be the same as expected.
+    obs_ = _find_study_subject_representative(df)
+    exp_ = pd.Series(
+        [True, False, True, False, False, True, False, False, False],
+        index=["S001", "S002", "S003", "I001", "S004", "S005", "S006", "S007", "S008"],
+    )
+
+    # THEN: Basic properties
+    assert_series_equal(obs_, exp_, check_names=False)
+
+
+def test_find_study_subject_with_no_representative():
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import (
+        _find_study_subject_with_no_representative,
+    )
+
+    # GIVEN: A slimmed down QC report
+    df = pd.read_csv(
+        StringIO(
+            dedent(
+                """
+        Group_By_Subject_ID,Sample_ID,Subject_Representative,Internal_Control
+        SB001,S001,True,False
+        SB001,S002,False,False
+        SB002,S003,False,False
+        SB002,S004,False,False
+        SB002,S005,True,False
+        SB003,S006,False,False
+        SB003,S007,False,False
+        SB004,I001,False,True
+        """
+            )
+        ),
+        index_col="Sample_ID",
+    )
+
+    # WHEN: I look for the representative sample for each Subject Group
+    # THEN: observed should be the same as expected.
+    obs_ = _find_study_subject_with_no_representative(df)
+    exp_ = pd.Series(
+        data=[False, False, False, False, False, True, True, False],
+        index=["S001", "S002", "S003", "S004", "S005", "S006", "S007", "I001"],
+    )
+
+    # THEN: Basic properties
+    assert_series_equal(obs_, exp_, check_names=False)

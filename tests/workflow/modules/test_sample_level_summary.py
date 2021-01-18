@@ -53,7 +53,7 @@ def sample_qc_report(tmp_path_factory) -> Path:
             "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
             "sample_level/median_idat_intensity.csv",
         )
-        .make_config()
+        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -83,7 +83,11 @@ def test_sample_qc_report(sample_qc_report):
     # THEN: This should be identical to the production outputs except for:
     exclude_cols = [
         "IdatsInProjectDir",  # This column does not match b/c I did not have all the Idat files
-        "Identifiler_Reason",  # This is a new column not in the legacy table
+        "Identifiler_Reason",  # New column
+        "Internal_Control",  # New column
+        "Group_By_Subject_ID",  # New column
+        "Subject_Representative",  # New column
+        "Subject_Dropped_From_Study",  # New column
     ]
 
     obs_ = (
@@ -169,6 +173,8 @@ def test_qc_failures(tmp_path, sample_qc_report):
                     "sample_level/qc_failures/contaminated.txt",
                     "sample_level/qc_failures/sex_discordant.txt",
                     "sample_level/qc_failures/replicate_discordant.txt",
+                    "sample_level/internal_controls.txt",
+                    "sample_level/samples_used_for_subjects.csv",
             """
         )
     )
@@ -194,6 +200,20 @@ def test_qc_failures(tmp_path, sample_qc_report):
     obs_ = tmp_path / "sample_level/qc_failures/replicate_discordant.txt"
     exp_ = data_cache / "production_outputs/remove_qc_fail/ExpectedRepDiscordant.txt"
     file_hashes_equal(obs_, exp_)
+
+    obs_ = tmp_path / "sample_level/internal_controls.txt"
+    exp_ = data_cache / "production_outputs/subject_level/internalControls.txt"
+    file_hashes_equal(obs_, exp_)
+
+    # Sort order is different
+    obs_ = pd.read_csv(
+        tmp_path / "sample_level/samples_used_for_subjects.csv", index_col="Subject_ID"
+    )
+    exp_ = pd.read_csv(
+        data_cache / "production_outputs/subject_level/SampleUsedforSubject.csv",
+        index_col="Subject_ID",
+    )
+    assert_frame_equal(obs_, exp_, check_like=True)
 
 
 @pytest.mark.workflow

@@ -41,29 +41,18 @@ rule sample_qc_report_summary_stats:
         "../scripts/sample_qc_report_summary_stats.py"
 
 
-rule qc_failures:
+rule sample_lists_from_qc_flags:
     input:
-        rules.sample_qc_report.output.all_samples,
+        all_samples=rules.sample_qc_report.output.all_samples,
     output:
         cr="sample_level/qc_failures/low_call_rate.txt",
         contam="sample_level/qc_failures/contaminated.txt",
         sex="sample_level/qc_failures/sex_discordant.txt",
         rep="sample_level/qc_failures/replicate_discordant.txt",
-    run:
-        def _save(df, col, file_name):
-            (
-                df.fillna(False)  # If missing assume False
-                .query(f"`{col}`")
-                .reindex(["Sample_ID", "Sample_ID2"], axis=1)
-                .to_csv(file_name, index=False, header=False, sep=" ")
-            )
-
-
-        df = pd.read_csv(input[0]).assign(Sample_ID2=lambda x: x.Sample_ID)
-        _save(df, "Low Call Rate", output.cr)
-        _save(df, "Contaminated", output.contam)
-        _save(df, "Sex Discordant", output.sex)
-        _save(df, "Expected Replicate Discordance", output.rep)
+        ctrl="sample_level/internal_controls.txt",
+        subj="sample_level/samples_used_for_subjects.csv",
+    script:
+        "../scripts/sample_lists_from_qc_flags.py"
 
 
 rule remove_contaminated:
@@ -71,7 +60,7 @@ rule remove_contaminated:
         bed="{prefix}.bed",
         bim="{prefix}.bim",
         fam="{prefix}.fam",
-        to_remove=rules.qc_failures.output.contam,
+        to_remove=rules.sample_lists_from_qc_flags.output.contam,
     params:
         out_prefix="{prefix}_contaminated_removed",
     output:
