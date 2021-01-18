@@ -50,7 +50,6 @@ rule sample_lists_from_qc_flags:
         sex="sample_level/qc_failures/sex_discordant.txt",
         rep="sample_level/qc_failures/replicate_discordant.txt",
         ctrl="sample_level/internal_controls.txt",
-        subj="sample_level/samples_used_for_subjects.csv",
     script:
         "../scripts/sample_lists_from_qc_flags.py"
 

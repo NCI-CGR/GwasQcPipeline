@@ -174,7 +174,6 @@ def test_qc_failures(tmp_path, sample_qc_report):
                     "sample_level/qc_failures/sex_discordant.txt",
                     "sample_level/qc_failures/replicate_discordant.txt",
                     "sample_level/internal_controls.txt",
-                    "sample_level/samples_used_for_subjects.csv",
             """
         )
     )
@@ -204,16 +203,6 @@ def test_qc_failures(tmp_path, sample_qc_report):
     obs_ = tmp_path / "sample_level/internal_controls.txt"
     exp_ = data_cache / "production_outputs/subject_level/internalControls.txt"
     file_hashes_equal(obs_, exp_)
-
-    # Sort order is different
-    obs_ = pd.read_csv(
-        tmp_path / "sample_level/samples_used_for_subjects.csv", index_col="Subject_ID"
-    )
-    exp_ = pd.read_csv(
-        data_cache / "production_outputs/subject_level/SampleUsedforSubject.csv",
-        index_col="Subject_ID",
-    )
-    assert_frame_equal(obs_, exp_, check_like=True)
 
 
 @pytest.mark.workflow
