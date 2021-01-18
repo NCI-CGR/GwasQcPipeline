@@ -80,6 +80,7 @@ QC_HEADER = [  # Header for main QC table
     "Identifiler_Reason",
     "Internal_Control",
     "Group_By_Subject_ID",
+    "Case/Control_Status",
     "Subject_Representative",
     "Subject_Dropped_From_Study",
 ]

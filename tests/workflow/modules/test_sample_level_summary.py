@@ -88,6 +88,7 @@ def test_sample_qc_report(sample_qc_report):
         "Group_By_Subject_ID",  # New column
         "Subject_Representative",  # New column
         "Subject_Dropped_From_Study",  # New column
+        "Case/Control_Status",  # New column
     ]
 
     obs_ = (
