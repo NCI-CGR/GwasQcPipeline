@@ -7,10 +7,10 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
-include: cfg.rules("common.smk")
-include: cfg.rules("entry_points.smk")
-include: cfg.rules("call_rate_filters.smk")
-include: cfg.rules("sample_filters.smk")
+include: cfg.modules("common.smk")
+include: cfg.modules("entry_points.smk")
+include: cfg.modules("call_rate_filters.smk")
+include: cfg.modules("sample_filters.smk")
 
 
 rule all:

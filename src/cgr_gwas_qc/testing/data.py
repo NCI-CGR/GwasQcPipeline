@@ -22,13 +22,10 @@ regression testing of most parts of the workflow.
 import os
 import shutil
 import subprocess
-import tarfile
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from pathlib import Path
-from tempfile import NamedTemporaryFile
 from typing import MutableMapping, Optional, TypeVar, Union
-from urllib.request import urlretrieve
 from warnings import warn
 
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
@@ -481,29 +478,3 @@ class RealData(DataRepo):
                 "change set the environmental variable `TEST_DATA_USER`, "
                 "`TEST_DATA_SERVER`, and `TEST_DATA_PATH."
             )
-
-
-class Graf:
-    def __init__(self):
-        self._data_path = _make_cgr_cache("graf")
-        if not (self._data_path / "graf").exists():
-            self._download_graf()
-
-    def _download_graf(self):
-        # Note: even though the url ends in ZIP it is really a TGZ
-        url = "http://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/GetZip.cgi?zip_name=GRAF_files.zip"
-        tmp = NamedTemporaryFile(suffix=".tgz")
-        tgz_file = tmp.name
-        urlretrieve(url, tgz_file)
-        with tarfile.open(tgz_file, mode="r:gz") as tgz:
-            tgz.extractall(self._data_path)
-
-    def __truediv__(self, value) -> Path:
-        """Override division operator to build paths."""
-        pth = self._data_path / value
-        if pth.exists():
-            return pth
-        raise FileNotFoundError(pth.as_posix())
-
-    def __str__(self):
-        return self._data_path.as_posix()

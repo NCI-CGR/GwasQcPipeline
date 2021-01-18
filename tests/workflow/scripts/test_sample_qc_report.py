@@ -1,27 +1,23 @@
+from io import StringIO
 from pathlib import Path
 from textwrap import dedent
-from typing import Tuple
 
 import numpy as np
 import pandas as pd
 import pytest
-from pandas.testing import assert_frame_equal, assert_series_equal
-from typer.testing import CliRunner
+from pandas.testing import assert_series_equal
 
 from cgr_gwas_qc import load_config
-from cgr_gwas_qc.config import ConfigMgr
-from cgr_gwas_qc.testing import chdir, run_snakemake
+from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import RealData
-
-runner = CliRunner()
 
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def real_data_cache(tmp_path_factory):
+def data_cache_and_cfg(tmp_path_factory):
     """Real data and config object for QC table unit tests."""
-    session_tmp_path: Path = tmp_path_factory.mktemp("data_for_sample_qc_report")
-    data_path = (
+    session_tmp_path: Path = tmp_path_factory.mktemp("sample_qc_report_script")
+    data_cache = (
         RealData(session_tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
         .add_reference_files(copy=False)
@@ -32,15 +28,15 @@ def real_data_cache(tmp_path_factory):
     with chdir(session_tmp_path):
         cfg = load_config()
 
-    return data_path, cfg
+    return data_cache, cfg
 
 
 @pytest.mark.parametrize("expected_sex_col", ["Expected_Sex", "LIMS_Individual_ID"])
-def test_wrangle_sample_sheet(real_data_cache: Tuple[RealData, ConfigMgr], expected_sex_col):
+def test_wrangle_sample_sheet(data_cache_and_cfg, expected_sex_col):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _wrangle_sample_sheet
 
     # GIVEN: A test sample sheet and column to use as `Expected_Sex`
-    _, cfg = real_data_cache
+    _, cfg = data_cache_and_cfg
 
     # WHEN: I wrangle the sample sheet
     ss = _wrangle_sample_sheet(cfg.ss, expected_sex_col)
@@ -56,12 +52,12 @@ def test_wrangle_sample_sheet(real_data_cache: Tuple[RealData, ConfigMgr], expec
 
 
 @pytest.mark.real_data
-def test_read_imiss_start(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_imiss_start(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_start
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
-    data_path, cfg = real_data_cache
-    file_name = data_path / "production_outputs/plink_start/samples_start.imiss"
+    data_cache, cfg = data_cache_and_cfg
+    file_name = data_cache / "production_outputs/plink_start/samples_start.imiss"
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
 
     # WHEN: I parse the imiss table.
@@ -74,12 +70,12 @@ def test_read_imiss_start(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_imiss_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_imiss_cr1(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_cr1
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
-    data_path, cfg = real_data_cache
-    file_name = data_path / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss"
+    data_cache, cfg = data_cache_and_cfg
+    file_name = data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss"
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
 
     # WHEN: I parse the imiss table.
@@ -93,12 +89,12 @@ def test_read_imiss_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_imiss_cr2(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_imiss_cr2(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_cr2
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
-    data_path, cfg = real_data_cache
-    file_name = data_path / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
+    data_cache, cfg = data_cache_and_cfg
+    file_name = data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
 
     # WHEN: I parse the imiss table.
@@ -112,13 +108,13 @@ def test_read_imiss_cr2(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_sexcheck_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_sexcheck_cr1(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_sexcheck_cr1
 
     # GIVEN: A test sample sheet, real production outputs, and the expected sex
     # calls from the sample table
-    data_path, cfg = real_data_cache
-    file_name = data_path / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
+    data_cache, cfg = data_cache_and_cfg
+    file_name = data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
     expected_sex_calls = cfg.ss.set_index("Sample_ID")["Expected_Sex"]
 
     # WHEN: read the sexcheck table
@@ -136,11 +132,11 @@ def test_read_sexcheck_cr1(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_ancestry_GRAF(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_ancestry_GRAF(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_ancestry
 
     # GIVEN: A test sample sheet, example outputs from GRAF -pop, and a list of Sample_IDs
-    _, cfg = real_data_cache
+    _, cfg = data_cache_and_cfg
     ancestry = cfg.root / "graf.tsv"
     ancestry.write_text(
         dedent(
@@ -173,13 +169,13 @@ def test_read_ancestry_GRAF(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_known_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_known_replicates(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_known_replicates
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
-    data_path, cfg = real_data_cache
+    data_cache, cfg = data_cache_and_cfg
     cutoff = cfg.config.software_params.dup_concordance_cutoff
-    reps = data_path / "production_outputs/concordance/KnownReplicates.csv"
+    reps = data_cache / "production_outputs/concordance/KnownReplicates.csv"
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
 
     # WHEN: Check for discordant replicates
@@ -193,12 +189,12 @@ def test_read_known_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_unknown_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_unknown_replicates(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_unknown_replicates
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
-    data_path, cfg = real_data_cache
-    reps = data_path / "production_outputs/concordance/UnknownReplicates.csv"
+    data_cache, cfg = data_cache_and_cfg
+    reps = data_cache / "production_outputs/concordance/UnknownReplicates.csv"
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
 
     # WHEN: I parse unknown concordant samples table.
@@ -212,13 +208,13 @@ def test_read_unknown_replicates(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_contam(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_contam(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_contam
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
-    data_path, cfg = real_data_cache
+    data_cache, cfg = data_cache_and_cfg
     cutoff = cfg.config.software_params.contam_threshold
-    contam = data_path / "production_outputs/all_contam/contam.csv"
+    contam = data_cache / "production_outputs/all_contam/contam.csv"
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
 
     # WHEN: Parse the contamination table
@@ -234,11 +230,11 @@ def test_read_contam(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_contam_file_name_none(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_contam_file_name_none(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_contam
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
-    _, cfg = real_data_cache
+    _, cfg = data_cache_and_cfg
     cutoff = cfg.config.software_params.contam_threshold
     contam = None
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
@@ -254,12 +250,12 @@ def test_read_contam_file_name_none(real_data_cache: Tuple[RealData, ConfigMgr])
 
 
 @pytest.mark.real_data
-def test_read_intensity(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_intensity(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_intensity
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
-    data_path, cfg = real_data_cache
-    intensity = data_path / "production_outputs/all_sample_idat_intensity/idat_intensity.csv"
+    data_cache, cfg = data_cache_and_cfg
+    intensity = data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv"
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
 
     # WHEN: Parse the read intensity table.
@@ -273,11 +269,11 @@ def test_read_intensity(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_read_intensity_file_name_none(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_read_intensity_file_name_none(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_intensity
 
     # GIVEN: A test sample sheet, No production outputs, and a list of Sample_IDs
-    _, cfg = real_data_cache
+    _, cfg = data_cache_and_cfg
     intensity = None
     Sample_IDs = cfg.ss.set_index("Sample_ID").index
 
@@ -291,11 +287,11 @@ def test_read_intensity_file_name_none(real_data_cache: Tuple[RealData, ConfigMg
 
 
 @pytest.mark.real_data
-def test_check_idat_files(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_check_idat_files(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _check_idats_files
 
     # GIVEN: A test sample sheet and real production outputs
-    _, cfg = real_data_cache
+    _, cfg = data_cache_and_cfg
 
     # WHEN: Scan the folder for Idat files.
     sr = _check_idats_files(cfg)
@@ -310,12 +306,12 @@ def test_check_idat_files(real_data_cache: Tuple[RealData, ConfigMgr]):
 
 
 @pytest.mark.real_data
-def test_check_idat_files_one_missing(real_data_cache: Tuple[RealData, ConfigMgr]):
+def test_check_idat_files_one_missing(data_cache_and_cfg):
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import _check_idats_files
 
     # GIVEN: A test sample sheet, real production outputs, and a fake sample
     # with missing Idat files.
-    _, cfg = real_data_cache
+    _, cfg = data_cache_and_cfg
 
     # fake entry
     fake = cfg.ss.iloc[0, :].copy()
@@ -353,169 +349,74 @@ def test_identifiler_reason():
     assert_series_equal(obs_, exp_)
 
 
-@pytest.mark.real_data
-@pytest.mark.workflow
-@pytest.fixture(scope="session")
-def reporting_module_outputs(tmp_path_factory):
-    """Run the reporting module."""
-    session_tmp_path: Path = tmp_path_factory.mktemp("reporting_module_outputs")
-    data_store = (
-        RealData(session_tmp_path)
-        .add_sample_sheet(full_sample_sheet=True)
-        .add_reference_files(copy=False)
-        .add_user_files(entry_point="gtc", copy=False)
-        .copy("production_outputs/plink_start/samples_start.imiss", "plink_start/samples.imiss")
-        .copy(
-            "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss",
-            "plink_filter_call_rate_1/samples.imiss",
-        )
-        .copy(
-            "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
-            "plink_filter_call_rate_1/samples.sexcheck",
-        )
-        .copy(
-            "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
-            "plink_filter_call_rate_2/samples.imiss",
-        )
-        .copy(
-            "production_outputs/snpweights/samples.snpweights.csv",
-            "ancestry/graf_ancestry_calls.txt",
-        )  # NOTE: I am using SNPweights b/c I don't have production GRAF output
-        .copy(
-            "production_outputs/concordance/KnownReplicates.csv",
-            "sample_filters/concordance/KnownReplicates.csv",
-        )
-        .copy(
-            "production_outputs/concordance/UnknownReplicates.csv",
-            "sample_filters/concordance/UnknownReplicates.csv",
-        )
-        .copy(
-            "production_outputs/all_contam/contam.csv", "sample_filters/agg_contamination_test.csv"
-        )
-        .copy(
-            "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-            "sample_filters/agg_median_idat_intensity.csv",
-        )
-        .make_config()
-        .make_snakefile(
-            """
-            from cgr_gwas_qc import load_config
+def test_find_study_subject_representative():
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _find_study_subject_representative
 
-            cfg = load_config()
-
-            include: cfg.rules("reporting.smk")
-
-            rule all:
-                input:
-                    "sample_qc_report/all_samples.csv",
-                    "sample_qc_report/lims_upload.csv",
-                    "sample_qc_report/summary_stats.txt",
-                    "sample_qc_report/identifiler_needed.csv",
-            """
-        )
+    # GIVEN: A slimmed down QC report
+    df = pd.read_csv(
+        StringIO(
+            dedent(
+                """
+        Group_By_Subject_ID,Sample_ID,Call_Rate_2,Low Call Rate,Contaminated,Expected Replicate Discordance,Internal_Control
+        SB001,S001,.98,False,False,False,False
+        SB002,S002,.98,False,False,False,False
+        SB002,S003,.99,False,False,False,False
+        IB001,I001,.99,False,False,False,True
+        SB003,S004,.90,False,True,False,False
+        SB003,S005,.91,False,False,False,False
+        SB003,S006,.89,False,False,False,False
+        SB004,S007,.89,False,False,False,True
+        SB004,S008,.9,False,False,False,True
+        """
+            )
+        ),
+        index_col="Sample_ID",
     )
 
-    run_snakemake(session_tmp_path)
-
-    return data_store, session_tmp_path
-
-
-@pytest.mark.regression
-@pytest.mark.workflow
-@pytest.mark.real_data
-def test_sample_qc_report(reporting_module_outputs):
-    # GIVEN: The outputs from the reporting module
-    data_store, tmp_path = reporting_module_outputs
-
-    # WHEN: Read in the all_samples table ignoring a couple of columns
-    exclude_cols = [
-        "IdatsInProjectDir",  # This column does not match b/c I did not have all the Idat files
-        "Identifiler_Reason",  # This is a new column not in the legacy table
-    ]
-
-    obs_ = (
-        pd.read_csv(tmp_path / "sample_qc_report/all_samples.csv")
-        .drop(exclude_cols, axis=1, errors="ignore")
-        .sort_values("Sample_ID")
-        .reset_index(drop=True)
-    )
-    exp_ = (
-        pd.read_csv(data_store / "production_outputs/all_sample_qc.csv")
-        .drop(exclude_cols, axis=1, errors="ignore")
-        .sort_values("Sample_ID")
-        .reset_index(drop=True)
+    # WHEN: I loook for the representative sample for each Subject Group
+    # THEN: observed should be the same as expected.
+    obs_ = _find_study_subject_representative(df)
+    exp_ = pd.Series(
+        [True, False, True, False, False, True, False, False, False],
+        index=["S001", "S002", "S003", "I001", "S004", "S005", "S006", "S007", "S008"],
     )
 
-    # THEN: The tables are identical
-    assert_frame_equal(obs_, exp_)
+    # THEN: Basic properties
+    assert_series_equal(obs_, exp_, check_names=False)
 
 
-@pytest.mark.regression
-@pytest.mark.workflow
-@pytest.mark.real_data
-def test_lims_upload(reporting_module_outputs):
-    # GIVEN: The outputs from the reporting module
-    data_store, tmp_path = reporting_module_outputs
-
-    # WHEN: Read in the lims upload table
-
-    obs_ = (
-        pd.read_csv(tmp_path / "sample_qc_report/lims_upload.csv")
-        .sort_values("Sample_ID")
-        .reset_index(drop=True)
-    )
-    exp_ = (
-        pd.read_csv(
-            data_store
-            / "production_outputs/SR0446-001_12_LimsUpload_1011201995419_casecontrol_20191011.csv"
-        )
-        .rename({"Sample ID": "Sample_ID"}, axis=1)  # Somehow the legacy workflow changed this
-        .sort_values("Sample_ID")
-        .reset_index(drop=True)
+def test_find_study_subject_with_no_representative():
+    from cgr_gwas_qc.workflow.scripts.sample_qc_report import (
+        _find_study_subject_with_no_representative,
     )
 
-    # THEN: The tables are identical
-    assert_frame_equal(obs_, exp_)
-
-
-@pytest.mark.workflow
-@pytest.mark.regression
-@pytest.mark.real_data
-def test_identifiler_needed(reporting_module_outputs):
-    """"""
-    # GIVEN: The outputs from the reporting module
-    data_path, tmp_path = reporting_module_outputs
-
-    obs_ = pd.read_csv(tmp_path / "sample_qc_report/identifiler_needed.csv").rename(
-        {"Identifiler_Reason": "Identifiler Reason"}, axis=1
-    )  # I had renamed one of the columns, I am renaming back for testing
-    exp_ = pd.read_csv(
-        data_path
-        / "production_outputs/files_for_lab/SR0446-001_12_Identifiler_1011201995419_casecontrol_20191011.csv"
+    # GIVEN: A slimmed down QC report
+    df = pd.read_csv(
+        StringIO(
+            dedent(
+                """
+        Group_By_Subject_ID,Sample_ID,Subject_Representative,Internal_Control
+        SB001,S001,True,False
+        SB001,S002,False,False
+        SB002,S003,False,False
+        SB002,S004,False,False
+        SB002,S005,True,False
+        SB003,S006,False,False
+        SB003,S007,False,False
+        SB004,I001,False,True
+        """
+            )
+        ),
+        index_col="Sample_ID",
     )
 
-    # THEN: The summary stats ends with 203 17
-    assert_frame_equal(obs_, exp_)
+    # WHEN: I look for the representative sample for each Subject Group
+    # THEN: observed should be the same as expected.
+    obs_ = _find_study_subject_with_no_representative(df)
+    exp_ = pd.Series(
+        data=[False, False, False, False, False, True, True, False],
+        index=["S001", "S002", "S003", "S004", "S005", "S006", "S007", "I001"],
+    )
 
-
-@pytest.mark.workflow
-@pytest.mark.real_data
-def test_sample_qc_report_summary_stats(reporting_module_outputs):
-    """Test the createion of summary_stats.txt
-
-    I am not able to perform regression testing because there are some issues
-    with the original script. First, they have the contamination threshold of
-    0.1 hardcoded so the summary stats don't match the sample_qc_table if
-    this threshold is changed by the user. Second, the fail call rate
-    includes NAs, where in the sample_qc_table these are converted to True.
-    Third, because I switched from R to python, there are some small
-    naming/formatting differences that I felt were not necessary to repeat.
-    """
-    # GIVEN: The outputs from the reporting module
-    _, tmp_path = reporting_module_outputs
-
-    # NOTE: There are going to be a number of formatting difference with the
-    # production workflow so this is hard to run regression tests on.
-
-    # THEN: The summary stats ends with 203 17
-    assert (tmp_path / "sample_qc_report/summary_stats.txt").read_text().endswith("203  17\n")
+    # THEN: Basic properties
+    assert_series_equal(obs_, exp_, check_names=False)

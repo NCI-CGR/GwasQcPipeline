@@ -2,9 +2,9 @@
 
 Each entry point is expected to create the following files:
 
-- plink_start/samples.bed
-- plink_start/samples.bim
-- plink_start/samples.ped
+- sample_level/samples.bed
+- sample_level/samples.bim
+- sample_level/samples.ped
 
 Entry point decisions are made by the presence of different user provided
 files in the config. If these options are None (or not in the file) then a
@@ -36,11 +36,11 @@ def test_gtc_to_ped_conversion(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input:
-                    cfg.expand("per_sample_plink_files/{Sample_ID}.ped")
+                    cfg.expand("sample_level/per_sample_plink_files/{Sample_ID}.ped")
             """
         )
     )
@@ -48,11 +48,11 @@ def test_gtc_to_ped_conversion(tmp_path):
     run_snakemake(tmp_path, keep_temp=True)
 
     # THEN: peds and maps should be identical to production output
-    obs_peds = sorted((tmp_path / "per_sample_plink_files").glob("*.ped"))
+    obs_peds = sorted((tmp_path / "sample_level/per_sample_plink_files").glob("*.ped"))
     exp_peds = sorted((tmp_path / "production_outputs/per_sample_plink_files").glob("*.ped"))
     assert all([file_hashes_equal(o, e) for o, e in zip(obs_peds, exp_peds)])
 
-    obs_maps = sorted((tmp_path / "per_sample_plink_files").glob("*.map"))
+    obs_maps = sorted((tmp_path / "sample_level/per_sample_plink_files").glob("*.map"))
     exp_maps = sorted((tmp_path / "production_outputs/per_sample_plink_files").glob("*.map"))
     assert all([file_hashes_equal(o, e) for o, e in zip(obs_maps, exp_maps)])
 
@@ -66,6 +66,7 @@ def test_create_gtc_merge_list(tmp_path):
         .add_sample_sheet(full_sample_sheet=False)
         .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
+        .copy("production_outputs/per_sample_plink_files", "sample_level/per_sample_plink_files")
         .make_config()
         .make_snakefile(
             """
@@ -73,22 +74,20 @@ def test_create_gtc_merge_list(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
-                input: "plink_start/mergeList.txt"
+                input: "sample_level/initial_mergeList.txt"
             """
         )
     )
-    # use pre-built intermediate per_sample_plink_files
-    data_repo.copy("production_outputs/per_sample_plink_files", "per_sample_plink_files")
 
     # WHEN: I run snakemake
-    run_snakemake(tmp_path)
+    run_snakemake(tmp_path, keep_temp=True)
 
     # THEN: The merge should have one row for each sample
     n_samples = data_repo.ss.data.shape[0]
-    merge_list = (tmp_path / "plink_start/mergeList.txt").read_text().strip().split("\n")
+    merge_list = (tmp_path / "sample_level/initial_mergeList.txt").read_text().strip().split("\n")
     assert n_samples == len(merge_list)
 
 
@@ -102,6 +101,7 @@ def test_merge_gtc_sample_peds(tmp_path, conda_envs):
         .add_sample_sheet(full_sample_sheet=False)
         .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
+        .copy("production_outputs/per_sample_plink_files", "sample_level/per_sample_plink_files")
         .make_config()
         .make_snakefile(
             """
@@ -109,30 +109,29 @@ def test_merge_gtc_sample_peds(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input:
-                    expand("plink_start/samples.{ext}", ext=["bed", "bim", "fam", "nosex"])
+                    expand("sample_level/samples.{ext}", ext=["bed", "bim", "fam", "nosex"])
             """
         )
     )
     # use pre-built intermediate per_sample_plink_files
-    data_repo.copy("production_outputs/per_sample_plink_files", "per_sample_plink_files")
 
     # WHEN: I run snakemake
     run_snakemake(tmp_path)
 
     # THEN:
     # The merged samples files should exist.
-    assert (tmp_path / "plink_start/samples.bed").exists()
-    assert (tmp_path / "plink_start/samples.bim").exists()
-    assert (tmp_path / "plink_start/samples.fam").exists()
-    assert (tmp_path / "plink_start/samples.nosex").exists()
+    assert (tmp_path / "sample_level/samples.bed").exists()
+    assert (tmp_path / "sample_level/samples.bim").exists()
+    assert (tmp_path / "sample_level/samples.fam").exists()
+    assert (tmp_path / "sample_level/samples.nosex").exists()
 
     # The same number of samples should be reported in the log as passing
     n_samples = data_repo.ss.data.shape[0]
-    log = (tmp_path / "plink_start/samples.log").read_text()
+    log = (tmp_path / "sample_level/samples.log").read_text()
     assert f"{n_samples} people pass filters and QC" in log
 
 
@@ -158,11 +157,11 @@ def test_ped_entry(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input:
-                    expand("plink_start/samples.{ext}", ext=["bed", "bim", "fam", "nosex"])
+                    expand("sample_level/samples.{ext}", ext=["bed", "bim", "fam", "nosex"])
             """
         )
     )
@@ -172,11 +171,11 @@ def test_ped_entry(tmp_path, conda_envs):
 
     # THEN:
     # The merged samples files should be identical to the test data I have generated.
-    obs_bed = tmp_path / "plink_start/samples.bed"
+    obs_bed = tmp_path / "sample_level/samples.bed"
     exp_bed = data_repo / "plink/samples.bed"
     assert file_hashes_equal(obs_bed, exp_bed)
 
-    obs_bim = tmp_path / "plink_start/samples.bim"
+    obs_bim = tmp_path / "sample_level/samples.bim"
     exp_bim = data_repo / "plink/samples.bim"
     assert file_hashes_equal(obs_bim, exp_bim)
 
@@ -184,7 +183,7 @@ def test_ped_entry(tmp_path, conda_envs):
     def parse_fam(pth):
         return sorted([row.split() for row in pth.read_text().strip().split("\n")])
 
-    obs_fam = parse_fam(tmp_path / "plink_start/samples.fam")
+    obs_fam = parse_fam(tmp_path / "sample_level/samples.fam")
     exp_fam = parse_fam(data_repo / "plink/samples.fam")
     assert obs_fam == exp_fam
 
@@ -196,7 +195,7 @@ def test_bed_entry(tmp_path):
     This entry point expects an aggregated (multi-sample) BED/BIM/FAM file.
     Since this is the expected output of the entry point module, these files
     are just symbolically linked to the expected location
-    ``plink_start/samples.{bed,bim,fam}``.
+    ``sample_level/samples.{bed,bim,fam}``.
     """
     # GIVEN: The the following FakeData repo
     (
@@ -211,11 +210,11 @@ def test_bed_entry(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("entry_points.smk")
+            include: cfg.modules("entry_points.smk")
 
             rule all:
                 input:
-                    expand("plink_start/samples.{ext}", ext=["bed", "bim", "fam"])
+                    expand("sample_level/samples.{ext}", ext=["bed", "bim", "fam"])
             """
         )
     )
@@ -225,6 +224,6 @@ def test_bed_entry(tmp_path):
 
     # THEN: the files should just be symlinks
     # The merged samples files should be identical to the test data I have generated.
-    assert (tmp_path / "plink_start/samples.bed").is_symlink()
-    assert (tmp_path / "plink_start/samples.bim").is_symlink()
-    assert (tmp_path / "plink_start/samples.fam").is_symlink()
+    assert (tmp_path / "sample_level/samples.bed").is_symlink()
+    assert (tmp_path / "sample_level/samples.bim").is_symlink()
+    assert (tmp_path / "sample_level/samples.fam").is_symlink()

@@ -6,9 +6,9 @@ the user.
 
 All entry points should create:
 
-    - plink_start/samples.bed
-    - plink_start/samples.bim
-    - plink_start/samples.fam
+    - sample_level/samples.bed
+    - sample_level/samples.bim
+    - sample_level/samples.fam
 """
 
 if cfg.config.user_files.gtc_pattern:
@@ -30,8 +30,8 @@ if cfg.config.user_files.gtc_pattern:
         params:
             strand=cfg.config.software_params.strand,
         output:
-            ped=temp("per_sample_plink_files/{Sample_ID}.ped"),
-            map_=temp("per_sample_plink_files/{Sample_ID}.map"),
+            ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
+            map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
         script:
             "../scripts/gtc2plink.py"
 
@@ -42,10 +42,10 @@ if cfg.config.user_files.gtc_pattern:
         a simple space delimited file where each sample is on it's own row.
         """
         input:
-            ped=cfg.expand("per_sample_plink_files/{Sample_ID}.ped"),
-            map_=cfg.expand("per_sample_plink_files/{Sample_ID}.map"),
+            ped=cfg.expand(rules.gtc_to_ped.output.ped),
+            map_=cfg.expand(rules.gtc_to_ped.output.map_),
         output:
-            "plink_start/mergeList.txt",
+            temp("sample_level/initial_mergeList.txt"),
         group:
             "merge_gtc_sample_peds"
         run:
@@ -60,18 +60,18 @@ if cfg.config.user_files.gtc_pattern:
         format.
         """
         input:
-            ped=cfg.expand("per_sample_plink_files/{Sample_ID}.ped"),
-            map_=cfg.expand("per_sample_plink_files/{Sample_ID}.map"),
+            ped=cfg.expand(rules.gtc_to_ped.output.ped),
+            map_=cfg.expand(rules.gtc_to_ped.output.map_),
             merge_list=rules.create_gtc_sample_merge_list.output[0],
         params:
-            prefix="plink_start/samples",
+            prefix="sample_level/samples",
         output:
-            bed="plink_start/samples.bed",
-            bim="plink_start/samples.bim",
-            fam="plink_start/samples.fam",
-            nosex="plink_start/samples.nosex",
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+            nosex="sample_level/samples.nosex",
         log:
-            "plink_start/samples.log",
+            "sample_level/samples.log",
         group:
             "merge_gtc_sample_peds"
         envmodules:
@@ -101,12 +101,14 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
             ped=cfg.config.user_files.ped,
             map_=cfg.config.user_files.map,
         params:
-            prefix="plink_start/samples",
+            prefix="sample_level/samples",
         output:
-            bed="plink_start/samples.bed",
-            bim="plink_start/samples.bim",
-            fam="plink_start/samples.fam",
-            nosex="plink_start/samples.nosex",
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+            nosex="sample_level/samples.nosex",
+        log:
+            "sample_level/samples.log",
         envmodules:
             cfg.envmodules("plink2"),
         conda:
@@ -140,9 +142,9 @@ elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user
             bim=cfg.config.user_files.bim,
             fam=cfg.config.user_files.fam,
         output:
-            bed="plink_start/samples.bed",
-            bim="plink_start/samples.bim",
-            fam="plink_start/samples.fam",
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
         shell:
             "ln -s $(readlink -f {input.bed}) {output.bed} && "
             "ln -s $(readlink -f {input.bim}) {output.bim} && "

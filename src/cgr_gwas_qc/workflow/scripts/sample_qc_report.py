@@ -78,6 +78,10 @@ QC_HEADER = [  # Header for main QC table
     "Count_of_QC_Issue",
     "Identifiler_Needed",
     "Identifiler_Reason",
+    "Internal_Control",
+    "Group_By_Subject_ID",
+    "Subject_Representative",
+    "Subject_Dropped_From_Study",
 ]
 
 
@@ -146,6 +150,9 @@ def main(
     df["Identifiler_Needed"] = df[IDENTIFILER_FLAGS].any(axis=1)
     df["Identifiler_Reason"] = _identifiler_reason(df, IDENTIFILER_FLAGS)
 
+    # Add flag for which samples to keep as subject
+    df["Subject_Representative"] = _find_study_subject_representative(df)
+    df["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(df)
     ################################################################################
     # Save Output
     ################################################################################
@@ -177,11 +184,11 @@ def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.Da
     # default this columns is already called `Expected_Sex`.
     _df["Expected_Sex"] = _df[expected_sex_col_name]
 
+    # Add Internal_Control Flag
+    _df["Internal_Control"] = _df.Sample_Group == "sVALD-001"
+
     # For internal controls use the `Indentifiler_Sex` column as `Expected_Sex`
-    internal_control_mask = _df.Sample_Group == "sVALD-001"
-    _df.loc[internal_control_mask, "Expected_Sex"] = _df.loc[
-        internal_control_mask, "Identifiler_Sex"
-    ]
+    _df.loc[_df.Internal_Control, "Expected_Sex"] = _df.loc[_df.Internal_Control, "Identifiler_Sex"]
 
     # Count the number of samples per subject ID and set Sample_ID as index
     return _df.merge(
@@ -529,6 +536,56 @@ def _identifiler_reason(df: pd.DataFrame, cols: List[str]):
         return ""
 
     return df.apply(reason_string, axis=1)
+
+
+def _find_study_subject_representative(df: pd.DataFrame) -> pd.Series:
+    """Flag indicating which sample to use as subject representative.
+
+    We use a single representative sample for subject level analysis. First
+    we remove all internal controls and poor quality samples (Low Call Rate,
+    Contaminated, Replicate Discordance). For subject IDs with multiple
+    remaining samples, we select the sample that has the highest Call Rate 2.
+
+    Returns:
+        pd.Series:
+            - Sample_ID (pd.Index): sorted by `df.index`
+            - A boolean flag where True indicates a sample was used as the
+              subject representative.
+    """
+    return (
+        df.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
+        .query(
+            "not Internal_Control & not Contaminated & not `Low Call Rate` & not `Expected Replicate Discordance`"
+        )
+        .groupby("Group_By_Subject_ID")  # Group sample by suject id
+        .apply(
+            lambda x: x.Call_Rate_2 == x.Call_Rate_2.max()
+        )  # Select the sample with highest call rate as representative
+        .droplevel(0)  # drop the subject label b/c don't need
+        .reindex(
+            df.index
+        )  # Add the samples that were filtered by the query step and make sure everything aligns
+        .fillna(False)
+    )
+
+
+def _find_study_subject_with_no_representative(df: pd.DataFrame) -> pd.Series:
+    """Flag indicating which subjects have representative sample.
+
+    This flag excludes internal controls which by nature are ignored in
+    subject level analysis.
+
+    Returns:
+        pd.Series:
+            - Sample_ID (pd.Index): sorted by `df.index`
+            - A boolean flag where True indicates the subject (i.e., all
+              samples) has no representative sample.
+    """
+    subject_w_no_rep = (
+        df.query("not Internal_Control").groupby("Group_By_Subject_ID").Subject_Representative.sum()
+        == 0
+    ).pipe(lambda x: x.index[x])
+    return df.Group_By_Subject_ID.isin(subject_w_no_rep)
 
 
 def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:

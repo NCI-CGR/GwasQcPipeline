@@ -57,7 +57,7 @@ def test_graf_fingerprint_list(tmp_path):
             from cgr_gwas_qc import load_config
 
             cfg = load_config()
-            include: cfg.rules("ancestry.smk")
+            include: cfg.modules("ancestry.smk")
 
             rule all:
                 input:
@@ -99,7 +99,7 @@ def graf_module(tmp_path_factory, conda_envs) -> Tuple[RealData, Path]:
             from cgr_gwas_qc import load_config
 
             cfg = load_config()
-            include: cfg.rules("ancestry.smk")
+            include: cfg.modules("ancestry.smk")
 
             rule all:
                 input:

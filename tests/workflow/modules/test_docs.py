@@ -21,7 +21,7 @@ def test_subset_all_qc(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.rules("docs.smk")
+            include: cfg.modules("docs.smk")
 
             rule all:
                 input:
