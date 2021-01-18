@@ -353,7 +353,8 @@ def _read_GRAF(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     """
     return (
         pd.read_csv(file_name, sep="\t")
-        .rename({"Subject": "Sample_ID", "Computed population": "Ancestry"}, axis=1)
+        .rename({"Subject": "Sample_ID"}, axis=1)
+        .assign(Ancestry=lambda x: x["Computed population"].str.replace(" ", "_"))
         .assign(AFR=lambda x: x["P_f (%)"] / 100)
         .assign(EUR=lambda x: x["P_e (%)"] / 100)
         .assign(ASN=lambda x: x["P_a (%)"] / 100)
