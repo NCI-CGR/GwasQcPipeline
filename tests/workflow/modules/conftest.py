@@ -58,6 +58,7 @@ def qc_summary(tmp_path_factory) -> Path:
     from cgr_gwas_qc.workflow.scripts.sample_qc_report import (
         IDENTIFILER_FLAGS,
         QC_HEADER,
+        _case_control_encoder,
         _find_study_subject_representative,
         _find_study_subject_with_no_representative,
         _identifiler_reason,
@@ -81,6 +82,9 @@ def qc_summary(tmp_path_factory) -> Path:
     )
 
     # Use functions from QC script to add other columns
+    legacy_qc_table["Case/Control_Status"] = legacy_qc_table["Case/Control_Status"].map(
+        _case_control_encoder
+    )
     legacy_qc_table["Identifiler_Reason"] = _identifiler_reason(legacy_qc_table, IDENTIFILER_FLAGS)
     legacy_qc_table["Subject_Representative"] = _find_study_subject_representative(legacy_qc_table)
     legacy_qc_table["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(
