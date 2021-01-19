@@ -62,7 +62,7 @@ def test_eigenstrat_config(tmp_path):
 
             rule all:
                 input:
-                    "samples.convertEigen.par",
+                    "samples.convert.par",
             """
         )
     )
@@ -71,14 +71,14 @@ def test_eigenstrat_config(tmp_path):
     run_snakemake(tmp_path)
 
     # THEN: The config file is generated as expected
-    obs_ = (tmp_path / "samples.convertEigen.par").read_text()
+    obs_ = (tmp_path / "samples.convert.par").read_text()
     exp_ = dedent(
         """\
         genotypename: samples.ped
         snpname: samples.map
         indivname: samples.ped
         outputformat: EIGENSTRAT
-        genooutfilename: samples.eigenstratgeno
+        genooutfilename: samples.gen
         snpoutfilename: samples.snp
         indoutfilename: samples.ind
         familynames: NO
@@ -88,7 +88,7 @@ def test_eigenstrat_config(tmp_path):
     assert obs_ == exp_
 
 
-def test_eigenstrat_convert(tmp_path, conda_envs):
+def test_eigensoft_convert(tmp_path, conda_envs):
     # GIVEN:
     conda_envs.copy_env("eigensoft", tmp_path)
     data_cache = (
@@ -108,7 +108,7 @@ def test_eigenstrat_convert(tmp_path, conda_envs):
 
             rule all:
                 input:
-                    "subjects.eigenstratgeno",
+                    "subjects.gen",
                     "subjects.snp",
                     "subjects.ind",
             """
@@ -119,7 +119,7 @@ def test_eigenstrat_convert(tmp_path, conda_envs):
 
     # THEN: the files exists
     file_hashes_equal(
-        tmp_path / "subjects.eigenstratgeno",
+        tmp_path / "subjects.gen",
         data_cache / "production_outputs/pca/EUR_subjects.eigenstratgeno",
     )
 
@@ -129,4 +129,38 @@ def test_eigenstrat_convert(tmp_path, conda_envs):
 
     file_hashes_equal(
         tmp_path / "subjects.ind", data_cache / "production_outputs/pca/EUR_subjects.ind"
+    )
+
+
+def test_eigensoft_smartpca(tmp_path, conda_envs):
+    # GIVEN:
+    conda_envs.copy_env("eigensoft", tmp_path)
+    data_cache = (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .add_reference_files(copy=False)
+        .copy("production_outputs/pca/EUR_subjects.eigenstratgeno", tmp_path / "subjects.gen")
+        .copy("production_outputs/pca/EUR_subjects.snp", tmp_path / "subjects.snp")
+        .copy("production_outputs/pca/EUR_subjects.ind", tmp_path / "subjects.ind")
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.modules("common.smk")
+
+            rule all:
+                input:
+                    "subjects.eigenvec",
+            """
+        )
+    )
+    # WHEN:
+    run_snakemake(tmp_path)
+
+    # THEN: the files exists
+    file_hashes_equal(
+        tmp_path / "subjects.eigenvec", data_cache / "production_outputs/pca/EUR_subjects.eigenvec",
     )

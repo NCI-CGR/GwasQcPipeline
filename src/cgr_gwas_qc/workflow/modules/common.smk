@@ -36,49 +36,97 @@ rule plink_bed_to_ped:
         "--out {wildcards.prefix}"
 
 
-rule eigenstrat_config:
-    input:
-        ped="{prefix}.ped",
-        map_="{prefix}.map",
-    params:
-        gen="{prefix}.eigenstratgeno",
-        snp="{prefix}.snp",
-        ind="{prefix}.ind",
-    output:
-        par="{prefix}.convertEigen.par",
-    group:
-        "eigenstrat"
-    run:
-        Path(output.par).write_text(
-            dedent(
-                f"""\
-        genotypename: {input.ped}
-        snpname: {input.map_}
-        indivname: {input.ped}
-        outputformat: EIGENSTRAT
-        genooutfilename: {params.gen}
-        snpoutfilename: {params.snp}
-        indoutfilename: {params.ind}
-        familynames: NO
+def eigensoft_config_inputs(wildcards):
+    tool = wildcards.tool
+    prefix = wildcards.prefix
+    if tool == "pca":
+        return {
+            "gen": f"{prefix}.gen",
+            "snp": f"{prefix}.snp",
+            "ind": f"{prefix}.ind",
+        }
+
+    # Default is to convert PED/MAP to EIGENSTRAT
+    return {
+        "gen": f"{prefix}.ped",
+        "snp": f"{prefix}.map",
+        "ind": f"{prefix}.ped",
+    }
+
+
+def eigensoft_config_params(wildcards):
+    tool = wildcards.tool
+    prefix = wildcards.prefix
+
+    if tool == "pca":
+        return f"""\
+        genotypename: {prefix}.gen
+        snpname: {prefix}.snp
+        indivname: {prefix}.ind
+        evecoutname: {prefix}.eigenvec
+        fastmode: YES
         """
-            )
-        )
+
+    # Default is to convert PED/MAP to EIGENSTRAT
+    return f"""\
+    genotypename: {prefix}.ped
+    snpname: {prefix}.map
+    indivname: {prefix}.ped
+    outputformat: EIGENSTRAT
+    genooutfilename: {prefix}.gen
+    snpoutfilename: {prefix}.snp
+    indoutfilename: {prefix}.ind
+    familynames: NO
+    """
 
 
-rule eigenstrat_convert:
+rule eigensoft_config:
+    input:
+        unpack(eigensoft_config_inputs),
+    params:
+        eigensoft_config_params,
+    output:
+        par="{prefix}.{tool}.par",
+    wildcard_constraints:
+        tool="convert|pca",
+    group:
+        "{tool}"
+    run:
+        Path(output.par).write_text(dedent(params[0]))
+
+
+rule eigensoft_convert:
     input:
         ped="{prefix}.ped",
         map_="{prefix}.map",
-        par="{prefix}.convertEigen.par",
+        par="{prefix}.convert.par",
     output:
-        gen="{prefix}.eigenstratgeno",
+        gen="{prefix}.gen",
         snp="{prefix}.snp",
         ind="{prefix}.ind",
     group:
-        "eigenstrat"
+        "convert"
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:
         cfg.conda("eigensoft.yml")
     shell:
         "convertf -p {input.par}"
+
+
+rule eigensoft_smartpca:
+    input:
+        gen="{prefix}.gen",
+        snp="{prefix}.snp",
+        ind="{prefix}.ind",
+        par="{prefix}.pca.par",
+    output:
+        gen="{prefix}.eigenvec",
+    group:
+        "convert"
+    envmodules:
+        cfg.envmodules("eigensoft"),
+    conda:
+        cfg.conda("eigensoft.yml")
+    shell:
+        "smartpca -p {input.par}"
