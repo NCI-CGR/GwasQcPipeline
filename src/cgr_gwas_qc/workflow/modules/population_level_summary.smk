@@ -1,11 +1,11 @@
 import pandas as pd
 
 
-rule samples_per_population:
+rule subjects_per_population:
     input:
         "sample_level/qc_summary.csv",
     output:
-        "population_level/sample_list_{population}.txt",
+        "population_level/subject_list_{population}.txt",
     run:
         (
             pd.read_csv(input[0])
@@ -21,7 +21,7 @@ rule plink_split_population:
         bed="subject_level/subjects.bed",
         bim="subject_level/subjects.bim",
         fam="subject_level/subjects.fam",
-        to_keep=rules.samples_per_population.output[0],
+        to_keep=rules.subjects_per_population.output[0],
     params:
         out_prefix="population_level/{population}",
     output:

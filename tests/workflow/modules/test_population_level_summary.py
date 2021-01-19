@@ -9,7 +9,7 @@ from cgr_gwas_qc.testing.data import RealData
 @pytest.mark.regression
 @pytest.mark.workflow
 @pytest.mark.real_data
-def test_samples_per_population(tmp_path, qc_summary):
+def test_subjects_per_population(tmp_path, qc_summary):
     # GIVEN
     data_cache = (
         RealData(tmp_path)
@@ -25,9 +25,9 @@ def test_samples_per_population(tmp_path, qc_summary):
 
             rule all:
                 input:
-                    "population_level/sample_list_AFR.txt",
-                    "population_level/sample_list_ASN.txt",
-                    "population_level/sample_list_EUR.txt",
+                    "population_level/subject_list_AFR.txt",
+                    "population_level/subject_list_ASN.txt",
+                    "population_level/subject_list_EUR.txt",
             """
         )
     )
@@ -39,17 +39,17 @@ def test_samples_per_population(tmp_path, qc_summary):
 
     # THEN
     file_hashes_equal(
-        tmp_path / "population_level/sample_list_AFR.txt",
+        tmp_path / "population_level/subject_list_AFR.txt",
         data_cache / "production_outputs/split_by_pop/AFR.keep.txt",
     )
 
     file_hashes_equal(
-        tmp_path / "population_level/sample_list_ASN.txt",
+        tmp_path / "population_level/subject_list_ASN.txt",
         data_cache / "production_outputs/split_by_pop/ASN.keep.txt",
     )
 
     file_hashes_equal(
-        tmp_path / "population_level/sample_list_EUR.txt",
+        tmp_path / "population_level/subject_list_EUR.txt",
         data_cache / "production_outputs/split_by_pop/EUR.keep.txt",
     )
 
@@ -64,7 +64,7 @@ def test_plink_split_population(tmp_path, conda_envs, qc_summary):
         RealData(tmp_path)
         .add_sample_sheet()
         .copy(
-            "production_outputs/split_by_pop/AFR.keep.txt", "population_level/sample_list_AFR.txt",
+            "production_outputs/split_by_pop/AFR.keep.txt", "population_level/subject_list_AFR.txt",
         )
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
