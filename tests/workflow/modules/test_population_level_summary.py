@@ -25,9 +25,9 @@ def test_subjects_per_population(tmp_path, qc_summary):
 
             rule all:
                 input:
-                    "population_level/subject_list_AFR.txt",
-                    "population_level/subject_list_ASN.txt",
-                    "population_level/subject_list_EUR.txt",
+                    "population_level/AFR/subject_list.txt",
+                    "population_level/ASN/subject_list.txt",
+                    "population_level/EUR/subject_list.txt",
             """
         )
     )
@@ -39,17 +39,17 @@ def test_subjects_per_population(tmp_path, qc_summary):
 
     # THEN
     file_hashes_equal(
-        tmp_path / "population_level/subject_list_AFR.txt",
+        tmp_path / "population_level/AFR/subject_list.txt",
         data_cache / "production_outputs/split_by_pop/AFR.keep.txt",
     )
 
     file_hashes_equal(
-        tmp_path / "population_level/subject_list_ASN.txt",
+        tmp_path / "population_level/ASN/subject_list.txt",
         data_cache / "production_outputs/split_by_pop/ASN.keep.txt",
     )
 
     file_hashes_equal(
-        tmp_path / "population_level/subject_list_EUR.txt",
+        tmp_path / "population_level/EUR/subject_list.txt",
         data_cache / "production_outputs/split_by_pop/EUR.keep.txt",
     )
 
@@ -64,7 +64,7 @@ def test_plink_split_population(tmp_path, conda_envs, qc_summary):
         RealData(tmp_path)
         .add_sample_sheet()
         .copy(
-            "production_outputs/split_by_pop/AFR.keep.txt", "population_level/subject_list_AFR.txt",
+            "production_outputs/split_by_pop/AFR.keep.txt", "population_level/AFR/subject_list.txt",
         )
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
@@ -80,9 +80,9 @@ def test_plink_split_population(tmp_path, conda_envs, qc_summary):
 
             rule all:
                 input:
-                    "population_level/AFR.bed",
-                    "population_level/AFR.bim",
-                    "population_level/AFR.fam",
+                    "population_level/AFR/subjects.bed",
+                    "population_level/AFR/subjects.bim",
+                    "population_level/AFR/subjects.fam",
             """
         )
     )
@@ -94,16 +94,16 @@ def test_plink_split_population(tmp_path, conda_envs, qc_summary):
 
     # THEN
     file_hashes_equal(
-        tmp_path / "population_level/AFR.bed",
+        tmp_path / "population_level/AFR/subjects.bed",
         data_cache / "production_outputs/split_by_pop/AFR_subjects.bed",
     )
 
     file_hashes_equal(
-        tmp_path / "population_level/AFR.bim",
+        tmp_path / "population_level/AFR/subjects.bim",
         data_cache / "production_outputs/split_by_pop/AFR_subjects.bim",
     )
 
     file_hashes_equal(
-        tmp_path / "population_level/AFR.fam",
+        tmp_path / "population_level/AFR/subjects.fam",
         data_cache / "production_outputs/split_by_pop/AFR_subjects.fam",
     )

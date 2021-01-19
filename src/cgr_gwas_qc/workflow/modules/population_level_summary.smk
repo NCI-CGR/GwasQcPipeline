@@ -5,7 +5,7 @@ rule subjects_per_population:
     input:
         "sample_level/qc_summary.csv",
     output:
-        "population_level/subject_list_{population}.txt",
+        "population_level/{population}/subject_list.txt",
     run:
         (
             pd.read_csv(input[0])
@@ -23,14 +23,14 @@ rule plink_split_population:
         fam="subject_level/subjects.fam",
         to_keep=rules.subjects_per_population.output[0],
     params:
-        out_prefix="population_level/{population}",
+        out_prefix="population_level/{population}/subjects",
     output:
-        bed="population_level/{population}.bed",
-        bim="population_level/{population}.bim",
-        fam="population_level/{population}.fam",
-        nosex="population_level/{population}.nosex",
+        bed="population_level/{population}/subjects.bed",
+        bim="population_level/{population}/subjects.bim",
+        fam="population_level/{population}/subjects.fam",
+        nosex="population_level/{population}/subjects.nosex",
     log:
-        "population_level/{population}.log",
+        "population_level/{population}/subjects.log",
     envmodules:
         cfg.envmodules("plink2"),
     conda:
