@@ -224,3 +224,109 @@ rule ld_prune:
         "--threads {threads} "
         "--memory {resources.mem} "
         "--out {params.out_prefix}"
+
+
+rule snps_only_filter:
+    """Exclude all variants with one or more multi-character allele codes"""
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+    params:
+        out_prefix="{prefix}_snps",
+    output:
+        bed=temp("{prefix}_snps.bed"),
+        bim=temp("{prefix}_snps.bim"),
+        fam=temp("{prefix}_snps.fam"),
+        nosex=temp("{prefix}_snps.nosex"),
+    log:
+        "{prefix}_snps.log",
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    threads: 2
+    resources:
+        mem=10000,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--snps-only "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
+
+
+rule autosome_only_filter:
+    """Exclude all unplaced and non-autosomal variants"""
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+    params:
+        out_prefix="{prefix}_autosome",
+    output:
+        bed=temp("{prefix}_autosome.bed"),
+        bim=temp("{prefix}_autosome.bim"),
+        fam=temp("{prefix}_autosome.fam"),
+        nosex=temp("{prefix}_autosome.nosex"),
+    log:
+        "{prefix}_autosome.log",
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    threads: 2
+    resources:
+        mem=10000,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--autosome "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
+
+
+rule cleaned_filter:
+    """Tell snakemake to keep the file.
+
+    The link filter rules are designed to be strung together. Intermediate
+    files are automatically deleted by snakemake. This "filter" is used to
+    create files that are kept by snakemake.
+    """
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+    params:
+        out_prefix="{prefix}_cleaned",
+    output:
+        bed="{prefix}_cleaned.bed",
+        bim="{prefix}_cleaned.bim",
+        fam="{prefix}_cleaned.fam",
+        nosex="{prefix}_cleaned.nosex",
+    log:
+        "{prefix}_cleaned.log",
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    threads: 2
+    resources:
+        mem=10000,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
