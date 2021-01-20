@@ -161,3 +161,31 @@ rule plink_stats_ibd:
         "--threads {threads} "
         "--memory {resources.mem} "
         "--out {wildcards.prefix}"
+
+
+rule plink_stats_het:
+    """Calculates autosomal heterozygosity."""
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+    output:
+        genome="{prefix}.het",
+    group:
+        "plink_stats"
+    threads: 2
+    resources:
+        mem=10000,
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--het "
+        "--threads {threads} "
+        "--memory {resources.mem} "
+        "--out {wildcards.prefix}"
