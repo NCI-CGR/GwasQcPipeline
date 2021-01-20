@@ -80,6 +80,7 @@ QC_HEADER = [  # Header for main QC table
     "Identifiler_Reason",
     "Internal_Control",
     "Group_By_Subject_ID",
+    "Case/Control_Status",
     "Subject_Representative",
     "Subject_Dropped_From_Study",
 ]
@@ -159,6 +160,11 @@ def main(
     _save_qc_table(df, all_samples)
 
 
+def _case_control_encoder(x):
+    _map = {"control": 0, "case": 1, "qc": 2}
+    return _map.get(x.lower(), 3)
+
+
 def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
     """Identify expected sex column and count number samples per subject.
 
@@ -180,15 +186,21 @@ def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.Da
     """
     _df = df.copy()
 
+    # Add Internal_Control Flag
+    _df["Internal_Control"] = _df.Sample_Group == "sVALD-001"
+
     # Set the user provided expected sex column as `Expected_Sex`. Note: by
     # default this columns is already called `Expected_Sex`.
     _df["Expected_Sex"] = _df[expected_sex_col_name]
 
-    # Add Internal_Control Flag
-    _df["Internal_Control"] = _df.Sample_Group == "sVALD-001"
-
     # For internal controls use the `Indentifiler_Sex` column as `Expected_Sex`
     _df.loc[_df.Internal_Control, "Expected_Sex"] = _df.loc[_df.Internal_Control, "Identifiler_Sex"]
+
+    # For internal controls make sure Case/Control_Status is QC
+    _df.loc[_df.Internal_Control, "Case/Control_Status"] = "QC"
+
+    # Convert Case/Control_status to numeric representation (control:0, case:1, qc:2, other:3)
+    _df["Case/Control_Status"] = _df["Case/Control_Status"].map(_case_control_encoder)
 
     # Count the number of samples per subject ID and set Sample_ID as index
     return _df.merge(
@@ -341,7 +353,8 @@ def _read_GRAF(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     """
     return (
         pd.read_csv(file_name, sep="\t")
-        .rename({"Subject": "Sample_ID", "Computed population": "Ancestry"}, axis=1)
+        .rename({"Subject": "Sample_ID"}, axis=1)
+        .assign(Ancestry=lambda x: x["Computed population"].str.replace(" ", "_"))
         .assign(AFR=lambda x: x["P_f (%)"] / 100)
         .assign(EUR=lambda x: x["P_e (%)"] / 100)
         .assign(ASN=lambda x: x["P_a (%)"] / 100)

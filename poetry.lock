@@ -1011,7 +1011,7 @@ description = "Snakemake is a workflow management system that aims to reduce the
 name = "snakemake"
 optional = false
 python-versions = "*"
-version = "5.25.0"
+version = "5.32.0"
 
 [package.dependencies]
 appdirs = "*"
@@ -1927,8 +1927,7 @@ snakefmt = [
     {file = "snakefmt-0.2.4.tar.gz", hash = "sha256:6b80508ff0607f3c88e84b966570a19ae2da3a628c57319308cfec9364399532"},
 ]
 snakemake = [
-    {file = "snakemake-5.25.0-py3-none-any.whl", hash = "sha256:b3060be5a7a88bf9e1b39e62315e8c06a831706f1a8a8883f83a49de0ab2c767"},
-    {file = "snakemake-5.25.0.tar.gz", hash = "sha256:6e9ba39038c0d64a6bba492e1646dda10f4826bd905a8b2aa93b18a6793b098b"},
+    {file = "snakemake-5.32.0.tar.gz", hash = "sha256:793a6ccf54461078fd79849702a5338f5ace533bac32b2f4088e5b5da2f10567"},
 ]
 snowballstemmer = [
     {file = "snowballstemmer-2.0.0-py2.py3-none-any.whl", hash = "sha256:209f257d7533fdb3cb73bdbd24f436239ca3b2fa67d56f6ff88e86be08cc5ef0"},

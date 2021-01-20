@@ -56,6 +56,15 @@ def file_rows_almost_equal(
     return all(results)
 
 
+def sorted_file_equal(file1: Union[str, Path], file2: Union[str, Path]) -> bool:
+    """Comapres two sorted files.
+
+    Reads in each file, splits by line, and then sorts.
+    """
+    pth1, pth2 = Path(file1), Path(file2)
+    return sorted(pth1.read_text().splitlines()) == sorted(pth2.read_text().splitlines())
+
+
 def make_test_config(current_dir: Path, **kwargs) -> None:
     """Create a GwasQcPipeline config in the working dir"""
     with chdir(current_dir):
