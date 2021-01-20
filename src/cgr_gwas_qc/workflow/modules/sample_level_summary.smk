@@ -23,7 +23,7 @@ def sample_qc_report_inputs(wildcards):
     return inputs
 
 
-rule sample_qc_report:
+checkpoint sample_qc_report:
     input:
         unpack(sample_qc_report_inputs),
     output:
