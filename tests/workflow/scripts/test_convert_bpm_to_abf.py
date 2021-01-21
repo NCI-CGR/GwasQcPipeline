@@ -85,3 +85,20 @@ def test_issue_30(tmp_path):
                 continue
 
             assert isclose(float(obs_value), float(exp_value), rel_tol=1e-4)
+
+
+@pytest.mark.parametrize("pos", [-10, 0, 1e12], ids=["negative", "zero", "bigger_than_chrom"])
+def test_issue_45(vcf_file, pos):
+    import pysam
+
+    from cgr_gwas_qc.workflow.scripts.bpm2abf import Variant, get_abf_from_vcf
+
+    # GIVEN: The 1KG VCF and a variant with and impossible position.
+    vcf = pysam.VariantFile(vcf_file)
+    var = Variant("1", pos, "test_snp", "[A/C]", "+")
+
+    # WHEN: I try to look up the variant in the VCF
+    res = get_abf_from_vcf(vcf, "AF", var)
+
+    # THEN: I get no exceptions and I return None
+    assert res is None

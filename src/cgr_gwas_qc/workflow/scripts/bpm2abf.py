@@ -97,6 +97,11 @@ def get_abf_from_vcf(vcf: pysam.VariantFile, population: str, variant: Variant) 
         # Chromosome not in VCF
         return None
 
+    chrom_length = vcf.header.contigs.get(variant.chrom).length
+    if (variant.pos < 1) or (variant.pos >= chrom_length):
+        # Variant located at an impossible position
+        return None
+
     b_allele = variant.b_allele
     b_allele_c = complement(b_allele)
 
