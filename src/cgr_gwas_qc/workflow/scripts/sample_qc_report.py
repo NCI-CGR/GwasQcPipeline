@@ -404,7 +404,7 @@ def _read_known_replicates(
 
     discord_Sample_IDs = (
         pd.read_csv(file_name)  # Subject_ID Sample_ID1 Sample_ID2 Concordance PI_HAT
-        .query("Concordance.notna() & Concordance < @dup_concordance_cutoff")
+        .query("concordance.notna() & concordance < @dup_concordance_cutoff")
         .loc[:, ("Sample_ID1", "Sample_ID2")]
         .melt()
         .value.unique()
@@ -486,7 +486,7 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
 
     return (
         pd.read_csv(file_name)
-        .rename({"SampId": "Sample_ID", "MedianIntensity": "IdatIntensity"}, axis=1)
+        .rename({"SampId": "Sample_ID", "median_intensity": "IdatIntensity"}, axis=1)
         .set_index("Sample_ID")
         .reindex(Sample_IDs)
         .IdatIntensity

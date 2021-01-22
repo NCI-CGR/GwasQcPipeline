@@ -62,8 +62,12 @@ if (
     rule per_sample_median_idat_intensity:
         """Calculate median intensity of Red and Green channels."""
         input:
-            red=cfg.config.user_files.idat_pattern.red,
-            green=cfg.config.user_files.idat_pattern.green,
+            red=lambda wc: cfg.expand(
+                cfg.config.user_files.idat_pattern.red, query=f"Sample_ID == '{wc.Sample_ID}'",
+            ),
+            green=lambda wc: cfg.expand(
+                cfg.config.user_files.idat_pattern.green, query=f"Sample_ID == '{wc.Sample_ID}'",
+            ),
         output:
             temp(
                 "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
@@ -71,7 +75,7 @@ if (
         envmodules:
             cfg.envmodules("r"),
         conda:
-            "../conda/illuminaio.yml"
+            cfg.conda("illuminaio.yml")
         script:
             "../scripts/median_idat_intensity.R"
 
@@ -193,7 +197,7 @@ rule sample_concordance_plink:
     input:
         sample_sheet=cfg.sample_sheet_file,
         imiss="sample_level/call_rate_2/samples.imiss",
-        ibd="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome".format(
+        ibd="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome".format(
             maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
     params:

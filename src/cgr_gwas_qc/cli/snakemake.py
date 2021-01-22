@@ -55,7 +55,7 @@ def main(
     ),
     conda_create_envs_only: bool = typer.Option(
         False,
-        "--conda-create--envs-only",
+        "--conda-create-envs-only",
         help="if specified, only builds the conda environments specified for each job, then exits.",
     ),
 ):
