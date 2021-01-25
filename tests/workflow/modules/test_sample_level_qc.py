@@ -477,7 +477,7 @@ def test_sample_concordance_plink(tmp_path):
             "sample_level/call_rate_2/samples.imiss",
         ).copy(
             "production_outputs/ibd/samples.genome",
-            f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
+            f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome",
         )
     )
 

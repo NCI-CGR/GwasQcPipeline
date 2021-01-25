@@ -7,10 +7,11 @@ SNP in the BPM.
 from math import isclose
 from pathlib import Path
 
+import pandas as pd
 import pytest
+from pandas.testing import assert_frame_equal
 from typer.testing import CliRunner
 
-from cgr_gwas_qc.testing import file_rows_almost_equal
 from cgr_gwas_qc.testing.data import RealData
 from cgr_gwas_qc.workflow.scripts.bpm2abf import app
 
@@ -28,9 +29,9 @@ def test_bpm2abf_AF(bpm_file, vcf_file, tmpdir):
     )
     assert results.exit_code == 0
 
-    obs_abf = file_out
-    exp_abf = Path("tests/data/small_manifest.AF.abf.txt")
-    assert file_rows_almost_equal(obs_abf, exp_abf, fuzzy_col=1, sep="\t", header=True)
+    obs_abf = pd.read_csv(file_out, sep="\t").fillna(0)  # legacy uses 0.0 instead of NA.
+    exp_abf = pd.read_csv("tests/data/small_manifest.AF.abf.txt", sep="\t")
+    assert_frame_equal(obs_abf, exp_abf)
 
 
 ################################################################################
