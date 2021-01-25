@@ -60,7 +60,7 @@ def test_subjects_per_population(tmp_path, qc_summary):
 @pytest.mark.workflow
 @pytest.mark.real_data
 def test_plink_split_population(tmp_path, conda_envs):
-    # GIVEN: real data config, subject level data, and the African subject list
+    # GIVEN: real data config, subject level data, and the European subject list
     # NOTE: we have to use EUR b/c other populations don't have enough subjects
     # in test data
     conda_envs.copy_env("plink2", tmp_path)
@@ -90,7 +90,7 @@ def test_plink_split_population(tmp_path, conda_envs):
             """
         )
     )
-    # WHEN: run snakemake to generate African data subsets
+    # WHEN: run snakemake to generate European data subsets
     run_snakemake(tmp_path)
 
     # THEN: the plink data sets match legcay
