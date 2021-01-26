@@ -175,8 +175,9 @@ def required_population_controls(wildcards):
     """
     qc_table = checkpoints.sample_qc_report.get(**wildcards).output[0]
 
-    maf = 0.05  # TODO: Hardcoded to match legacy
-    control_threshold = cfg.config.workflow_params.control_hwp_threshold
+    maf = cfg.config.software_params.maf_for_hwe
+    control_threshold = cfg.config.software_params.control_hwp_threshold
+
     pops = (
         pd.read_csv(qc_table)
         .query("Subject_Representative & `Case/Control_Status` == 0")
