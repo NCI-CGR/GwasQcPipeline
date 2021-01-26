@@ -140,8 +140,6 @@ def test_software_params_defaults():
     assert software_params.contam_population == "AF"
     assert software_params.pi_hat_threshold == 0.2
     assert software_params.autosomal_het_threshold == 0.1
-    assert software_params.minimum_pop_subjects == 50
-    assert software_params.control_hwp_threshold == 50
     assert software_params.strand == "top"
 
 
@@ -155,6 +153,8 @@ def test_workflow_params_defaults():
     assert workflow_params.remove_sex_discordant is True
     assert workflow_params.remove_rep_discordant is True
     assert workflow_params.remove_unexpected_rep is True
+    assert workflow_params.minimum_pop_subjects == 50
+    assert workflow_params.control_hwp_threshold == 50
 
 
 def test_basic_config():

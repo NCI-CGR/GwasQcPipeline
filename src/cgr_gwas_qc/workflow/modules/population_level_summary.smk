@@ -63,14 +63,14 @@ rule plink_split_population:
 def required_population_results(wildcards):
     """Decide what populations to analyze.
 
-    If a population has fewer than `software_params.minimum_pop_subjects`
+    If a population has fewer than `workflow_params.minimum_pop_subjects`
     subjects than ignore.
     """
     qc_table = checkpoints.sample_qc_report.get(**wildcards).output[0]
 
     maf = cfg.config.software_params.maf_for_ibd
     ld = cfg.config.software_params.ld_prune_r2
-    population_threshold = cfg.config.software_params.minimum_pop_subjects
+    population_threshold = cfg.config.workflow_params.minimum_pop_subjects
 
     pops = (
         pd.read_csv(qc_table)
@@ -170,13 +170,14 @@ rule plink_split_controls:
 def required_population_controls(wildcards):
     """Decide what populations controls to analyze.
 
-    If population controls have fewer than `software_params.control_hwp_threshold`
+    If population controls have fewer than `workflow_params.control_hwp_threshold`
     subjects than ignore.
     """
     qc_table = checkpoints.sample_qc_report.get(**wildcards).output[0]
 
     maf = cfg.config.software_params.maf_for_hwe
     control_threshold = cfg.config.software_params.control_hwp_threshold
+
     pops = (
         pd.read_csv(qc_table)
         .query("Subject_Representative & `Case/Control_Status` == 0")
