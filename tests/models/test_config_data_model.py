@@ -132,6 +132,7 @@ def test_software_params_defaults():
     assert software_params.snp_cr_2 == 0.95
     assert software_params.ld_prune_r2 == 0.1
     assert software_params.maf_for_ibd == 0.2
+    assert software_params.maf_for_hwe == 0.05
     assert software_params.ibd_pi_hat_min == 0.05
     assert software_params.ibd_pi_hat_max == 1.0
     assert software_params.dup_concordance_cutoff == 0.95
