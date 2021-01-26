@@ -26,11 +26,6 @@ class SoftwareParams(BaseModel):
         0.1, description="Autosomal heterozygosity threshold.", gt=0, le=1
     )
 
-    minimum_pop_subjects: int = Field(
-        50, description="Minimum number of subjects in a population", gt=0
-    )
-    control_hwp_threshold: int = Field(50, description="Control samples HWP threshold.", gt=0)
-
     strand: str = Field(
         "top",
         description="Which strand to use when converting GTC to plink {TOP, FWD, PLUS}. default TOP",

@@ -27,6 +27,11 @@ class WorkflowParams(BaseModel):
         True, description="Remove samples that are unexpected replicates."
     )
 
+    minimum_pop_subjects: int = Field(
+        50, description="Minimum number of subjects in a population", gt=0
+    )
+    control_hwp_threshold: int = Field(50, description="Control samples HWP threshold.", gt=0)
+
     @validator("subject_id_to_use")
     def validate_subject_id_to_use(cls, v):
         if v is None:
