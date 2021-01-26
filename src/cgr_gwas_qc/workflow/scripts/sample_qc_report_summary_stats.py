@@ -4,68 +4,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import typer
-from jinja2 import Template
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr
 from cgr_gwas_qc.paths import make_path_list
+from cgr_gwas_qc.reporting import env
 from cgr_gwas_qc.validators import check_file
 
 app = typer.Typer(add_completion=False)
 
-template = Template(
-    """
-The pipeline is complete and the summary files can be found here:
-{{ working_dir }}
-
-Of the {{ n_samples }} samples {{ n_no_gtc }} did not have gtc files:
-
-Are the idat files in the project directory?
-
-{{ idats }}
-
-Initial call rate:
-
-{{ call_rate_initial }}
-
-Contamination Rate:
-
-{{ contamination_rate }}
-
-idat intensity:
-
-{{ intensity }}
-
-Fail contamination rate:
-
-{{ contaminated }}
-
-Fail Call Rate:
-
-{{ call_rate_filter }}
-
-Sex Discordant:
-
-{{ sex_discord }}
-
-Expected Replicate Discordance:
-
-{{ rep_discord }}
-
-Unexpected Replicate:
-
-{{ unexpected_rep }}
-
-Identifiler Needed:
-
-{{ identifiler }}
-
-Number of QC Issues:
-
-{{ issues }}
-
-"""
-)
+template = env.get_template("summary_stats.txt.jinja2")
 
 
 @app.command()
