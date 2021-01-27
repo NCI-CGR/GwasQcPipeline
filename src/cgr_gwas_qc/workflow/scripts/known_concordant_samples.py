@@ -24,7 +24,7 @@ app = typer.Typer(add_completion=False)
 def main(
     sample_sheet: Path = typer.Argument(..., help="Path to the sample sheet CSV."),
     imiss: Path = typer.Argument(..., help="Path to the `plink_filter_call_rate_2/samples.imiss`"),
-    ibd: Path = typer.Argument(..., help="Path to the `ibd/samples.genome` file."),
+    concordance: Path = typer.Argument(..., help="Path to the `ibd/samples.genome` file."),
     known: Path = typer.Argument(..., help="Path to save known concordant samples."),
     known_qc: Path = typer.Argument(..., help="Path to save known concordant internal QC samples."),
     known_study: Path = typer.Argument(..., help="Path to save known concordant study samples."),
@@ -40,7 +40,9 @@ def main(
     ################################################################################
     # Pairwise sample concordance + sample metadata
     ################################################################################
-    sample_concordance = read_pairwise_sample_concordance(ibd)
+    sample_concordance = pd.read_csv(concordance).rename(
+        {"IID1": "Sample_ID1", "IID2": "Sample_ID2"}, axis=1
+    )
     sample_metadata = read_sample_metadata(sample_sheet, imiss, subject_id_override)
 
     # Add metadata for Sample 1 and Sample 2 in pairwise table
@@ -85,21 +87,6 @@ def read_sample_metadata(
         .data.merge(read_imiss_file(call_rate), how="left")
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
         .loc[:, ("Sample_ID", "Subject_ID", "Sample_Group", "call_rate")]
-    )
-
-
-def read_pairwise_sample_concordance(file_name: Path) -> pd.DataFrame:
-    """Parse IBD file and calculate sample concordance.
-
-    Returns:
-        DataFrame with ["Sample_ID1", "Sample_ID2", "PI_HAT", "concordance"].
-          Sample concordance is `IBS2 / (IBS0 + IBS1 + IBS2)`.
-    """
-    return (
-        pd.read_csv(file_name, delim_whitespace=True)
-        .assign(concordance=lambda x: x.IBS2 / (x.IBS0 + x.IBS1 + x.IBS2))
-        .rename({"IID1": "Sample_ID1", "IID2": "Sample_ID2"}, axis=1)
-        .loc[:, ("Sample_ID1", "Sample_ID2", "PI_HAT", "concordance")]
     )
 
 
