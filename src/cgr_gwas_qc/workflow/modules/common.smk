@@ -1,6 +1,8 @@
 from pathlib import Path
 from textwrap import dedent
 
+import pandas as pd
+
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
 
 
@@ -34,6 +36,26 @@ rule plink_bed_to_ped:
         "--threads {threads} "
         "--memory {resources.mem} "
         "--out {wildcards.prefix}"
+
+
+rule concordance_table:
+    """Parse IBD file and calculate sample concordance.
+
+    Returns:
+        DataFrame with ["IID1", "IID2", "PI_HAT", "concordance"].
+          Sample concordance is `IBS2 / (IBS0 + IBS1 + IBS2)`.
+    """
+    input:
+        "{prefix}.genome",
+    output:
+        temp("{prefix}.concordance.csv"),
+    run:
+        (
+            pd.read_csv(input[0], delim_whitespace=True)
+            .assign(concordance=lambda x: x.IBS2 / (x.IBS0 + x.IBS1 + x.IBS2))
+            .reindex(["IID1", "IID2", "PI_HAT", "concordance"], axis=1)
+            .to_csv(output[0])
+        )
 
 
 def eigensoft_config_inputs(wildcards):
