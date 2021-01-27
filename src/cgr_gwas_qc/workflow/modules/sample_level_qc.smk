@@ -197,7 +197,7 @@ rule sample_concordance_plink:
     input:
         sample_sheet=cfg.sample_sheet_file,
         imiss="sample_level/call_rate_2/samples.imiss",
-        ibd="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome".format(
+        concordance="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.concordance.csv".format(
             maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
     params:

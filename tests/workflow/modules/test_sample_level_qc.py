@@ -455,6 +455,7 @@ def test_sample_concordance_plink(tmp_path):
 
             cfg = load_config()
 
+            include: cfg.modules("common.smk")
             include: cfg.modules("sample_level_qc.smk")
 
             rule all:
