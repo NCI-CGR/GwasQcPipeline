@@ -98,3 +98,51 @@ rule renamed_subjects:
         "--threads {threads} "
         "--memory {resources.mem} "
         "--out {params.out_prefix}"
+
+
+rule related_subjects:
+    input:
+        imiss="subject_level/subjects.imiss",
+        ibs="subject_level/subjects_maf{maf}_ld{ld}_pruned.genome".format(
+            maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
+        ),
+    params:
+        pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
+    output:
+        "subject_level/subjects_to_remove.txt",
+    script:
+        "../scripts/related_subjects.py"
+
+
+rule remove_related_subjects:
+    input:
+        bed="{prefix}/subjects.bed",
+        bim="{prefix}/subjects.bim",
+        fam="{prefix}/subjects.fam",
+        to_remove=rules.related_subjects.output[0],
+    params:
+        out_prefix="{prefix}/subjects_unrelated",
+    output:
+        bed="{prefix}/subjects_unrelated.bed",
+        bim="{prefix}/subjects_unrelated.bim",
+        fam="{prefix}/subjects_unrelated.fam",
+        nosex="{prefix}/subjects_unrelated.nosex",
+    log:
+        "{prefix}/subjects_unrelated.log",
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    threads: 20
+    resources:
+        mem=10000,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--remove {input.to_remove} "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
