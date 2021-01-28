@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
-from itertools import groupby, product
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Generator, Optional
 
+import networkx as nx
 import pandas as pd
 import typer
+from numpy.random import RandomState
 
 app = typer.Typer(add_completion=False)
 
 
 @app.command()
 def main(
-    imiss: Path = typer.Argument(..., help="Path to the subject level call rate.", exists=True),
     ibs: Path = typer.Argument(..., help="Path to the PLINK `.genome` file", exists=True),
     pi_hat_threshold: float = typer.Argument(  # noqa
         ..., help="The threshold to consider subjects related."
@@ -21,13 +21,27 @@ def main(
 ):
     """Create related subjects pruning list.
 
-    Identifies groups of subjects that are related based on PI_HAT. For each
-    group, keep the subject with the highest call rate. Save the remaining
-    subjects to a file for use with PLINK's `--remove` command.
+    The goal of this script is to prune related subjects based on PI_HAT. It
+    uses a greedy based graph algorithm to select which subjects should be
+    pruned. It does the following:
+
+    1. Uses PI_HAT from IBS/IBD estimation to identify pairwise groups of
+       related subjects.
+    2. Builds a graph where subjects (nodes) are connected by edges if their
+       PI_HAT was above the pi_hat_threshold.
+    3. Identifies subjects that have the most relatives (ie., nodes with max
+       degree).
+    4. Randomly selects one of these subjects for removal.
+    5. Removes any subjects that no longer have a relative in the graph
+       (i.e., isolated nodes with no edges).
+    6. Repeats 3-5 until there are no subjects left in the graph.
+
+    Writes out a list of subjects to prune in a format compatible with
+    PLINK's `--remove` option.
     """
     pairwise_related_subjects = list(
         pd.read_csv(ibs, delim_whitespace=True)
-        .query("PI_HAT > @pi_hat_threshold")
+        .query("PI_HAT > @pi_hat_threshold")  # Ignore subjects under the pi_hat_threshold
         .reindex(["IID1", "IID2"], axis=1)
         .itertuples(index=False)
     )
@@ -37,59 +51,47 @@ def main(
         out_file.touch()
         return None
 
-    grouped_related_subjects = merge_overlapping_subjects(pairwise_related_subjects)
-    prune_list = create_prune_list(grouped_related_subjects, imiss)
+    # Create a graph with subjects as nodes.
+    G = nx.Graph()
+    G.add_edges_from(pairwise_related_subjects)
+
+    # Create pruning list and save.
+    prune_list = create_prune_list(G)
     out_file.write_text("\n".join(prune_list))
 
 
-def merge_overlapping_subjects(subject_list: Iterable[Tuple[str, str]]) -> List[List[str]]:
-    """Create a list of overlapping subjects.
+def create_prune_list(
+    G: nx.Graph, seed: Optional[RandomState] = None
+) -> Generator[str, None, None]:
+    """Generator creating a list of subjects to prune.
 
-    Given a list of subject ID tuples [(sub1, sub2), (sub1, sub3), (sub4,
-    sub5)]. Merge tuples together that have overlapping subject IDs [[sub1,
-    sub2, sub3], [sub4, sub5]].
+    Keeps running until the graph `G` is empty.
+
+    Args:
+        G: A graph where nodes are subjects and edges indicate two
+          subjects are related.
+        seed: A numpy random seed. This is required for testing.
+
+    Yields:
+        Generator[str, None, None]: A string in the format "Subject_ID Subject_ID"
     """
-    # Convert Tuples to Sets
-    subject_sets = [set(x) for x in subject_list]
-
-    # Do all pairwise comparisons and update each set in place if `a` overlaps
-    # with `b`. Update is an in place union.
-    for a, b in product(subject_sets, subject_sets):
-        if a.intersection(b):
-            a.update(b)
-            b.update(a)
-
-    # Convert from a list of sets to a list of lists
-    combined_lists = sorted([sorted(list(x)) for x in subject_sets])
-
-    # Remove duplicates and return list of lists
-    return [grouped_ids for grouped_ids, _ in groupby(combined_lists)]
+    while len(G) > 0:
+        yield from _prune(G, seed)
 
 
-def create_prune_list(grouped_subjects: List[List[str]], imiss: Path) -> List[str]:
-    """Create a list of subjects for pruning.
-
-    For each group of subjects, identify the subject with the highest call
-    rate. Then return the remaining subjects to mark for pruning.
-
-    Returns:
-        A list of subjects to remove using PLINK's `--remove`.
-    """
-    subject2call_rate = (
-        pd.read_csv(imiss, delim_whitespace=True)
-        .set_index("IID")
-        .rename_axis("Subject_ID")
-        .assign(call_rate=lambda x: 1 - x.F_MISS)
-        .call_rate
+def _prune(G: nx.Graph, seed: Optional[RandomState]) -> Generator[str, None, None]:
+    node_to_remove = (
+        pd.Series(dict(G.degree))
+        .pipe(lambda x: x[x == x.max()])  # select the subjects with the most relatives
+        .sample(n=1, random_state=seed)  # randomly select one of these subjects
+        .index[0]
     )
+    G.remove_node(node_to_remove)  # remove this subject
 
-    subjects_to_prune = []
-    for related_subjects in grouped_subjects:
-        best_subject_idx = subject2call_rate.reindex(related_subjects).argmax()
-        del related_subjects[best_subject_idx]  # don't prune the best subject
-        subjects_to_prune.extend(related_subjects)
+    non_connected_nodes = list(nx.isolates(G))  # Find subjects with no remaining relatives
+    G.remove_nodes_from(non_connected_nodes)  # Remove these isolated subjects from the graph
 
-    return [f"{subID} {subID}" for subID in subjects_to_prune]
+    yield f"{node_to_remove} {node_to_remove}"  # add node_to_remove to pruning list
 
 
 if __name__ == "__main__":

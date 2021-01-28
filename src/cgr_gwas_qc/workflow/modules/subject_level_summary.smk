@@ -102,7 +102,6 @@ rule renamed_subjects:
 
 rule related_subjects:
     input:
-        imiss="subject_level/subjects.imiss",
         ibs="subject_level/subjects_maf{maf}_ld{ld}_pruned.genome".format(
             maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
