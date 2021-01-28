@@ -110,11 +110,12 @@ rule deliver_hwp:
         "deliver/HWP.zip",
     shell:
         """
-        ODIR=$(dirname {output[0]})/HWP
-        mkdir -p $ODIR \
-        && for FILE in {input[0]}; do cp $FILE $ODIR/; done \
-        && zip -r {output[0]} $ODIR \
-        && rm -r $ODIR
+        ODIR=$(dirname {output[0]})
+        mkdir -p $ODIR/HWP \
+        && for FILE in $(cat {input[0]}); do cp $FILE $ODIR/HWP/; done \
+        && cd $ODIR \
+        && zip -r $(basename {output[0]}) ./HWP \
+        && rm -r HWP
         """
 
 
@@ -132,10 +133,10 @@ rule deliver_original_sample_data:
 
 
 rule deliver_subject_data:
-    output:
-        bed="subject_level/subjects.bed",
-        bim="subject_level/subjects.bim",
-        fam="subject_level/subjects.fam",
+    input:
+        bed="subject_level/samples.bed",
+        bim="subject_level/samples.bim",
+        fam="subject_level/samples.fam",
     output:
         bed="deliver/subjects.bed",
         bim="deliver/subjects.bim",
@@ -150,11 +151,18 @@ rule deliver_subject_list:
     output:
         "deliver/SampleUsedforSubject.csv",
     run:
+        qc = pd.read_csv(input[0]).query("not Internal_Control")  # exclude internal controls
+
         (
-            pd.read_csv(input[0])
-            .query("Subject_Representative")
-            .rename({"Group_By_Subject_ID": "Subject_ID"})
-            .reindex(["Subject_ID", "Sample_ID"], axis=1)
+            qc.query("Subject_Representative")
+            .reindex(["Group_By_Subject_ID", "Sample_ID"], axis=1)
+            # For groups without representative set Sample_ID to NA
+            .set_index("Group_By_Subject_ID")
+            .reindex(qc.Group_By_Subject_ID.unique())
+            .fillna("NA")
+            .reset_index()
+            # Clean-up
+            .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
             .to_csv(output[0], index=False)
         )
 
