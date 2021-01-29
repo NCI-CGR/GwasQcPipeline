@@ -106,4 +106,4 @@ def test_remove_related_subjects(tmp_path, conda_envs):
 
     # The plink log should say I 177 subjects remaining. (184 - 7 = 177)
     log = (tmp_path / "subject_level/subjects_unrelated.log").read_text()
-    assert "177 people remaining." in log
+    assert "178 people remaining." in log
