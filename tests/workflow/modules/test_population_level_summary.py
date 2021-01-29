@@ -195,6 +195,7 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
         cfg = load_config()
         maf = cfg.config.software_params.maf_for_ibd
         ld = cfg.config.software_params.ld_prune_r2
+        pi = cfg.config.software_params.pi_hat_threshold
 
     assert not (tmp_path / "population_level/AFR").exists()  # Should not run b/c too few subjects
     assert not (tmp_path / "population_level/ASN").exists()  # Should not run b/c too few subjects
@@ -210,7 +211,7 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
         return re.sub("-", "", re.sub(r"\s+", " ", pth.read_text()))
 
     assert clean_eigenvec(
-        tmp_path / f"population_level/EUR/subjects_maf{maf}_ld{ld}_pruned.eigenvec"
+        tmp_path / f"population_level/EUR/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec"
     ) == clean_eigenvec(data_cache / "production_outputs/pca/EUR_subjects.eigenvec")
 
     assert file_hashes_equal(

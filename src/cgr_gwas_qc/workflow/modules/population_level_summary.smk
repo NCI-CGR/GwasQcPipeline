@@ -68,6 +68,7 @@ def required_population_results(wildcards):
     """
     qc_table = checkpoints.sample_qc_report.get(**wildcards).output[0]
 
+    pi = cfg.config.software_params.pi_hat_threshold
     maf = cfg.config.software_params.maf_for_ibd
     ld = cfg.config.software_params.ld_prune_r2
     population_threshold = cfg.config.workflow_params.minimum_pop_subjects
@@ -83,21 +84,22 @@ def required_population_results(wildcards):
 
     return flatten(
         [
-            expand(
-                "population_level/{population}/subjects_maf{maf}_ld{ld}_pruned.eigenvec",
+            expand(  # PCA
+                "population_level/{population}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec",
                 population=pops,
+                pi=pi,
                 maf=maf,
                 ld=ld,
-            ),  # PCA
-            expand(
+            ),
+            expand(  # IBS/IBD
                 "population_level/{population}/subjects_maf{maf}_ld{ld}_pruned.genome",
                 population=pops,
                 maf=maf,
                 ld=ld,
-            ),  # IBS/IBD
-            expand(
+            ),
+            expand(  # Autosomal Heterozygosity
                 "population_level/{population}/subjects.het", population=pops, maf=maf, ld=ld,
-            ),  # Autosomal Heterozygosity
+            ),
         ]
     )
 
