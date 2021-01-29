@@ -102,13 +102,15 @@ rule renamed_subjects:
 
 rule related_subjects:
     input:
-        ibs="subject_level/subjects_maf{maf}_ld{ld}_pruned.genome".format(
+        ibs="{{prefix}}/subjects_maf{maf}_ld{ld}_pruned.genome".format(
             maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
     params:
-        pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
+        pi_hat_threshold=lambda wc: float(wc.pi),
     output:
-        "subject_level/subjects_to_remove.txt",
+        "{prefix}/subjects_to_remove_pi_hat_gt{pi}.txt",
+    wildcard_constraints:
+        pi="[01].\d+",
     script:
         "../scripts/related_subjects.py"
 
@@ -120,14 +122,14 @@ rule remove_related_subjects:
         fam="{prefix}/subjects.fam",
         to_remove=rules.related_subjects.output[0],
     params:
-        out_prefix="{prefix}/subjects_unrelated",
+        out_prefix="{prefix}/subjects_unrelated{pi}",
     output:
-        bed="{prefix}/subjects_unrelated.bed",
-        bim="{prefix}/subjects_unrelated.bim",
-        fam="{prefix}/subjects_unrelated.fam",
-        nosex="{prefix}/subjects_unrelated.nosex",
+        bed="{prefix}/subjects_unrelated{pi}.bed",
+        bim="{prefix}/subjects_unrelated{pi}.bim",
+        fam="{prefix}/subjects_unrelated{pi}.fam",
+        nosex="{prefix}/subjects_unrelated{pi}.nosex",
     log:
-        "{prefix}/subjects_unrelated.log",
+        "{prefix}/subjects_unrelated{pi}.log",
     envmodules:
         cfg.envmodules("plink2"),
     conda:
