@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Create a list of markers that do not match the VCF."""
 import shutil
 from pathlib import Path

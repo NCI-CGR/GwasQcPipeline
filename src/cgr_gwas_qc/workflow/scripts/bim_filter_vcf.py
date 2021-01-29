@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Create a list of markers that do not match the VCF."""
 from collections import Counter
 from pathlib import Path

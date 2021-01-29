@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Generate the internal sample QC report.
 
 This script takes various outputs from the GwasQcPipeline and
