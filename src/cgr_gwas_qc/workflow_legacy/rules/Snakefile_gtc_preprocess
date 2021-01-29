@@ -1,0 +1,71 @@
+"""Convert genotype calls to a ``plink`` compatible format.
+
+Converts GTC + BPM for all samples and then merges them into the binary ``plink`` format (BED +
+BIM + FAM).
+"""
+
+
+rule gtc_to_ped:
+    """Converts a sample's GTC + BPM to PED + MAP.
+
+    Uses a custom python2 script to do the conversion. There are two versions of this script, one
+    for **TOP** and **FWD** which are set in the config.
+
+    .. todo::
+        Figure out the significance of **TOP** and **FWD**.
+
+    .. warning::
+        This is a submission hot spot creating 1 job per sample.
+    """
+    input:
+        gtc=getGtc,
+        bpm=illumina_manifest_file,
+    output:
+        "per_sample_plink_files/{sample_id}.ped",
+        "per_sample_plink_files/{sample_id}.map",
+    shell:"""
+        gtc2plink \
+            {input.gtc} \
+            {input.bpm} \
+            {wildcards.sample_id} \
+            per_sample_plink_files \
+            --strand {config["strand"]}
+    """
+
+
+
+rule merge_sample_peds:
+    """Merges multiple sample PED files into a format ready for ``plink`` (BED + BIM + FAM).
+
+    Uses ``plink`` to convert sample(s) into the ``plink`` format. If there are multiple samples
+    they are merged together.
+
+    .. resources::
+        :threads: 20
+        :memory: 24GB
+    """
+    input:
+        expand("per_sample_plink_files/{sample_id}.ped", sample_id=SAMPLE_IDS),
+    output:
+        bed="plink_start/samples.bed",
+        bim="plink_start/samples.bim",
+        fam="plink_start/samples.fam",
+        mergeList="plink_start/mergeList.txt",
+    params:
+        outProj="plink_start/samples",
+    threads: 20
+    run:
+        inProj = input[0][:-4]
+        if len(input) == 1:
+            with open("plink_start/mergeList.txt", "w") as out:
+                out.write("just one ped file found")
+            shell("plink --file " + inProj + " --make-bed --out {params}")
+        else:
+            with open("plink_start/mergeList.txt", "w") as out:
+                for ped in input[1:]:
+                    out.write(ped + " " + ped[:-4] + ".map\n")
+            shell(
+                "plink --file "
+                + inProj
+                + " --merge-list {output.mergeList} --make-bed --out {params.outProj} --threads {threads} --memory 240000"
+            )

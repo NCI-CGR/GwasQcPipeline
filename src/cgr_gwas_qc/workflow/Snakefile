@@ -1,0 +1,24 @@
+from pathlib import Path
+
+from snakemake.rules import expand
+
+from cgr_gwas_qc import load_config
+
+cfg = load_config()
+
+
+include: cfg.modules("common.smk")
+include: cfg.modules("entry_points.smk")
+include: cfg.modules("plink_stats.smk")
+include: cfg.modules("plink_filters.smk")
+include: cfg.modules("sample_level_qc.smk")
+include: cfg.modules("sample_level_summary.smk")
+include: cfg.modules("subject_level_summary.smk")
+include: cfg.modules("population_level_summary.smk")
+
+
+rule all:
+    input:
+        "sample_level/qc_summary.csv",
+        "population_level/results.done",
+        "population_level/controls.done",

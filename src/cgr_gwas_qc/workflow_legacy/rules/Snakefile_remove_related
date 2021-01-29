@@ -1,0 +1,63 @@
+rule make_related_list:
+    input:
+        track="subject_level/SampleUsedforSubject.csv",
+        ibd="ibd/samples.genome",
+        fam="subject_level/subjects.fam",
+        imiss="subject_level/subjects_qc.imiss",
+    output:
+        "remove_related/subjects_to_remove.txt",
+    run:
+        relatedDict = MakeRelatedDict(input.ibd, input.track, input.fam)
+        crDict = makeCallRateDict(input.imiss)
+        with open(output[0], "w") as out:
+            while len(relatedDict.keys()) > 0:
+                maxLenList = 0
+                maxRelatedSamp = "NA"
+                for samp in list(relatedDict):
+                    lenList = len(relatedDict[samp])
+                    if lenList > maxLenList:
+                        maxLenList = lenList
+                        maxRelatedSamp = samp
+                if maxLenList == 1:
+                    crMax = crDict[maxRelatedSamp]
+                    maxPair = relatedDict[maxRelatedSamp][0]
+                    crPair = crDict[maxPair]
+                    if crMax > crPair:
+                        maxRelatedSamp = maxPair
+                out.write(maxRelatedSamp + " " + maxRelatedSamp + "\n")
+                for samp in list(relatedDict):
+                    if maxRelatedSamp in relatedDict[samp]:
+                        relatedDict[samp].remove(maxRelatedSamp)
+                        if len(relatedDict[samp]) == 0:
+                            del relatedDict[samp]
+                del relatedDict[maxRelatedSamp]
+
+
+rule subject_ibd_csv:
+    input:
+        track="subject_level/SampleUsedforSubject.csv",
+        ibd="ibd/samples.genome",
+    params:
+        relatedThresh=config["pi_hat_threshold"],
+    output:
+        "remove_related/subjects_ibd.csv",
+    run:
+        sampToSubDict = MakeSampToSubDict(input.track)
+        with open(input.ibd) as f, open(output[0], "w") as out:
+            head = f.readline()
+            out.write("Subject_ID1,Subject_ID2,PI_HAT\n")
+            line = f.readline()
+            while line != "":
+                line_list = line.split()
+                samp1 = line_list[1]
+                samp2 = line_list[2]
+                piHat = float(line_list[9])
+                if (
+                    sampToSubDict.get(samp1)
+                    and sampToSubDict.get(samp2)
+                    and piHat > float(params.relatedThresh)
+                ):
+                    sub1 = sampToSubDict[samp1]
+                    sub2 = sampToSubDict[samp2]
+                    out.write(",".join([sub1, sub2, str(piHat)]) + "\n")
+                line = f.readline()

@@ -1,0 +1,224 @@
+"""Looks at sample concordance to validate known replicates and identify unknown highly similar samples.
+
+Starts with LD filtering to remove markers that are highly correlated for better IBS/IBD
+estimates. Then uses sequence similarity between all pairs of samples to get a measure of
+concordance. Specifically, uses the proportion of shared homozygous sites.
+"""
+
+
+rule plink_ld_prune:
+    """Filter out highly correlated variants within a sliding window.
+
+    Variants in linkage disequilibrium (LD) cannot be separated in GWAS analysis. Here we use a
+    50 variant sliding window to identify variants with high LD (i.e., correlation) and prune
+    variants to leave a single representative variant for that window. We also filter out
+    variants below a MAF threshold.
+
+    .. warning::
+        Is the current window size correct? Or should it include the `kb` modifier?
+
+    .. resources::
+        :memory: 10Gb
+    """
+    input:
+        "plink_filter_call_rate_2/samples.bed",
+        "plink_filter_call_rate_2/samples.bim",
+        "plink_filter_call_rate_2/samples.fam",
+    params:
+        inProj="plink_filter_call_rate_2/samples",
+        outProj="ld_prune/ldPruneList",
+        r2=ld_prune_r2, # r2 threshold: currently 0.1
+        maf=maf_for_ibd, # minor allele frequency threshold: currently 0.2
+    output:
+        "ld_prune/ldPruneList.prune.in", # IDs of included markers, in approx. linkage equilibrium
+        "ld_prune/ldPruneList.prune.out", # IDs of excluded markers
+    shell:
+        "plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --memory 10000 --out {params.outProj}" # `--indep-pairwise <window size>['kb'] <step size (variant ct)> <r^2 threshold>`
+         # <window size> sliding window size in variant counts or kilobase used to look at correlation
+         # <step size> the number of variant counts to slide the window at each iteration
+         # <r^2 threshold> pairwise correlation threshold
+
+
+rule extract_ld_prune:
+    """Subsets the dataset only keeping variants in linkage equilibrium.
+
+    This step keeps only makers in the ``*.prune.in`` and creates a new ``plink`` dataset.
+
+    .. resources::
+        :memory: 10Gb
+    """
+    input:
+        bed="plink_filter_call_rate_2/samples.bed",
+        bim="plink_filter_call_rate_2/samples.bim",
+        fam="plink_filter_call_rate_2/samples.fam",
+        prune="ld_prune/ldPruneList.prune.in",
+    params:
+        inProj="plink_filter_call_rate_2/samples",
+        outProj="ld_prune/samples",
+    output:
+        "ld_prune/samples.bed",
+        "ld_prune/samples.bim",
+        "ld_prune/samples.fam",
+    shell:
+        "plink --bfile {params.inProj} --extract {input.prune} --make-bed --memory 10000 --out {params.outProj}"
+
+
+rule plink_ibd:
+    """Calculates Identity-by-descent.
+
+    This step is trying to find relationships among the samples by calculating IBS/IBD. This
+    calculation is no LD-aware so we are doing the LD pruning before. This calculation excludes
+    non-autosomes.
+
+    .. resources::
+        :threads: 20
+        :memory: 24Gb
+    """
+    input:
+        "ld_prune/samples.bed",
+        "ld_prune/samples.bim",
+        "ld_prune/samples.fam",
+    params:
+        inProj="ld_prune/samples",
+        outProj="ibd/samples",
+    output:
+        "ibd/samples.genome",
+    threads: 20
+    shell:
+        "plink --bfile {params.inProj} --genome full --min 0.05 --memory 240000 --threads {threads} --out {params.outProj}"
+
+
+rule output_replicates:
+    """Summarize sample concordance using IBS/IBD.
+
+    Calculates the proportion of shared homozygous markers (IBS2 / (IBS0 + IBS1 + IBS2)) as a
+    measure of sample concordance. Then outputs concordance measures for samples that are known
+    to be replicates and samples that are thought to be unrelated/independent with a concordance
+    > dup_concordance_cutoff (currently 0.95).
+    """
+    input:
+        sampSheet=sample_sheet,
+        imiss3="plink_filter_call_rate_2/samples_filter2.imiss",
+        ibd="ibd/samples.genome",
+    output:
+        known="concordance/KnownReplicates.csv",
+        unknown="concordance/UnknownReplicates.csv",
+    run:
+        (SubToSampListDict, sampToSubIdDict) = makeSubjectToSampListDict(sample_sheet)
+        crDict = makeCallRateDict(input.imiss3)
+        piHatDict = {}
+        minConcordance = 1.0
+
+        with open(input.ibd) as f:
+            head = f.readline()
+            (piHatCol, ibs0col, ibs1col, ibs2col) = [None, None, None, None]
+            head_list = head.split()
+            for i in range(len(head_list)):
+                if head_list[i] == "PI_HAT":
+                    piHatCol = i
+                elif head_list[i] == "IBS0":
+                    ibs0col = i
+                elif head_list[i] == "IBS1":
+                    ibs1col = i
+                elif head_list[i] == "IBS2":
+                    ibs2col = i
+            if not piHatCol or not ibs0col or not ibs1col or not ibs2col:
+                print("Necessary column headers not in IBD output.")
+                sys.exit(1)
+
+            line = f.readline()
+            while line != "":
+                line_list = line.split()
+                samp1 = line_list[1]
+                samp2 = line_list[3]
+                piHat = float(line_list[piHatCol])
+                ibs0 = float(line_list[ibs0col])
+                ibs1 = float(line_list[ibs1col])
+                ibs2 = float(line_list[ibs2col])
+                concordance = getConcIBS(ibs0, ibs1, ibs2)k
+                if concordance < minConcordance:
+                    minConcordance = concordance
+                sampList = sorted([samp1, samp2])
+                piHatDict[(sampList[0], sampList[1])] = (piHat, concordance)
+                line = f.readline()
+
+        with open(output.known, "w") as outKnown:
+            outKnown.write("Subject_ID,Sample_ID1,Sample_ID2,Concordance,PI_HAT\n")
+            for subId in SubToSampListDict:
+                sampList = sorted(set(SubToSampListDict[subId]))
+                if len(sampList) > 1:
+                    for i in range(len(sampList)):
+                        for j in range(i + 1, len(sampList)):
+                            samp1 = sampList[i]
+                            samp2 = sampList[j]
+                            if not piHatDict.get((samp1, samp2)):
+                                piHat = 0.05
+                                concordance = minConcordance
+                            else:
+                                (piHat, concordance) = piHatDict[(samp1, samp2)]
+                            if not crDict.get(samp1) or not crDict.get(samp2):
+                                concordance = "NA"
+                                piHat = "NA"
+                            outKnown.write(
+                                ",".join(
+                                    [subId, samp1, samp2, str(concordance), str(piHat)]
+                                )
+                                + "\n"
+                            )
+
+        with open(output.unknown, "w") as outUn:
+            outUn.write(
+                "Subject_ID1,Subject_ID2,Sample_ID1,Sample_ID2,Concordance,PI_HAT\n"
+            )
+            for (samp1, samp2) in piHatDict.keys():
+                (piHat, concordance) = piHatDict[(samp1, samp2)]
+                if concordance > dup_concordance_cutoff:
+                    subId1 = sampToSubIdDict[samp1]
+                    subId2 = sampToSubIdDict[samp2]
+                    if subId1 != subId2 and crDict.get(samp1) and crDict.get(samp2):
+                        outUn.write(
+                            ",".join(
+                                [
+                                    subId1,
+                                    subId2,
+                                    samp1,
+                                    samp2,
+                                    str(concordance),
+                                    str(piHat),
+                                ]
+                            )
+                            + "\n"
+                        )
+
+
+
+rule split_known_rep:
+    """Splits out known replicates.
+
+    Splits out known replicates into the qc if they are in the sVALD-001 sample group.
+
+    .. todo::
+        Figure out what the sVALD-001 sample group is.
+    """
+    input:
+        sampSheet=sample_sheet,
+        rep="concordance/KnownReplicates.csv",
+    output:
+        qc="concordance/InternalQcKnown.csv",
+        other="concordance/StudySampleKnown.csv",
+    run:
+        qcSubDict = makeControlDict(input.sampSheet)
+        with open(input.rep) as f, open(output.qc, "w") as out1, open(
+            output.other, "w"
+        ) as out2:
+            head = f.readline()
+            out1.write(head)
+            out2.write(head)
+            line = f.readline()
+            while line != "":
+                sub = line.split(",")[0]
+                if qcSubDict.get(sub):
+                    out1.write(line)
+                else:
+                    out2.write(line)
+                line = f.readline()

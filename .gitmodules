@@ -1,0 +1,4 @@
+[submodule "tests/data"]
+	path = tests/data
+	url = git@10.133.130.114:jfear/GwasQcPipeline-test-data.git
+	branch = default

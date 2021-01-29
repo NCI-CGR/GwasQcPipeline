@@ -1,0 +1,175 @@
+rule plink_ld_prune_pca:
+    input:
+        bed="split_by_pop/{pop}_subjects.bed",
+        bim="split_by_pop/{pop}_subjects.bim",
+        fam="split_by_pop/{pop}_subjects.fam",
+    params:
+        inProj="split_by_pop/{pop}_subjects",
+        outProj="pca/{pop}_ldPruneList",
+        r2=ld_prune_r2,
+        maf=maf_for_ibd,
+    output:
+        "pca/{pop}_ldPruneList.prune.in",
+        "pca/{pop}_ldPruneList.prune.out",
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == "Too few subjects to process pop\n":
+            for x in output:
+                with open(x, "w") as out:
+                    out.write("Too few subjects to process pop\n")
+        else:
+            shell(
+                "plink --bfile {params.inProj} --indep-pairwise 50 5 {params.r2}  --maf {params.maf} --memory 10000 --out {params.outProj}"
+            )
+
+
+rule extract_ld_prune_pca:
+    input:
+        bed="split_by_pop/{pop}_subjects.bed",
+        bim="split_by_pop/{pop}_subjects.bim",
+        fam="split_by_pop/{pop}_subjects.fam",
+        prune="pca/{pop}_ldPruneList.prune.in",
+        related="remove_related/subjects_to_remove.txt",
+    params:
+        inProj="split_by_pop/{pop}_subjects",
+        outProj="pca/{pop}_subjects_ld_prune",
+    output:
+        "pca/{pop}_subjects_ld_prune.ped",
+        "pca/{pop}_subjects_ld_prune.map",
+    run:
+        with open(input.fam) as f:
+            line = f.readline()
+        if line == "Too few subjects to process pop\n":
+            for x in output:
+                with open(x, "w") as out:
+                    out.write("Too few subjects to process pop\n")
+        else:
+            shell(
+                "plink --bfile {params.inProj} --remove {input.related} --extract {input.prune} --recode --memory 10000 --out {params.outProj}"
+            )
+
+
+rule convert_eigen_pca:
+    input:
+        ped="pca/{pop}_subjects_ld_prune.ped",
+        map="pca/{pop}_subjects_ld_prune.map",
+    output:
+        par="pca/{pop}_subjects.convertEigen.par",
+        gen="pca/{pop}_subjects.eigenstratgeno",
+        snp="pca/{pop}_subjects.snp",
+        ind="pca/{pop}_subjects.ind",
+    run:
+        with open(input.map) as f:
+            line = f.readline()
+        if line == "Too few subjects to process pop\n":
+            for x in output:
+                with open(x, "w") as out:
+                    out.write("Too few subjects to process pop\n")
+        else:
+            parTxt = "genotypename: " + input.ped + "\n"
+            parTxt += "snpname: " + input.map + "\n"
+            parTxt += "indivname: " + input.ped + "\n"
+            parTxt += "outputformat: EIGENSTRAT\n"
+            parTxt += "genooutfilename: " + output.gen + "\n"
+            parTxt += "snpoutfilename: " + output.snp + "\n"
+            parTxt += "indoutfilename: " + output.ind + "\n"
+            parTxt += "familynames: NO\n"
+            with open(output.par, "w") as out:
+                out.write(parTxt)
+            shell("convertf -p {output.par}")
+
+
+rule smartpca:
+    input:
+        gen="pca/{pop}_subjects.eigenstratgeno",
+        snp="pca/{pop}_subjects.snp",
+        ind="pca/{pop}_subjects.ind",
+    output:
+        par="pca/{pop}_subjects.smartpca.par",
+        eigen="pca/{pop}_subjects.eigenvec",
+    run:
+        with open(input.ind) as f:
+            line = f.readline()
+        if line == "Too few subjects to process pop\n":
+            for x in output:
+                with open(x, "w") as out:
+                    out.write("Too few subjects to process pop\n")
+        else:
+            parTxt = "genotypename: " + input.gen + "\n"
+            parTxt += "snpname: " + input.snp + "\n"
+            parTxt += "indivname: " + input.ind + "\n"
+            parTxt += "evecoutname: " + output.eigen + "\n"
+            parTxt += "fastmode: YES\n"
+            with open(output.par, "w") as out:
+                out.write(parTxt)
+            shell("smartpca -p {output.par}")
+
+
+rule pca_csv:
+    input:
+        "pca/{pop}_subjects.eigenvec",
+    output:
+        "pca/{pop}_subjects.eigenvec.csv",
+    run:
+        SubjectToCaCoDict = makeSubjectToCaCoDict(sample_sheet)
+        with open(input[0]) as f, open(output[0], "w") as out:
+            line = f.readline()
+            if line == "Too few subjects to process pop\n":
+                out.write("Too few subjects to process pop\n")
+            else:
+                out.write("Subject_ID,CaCo")
+                for i in range(1, 11):
+                    out.write(",PC" + str(i))
+                out.write("\n")
+                line = f.readline()
+                while line != "":
+                    line_list = line.split()
+                    sub = line_list[0]
+                    CaCo = SubjectToCaCoDict[sub]
+                    if CaCo == "NA":
+                        CaCo = "2"
+                    pcas = line_list[1:11]
+                    out.write(",".join([sub, CaCo] + pcas) + "\n")
+                    line = f.readline()
+
+
+rule plot_pca:
+    input:
+        "pca/{pop}_subjects.eigenvec.csv",
+    output:
+        png="pca/{pop}_subjects.pca.png",
+        R="pca/{pop}_subjects.pca.R",
+        Rout="pca/{pop}_subjects.pca.R.out",
+    run:
+        with open(input[0]) as f:
+            line = f.readline()
+        if line == "Too few subjects to process pop\n":
+            for x in output:
+                with open(x, "w") as out:
+                    out.write("Too few subjects to process pop\n")
+        else:
+            rTxt = (
+                '''
+                            colors <- c(rgb(0, 0, 1, .3), rgb(1, 0, 0, .3), rgb(.75, .75, .75, .3), rgb(0, 1, 0, .3))
+                            data <- read.csv("'''
+                + input[0]
+                + '''")
+                            png("'''
+                + output.png
+                + """", 6.5, 6.5, "in", res = 300)
+                            par(mfrow=c(3,2),ps=20,cex=0.3,mar=c(4.5,4.5,1.5,1)+0.1,oma=rep(3,4))
+                            plot(data$PC1, data$PC2, pch = 20, col = colors[data$CaCo + 1], xlab = "PC1", ylab = "PC2")
+                            plot(data$PC2, data$PC3, pch = 20, col = colors[data$CaCo + 1], xlab = "PC2", ylab = "PC3")
+                            plot(data$PC3, data$PC4, pch = 20, col = colors[data$CaCo + 1], xlab = "PC3", ylab = "PC4")
+                            plot(data$PC4, data$PC5, pch = 20, col = colors[data$CaCo + 1], xlab = "PC4", ylab = "PC5")
+                            plot(data$PC5, data$PC6, pch = 20, col = colors[data$CaCo + 1], xlab = "PC5", ylab = "PC6")
+                            plot(c(0, 1), c(0, 1), type="n", ann=FALSE, axes=FALSE)
+                            legend("center", legend = c("Cases", "Controls", "Unknown"), col = c("red", "blue", "green"), pch = 19, cex = 3, y.intersp=2)
+                            par(mar = c(5, 4, 4, 2) + 0.1)
+                            dev.off()
+                            """
+            )
+            with open(output.R, "w") as R:
+                R.write(rTxt)
+            shell("R --vanilla < {output.R} > {output.Rout}")

@@ -1,0 +1,55 @@
+rule sex_discordant_list:
+    input:
+        sex="remove_qc_fail/SexDiscordant.txt",
+        samp_to_sub="subject_level/SampleUsedforSubject.csv",
+        fam="subject_level/samples.fam",
+    output:
+        sex="subject_qc_removal/sex_discordant.txt",
+    params:
+        sex=config["remove_sex_discordant"],
+    run:
+        sampToSubDict = MakeSampToSubDict(input.samp_to_sub)
+        sampDict = {}
+        with open(input.fam) as f:
+            for line in f:
+                samp = line.split()[1]
+                sampDict[samp] = 1
+        sexRemDict = {}
+        with open(output.sex, "w") as out:
+            if params.sex == "YES":
+                with open(input.sex) as f:
+                    for line in f:
+                        samp = line.split()[1]
+                        if sampDict.get(samp):
+                            sub = sampToSubDict[samp]
+                            sexRemDict[sub] = 1
+                            out.write(sub + " " + sub + "\n")
+
+
+rule unexp_rep_list:
+    input:
+        fam="subject_level/samples.fam",
+        rep="concordance/UnknownReplicates.csv",
+    output:
+        "subject_qc_removal/unexpected_replicate.csv",
+    params:
+        unexpectRep=config["remove_unexpected_rep"],
+    run:
+        subDict = {}
+        with open(input.fam) as f:
+            for line in f:
+                sub = line.split()[1]
+                subDict[sub] = 1
+        repToRemDict = {}
+        if params.unexpectRep == "YES":
+            with open(input.rep) as f, open(output[0], "w") as out:
+                head = f.readline()
+                out.write(head)
+                line = f.readline()
+                while line != "":
+                    line_list = line.rstrip().split(",")
+                    samp1 = line_list[2]
+                    samp2 = line_list[3]
+                    if subDict.get(samp1) and subDict.get(samp2):
+                        out.write(line)
+                    line = f.readline()
