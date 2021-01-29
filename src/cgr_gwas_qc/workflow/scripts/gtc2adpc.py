@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Converts a GCT + BIM file into Illumina's adpc.bin format."""
 from pathlib import Path
 from typing import Generator, List, Optional

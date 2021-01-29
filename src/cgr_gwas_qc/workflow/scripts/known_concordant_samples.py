@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Create tables of sample concordance.
 
 This script uses sample concordance based on pairwise IBD estimations. We
