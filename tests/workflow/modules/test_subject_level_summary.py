@@ -101,7 +101,7 @@ def test_remove_related_subjects(tmp_path, conda_envs):
     # THEN: Given my test data and the `pi_hat_threshold = 0.16` I expect 7 subjects to be remove.
     assert (
         len((tmp_path / "subject_level/subjects_to_remove.txt").read_text().strip().splitlines())
-        == 7
+        == 6
     )
 
     # The plink log should say I 177 subjects remaining. (184 - 7 = 177)
