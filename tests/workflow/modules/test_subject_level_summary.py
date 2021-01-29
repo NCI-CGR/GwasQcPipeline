@@ -62,3 +62,48 @@ def test_create_subjects(tmp_path, conda_envs, qc_summary):
         tmp_path / "subject_level/subjects.fam",
         data_cache / "production_outputs/subject_level/subjects.fam",
     )
+
+
+@pytest.mark.workflow
+@pytest.mark.real_data
+def test_remove_related_subjects(tmp_path, conda_envs):
+    # GIVEN: Real subject level data
+    conda_envs.copy_env("plink2", tmp_path)
+    (
+        RealData(tmp_path)
+        .add_sample_sheet()
+        .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
+        .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
+        .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
+        .make_config(software_params={"pi_hat_threshold": 0.16})  # ensure some subjects are related
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.modules("plink_filters.smk")
+            include: cfg.modules("plink_stats.smk")
+            include: cfg.modules("subject_level_summary.smk")
+
+            rule all:
+                input:
+                    "subject_level/subjects_unrelated.bed",
+                    "subject_level/subjects_unrelated.bim",
+                    "subject_level/subjects_unrelated.fam",
+            """
+        )
+    )
+
+    # WHEN: Prune related subjects.
+    run_snakemake(tmp_path)
+
+    # THEN: Given my test data and the `pi_hat_threshold = 0.16` I expect 7 subjects to be remove.
+    assert (
+        len((tmp_path / "subject_level/subjects_to_remove.txt").read_text().strip().splitlines())
+        == 7
+    )
+
+    # The plink log should say I 177 subjects remaining. (184 - 7 = 177)
+    log = (tmp_path / "subject_level/subjects_unrelated.log").read_text()
+    assert "177 people remaining." in log
