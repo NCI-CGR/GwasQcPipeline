@@ -7,10 +7,10 @@ import re
 from pathlib import Path
 from typing import Generator, Optional
 
-import pysam
 import typer
 
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, complement
+from cgr_gwas_qc.parsers.vcf import VariantFile
 
 app = typer.Typer(add_completion=False)
 
@@ -56,7 +56,7 @@ def main(
     a list of available populations. If the variant does not exists in the
     `vcf_file` then the ABF will be set to 0.0.
     """
-    vcf = pysam.VariantFile(vcf_file)
+    vcf = VariantFile(vcf_file)
     available_populations = sorted([x for x in vcf.header.info.keys() if "AF" in x])
 
     if population not in available_populations:
@@ -82,7 +82,7 @@ def get_bpm_variants(bpm_file: Path) -> Generator[Variant, None, None]:
         yield Variant(*variant)
 
 
-def get_abf_from_vcf(vcf: pysam.VariantFile, population: str, variant: Variant) -> Optional[float]:
+def get_abf_from_vcf(vcf: VariantFile, population: str, variant: Variant) -> Optional[float]:
     """Pull the select popultion B allele frequency from the VCF.
 
     Tries to find the given variant in the VCF. If the variant exists then it
@@ -93,12 +93,11 @@ def get_abf_from_vcf(vcf: pysam.VariantFile, population: str, variant: Variant) 
         # No B allele
         return None
 
-    if variant.chrom not in vcf.header.contigs.keys():
+    if not vcf.contains_contig(variant.chrom):
         # Chromosome not in VCF
         return None
 
-    chrom_length = vcf.header.contigs.get(variant.chrom).length
-    if (variant.pos < 1) or (variant.pos >= chrom_length):
+    if variant.pos < 1:
         # Variant located at an impossible position
         return None
 
