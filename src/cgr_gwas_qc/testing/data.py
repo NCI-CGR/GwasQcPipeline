@@ -399,7 +399,9 @@ class RealData(DataRepo):
     _bim = "production_outputs/plink_start/samples.bim"
     _fam = "production_outputs/plink_start/samples.fam"
 
-    def __init__(self, working_dir: Optional[Path] = None, sync: bool = False):
+    def __init__(
+        self, working_dir: Optional[Path] = None, sync: bool = False, GRCh_version: int = 37
+    ):
         """A real test data repository of ~200 samples.
 
         These data are stored on cgems. If you are running this on a computer
@@ -408,13 +410,26 @@ class RealData(DataRepo):
         ``sync=True`` will create a symlink into the cache folder.
 
         Args:
-            sync: If True we will try to cache data locally. Defaults to False.
+            sync: If True we will try to cache data locally [Default False].
+            GRCh_version: Which version of the human genome to use [Default
+              37]. If it is 38 then override the Illumina manifest and thousand
+              genomes files.
 
         """
+        super().__init__(working_dir)
+
         if sync:
             self._sync_data()
 
-        super().__init__(working_dir)
+        if GRCh_version == 38:  # Override reference file sto GRCh38
+            warn("User files are still only available for GRCh37.")
+            self._illumina_manifest_file = "reference_data/GSAMD-24v1-0_20011747_A2.bpm"
+            self._thousand_genome_vcf = (
+                "reference_data/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz"
+            )
+            self._thousand_genome_tbi = (
+                "reference_data/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz.tbi"
+            )
 
     def add_sample_sheet(self, copy: bool = True, full_sample_sheet: bool = True) -> U:
         """Add sample sheet.
