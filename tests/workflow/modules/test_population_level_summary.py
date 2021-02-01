@@ -195,6 +195,7 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
         cfg = load_config()
         maf = cfg.config.software_params.maf_for_ibd
         ld = cfg.config.software_params.ld_prune_r2
+        pi = cfg.config.software_params.pi_hat_threshold
 
     assert not (tmp_path / "population_level/AFR").exists()  # Should not run b/c too few subjects
     assert not (tmp_path / "population_level/ASN").exists()  # Should not run b/c too few subjects
@@ -210,7 +211,7 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
         return re.sub("-", "", re.sub(r"\s+", " ", pth.read_text()))
 
     assert clean_eigenvec(
-        tmp_path / f"population_level/EUR/subjects_maf{maf}_ld{ld}_pruned.eigenvec"
+        tmp_path / f"population_level/EUR/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec"
     ) == clean_eigenvec(data_cache / "production_outputs/pca/EUR_subjects.eigenvec")
 
     assert file_hashes_equal(
@@ -265,20 +266,27 @@ def test_plink_split_controls(tmp_path, conda_envs):
     # NOTE: we have to use EUR b/c other populations don't have enough subjects
     # in test data
     conda_envs.copy_env("plink2", tmp_path)
+
+    pi = 0.2
+    maf = 0.05
+
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
         .copy("production_outputs/HWP/EUR_controls.txt", "population_level/EUR/controls_list.txt",)
         .copy(
-            "production_outputs/split_by_pop/EUR_subjects.bed", "population_level/EUR/subjects.bed",
+            "production_outputs/split_by_pop/EUR_subjects.bed",
+            f"population_level/EUR/subjects_unrelated{pi}.bed",
         )
         .copy(
-            "production_outputs/split_by_pop/EUR_subjects.bim", "population_level/EUR/subjects.bim",
+            "production_outputs/split_by_pop/EUR_subjects.bim",
+            f"population_level/EUR/subjects_unrelated{pi}.bim",
         )
         .copy(
-            "production_outputs/split_by_pop/EUR_subjects.fam", "population_level/EUR/subjects.fam",
+            "production_outputs/split_by_pop/EUR_subjects.fam",
+            f"population_level/EUR/subjects_unrelated{pi}.fam",
         )
-        .make_config()
+        .make_config(software_params={"maf_for_hwe": maf, "pi_hat_threshold": pi})
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -290,9 +298,12 @@ def test_plink_split_controls(tmp_path, conda_envs):
 
             rule all:
                 input:
-                    "population_level/EUR/controls_maf0.05_snps_autosome_cleaned.bed",
-                    "population_level/EUR/controls_maf0.05_snps_autosome_cleaned.bim",
-                    "population_level/EUR/controls_maf0.05_snps_autosome_cleaned.fam",
+                    expand(
+                        "population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.{ext}",
+                        maf=cfg.config.software_params.maf_for_hwe,
+                        pi=cfg.config.software_params.pi_hat_threshold,
+                        ext=["bed", "bim", "fam"]
+                    )
             """
         )
     )
@@ -302,17 +313,20 @@ def test_plink_split_controls(tmp_path, conda_envs):
 
     # THEN: The European control data sets should match legacy
     assert file_hashes_equal(
-        tmp_path / "population_level/EUR/controls_maf0.05_snps_autosome_cleaned.bed",
+        tmp_path
+        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.bed",
         data_cache / "production_outputs/HWP/EUR_subjects.bed",
     )
 
     assert file_hashes_equal(
-        tmp_path / "population_level/EUR/controls_maf0.05_snps_autosome_cleaned.bim",
+        tmp_path
+        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.bim",
         data_cache / "production_outputs/HWP/EUR_subjects.bim",
     )
 
     assert file_hashes_equal(
-        tmp_path / "population_level/EUR/controls_maf0.05_snps_autosome_cleaned.fam",
+        tmp_path
+        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.fam",
         data_cache / "production_outputs/HWP/EUR_subjects.fam",
     )
 
@@ -400,15 +414,22 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
 
     shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
 
+    with chdir(tmp_path):
+        cfg = load_config()
+        maf = cfg.config.software_params.maf_for_hwe
+        pi = cfg.config.software_params.pi_hat_threshold
+
     # WHEN: run snakemake to get all population level and all population-control level results
     run_snakemake(tmp_path)
 
     # THEN:
     assert file_hashes_equal(
-        tmp_path / "population_level/EUR/controls_maf0.05_snps_autosome_cleaned.bed",
+        tmp_path
+        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.bed",
         data_cache / "production_outputs/HWP/EUR_subjects.bed",
     )
     assert file_hashes_equal(
-        tmp_path / "population_level/EUR/controls_maf0.05_snps_autosome_cleaned.hwe",
+        tmp_path
+        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.hwe",
         data_cache / "production_outputs/HWP/EUR_subjects_qc.hwe",
     )

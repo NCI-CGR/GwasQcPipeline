@@ -2,7 +2,8 @@ import shutil
 
 import pytest
 
-from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
+from cgr_gwas_qc import load_config
+from cgr_gwas_qc.testing import chdir, file_hashes_equal, run_snakemake
 from cgr_gwas_qc.testing.data import RealData
 
 
@@ -88,22 +89,33 @@ def test_remove_related_subjects(tmp_path, conda_envs):
 
             rule all:
                 input:
-                    "subject_level/subjects_unrelated.bed",
-                    "subject_level/subjects_unrelated.bim",
-                    "subject_level/subjects_unrelated.fam",
+                    expand(
+                        "subject_level/subjects_unrelated{pi}.{ext}",
+                        pi=cfg.config.software_params.pi_hat_threshold,
+                        ext=["bed", "bim", "fam"]
+                    )
             """
         )
     )
+
+    with chdir(tmp_path):
+        cfg = load_config()
+        pi = cfg.config.software_params.pi_hat_threshold
 
     # WHEN: Prune related subjects.
     run_snakemake(tmp_path)
 
     # THEN: Given my test data and the `pi_hat_threshold = 0.16` I expect 7 subjects to be remove.
     assert (
-        len((tmp_path / "subject_level/subjects_to_remove.txt").read_text().strip().splitlines())
+        len(
+            (tmp_path / f"subject_level/subjects_to_remove_pi_hat_gt{pi}.txt")
+            .read_text()
+            .strip()
+            .splitlines()
+        )
         == 6
     )
 
     # The plink log should say I 177 subjects remaining. (184 - 7 = 177)
-    log = (tmp_path / "subject_level/subjects_unrelated.log").read_text()
-    assert "177 people remaining." in log
+    log = (tmp_path / f"subject_level/subjects_unrelated{pi}.log").read_text()
+    assert "178 people remaining." in log

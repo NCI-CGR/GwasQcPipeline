@@ -68,6 +68,7 @@ def required_population_results(wildcards):
     """
     qc_table = checkpoints.sample_qc_report.get(**wildcards).output[0]
 
+    pi = cfg.config.software_params.pi_hat_threshold
     maf = cfg.config.software_params.maf_for_ibd
     ld = cfg.config.software_params.ld_prune_r2
     population_threshold = cfg.config.workflow_params.minimum_pop_subjects
@@ -83,21 +84,22 @@ def required_population_results(wildcards):
 
     return flatten(
         [
-            expand(
-                "population_level/{population}/subjects_maf{maf}_ld{ld}_pruned.eigenvec",
+            expand(  # PCA
+                "population_level/{population}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec",
                 population=pops,
+                pi=pi,
                 maf=maf,
                 ld=ld,
-            ),  # PCA
-            expand(
+            ),
+            expand(  # IBS/IBD
                 "population_level/{population}/subjects_maf{maf}_ld{ld}_pruned.genome",
                 population=pops,
                 maf=maf,
                 ld=ld,
-            ),  # IBS/IBD
-            expand(
+            ),
+            expand(  # Autosomal Heterozygosity
                 "population_level/{population}/subjects.het", population=pops, maf=maf, ld=ld,
-            ),  # Autosomal Heterozygosity
+            ),
         ]
     )
 
@@ -135,19 +137,21 @@ rule controls_per_population:
 
 rule plink_split_controls:
     input:
-        bed=rules.plink_split_population.output.bed,
-        bim=rules.plink_split_population.output.bim,
-        fam=rules.plink_split_population.output.fam,
+        bed="population_level/{population}/subjects_unrelated{pi}.bed",
+        bim="population_level/{population}/subjects_unrelated{pi}.bim",
+        fam="population_level/{population}/subjects_unrelated{pi}.fam",
         to_keep=rules.controls_per_population.output[0],
     params:
-        out_prefix="population_level/{population}/controls",
+        out_prefix="population_level/{population}/controls_unrelated{pi}",
     output:
-        bed="population_level/{population}/controls.bed",
-        bim="population_level/{population}/controls.bim",
-        fam="population_level/{population}/controls.fam",
-        nosex="population_level/{population}/controls.nosex",
+        bed="population_level/{population}/controls_unrelated{pi}.bed",
+        bim="population_level/{population}/controls_unrelated{pi}.bim",
+        fam="population_level/{population}/controls_unrelated{pi}.fam",
+        nosex="population_level/{population}/controls_unrelated{pi}.nosex",
     log:
-        "population_level/{population}/controls.log",
+        "population_level/{population}/controls_unrelated{pi}.log",
+    wildcard_constraints:
+        pi="[01].\d+",
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -176,6 +180,7 @@ def required_population_controls(wildcards):
     qc_table = checkpoints.sample_qc_report.get(**wildcards).output[0]
 
     maf = cfg.config.software_params.maf_for_hwe
+    pi = cfg.config.software_params.pi_hat_threshold
     control_threshold = cfg.config.workflow_params.control_hwp_threshold
 
     pops = (
@@ -187,11 +192,12 @@ def required_population_controls(wildcards):
         .index.values.tolist()
     )
 
-    return expand(
-        "population_level/{population}/controls_maf{maf}_snps_autosome_cleaned.hwe",
+    return expand(  # HWE
+        "population_level/{population}/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.hwe",
         population=pops,
         maf=maf,
-    )  # HWE
+        pi=pi,
+    )
 
 
 rule phony_population_controls:
