@@ -52,11 +52,11 @@ def test_bpm2abf_unknown_population(bpm_file, vcf_file, tmpdir):
 
 
 ################################################################################
-# Issue #30 failed regression test with real data.
+# GitLab Issue #30 failed regression test with real data.
 ################################################################################
 @pytest.mark.real_data
 @pytest.mark.regression
-def test_issue_30(tmp_path):
+def test_bpm2abf_real_data(tmp_path):
     # GIVEN: A real Illumina BPM and 1KG vcf file
     data_store = RealData()
     bpm_file = (data_store / data_store._illumina_manifest_file).as_posix()
@@ -89,9 +89,7 @@ def test_issue_30(tmp_path):
 
 
 @pytest.mark.parametrize("pos", [-10, 0, 1e12], ids=["negative", "zero", "bigger_than_chrom"])
-def test_issue_45(vcf_file, pos):
-    import pysam
-
+def test_bpm2abf_impossible_positions(vcf_file, pos):
     from cgr_gwas_qc.workflow.scripts.bpm2abf import Variant, get_abf_from_vcf
 
     # GIVEN: The 1KG VCF and a variant with and impossible position.
