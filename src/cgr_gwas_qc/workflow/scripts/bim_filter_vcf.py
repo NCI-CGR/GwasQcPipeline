@@ -5,13 +5,13 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Generator, Optional, Tuple
 
-import pysam
 import typer
 
 from cgr_gwas_qc.parsers.illumina import complement
+from cgr_gwas_qc.parsers.vcf import VariantFile
 
 app = typer.Typer(add_completion=False)
-counter: Counter = Counter()  # match, remove, flip, bad_chrom, ambiguous, indel, duplicate, missing
+counter: Counter = Counter()  # match, remove, flip, bad_chrom, bad_position, ambiguous, indel, duplicate, missing
 unique_snps = set()
 
 
@@ -48,13 +48,13 @@ def main(
     if output_bim is None:
         output_bim = bim_file.with_suffix(".vcfStrand.bim")
 
-    vcf = pysam.VariantFile(vcf_file, "r")
+    vcf = VariantFile(vcf_file, "r")
     remove = snp_removal_list.open("w")
     bim_out = output_bim.open("w")
 
     try:
         for row in BimFile(bim_file):
-            if no_match(row, vcf):
+            if fail_record_check(row) or not update_bim_record_with_vcf(row, vcf):
                 remove.write(row.vid_string())
             bim_out.write(row.bim_string())
     finally:
@@ -72,6 +72,7 @@ def main(
             {"  Number SNPs Flipped:": <30}{counter["flip"]:>6}
             {"Number SNPs to Remove:": <30}{counter["remove"]:>6,}
             {"  Unrecognized Chromosome:": <30}{counter["bad_chrom"]:>6,}
+            {"  Impossible Position:": <30}{counter["bad_position"]:>6,}
             {"  Ambiguous Alleles:": <30}{counter["ambiguous"]:>6,}
             {"  Insertion or Deletion:": <30}{counter["indel"]:>6,}
             {"  Duplicate SNPs:": <30}{counter["duplicate"]:>6,}
@@ -81,12 +82,18 @@ def main(
     )
 
 
-def no_match(row, vcf) -> bool:
+def fail_record_check(row: "BimRecord") -> bool:
     """Determine if markers is problematic or not in the VCF."""
     if row.not_major_chrom():
         typer.echo(f"Unrecognized chrom [{row.chrom}]: {row.variant_id}")
         counter["remove"] += 1
         counter["bad_chrom"] += 1
+        return True
+
+    if row.coordinate < 1:
+        # Variant located at an impossible position
+        counter["remove"] += 1
+        counter["bad_position"] += 1
         return True
 
     if row.is_ambiguous_allele():
@@ -100,6 +107,14 @@ def no_match(row, vcf) -> bool:
         counter["remove"] += 1
         counter["indel"] += 1
         return True
+
+    return False
+
+
+def update_bim_record_with_vcf(row: "BimRecord", vcf: VariantFile) -> bool:
+    if not vcf.contains_contig(row.chrom_decode):
+        # Chromosome not in VCF
+        return False
 
     for record in vcf.fetch(row.chrom_decode, row.coordinate - 1, row.coordinate):
         if record.id is None:
@@ -115,10 +130,10 @@ def no_match(row, vcf) -> bool:
             if is_duplicate(row):
                 counter["remove"] += 1
                 counter["duplicate"] += 1
-                return True
+                return False
 
             counter["match"] += 1
-            return False
+            return True
 
         # Complements of alleles match the VCF
         if row.coordinate == record.pos and sorted(row.allele_complements) == sorted(
@@ -129,7 +144,7 @@ def no_match(row, vcf) -> bool:
             if is_duplicate(row):
                 counter["remove"] += 1
                 counter["duplicate"] += 1
-                return True
+                return False
 
             # Fix the alleles by taking the complement to match VCF record
             _alleles = row.alleles
@@ -139,12 +154,12 @@ def no_match(row, vcf) -> bool:
             )
             counter["match"] += 1
             counter["flip"] += 1
-            return False
+            return True
 
     typer.echo(f"Not in VCF: {row.variant_id}")
     counter["remove"] += 1
     counter["missing"] += 1
-    return True
+    return False
 
 
 def is_duplicate(row: "BimRecord") -> bool:

@@ -1,12 +1,14 @@
 """Compares a plink BIM file with the 1KG VCF and flags SNPs for removal."""
 import re
+from collections import Counter
 from pathlib import Path
 
 import pytest
 from typer.testing import CliRunner
 
+from cgr_gwas_qc.parsers.vcf import VariantFile
 from cgr_gwas_qc.testing import file_hashes_equal
-from cgr_gwas_qc.workflow.scripts.bim_filter_vcf import app
+from cgr_gwas_qc.workflow.scripts.bim_filter_vcf import BimRecord
 
 runner = CliRunner()
 
@@ -16,6 +18,8 @@ runner = CliRunner()
 ################################################################################
 @pytest.mark.regression
 def test_bim_filter_vcf(bim_file, vcf_file, tmpdir):
+    from cgr_gwas_qc.workflow.scripts.bim_filter_vcf import app
+
     expected_snps_to_remove = Path("tests/data/SnpsToRemove.txt")
     expected_strand_corrected_bim = Path("tests/data/plink/samples.vcfStrand.bim")
 
@@ -62,7 +66,7 @@ def test_bim_filter_vcf(bim_file, vcf_file, tmpdir):
 ################################################################################
 # Test specific examples
 ################################################################################
-bim_rows = [  # bim_row, no_match, status
+bad_bim_records = [  # bim_row, failed_record_check, status
     # Only chrom 1-23 are valid
     ("24 rs00001 0 12341234 A G", True, "bad_chrom"),
     ("0 rs00001 0 12341234 A G", True, "bad_chrom"),
@@ -79,47 +83,59 @@ bim_rows = [  # bim_row, no_match, status
     ("1 rs00001 0 12341234 D D", True, "indel"),
     ("1 rs00001 0 12341234 0 D", True, "indel"),
     ("1 rs00001 0 12341234 D 0", True, "indel"),
-    # Ignore snps not in VCF
-    ("1 rs00001 0 12341234 A G", True, "missing"),
-    ("1 rs00001 0 12341234 G A", True, "missing"),
-    ("1 rs00001 0 12341234 C T", True, "missing"),
-    ("1 rs00001 0 12341234 T C", True, "missing"),
-    ("1 rs00001 0 12341234 T C,A", True, "missing"),
-    # Match Snps in VCF
-    ("1 rs148369513 0 167042622 C T", False, "match"),
-    ("1 rs148369513 0 167042622 T C", False, "match"),  # Match even if the alleles are switched
-    ("1 rs148369513 0 167042622 G A", False, "flip"),  # Match even if the complement
-    ("1 rs148369513 0 167042622 A G", False, "flip"),  # Match even if the complement and switched
-    # Ignore duplicates
-    ("1 rs148369513 0 167042622 C T", True, "duplicate"),
 ]
 
 
-@pytest.mark.parametrize("row,expected_call,status", bim_rows)
-def test_no_match(vcf, row, expected_call, status):
-    from cgr_gwas_qc.workflow.scripts.bim_filter_vcf import (
-        BimRecord,
-        counter,
-        no_match,
-        unique_snps,
-    )
+@pytest.mark.parametrize("row,failed_record_check,status", bad_bim_records)
+def test_fail_record_check(row, failed_record_check, status, monkeypatch):
+    from cgr_gwas_qc.workflow.scripts.bim_filter_vcf import fail_record_check
 
-    # WARNING: counter is created at import and is shared within the test session.
-    # Here I clear it to remove any count artifacts.
-    counter.clear()
+    test_counter = Counter()
+    monkeypatch.setattr("cgr_gwas_qc.workflow.scripts.bim_filter_vcf.counter", test_counter)
 
+    bim = BimRecord(row)
+    res = fail_record_check(bim)
+
+    assert failed_record_check == res
+    assert test_counter[status] == 1
+
+
+ok_bim_records = [  # bim_row, updated_record, status
+    # Ignore snps not in VCF
+    ("1 rs00001 0 12341234 A G", False, "missing"),
+    ("1 rs00001 0 12341234 G A", False, "missing"),
+    ("1 rs00001 0 12341234 C T", False, "missing"),
+    ("1 rs00001 0 12341234 T C", False, "missing"),
+    ("1 rs00001 0 12341234 T C,A", False, "missing"),
+    # Match Snps in VCF
+    ("1 rs148369513 0 167042622 C T", True, "match"),
+    ("1 rs148369513 0 167042622 T C", True, "match"),  # Match even if the alleles are switched
+    ("1 rs148369513 0 167042622 G A", True, "flip"),  # Match even if the complement
+    ("1 rs148369513 0 167042622 A G", True, "flip"),  # Match even if the complement and switched
+    # Ignore duplicates
+    ("1 rs148369513 0 167042622 C T", False, "duplicate"),
+]
+
+
+@pytest.mark.parametrize("row,updated_record,status", ok_bim_records)
+def test_update_record_with_vcf(vcf_file, row, updated_record, status, monkeypatch):
+    from cgr_gwas_qc.workflow.scripts.bim_filter_vcf import update_bim_record_with_vcf
+
+    test_counter = Counter()
+    monkeypatch.setattr("cgr_gwas_qc.workflow.scripts.bim_filter_vcf.counter", test_counter)
+
+    test_unique_snps = set()
+    monkeypatch.setattr("cgr_gwas_qc.workflow.scripts.bim_filter_vcf.unique_snps", test_unique_snps)
+
+    vcf = VariantFile(vcf_file)
     bim = BimRecord(row)
 
     if status == "duplicate":
         # to test duplicate I need to ensure that variant_id is already there.
-        unique_snps.add(bim.variant_id)
-    else:
-        # WARNING: unique_snps is created at import and is shared within the test
-        # session. Unless I am testing for duplicates I want to clear it.
-        unique_snps.discard(bim.variant_id)
+        test_unique_snps.add(bim.variant_id)
 
-    res = no_match(bim, vcf)
+    res = update_bim_record_with_vcf(bim, vcf)
 
-    assert expected_call == res
-    assert counter[status] == 1
-    assert counter["remove"] == 1 if res else counter["match"] == 1
+    assert updated_record == res
+    assert test_counter[status] == 1
+    assert test_counter["match"] == 1 if res else test_counter["remove"] == 1
