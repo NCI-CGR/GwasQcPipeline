@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 """Create a list of markers that do not match the VCF."""
+import re
 import shutil
 from pathlib import Path
 from typing import Generator, Optional, Tuple
 
-import pysam
 import typer
 
 from cgr_gwas_qc.parsers.illumina import complement
+from cgr_gwas_qc.parsers.vcf import VariantFile
 
 app = typer.Typer(add_completion=False)
 
@@ -54,32 +55,51 @@ def main(
         make using this output easier.
 
     """
-    with pysam.VariantFile(vcf_in, "r") as vcf, bim_out.open("w") as bout:
+    with VariantFile(vcf_in, "r") as vcf, bim_out.open("w") as bout:
         for row in BimFile(bim_in):
-            row2 = update_snp(row, vcf)
-            bout.write(row2.bim_string())
+            normalize_variant_id(row)
+            update_variant_id_with_vcf(row, vcf)
+            bout.write(row.bim_string())
 
     shutil.copyfile(bed_in, bed_out)
     shutil.copyfile(fam_in, fam_out)
 
 
-def update_snp(row, vcf) -> "BimRecord":
-    """Determine if markers is problematic or not in the VCF."""
-    if row.not_major_chrom():
-        typer.echo(f"Unrecognized chrom [{row.chrom}]: {row.variant_id}")
-        return row
+def normalize_variant_id(row: "BimRecord"):
+    """Normalize variant id to rsID.
+
+    Sometimes variant IDs are rsID or have an embedded rsID (i.e.,
+    GSA-rs1234). If there is some form of rsID in the name go ahead and use
+    it as the variants ID.
+    """
+    rsID = extract_rsID(row.variant_id)
+    if rsID:
+        row.variant_id = rsID
+
+
+def extract_rsID(variant: str) -> Optional[str]:
+    match = re.search(r"rs\d+", variant)
+    return match.group() if match else None
+
+
+def update_variant_id_with_vcf(row: "BimRecord", vcf: VariantFile) -> None:
+    """Update the variant ID using the VCF IDs if present."""
+    if row.not_major_chrom() or not vcf.contains_contig(row.chrom_decode):
+        # Unrecognized chromosome
+        return None
 
     if row.is_ambiguous_allele():
-        typer.echo(f"Ambiguous alleles [{'/'.join(row.alleles)}]: {row.variant_id}")
-        return row
+        # Ambiguous allele
+        return None
 
     if row.is_indel():
-        typer.echo(f"Indel: {row.variant_id}")
-        return row
+        # Indel
+        return None
 
     for record in vcf.fetch(row.chrom_decode, row.coordinate - 1, row.coordinate):
-        if record.id is None:
-            record.id = f"{record.chrom}_{record.pos}:{record.ref}:{record.alts[0]}"
+        if record.id is None or extract_rsID(record.id) is None:
+            # No rsID to update with
+            continue
 
         if any("<" in alt for alt in record.alts):
             continue
@@ -87,24 +107,18 @@ def update_snp(row, vcf) -> "BimRecord":
         # Perfect match
         if row.coordinate == record.pos and sorted(row.alleles) == sorted(record.alleles):
             row.variant_id = record.id
-            return row
+            return None
 
         # Complements of alleles match the VCF
         if row.coordinate == record.pos and sorted(row.allele_complements) == sorted(
             record.alleles
         ):
             row.variant_id = record.id
+            row.set_complements()  # Fix the alleles by taking the complement to match VCF record
+            return None
 
-            # Fix the alleles by taking the complement to match VCF record
-            _alleles = row.alleles
-            row.set_complements()
-            typer.echo(
-                f"Flipping alleles [{'/'.join(_alleles)} -> {'/'.join(row.alleles)}]: {row.variant_id}"
-            )
-            return row
-
-    typer.echo(f"Not in VCF: {row.variant_id}")
-    return row
+    # Variant is not in the VCF
+    return None
 
 
 class BimRecord:
