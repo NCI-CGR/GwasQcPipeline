@@ -3,15 +3,14 @@
 from collections import Counter
 from pathlib import Path
 from textwrap import dedent
-from typing import Generator, Optional, Tuple
+from typing import List, Optional
 
 import typer
 
-from cgr_gwas_qc.parsers.illumina import complement
+from cgr_gwas_qc.parsers import bim
 from cgr_gwas_qc.parsers.vcf import VariantFile
 
 app = typer.Typer(add_completion=False)
-counter: Counter = Counter()  # match, remove, flip, bad_chrom, bad_position, ambiguous, indel, duplicate, missing
 unique_snps = set()
 
 
@@ -48,20 +47,28 @@ def main(
     if output_bim is None:
         output_bim = bim_file.with_suffix(".vcfStrand.bim")
 
-    vcf = VariantFile(vcf_file, "r")
-    remove = snp_removal_list.open("w")
-    bim_out = output_bim.open("w")
+    # match, remove, flip, bad_chrom, bad_position, ambiguous, indel, duplicate, missing
+    counter: Counter = Counter()
+    with VariantFile(vcf_file, "r") as vcf, bim.open(bim_file) as bim_in, bim.open(
+        output_bim, "w"
+    ) as bim_out, snp_removal_list.open("w") as to_remove:
+        for record in bim_in:
+            problems = record.get_record_problems()
+            if problems:
+                counter.update(Counter(problems))
+                counter["remove"] += 1
+                to_remove.write(record.id + "\n")
+            else:
+                res = update_bim_record_with_vcf(record, vcf)
+                counter[res] += 1
 
-    try:
-        for row in BimFile(bim_file):
-            if fail_record_check(row) or not update_bim_record_with_vcf(row, vcf):
-                remove.write(row.vid_string())
-            bim_out.write(row.bim_string())
-    finally:
-        vcf.close()
-        remove.close()
-        bim_out.close()
+                if res in ["missing", "duplicate"]:
+                    counter["remove"] += 1
+                    to_remove.write(record.id + "\n")
 
+            bim_out.write(record)
+
+    counter["match"] = counter["exact_match"] + counter["flip"]
     typer.echo(
         dedent(
             f"""
@@ -71,9 +78,9 @@ def main(
             {"Number SNPs Match:": <30}{counter["match"]:>6}
             {"  Number SNPs Flipped:": <30}{counter["flip"]:>6}
             {"Number SNPs to Remove:": <30}{counter["remove"]:>6,}
-            {"  Unrecognized Chromosome:": <30}{counter["bad_chrom"]:>6,}
+            {"  Unrecognized Chromosome:": <30}{counter["not_major_chrom"]:>6,}
             {"  Impossible Position:": <30}{counter["bad_position"]:>6,}
-            {"  Ambiguous Alleles:": <30}{counter["ambiguous"]:>6,}
+            {"  Ambiguous Alleles:": <30}{counter["ambiguous_allele"]:>6,}
             {"  Insertion or Deletion:": <30}{counter["indel"]:>6,}
             {"  Duplicate SNPs:": <30}{counter["duplicate"]:>6,}
             {"  Not in VCF:": <30}{counter["missing"]:>6,}
@@ -82,164 +89,42 @@ def main(
     )
 
 
-def fail_record_check(row: "BimRecord") -> bool:
-    """Determine if markers is problematic or not in the VCF."""
-    if row.not_major_chrom():
-        typer.echo(f"Unrecognized chrom [{row.chrom}]: {row.variant_id}")
-        counter["remove"] += 1
-        counter["bad_chrom"] += 1
-        return True
-
-    if row.coordinate < 1:
-        # Variant located at an impossible position
-        counter["remove"] += 1
-        counter["bad_position"] += 1
-        return True
-
-    if row.is_ambiguous_allele():
-        typer.echo(f"Ambiguous alleles [{'/'.join(row.alleles)}]: {row.variant_id}")
-        counter["remove"] += 1
-        counter["ambiguous"] += 1
-        return True
-
-    if row.is_indel():
-        typer.echo(f"Indel: {row.variant_id}")
-        counter["remove"] += 1
-        counter["indel"] += 1
-        return True
-
-    return False
-
-
-def update_bim_record_with_vcf(row: "BimRecord", vcf: VariantFile) -> bool:
-    if not vcf.contains_contig(row.chrom_decode):
-        # Chromosome not in VCF
-        return False
-
-    for record in vcf.fetch(row.chrom_decode, row.coordinate - 1, row.coordinate):
-        if record.id is None:
-            record.id = f"{record.chrom}_{record.pos}:{record.ref}:{record.alts[0]}"
-
-        if any("<" in alt for alt in record.alts):
+def update_bim_record_with_vcf(b_record: bim.BimRecord, vcf: VariantFile) -> str:
+    for v_record in vcf.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
+        if b_record.pos != v_record.pos:
+            # positions aren't the same, this should never happen b/c we are using fetch
             continue
 
+        if any("<" in alt for alt in v_record.alts):
+            continue
+
+        if v_record.id is None:
+            v_record.id = f"{v_record.chrom}_{v_record.pos}:{v_record.ref}:{v_record.alts[0]}"
+
         # Perfect match
-        if row.coordinate == record.pos and sorted(row.alleles) == sorted(record.alleles):
-            row.variant_id = record.id
-
-            if is_duplicate(row):
-                counter["remove"] += 1
-                counter["duplicate"] += 1
-                return False
-
-            counter["match"] += 1
-            return True
+        if alleles_equal(b_record.alleles, v_record.alleles):
+            b_record.id = v_record.id
+            return "exact_match" if not is_duplicate(b_record) else "duplicate"
 
         # Complements of alleles match the VCF
-        if row.coordinate == record.pos and sorted(row.allele_complements) == sorted(
-            record.alleles
-        ):
-            row.variant_id = record.id
+        if alleles_equal(b_record.complement_alleles(), v_record.alleles):
+            b_record.id = v_record.id
+            b_record.complement_alleles(inplace=True)
+            return "flip" if not is_duplicate(b_record) else "duplicate"
 
-            if is_duplicate(row):
-                counter["remove"] += 1
-                counter["duplicate"] += 1
-                return False
-
-            # Fix the alleles by taking the complement to match VCF record
-            _alleles = row.alleles
-            row.set_complements()
-            typer.echo(
-                f"Flipping alleles [{'/'.join(_alleles)} -> {'/'.join(row.alleles)}]: {row.variant_id}"
-            )
-            counter["match"] += 1
-            counter["flip"] += 1
-            return True
-
-    typer.echo(f"Not in VCF: {row.variant_id}")
-    counter["remove"] += 1
-    counter["missing"] += 1
-    return False
+    return "missing"
 
 
-def is_duplicate(row: "BimRecord") -> bool:
-    if row.variant_id in unique_snps:
-        row.variant_id += "_duplicate"
+def alleles_equal(bim: List[str], vcf: List[str]) -> bool:
+    return sorted(bim) == sorted(vcf)
+
+
+def is_duplicate(record: bim.BimRecord) -> bool:
+    if record.id in unique_snps:
+        record.id += "_duplicate"
         return True
-    unique_snps.add(row.variant_id)
+    unique_snps.add(record.id)
     return False
-
-
-class BimRecord:
-    def __init__(self, row):
-        chrom, variant_id, position, coordinate, allele_1, allele_2 = row.strip().split()
-        self.chrom: int = int(chrom)
-        self.variant_id: str = variant_id
-        self.position: int = int(position)
-        self.coordinate: int = int(coordinate)
-        self.allele_1: str = allele_1
-        self.allele_2: str = allele_2
-        self.msg: Optional[str] = None
-
-    @property
-    def alleles(self) -> Tuple[str, str]:
-        return self.allele_1, self.allele_2
-
-    @property
-    def allele_complements(self) -> Tuple[str, str]:
-        def _complement(allele):
-            """Illumina's complement does not work when allele is "0"."""
-            try:
-                return complement(allele)
-            except ValueError:
-                return allele
-
-        return _complement(self.allele_1), _complement(self.allele_2)
-
-    @property
-    def chrom_decode(self):
-        return str(self.chrom) if self.chrom < 23 else "X"
-
-    def bim_string(self) -> str:
-        """Convert to a BIM row string ready to write."""
-        return "{}\t{}\t{}\t{}\t{}\t{}\n".format(
-            self.chrom,
-            self.variant_id,
-            self.position,
-            self.coordinate,
-            self.allele_1,
-            self.allele_2,
-        )
-
-    def vid_string(self) -> str:
-        """Create a variant ID string ready to write."""
-        return f"{self.variant_id}\n"
-
-    def is_x_chrom(self) -> bool:
-        return self.chrom == 23
-
-    def not_major_chrom(self) -> bool:
-        return self.chrom == 0 or self.chrom >= 24
-
-    def is_ambiguous_allele(self) -> bool:
-        return sorted(self.alleles) in [["A", "T"], ["C", "G"]]
-
-    def is_indel(self) -> bool:
-        return any(allele in ["D", "I"] for allele in self.alleles)
-
-    def set_complements(self) -> None:
-        """Sets allele_1 and allele_2 to their compliments."""
-        self.allele_1, self.allele_2 = self.allele_complements
-
-
-class BimFile:
-    def __init__(self, file_name: Path):
-        self.file_name = file_name
-        self.fh = file_name.open("r")
-
-    def __iter__(self) -> Generator[BimRecord, None, None]:
-        for row in self.fh:
-            yield BimRecord(row)
 
 
 if __name__ == "__main__":
