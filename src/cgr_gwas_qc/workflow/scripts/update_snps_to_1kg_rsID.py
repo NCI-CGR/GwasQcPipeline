@@ -73,7 +73,12 @@ def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VariantFile):
             # positions aren't the same, this should never happen b/c we are using fetch
             continue
 
-        if any("<" in alt for alt in v_record.alts):
+        if len(v_record.alts) > 1:
+            # Skip Multiallelic loci
+            continue
+
+        if len(v_record.ref) > 1 or len(v_record.alts[0]) > 1:
+            # only consider SNVs
             continue
 
         if v_record.id is None or not v_record.id.startswith("rs"):
