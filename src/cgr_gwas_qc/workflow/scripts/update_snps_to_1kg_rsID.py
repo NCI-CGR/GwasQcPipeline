@@ -3,11 +3,11 @@
 import re
 import shutil
 from pathlib import Path
-from typing import Generator, Optional, Tuple
+from typing import List
 
 import typer
 
-from cgr_gwas_qc.parsers.illumina import complement
+from cgr_gwas_qc.parsers import bim
 from cgr_gwas_qc.parsers.vcf import VariantFile
 
 app = typer.Typer(add_completion=False)
@@ -55,142 +55,46 @@ def main(
         make using this output easier.
 
     """
-    with VariantFile(vcf_in, "r") as vcf, bim_out.open("w") as bout:
-        for row in BimFile(bim_in):
-            normalize_variant_id(row)
-            update_variant_id_with_vcf(row, vcf)
-            bout.write(row.bim_string())
+    with VariantFile(vcf_in, "r") as vcf, bim.open(bim_in) as bin, bim.open(bim_out, "w") as bout:
+        for record in bin:
+            if not record.get_record_problems():
+                update_record_id(record, vcf)
+            bout.write(record)
 
     shutil.copyfile(bed_in, bed_out)
     shutil.copyfile(fam_in, fam_out)
 
 
-def normalize_variant_id(row: "BimRecord"):
-    """Normalize variant id to rsID.
-
-    Sometimes variant IDs are rsID or have an embedded rsID (i.e.,
-    GSA-rs1234). If there is some form of rsID in the name go ahead and use
-    it as the variants ID.
-    """
-    rsID = extract_rsID(row.variant_id)
-    if rsID:
-        row.variant_id = rsID
-
-
-def extract_rsID(variant: str) -> Optional[str]:
-    match = re.search(r"rs\d+", variant)
-    return match.group() if match else None
-
-
-def update_variant_id_with_vcf(row: "BimRecord", vcf: VariantFile) -> None:
+def update_record_id(b_record: bim.BimRecord, vcf: VariantFile):
     """Update the variant ID using the VCF IDs if present."""
-    if row.not_major_chrom() or not vcf.contains_contig(row.chrom_decode):
-        # Unrecognized chromosome
-        return None
+    b_record.id = extract_rsID(b_record.id)  # convert IDs like GSA-rs#### to rs####
 
-    if row.is_ambiguous_allele():
-        # Ambiguous allele
-        return None
+    for v_record in vcf.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
+        if b_record.pos != v_record.pos:
+            # positions aren't the same, this should never happen b/c we are using fetch
+            continue
 
-    if row.is_indel():
-        # Indel
-        return None
+        if any("<" in alt for alt in v_record.alts):
+            continue
 
-    for record in vcf.fetch(row.chrom_decode, row.coordinate - 1, row.coordinate):
-        if record.id is None or extract_rsID(record.id) is None:
+        if v_record.id is None or not v_record.id.startswith("rs"):
             # No rsID to update with
             continue
 
-        if any("<" in alt for alt in record.alts):
-            continue
-
-        # Perfect match
-        if row.coordinate == record.pos and sorted(row.alleles) == sorted(record.alleles):
-            row.variant_id = record.id
-            return None
-
-        # Complements of alleles match the VCF
-        if row.coordinate == record.pos and sorted(row.allele_complements) == sorted(
-            record.alleles
+        if alleles_equal(b_record.alleles, v_record.alleles) or alleles_equal(
+            b_record.complement_alleles(), v_record.alleles
         ):
-            row.variant_id = record.id
-            row.set_complements()  # Fix the alleles by taking the complement to match VCF record
-            return None
-
-    # Variant is not in the VCF
-    return None
+            b_record.id = v_record.id
+            return
 
 
-class BimRecord:
-    def __init__(self, row):
-        chrom, variant_id, position, coordinate, allele_1, allele_2 = row.strip().split()
-        self.chrom: int = int(chrom)
-        self.variant_id: str = variant_id
-        self.position: int = int(position)
-        self.coordinate: int = int(coordinate)
-        self.allele_1: str = allele_1
-        self.allele_2: str = allele_2
-        self.msg: Optional[str] = None
-
-    @property
-    def alleles(self) -> Tuple[str, str]:
-        return self.allele_1, self.allele_2
-
-    @property
-    def allele_complements(self) -> Tuple[str, str]:
-        def _complement(allele):
-            """Illumina's complement does not work when allele is "0"."""
-            try:
-                return complement(allele)
-            except ValueError:
-                return allele
-
-        return _complement(self.allele_1), _complement(self.allele_2)
-
-    @property
-    def chrom_decode(self):
-        return str(self.chrom) if self.chrom < 23 else "X"
-
-    def bim_string(self) -> str:
-        """Convert to a BIM row string ready to write."""
-        return "{}\t{}\t{}\t{}\t{}\t{}\n".format(
-            self.chrom,
-            self.variant_id,
-            self.position,
-            self.coordinate,
-            self.allele_1,
-            self.allele_2,
-        )
-
-    def vid_string(self) -> str:
-        """Create a variant ID string ready to write."""
-        return f"{self.variant_id}\n"
-
-    def is_x_chrom(self) -> bool:
-        return self.chrom == 23
-
-    def not_major_chrom(self) -> bool:
-        return self.chrom == 0 or self.chrom >= 24
-
-    def is_ambiguous_allele(self) -> bool:
-        return sorted(self.alleles) in [["A", "T"], ["C", "G"]]
-
-    def is_indel(self) -> bool:
-        return any(allele in ["D", "I"] for allele in self.alleles)
-
-    def set_complements(self) -> None:
-        """Sets allele_1 and allele_2 to their compliments."""
-        self.allele_1, self.allele_2 = self.allele_complements
+def extract_rsID(variant_id: str) -> str:
+    match = re.search(r"rs\d+", variant_id)
+    return match.group() if match else variant_id
 
 
-class BimFile:
-    def __init__(self, file_name: Path):
-        self.file_name = file_name
-        self.fh = file_name.open("r")
-
-    def __iter__(self) -> Generator[BimRecord, None, None]:
-        for row in self.fh:
-            yield BimRecord(row)
+def alleles_equal(bim: List[str], vcf: List[str]) -> bool:
+    return sorted(bim) == sorted(vcf)
 
 
 if __name__ == "__main__":
