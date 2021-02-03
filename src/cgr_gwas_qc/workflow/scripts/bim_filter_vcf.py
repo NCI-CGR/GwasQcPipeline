@@ -7,8 +7,7 @@ from typing import List, Optional
 
 import typer
 
-from cgr_gwas_qc.parsers import bim
-from cgr_gwas_qc.parsers.vcf import VariantFile
+from cgr_gwas_qc.parsers import bim, vcf
 
 app = typer.Typer(add_completion=False)
 unique_snps = set()
@@ -49,7 +48,8 @@ def main(
 
     # match, remove, flip, bad_chrom, bad_position, ambiguous, indel, duplicate, missing
     counter: Counter = Counter()
-    with VariantFile(vcf_file, "r") as vcf, bim.open(bim_file) as bim_in, bim.open(
+
+    with vcf.open(vcf_file, "r") as vcf_fh, bim.open(bim_file) as bim_in, bim.open(
         output_bim, "w"
     ) as bim_out, snp_removal_list.open("w") as to_remove:
         for record in bim_in:
@@ -59,7 +59,7 @@ def main(
                 counter["remove"] += 1
                 to_remove.write(record.id + "\n")
             else:
-                res = update_bim_record_with_vcf(record, vcf)
+                res = update_bim_record_with_vcf(record, vcf_fh)
                 counter[res] += 1
 
                 if res in ["missing", "duplicate"]:
@@ -89,8 +89,8 @@ def main(
     )
 
 
-def update_bim_record_with_vcf(b_record: bim.BimRecord, vcf: VariantFile) -> str:
-    for v_record in vcf.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
+def update_bim_record_with_vcf(b_record: bim.BimRecord, vcf_fh: vcf.VariantFile) -> str:
+    for v_record in vcf_fh.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
         if b_record.pos != v_record.pos:
             # positions aren't the same, this should never happen b/c we are using fetch
             continue

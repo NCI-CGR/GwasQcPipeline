@@ -7,8 +7,7 @@ from typing import List
 
 import typer
 
-from cgr_gwas_qc.parsers import bim
-from cgr_gwas_qc.parsers.vcf import VariantFile
+from cgr_gwas_qc.parsers import bim, vcf
 
 app = typer.Typer(add_completion=False)
 
@@ -55,21 +54,21 @@ def main(
         make using this output easier.
 
     """
-    with VariantFile(vcf_in, "r") as vcf, bim.open(bim_in) as bin, bim.open(bim_out, "w") as bout:
+    with vcf.open(vcf_in, "r") as vcf_fh, bim.open(bim_in) as bin, bim.open(bim_out, "w") as bout:
         for record in bin:
             if not record.get_record_problems():
-                update_record_id(record, vcf)
+                update_record_id(record, vcf_fh)
             bout.write(record)
 
     shutil.copyfile(bed_in, bed_out)
     shutil.copyfile(fam_in, fam_out)
 
 
-def update_record_id(b_record: bim.BimRecord, vcf: VariantFile):
+def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VariantFile):
     """Update the variant ID using the VCF IDs if present."""
     b_record.id = extract_rsID(b_record.id)  # convert IDs like GSA-rs#### to rs####
 
-    for v_record in vcf.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
+    for v_record in vcf_fh.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
         if b_record.pos != v_record.pos:
             # positions aren't the same, this should never happen b/c we are using fetch
             continue

@@ -7,8 +7,8 @@ import pytest
 from pandas.testing import assert_frame_equal
 from typer.testing import CliRunner
 
+from cgr_gwas_qc.parsers import vcf
 from cgr_gwas_qc.parsers.bim import BimRecord
-from cgr_gwas_qc.parsers.vcf import VariantFile
 from cgr_gwas_qc.testing import file_hashes_equal
 
 runner = CliRunner()
@@ -97,8 +97,9 @@ def test_update_record_with_vcf(vcf_file, record, update_msg, monkeypatch):
 
     monkeypatch.setattr("cgr_gwas_qc.workflow.scripts.bim_filter_vcf.unique_snps", set())
 
-    vcf = VariantFile(vcf_file)
-    res = update_bim_record_with_vcf(record, vcf)
+    with vcf.open(vcf_file) as vcf_fh:
+        res = update_bim_record_with_vcf(record, vcf_fh)
+
     assert update_msg == res
 
 
@@ -107,8 +108,13 @@ def test_update_record_with_vcf_duplicates(vcf_file, monkeypatch):
 
     monkeypatch.setattr("cgr_gwas_qc.workflow.scripts.bim_filter_vcf.unique_snps", set())
 
-    vcf = VariantFile(vcf_file)
     record1 = BimRecord("1", "rs148369513", 0, 167042622, "C", "T")
     record2 = BimRecord("1", "GSA-rs148369513", 0, 167042622, "C", "T")
-    messages = [update_bim_record_with_vcf(record1, vcf), update_bim_record_with_vcf(record2, vcf)]
+
+    with vcf.open(vcf_file) as vcf_fh:
+        messages = [
+            update_bim_record_with_vcf(record1, vcf_fh),
+            update_bim_record_with_vcf(record2, vcf_fh),
+        ]
+
     assert ["exact_match", "duplicate"] == messages
