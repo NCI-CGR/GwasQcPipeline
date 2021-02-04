@@ -122,13 +122,12 @@ if (
         ``AF`` which ignores super population.
         """
         input:
-            bpm=cfg.config.reference_files.illumina_manifest_file,
-            vcf=cfg.config.reference_files.thousand_genome_vcf,
-            tbi=cfg.config.reference_files.thousand_genome_tbi,
+            bpm_file=cfg.config.reference_files.illumina_manifest_file,
+            vcf_file=cfg.config.reference_files.thousand_genome_vcf,
         params:
             population=cfg.config.software_params.contam_population,
         output:
-            abf="sample_level/{}.{}.abf.txt".format(
+            abf_file="sample_level/{}.{}.abf.txt".format(
                 cfg.config.reference_files.illumina_manifest_file.stem,
                 cfg.config.software_params.contam_population,
             ),
@@ -151,7 +150,7 @@ if (
         """
         input:
             adpc=rules.per_sample_gtc_to_adpc.output.adpc,
-            abf=rules.pull_1KG_allele_b_freq.output[0],
+            abf=rules.pull_1KG_allele_b_freq.output.abf_file,
         params:
             snps=numSNPs,
         output:
