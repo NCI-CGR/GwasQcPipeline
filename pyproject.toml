@@ -45,6 +45,7 @@ pytest-xdist = "^2.1.0"
 commitizen = "^2.6.0"
 ptvsd = "^4.3.2"
 rope = "^0.18.0"
+pytest-mock = "^3.5.1"
 
 [tool.poetry.scripts]
 cgr = "cgr_gwas_qc.cli:app"
