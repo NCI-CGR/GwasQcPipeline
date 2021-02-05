@@ -3,35 +3,14 @@
 
 B allele frequencies are used when examining sample contaminaton.
 """
-import re
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Optional
 
 import typer
 
-from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, complement
-from cgr_gwas_qc.parsers.vcf import VariantFile
+from cgr_gwas_qc.parsers import bpm, vcf
 
 app = typer.Typer(add_completion=False)
-
-
-class Variant:
-    def __init__(self, chrom: str, pos: int, name: str, snp: str, strand: int) -> None:
-        self.chrom = chrom
-        self.pos = pos
-        self.name = name
-        self.snp = snp
-        self.strand = strand
-        self.b_allele: Optional[str] = None
-        self.parse_snp_to_b_allele()
-
-    def parse_snp_to_b_allele(self):
-        """Parse the B allele from the BPM SNP string."""
-        try:
-            b_allele = re.findall(r"\[\w\/(\w)\]", self.snp)[0]
-            self.b_allele = complement(b_allele) if self.strand == 2 else b_allele
-        except IndexError:
-            typer.echo(f"Problem parsing SNP: {self.snp} @{self.chrom}:{self.pos}")
 
 
 @app.command()
@@ -54,94 +33,67 @@ def main(
     based on the allele frequency for the provided subpopulation
     `population`. If the provided subpopulation doesn't exist, it will output
     a list of available populations. If the variant does not exists in the
-    `vcf_file` then the ABF will be set to 0.0.
+    `vcf_file` then the ABF will be set to "NA".
     """
-    vcf = VariantFile(vcf_file)
-    available_populations = sorted([x for x in vcf.header.info.keys() if "AF" in x])
-
-    if population not in available_populations:
-        typer.echo(f"Population must be one of: {', '.join(available_populations)}")
-        raise typer.Exit(1)
 
     if abf_file is None:
         abf_file = bpm_file.with_suffix(".abf.txt")
 
-    with abf_file.open("w") as f:
-        f.write("SNP_ID\tABF\n")
-        for variant in get_bpm_variants(bpm_file):
-            abf = get_abf_from_vcf(vcf, population, variant)
-            abf_str = str(abf) if abf is not None else "NA"
-            f.write(f"{variant.name}\t{abf_str}\n")
-    vcf.close()
+    with vcf.open(vcf_file) as vcf_fh:
+        available_populations = sorted([x for x in vcf_fh.header.info.keys() if "AF" in x])
+        if population not in available_populations:
+            typer.echo(f"Population must be one of: {', '.join(available_populations)}")
+            raise typer.Exit(1)
+
+        with bpm.open(bpm_file) as bpm_fh, abf_file.open("w") as abf_fh:
+            abf_fh.write("SNP_ID\tABF\n")
+            for record in bpm_fh:
+                if record.get_record_problems():
+                    b_allele_freq = "NA"
+                else:
+                    b_allele_freq = get_abf_from_vcf(record, vcf_fh, population)
+
+                abf_fh.write(f"{record.id}\t{b_allele_freq}\n")
 
 
-def get_bpm_variants(bpm_file: Path) -> Generator[Variant, None, None]:
-    """Pull all variants out of the bpm file."""
-    bpm = BeadPoolManifest(bpm_file)
-    for variant in zip(bpm.chroms, bpm.map_infos, bpm.names, bpm.snps, bpm.source_strands):
-        yield Variant(*variant)
-
-
-def get_abf_from_vcf(vcf: VariantFile, population: str, variant: Variant) -> Optional[float]:
+def get_abf_from_vcf(b_record: bpm.BpmRecord, vcf_fh: vcf.VcfFile, population: str):
     """Pull the select popultion B allele frequency from the VCF.
 
     Tries to find the given variant in the VCF. If the variant exists then it
     returns the B allele frequency for the given population. If the variant
-    is multiallelic or dose not exist then it returns `None`.
+    is multiallelic or dose not exist then it returns "NA".
     """
-    if variant.b_allele is None:
-        # No B allele
-        return None
-
-    if not vcf.contains_contig(variant.chrom):
-        # Chromosome not in VCF
-        return None
-
-    if variant.pos < 1:
-        # Variant located at an impossible position
-        return None
-
-    b_allele = variant.b_allele
-    b_allele_c = complement(b_allele)
-
-    for record in vcf.fetch(variant.chrom, variant.pos - 1, variant.pos + 1):
-        ref, alts = record.ref, record.alts
-
-        if len(alts) > 1:
-            # Skip Multiallelic loci
+    for v_record in vcf_fh.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
+        if v_record.pos != b_record.pos:
+            # positions aren't the same, this should never happen b/c we are using fetch
             continue
 
-        alt = alts[0]
-
-        if variant.pos != record.pos or (
-            b_allele not in [ref, alt] and b_allele_c not in [ref, alt]
-        ):
-            # Different SNP
+        if v_record.is_multiallelic() or not v_record.is_snp():
             continue
 
-        if sorted([ref, alt]) in (["A", "T"], ["C", "G"]):
-            # Ambiguous SNP
+        if v_record.info is None or v_record.info.get(population) is None:
+            # No allele frequencies
             continue
 
-        allele_freq = record.info.get(population)[0]
+        ref, alt = v_record.ref, v_record.alts[0]
+        allele_freq = v_record.info.get(population)[0]  # type: ignore
 
-        if b_allele == alt or b_allele_c == alt:
+        if b_record.B_allele == alt or b_record.B_allele_complement == alt:
             return allele_freq
 
-        if b_allele == ref or b_allele_c == ref:
+        if b_record.B_allele == ref or b_record.B_allele_complement == ref:
             return round(1.0 - allele_freq, 8)
 
     # No applicable VCF SNP found
-    return None
+    return "NA"
 
 
 if __name__ == "__main__":
     if "snakemake" in locals():
-        main(
-            Path(snakemake.input.bpm),  # type: ignore # noqa
-            Path(snakemake.input.vcf),  # type: ignore # noqa
-            snakemake.params.population,  # type: ignore # noqa
-            Path(snakemake.output.abf),  # type: ignore # noqa
-        )
+        defaults = {}
+        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
+        defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
+        defaults.update({k: v for k, v in snakemake.params.items()})  # type: ignore # noqa
+        main(**defaults)  # type: ignore
     else:
         app()

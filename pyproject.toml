@@ -45,6 +45,7 @@ pytest-xdist = "^2.1.0"
 commitizen = "^2.6.0"
 ptvsd = "^4.3.2"
 rope = "^0.18.0"
+pytest-mock = "^3.5.1"
 
 [tool.poetry.scripts]
 cgr = "cgr_gwas_qc.cli:app"
@@ -60,7 +61,8 @@ line-length = 100
 markers = [
     "regression: Functional tests to compare with outputs from legacy workflow.",
     "workflow: Snakemake workflow tests, partial integration tests for snakemake modules.",
-    "real_data: Mark test to run if we can use real internal data."
+    "real_data: Mark test to run if we can use real internal data.",
+    "slow: Marks tests that take a really long time to run."
 ]
 
 [build-system]

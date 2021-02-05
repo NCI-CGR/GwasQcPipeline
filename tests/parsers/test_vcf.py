@@ -1,47 +1,47 @@
-import warnings
-
 import pytest
 
-from cgr_gwas_qc.parsers.vcf import VariantFile
-from cgr_gwas_qc.testing.data import RealData
+from cgr_gwas_qc.parsers import vcf
 
 
-@pytest.mark.real_data
-@pytest.fixture(scope="session", params=[37, 38])
-def thousand_genomes_vcf(request):
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        data_cache = RealData(GRCh_version=request.param)
-
-    return VariantFile(data_cache / data_cache._thousand_genome_vcf)
+@pytest.fixture(scope="module")
+def vcf_fh(vcf_file):
+    return vcf.VcfFile(vcf_file)
 
 
-@pytest.mark.real_data
 @pytest.mark.parametrize("chrom", [1, "1", "chr1", "X", "chrX"])
-def test_vcf_multiple_chrom_codes(thousand_genomes_vcf, chrom):
-    # GIVEN: Thousand Genomes VCF
-    # THEN: I can fetch with different chromosome codes and they will be
-    # handled gracefully.
-    assert thousand_genomes_vcf.fetch(chrom, 1_000_000, 1_001_000)
+def test_vcf_file_fetch_different_chrom_formats(vcf_fh, chrom):
+    # GIVEN: VCF file handler
+    # THEN: I can fetch different chromosome codes and they will be handled
+    # gracefully.
+    assert vcf_fh.fetch(chrom)
 
 
-@pytest.mark.real_data
 @pytest.mark.parametrize("chrom", [-1, "XY", "NA"])
-def test_vcf_nonsense_chrom(thousand_genomes_vcf, chrom):
-    # GIVEN: Thousand Genomes VCF
-    # THEN: I can fetch with different chromosome codes and they will be
+def test_vcf_file_fetch_nonsense_chrom(vcf_fh, chrom):
+    # GIVEN: VCF file handler
+    # THEN: I can fetch nonsense chromosome codes and they will be
     # handled gracefully.
-    with pytest.raises(ValueError):
-        thousand_genomes_vcf.fetch(chrom, 1_000_000, 1_001_000)
+    assert [] == list(vcf_fh.fetch(chrom))
 
 
-@pytest.mark.real_data
-@pytest.mark.parametrize("chrom", [1, "chr2", "X"])
-def test_contains_contig(thousand_genomes_vcf, chrom):
-    assert thousand_genomes_vcf.contains_contig(chrom)
+@pytest.mark.parametrize(
+    "record,result",
+    [
+        (vcf.VcfRecord(None, "1", 1, "T", ("G", "C")), True),
+        (vcf.VcfRecord(None, "1", 1, "T", ("G",)), False),
+    ],
+)
+def test_vcf_record_is_multiallelic(record, result):
+    assert record.is_multiallelic() == result
 
 
-@pytest.mark.real_data
-@pytest.mark.parametrize("chrom", ["A", 42, "NA"])
-def test_not_contains_contig(thousand_genomes_vcf, chrom):
-    assert not thousand_genomes_vcf.contains_contig(chrom)
+@pytest.mark.parametrize(
+    "record,result",
+    [
+        (vcf.VcfRecord(None, "1", 1, "T", ("G",)), True),
+        (vcf.VcfRecord(None, "1", 1, "T", ("GC",)), False),
+        (vcf.VcfRecord(None, "1", 1, "TAA", ("C",)), False),
+    ],
+)
+def test_vcf_record_is_snp(record, result):
+    assert record.is_snp() == result
