@@ -2,9 +2,9 @@
 import re
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Generator, List, Optional
+from typing import Generator, List, Sequence
 
-from cgr_gwas_qc.parsers import CgrFile
+from cgr_gwas_qc.parsers import CgrBiAllelicVariantRecord, CgrFile
 from cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles import (
     BeadPoolManifest,
     RefStrand,
@@ -15,6 +15,11 @@ from cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles import (
 
 @contextmanager
 def open(filename):
+    """Note this has to be used as a context manager.
+
+    To open and close while not using a `with` block you must to the
+    `BpmFile` class directly.
+    """
     bpm_data = BpmFile(filename)
     try:
         yield bpm_data
@@ -23,14 +28,23 @@ def open(filename):
 
 
 class BpmFile(CgrFile):
+    """Provides an iterable interface to BPM files."""
+
+    fields = ["id", "snp", "chrom", "pos", "ref_strand", "source_strand"]
+
     def __init__(self, filename):
         self.fileobj = BeadPoolManifest(filename)
         self.num_loci = self.fileobj.num_loci
         self.manifest_name = self.fileobj.manifest_name
         self.control_config = self.fileobj.control_config
 
+    def write(self):
+        raise NotImplementedError(
+            "BPM is a binary format and writing is not currently implemented."
+        )
+
     def __iter__(self) -> Generator["BpmRecord", None, None]:
-        for values in zip(
+        for row in zip(
             self.fileobj.names,
             self.fileobj.snps,
             self.fileobj.chroms,
@@ -38,35 +52,40 @@ class BpmFile(CgrFile):
             self.fileobj.ref_strands,
             self.fileobj.source_strands,
         ):
-            yield BpmRecord(*values)
+            data = dict(zip(self.fields, row))
+            data["allele_1"], data["allele_2"] = _split_alleles(data["snp"])
+            data["ref_strand"] = RefStrand.to_string(data["ref_strand"])
+            data["source_strand"] = SourceStrand.to_string(data["source_strand"])
+
+            yield BpmRecord(**data)
+
+
+def _split_alleles(snp: str) -> Sequence[str]:
+    match = re.search(r"\[(\w)\/(\w)\]", snp)
+    return match.groups() if match else ()
 
 
 @dataclass
-class BpmRecord:
-    id: str
-    snp: str
-    chrom: str
-    pos: int
-    _ref_strand: int
-    _source_strand: int
-    A_allele: Optional[str] = None
-    A_allele_complement: Optional[str] = None
-    B_allele: Optional[str] = None
-    B_allele_complement: Optional[str] = None
-    ref_strand: Optional[str] = None
-    source_strand: Optional[str] = None
+class BpmRecord(CgrBiAllelicVariantRecord):
+    snp: str  # in the form [A/B]
+    ref_strand: str  # decoded ref strand [U, +, -], set at init
+    source_strand: str  # decoded source strand [U, F, R], set at init
 
-    def __post_init__(self):
-        self.A_allele, self.B_allele = self._split_alleles()
-        self.A_allele_complement, self.B_allele_complement = self._get_complements()
-        self.ref_strand = RefStrand.to_string(self._ref_strand)
-        self.source_strand = SourceStrand.to_string(self._source_strand)
+    @property
+    def A_allele(self):
+        return self.allele_1
 
-    def is_ambiguous(self) -> bool:
-        return sorted([self.A_allele, self.B_allele]) in [["A", "T"], ["C", "G"]]
+    @property
+    def A_allele_complement(self):
+        return complement(self.allele_1)
 
-    def is_indel(self) -> bool:
-        return self.A_allele in ["D", "I"] or self.B_allele in ["D", "I"]
+    @property
+    def B_allele(self):
+        return self.allele_2
+
+    @property
+    def B_allele_complement(self):
+        return complement(self.allele_2)
 
     def get_record_problems(self) -> List[str]:
         problems = []
@@ -80,9 +99,3 @@ class BpmRecord:
             problems.append("indel")
 
         return problems
-
-    def _split_alleles(self):
-        return re.search(r"\[(\w)\/(\w)\]", self.snp).groups()
-
-    def _get_complements(self):
-        return complement(self.A_allele), complement(self.B_allele)

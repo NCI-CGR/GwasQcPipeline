@@ -1,15 +1,19 @@
 """Parser for the PLINK BIM format."""
 
 from contextlib import contextmanager
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Generator, List, Optional
 
-from cgr_gwas_qc.parsers import CgrFile
-from cgr_gwas_qc.parsers.illumina import complement
+from cgr_gwas_qc.parsers import CgrBiAllelicVariantRecord, CgrFile
 
 
 @contextmanager
 def open(filename, mode: str = "r"):
+    """Note this has to be used as a context manager.
+
+    To open and close while not using a `with` block you must to the
+    `BimFile` class directly.
+    """
     bim_file = BimFile(filename, mode)
     try:
         yield bim_file
@@ -18,55 +22,54 @@ def open(filename, mode: str = "r"):
 
 
 class BimFile(CgrFile):
+    """Provides an iterable interface to BIM files."""
+
     endchar: Optional[str] = "\n"
+    fields = [
+        "encoded_chrom",
+        "id",
+        "morgans",
+        "pos",
+        "allele_1",
+        "allele_2",
+    ]
 
     def __iter__(self) -> Generator["BimRecord", None, None]:
         for row in self.fileobj:
-            values = row.strip().split()
-            values[2] = int(values[2])  # convert morgans to int
-            values[3] = int(values[3])  # convert pos to int
-            yield BimRecord(*values)
+            data = dict(zip(self.fields, row.strip().split()))
+
+            # Fix types
+            data["morgans"] = int(data["morgans"])
+            data["pos"] = int(data["pos"])
+
+            data["chrom"] = _decode(data["encoded_chrom"])
+
+            yield BimRecord(**data)
+
+
+def _decode(chrom):
+    """Decodes BIM chromosome code."""
+    chrom_codes = {
+        "23": "X",
+        "24": "Y",
+        "25": "XY",
+        "26": "MT",
+    }
+    return chrom_codes.get(chrom, chrom)
 
 
 @dataclass
-class BimRecord:
-    _chrom: str  # encoded chromosome
-    id: str
-    morgans: int  # position in morgans
-    pos: int  # position in base-coordinate
-    allele_1: str
-    allele_2: str
-    chrom: Optional[str] = None
-    alleles: List[str] = field(default_factory=list)
-
-    def __post_init__(self):
-        self.chrom = self._decode(self._chrom)
-        self.alleles = self._alleles()
-
-    def is_ambiguous(self) -> bool:
-        return sorted(self.alleles) in [["A", "T"], ["C", "G"]]
-
-    def is_indel(self) -> bool:
-        return any(allele in ["D", "I"] for allele in self.alleles)
-
-    def not_major_chrom(self) -> bool:
-        return self._chrom not in [str(x) for x in range(1, 24)]
-
-    def switch_allele_order(self):
-        self.allele_1, self.allele_2 = self.allele_2, self.allele_1
-        self.alleles = self._alleles()
-
-    def complement_alleles(self, inplace=False):
-        _a1 = self._complement(self.allele_1)
-        _a2 = self._complement(self.allele_2)
-        if inplace:
-            self.allele_1 = _a1
-            self.allele_2 = _a2
-            self.alleles = self._alleles()
-        else:
-            return _a1, _a2
+class BimRecord(CgrBiAllelicVariantRecord):
+    encoded_chrom: Optional[str] = None  # encoded chromosome
+    morgans: Optional[int] = None  # position in morgans
 
     def get_record_problems(self) -> List[str]:
+        """Checks the record for common problems.
+
+        A convenience method to check the record for a set of common problems
+        and return a list of those problems. Potential problems:
+        ["not_major_chrom", "bad_position", "ambiguous_allele", "indel].
+        """
         problems = []
         if self.not_major_chrom():
             problems.append("not_major_chrom")
@@ -82,25 +85,5 @@ class BimRecord:
 
         return problems
 
-    def _alleles(self):
-        return self.allele_1, self.allele_2
-
-    @staticmethod
-    def _decode(chrom):
-        chrom_codes = {
-            "23": "X",
-            "24": "Y",
-            "25": "XY",
-            "26": "MT",
-        }
-        return chrom_codes.get(chrom, chrom)
-
-    @staticmethod
-    def _complement(allele):
-        try:
-            return complement(allele)
-        except ValueError:
-            return allele
-
     def __str__(self):
-        return f"{self._chrom} {self.id} {self.morgans} {self.pos} {self.allele_1} {self.allele_2}"
+        return f"{self.encoded_chrom} {self.id} {self.morgans} {self.pos} {self.allele_1} {self.allele_2}"
