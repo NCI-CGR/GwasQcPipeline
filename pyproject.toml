@@ -60,7 +60,8 @@ line-length = 100
 markers = [
     "regression: Functional tests to compare with outputs from legacy workflow.",
     "workflow: Snakemake workflow tests, partial integration tests for snakemake modules.",
-    "real_data: Mark test to run if we can use real internal data."
+    "real_data: Mark test to run if we can use real internal data.",
+    "slow: Marks tests that take a really long time to run."
 ]
 
 [build-system]

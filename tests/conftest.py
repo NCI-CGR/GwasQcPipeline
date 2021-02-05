@@ -19,6 +19,8 @@ def pytest_addoption(parser):
         "--real-data", action="store_true", default=False, help="Run tests with real data."
     )
 
+    parser.addoption("--no-slow", action="store_true", default=False, help="Don't run slow tests.")
+
     parser.addoption(
         "--sync-real-data",
         action="store_true",
@@ -43,6 +45,14 @@ def pytest_collection_modifyitems(config, items):
         for item in items:
             if "real_data" in item.keywords:
                 item.add_marker(skip_real_data)
+
+    if config.getoption("--no-slow"):
+        # Skip test that are marked with `slow` when the command line
+        # flag `--no-slow` is provided
+        skip_slow = pytest.mark.skip(reason="--no-slow options was given")
+        for item in items:
+            if "slow" in item.keywords:
+                item.add_marker(skip_slow)
 
 
 ##################################################################################
