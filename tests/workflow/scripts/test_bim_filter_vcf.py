@@ -75,17 +75,17 @@ def test_bim_filter_vcf(bim_file, vcf_file, tmp_path):
 ################################################################################
 ok_bim_records = [  # record, update_msg
     # Ignore snps not in VCF
-    (BimRecord("1", "rs00001", 0, 12341234, "A", "G"), "missing"),
-    (BimRecord("1", "rs00001", 0, 12341234, "T", "C,A"), "missing"),
+    (BimRecord("rs00001", "1", 12341234, "A", "G"), "missing"),
+    (BimRecord("rs00001", "1", 12341234, "T", "C,A"), "missing"),
     # Match Snps in VCF
-    (BimRecord("1", "rs148369513", 0, 167042622, "C", "T"), "exact_match"),
+    (BimRecord("rs148369513", "1", 167042622, "C", "T"), "exact_match"),
     (
-        BimRecord("1", "rs148369513", 0, 167042622, "T", "C"),
+        BimRecord("rs148369513", "1", 167042622, "T", "C"),
         "exact_match",
     ),  # Match even if the alleles are switched
-    (BimRecord("1", "rs148369513", 0, 167042622, "G", "A"), "flip"),  # Match even if the complement
+    (BimRecord("rs148369513", "1", 167042622, "G", "A"), "flip"),  # Match even if the complement
     (
-        BimRecord("1", "rs148369513", 0, 167042622, "A", "G"),
+        BimRecord("rs148369513", "1", 167042622, "A", "G"),
         "flip",
     ),  # Match even if the complement and switched
 ]
@@ -108,8 +108,8 @@ def test_update_record_with_vcf_duplicates(vcf_file, monkeypatch):
 
     monkeypatch.setattr("cgr_gwas_qc.workflow.scripts.bim_filter_vcf.unique_snps", set())
 
-    record1 = BimRecord("1", "rs148369513", 0, 167042622, "C", "T")
-    record2 = BimRecord("1", "GSA-rs148369513", 0, 167042622, "C", "T")
+    record1 = BimRecord("rs148369513", "1", 167042622, "C", "T")
+    record2 = BimRecord("GSA-rs148369513", "1", 167042622, "C", "T")
 
     with vcf.open(vcf_file) as vcf_fh:
         messages = [

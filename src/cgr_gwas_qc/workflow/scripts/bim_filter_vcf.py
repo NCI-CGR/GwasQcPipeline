@@ -3,7 +3,7 @@
 from collections import Counter
 from pathlib import Path
 from textwrap import dedent
-from typing import List, Optional
+from typing import Optional, Tuple
 
 import typer
 
@@ -89,38 +89,33 @@ def main(
     )
 
 
-def update_bim_record_with_vcf(b_record: bim.BimRecord, vcf_fh: vcf.VariantFile) -> str:
+def update_bim_record_with_vcf(b_record: bim.BimRecord, vcf_fh: vcf.VcfFile) -> str:
     for v_record in vcf_fh.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
         if b_record.pos != v_record.pos:
             # positions aren't the same, this should never happen b/c we are using fetch
             continue
 
-        if len(v_record.alts) > 1:
-            # Skip Multiallelic loci
+        if v_record.is_multiallelic() or not v_record.is_snp():
             continue
-
-        if len(v_record.ref) > 1 or len(v_record.alts[0]) > 1:
-            # only consider SNVs
-            continue
-
-        if v_record.id is None:
-            v_record.id = f"{v_record.chrom}_{v_record.pos}:{v_record.ref}:{v_record.alts[0]}"
 
         # Perfect match
         if alleles_equal(b_record.alleles, v_record.alleles):
-            b_record.id = v_record.id
+            b_record.id = v_record.id if v_record.id is not None else b_record.id
             return "exact_match" if not is_duplicate(b_record) else "duplicate"
 
         # Complements of alleles match the VCF
         if alleles_equal(b_record.complement_alleles(), v_record.alleles):
-            b_record.id = v_record.id
+            b_record.id = v_record.id if v_record.id is not None else b_record.id
             b_record.complement_alleles(inplace=True)
             return "flip" if not is_duplicate(b_record) else "duplicate"
 
     return "missing"
 
 
-def alleles_equal(bim: List[str], vcf: List[str]) -> bool:
+def alleles_equal(bim: Optional[Tuple[str, ...]], vcf: Optional[Tuple[str, ...]]) -> bool:
+    if bim is None or vcf is None:
+        return False
+
     return sorted(bim) == sorted(vcf)
 
 
