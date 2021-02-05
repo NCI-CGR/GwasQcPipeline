@@ -4,7 +4,7 @@
 B allele frequencies are used when examining sample contaminaton.
 """
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 import typer
 
@@ -48,38 +48,35 @@ def main(
         with bpm.open(bpm_file) as bpm_fh, abf_file.open("w") as abf_fh:
             abf_fh.write("SNP_ID\tABF\n")
             for record in bpm_fh:
-                b_allele_freq = get_abf_from_vcf(record, vcf_fh, population)
+                if record.get_record_problems():
+                    b_allele_freq = "NA"
+                else:
+                    b_allele_freq = get_abf_from_vcf(record, vcf_fh, population)
+
                 abf_fh.write(f"{record.id}\t{b_allele_freq}\n")
 
 
-def get_abf_from_vcf(
-    b_record: bpm.BpmRecord, vcf_fh: vcf.VariantFile, population: str
-) -> Union[float, str]:
+def get_abf_from_vcf(b_record: bpm.BpmRecord, vcf_fh: vcf.VcfFile, population: str):
     """Pull the select popultion B allele frequency from the VCF.
 
     Tries to find the given variant in the VCF. If the variant exists then it
     returns the B allele frequency for the given population. If the variant
     is multiallelic or dose not exist then it returns "NA".
     """
-    if b_record.get_record_problems():
-        # Problematic record: invalidate coordinate, ambiguous allele, indels
-        return "NA"
-
     for v_record in vcf_fh.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
         if v_record.pos != b_record.pos:
             # positions aren't the same, this should never happen b/c we are using fetch
             continue
 
-        if len(v_record.alts) > 1:
-            # Skip Multiallelic loci
+        if v_record.is_multiallelic() or not v_record.is_snp():
+            continue
+
+        if v_record.info is None or v_record.info.get(population) is None:
+            # No allele frequencies
             continue
 
         ref, alt = v_record.ref, v_record.alts[0]
-        if len(ref) > 1 or len(alt) > 1:
-            # only consider SNVs
-            continue
-
-        allele_freq = v_record.info.get(population)[0]
+        allele_freq = v_record.info.get(population)[0]  # type: ignore
 
         if b_record.B_allele == alt or b_record.B_allele_complement == alt:
             return allele_freq
@@ -97,6 +94,6 @@ if __name__ == "__main__":
         defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
         defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
         defaults.update({k: v for k, v in snakemake.params.items()})  # type: ignore # noqa
-        main(**defaults)
+        main(**defaults)  # type: ignore
     else:
         app()

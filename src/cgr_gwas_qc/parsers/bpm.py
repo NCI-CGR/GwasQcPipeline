@@ -2,7 +2,7 @@
 import re
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Generator, List, Sequence
+from typing import Generator, List, Optional, Sequence
 
 from cgr_gwas_qc.parsers import CgrBiAllelicVariantRecord, CgrFile
 from cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles import (
@@ -67,9 +67,9 @@ def _split_alleles(snp: str) -> Sequence[str]:
 
 @dataclass
 class BpmRecord(CgrBiAllelicVariantRecord):
-    snp: str  # in the form [A/B]
-    ref_strand: str  # decoded ref strand [U, +, -], set at init
-    source_strand: str  # decoded source strand [U, F, R], set at init
+    snp: Optional[str] = None  # in the form [A/B]
+    ref_strand: Optional[str] = None  # decoded ref strand [U, +, -], set at init
+    source_strand: Optional[str] = None  # decoded source strand [U, F, R], set at init
 
     @property
     def A_allele(self):
