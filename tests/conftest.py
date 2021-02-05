@@ -152,6 +152,20 @@ def vcf(vcf_file) -> pysam.VariantFile:
     return pysam.VariantFile(vcf_file, "r")
 
 
+@pytest.fixture(scope="session")
+def vcf_mock():
+    from cgr_gwas_qc.parsers.vcf import VcfFile
+
+    class VcfFileMock(VcfFile):
+        def __init__(self, records):
+            self.records = records
+
+        def fetch(self, *args, **kwargs):
+            return self.records
+
+    return VcfFileMock
+
+
 ##################################################################################
 # Update QC Summary Table
 ##################################################################################

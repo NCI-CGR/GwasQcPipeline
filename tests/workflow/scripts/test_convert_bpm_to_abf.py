@@ -89,14 +89,10 @@ bpm_vcf_records = [
 
 
 @pytest.mark.parametrize("bpm_record,vcf_records,AF", bpm_vcf_records)
-def test_get_abf_from_vcf(bpm_record, vcf_records, AF):
+def test_get_abf_from_vcf(bpm_record, vcf_records, AF, vcf_mock):
     from cgr_gwas_qc.workflow.scripts.bpm2abf import get_abf_from_vcf
 
-    class VcfFileMock:
-        def fetch(*args, **kwargs):
-            return vcf_records
-
-    assert AF == get_abf_from_vcf(bpm_record, VcfFileMock(), "AF")
+    assert AF == get_abf_from_vcf(bpm_record, vcf_mock(vcf_records), "AF")
 
 
 ################################################################################
