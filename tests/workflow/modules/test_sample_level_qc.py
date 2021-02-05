@@ -62,6 +62,7 @@ def graf_inputs(tmp_path_factory, conda_envs):
 
 @pytest.mark.real_data
 @pytest.mark.workflow
+@pytest.mark.slow
 def test_update_snps_to_1kg_rsID(graf_inputs):
     # GIVEN: outputs from update_snps_to_1kg_rsID
 
@@ -87,6 +88,7 @@ def test_update_snps_to_1kg_rsID(graf_inputs):
 
 @pytest.mark.real_data
 @pytest.mark.workflow
+@pytest.mark.slow
 def test_graf_extract_fingerprint_snps(graf_inputs):
     # GIVEN: the log from graf_extract_finger_print_snps
     graf_log = (graf_inputs / "sample_level/call_rate_2/samples_1kg_rsID.fpg.log").read_text()
@@ -164,6 +166,7 @@ def test_agg_median_idat_intensity(median_idat_intensity):
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
+@pytest.mark.slow
 def test_per_sample_gtc_to_adpc(tmp_path):
     # GIVEN: Real data using GTC entry point.
     data_cache = (
@@ -272,6 +275,7 @@ def test_per_sample_verifyIDintensity_contamination(tmp_path, conda_envs):
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
+@pytest.mark.slow
 def test_contamination_test_with_missing_abf_values(tmp_path):
     """Does verifyIDintensity run with missing abf values.
 
@@ -325,6 +329,7 @@ def test_contamination_test_with_missing_abf_values(tmp_path):
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
+@pytest.mark.slow
 def test_contamination_test_with_missing_adpc_values(tmp_path, conda_envs):
     """Does verifyIDintensity work when there are missing data.
 
@@ -522,6 +527,7 @@ def test_sample_concordance_plink(tmp_path):
 @pytest.mark.real_data
 @pytest.mark.workflow
 @pytest.mark.regression
+@pytest.mark.slow
 def test_sample_concordance_graf(tmp_path, graf_inputs, conda_envs):
     conda_envs.copy_env("graf", tmp_path)
     shutil.copytree(graf_inputs, tmp_path, dirs_exist_ok=True)
@@ -568,6 +574,7 @@ def test_sample_concordance_graf(tmp_path, graf_inputs, conda_envs):
 @pytest.mark.real_data
 @pytest.mark.workflow
 @pytest.mark.regression
+@pytest.mark.slow
 def test_graf_ancestry(tmp_path, graf_inputs, conda_envs):
     conda_envs.copy_env("graf", tmp_path)
     shutil.copytree(graf_inputs, tmp_path, dirs_exist_ok=True)

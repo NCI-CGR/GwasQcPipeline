@@ -51,6 +51,7 @@ def test_gtc2adpc(gtc_file, bpm_file, tmp_path):
 
 @pytest.mark.real_data
 @pytest.mark.regression
+@pytest.mark.slow
 def test_gtc2adpc_issue_31(tmp_path):
     """Issue 31: Regression difference NA vs 0.0
 

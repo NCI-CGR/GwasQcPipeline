@@ -113,6 +113,7 @@ def test_plink_split_population(tmp_path, conda_envs):
 @pytest.mark.regression
 @pytest.mark.workflow
 @pytest.mark.real_data
+@pytest.mark.slow
 def test_phony_population_results(tmp_path, conda_envs, qc_summary):
     # GIVEN: real data config, qc_summary table, all of the inputs to generate
     # the summary table, and subject level plink data sets.
@@ -334,6 +335,7 @@ def test_plink_split_controls(tmp_path, conda_envs):
 @pytest.mark.regression
 @pytest.mark.workflow
 @pytest.mark.real_data
+@pytest.mark.slow
 def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
     # GIVEN: real data config, qc_summary table, all of the inputs to generate
     # the summary table, the European control list, and subject level plink data sets.
