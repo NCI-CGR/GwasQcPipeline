@@ -3,7 +3,7 @@
 import re
 import shutil
 from pathlib import Path
-from typing import List
+from typing import Optional, Tuple
 
 import typer
 
@@ -64,7 +64,7 @@ def main(
     shutil.copyfile(fam_in, fam_out)
 
 
-def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VariantFile):
+def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VcfFile):
     """Update the variant ID using the VCF IDs if present."""
     b_record.id = extract_rsID(b_record.id)  # convert IDs like GSA-rs#### to rs####
 
@@ -73,23 +73,22 @@ def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VariantFile):
             # positions aren't the same, this should never happen b/c we are using fetch
             continue
 
-        if len(v_record.alts) > 1:
-            # Skip Multiallelic loci
-            continue
-
-        if len(v_record.ref) > 1 or len(v_record.alts[0]) > 1:
-            # only consider SNVs
+        if v_record.is_multiallelic() or not v_record.is_snp():
             continue
 
         if v_record.id is None or not v_record.id.startswith("rs"):
             # No rsID to update with
             continue
 
-        if alleles_equal(b_record.alleles, v_record.alleles) or alleles_equal(
-            b_record.complement_alleles(), v_record.alleles
-        ):
+        if alleles_equal(b_record.alleles, v_record.alleles):
             b_record.id = v_record.id
             return
+
+        if alleles_equal(b_record.complement_alleles(), v_record.alleles):
+            b_record.id = v_record.id
+            return
+
+        return
 
 
 def extract_rsID(variant_id: str) -> str:
@@ -97,7 +96,10 @@ def extract_rsID(variant_id: str) -> str:
     return match.group() if match else variant_id
 
 
-def alleles_equal(bim: List[str], vcf: List[str]) -> bool:
+def alleles_equal(bim: Optional[Tuple[str, ...]], vcf: Optional[Tuple[str, ...]]) -> bool:
+    if bim is None or vcf is None:
+        return False
+
     return sorted(bim) == sorted(vcf)
 
 
