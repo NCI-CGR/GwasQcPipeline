@@ -6,7 +6,7 @@ snakemake.
 """
 import typer
 
-from cgr_gwas_qc.cli import config, pre_flight, snakemake
+from cgr_gwas_qc.cli import config, pre_flight, snakemake, submit
 
 app = typer.Typer(add_completion=False, help=__doc__)
 app.command("config")(config.main)
@@ -19,6 +19,7 @@ app.command(
         "help_option_names": [],
     },
 )(snakemake.main)
+app.command("submit")(submit.main)
 
 
 if __name__ == "__main__":
