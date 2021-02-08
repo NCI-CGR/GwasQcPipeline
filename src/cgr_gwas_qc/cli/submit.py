@@ -55,7 +55,7 @@ def main(
 
 
 def check_exclusive_options(cgems, biowulf, cluster_profile):
-    if not (cgems ^ biowulf ^ (cluster_profile is not None)):
+    if sum([cgems, biowulf, (cluster_profile is not None)]) > 1:
         typer.echo(
             "\n".join(
                 wrap(
@@ -90,7 +90,7 @@ def check_custom_cluster_profile(cluster_profile, queue, submission_cmd):
 
 
 def get_profile(cluster: str):
-    cgr_profiles = (Path(__file__).parents[2] / "cluster_profiles").resolve()
+    cgr_profiles = (Path(__file__).parents[1] / "cluster_profiles").resolve()
 
     if cluster == "cgems":
         return (cgr_profiles / "cgems").as_posix()
@@ -99,9 +99,9 @@ def get_profile(cluster: str):
         return (cgr_profiles / "biowulf").as_posix()
 
 
-def create_submission_script(payload) -> Path:
+def create_submission_script(payload) -> str:
     template = env.get_template("snakemake.sh")
     run_script = Path(".snakemake/GwasQcPipeline_submission.sh")
     run_script.parent.mkdir(exist_ok=True)
     run_script.write_text(template.render(**payload))
-    return run_script
+    return run_script.as_posix()
