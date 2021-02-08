@@ -11,7 +11,14 @@ from cgr_gwas_qc.cli import config, pre_flight, snakemake
 app = typer.Typer(add_completion=False, help=__doc__)
 app.command("config")(config.main)
 app.command("pre-flight")(pre_flight.main)
-app.command("snakemake")(snakemake.main)
+app.command(
+    "snakemake",
+    context_settings={
+        "allow_extra_args": True,
+        "ignore_unknown_options": True,
+        "help_option_names": [],
+    },
+)(snakemake.main)
 
 
 if __name__ == "__main__":
