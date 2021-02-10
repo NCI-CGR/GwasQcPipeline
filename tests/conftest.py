@@ -7,7 +7,7 @@ import pytest
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 from cgr_gwas_qc.testing.conda import CondaEnv
-from cgr_gwas_qc.testing.data import RealData
+from cgr_gwas_qc.testing.data import FakeData, RealData
 
 
 ##################################################################################
@@ -97,7 +97,7 @@ def qsub():
 
     Instead of running qsub, just save out the job script and run it with SH.
     """
-    return Path("data/scripts/qsub").resolve().as_posix()
+    return (FakeData() / "scripts/qsub").resolve().as_posix()
 
 
 ##################################################################################
