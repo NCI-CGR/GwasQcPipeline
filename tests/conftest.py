@@ -7,7 +7,7 @@ import pytest
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 from cgr_gwas_qc.testing.conda import CondaEnv
-from cgr_gwas_qc.testing.data import RealData
+from cgr_gwas_qc.testing.data import FakeData, RealData
 
 
 ##################################################################################
@@ -89,6 +89,15 @@ def change_default_behavior_of_ConfigMgr(monkeypatch):
         return ConfigMgr(*find_configs(), **kwargs)
 
     monkeypatch.setattr(ConfigMgr, "instance", mock_instance)
+
+
+@pytest.fixture(scope="session")
+def qsub():
+    """A mock version of qsub.
+
+    Instead of running qsub, just save out the job script and run it with SH.
+    """
+    return (FakeData() / "scripts/qsub").resolve().as_posix()
 
 
 ##################################################################################
