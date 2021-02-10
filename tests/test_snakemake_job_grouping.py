@@ -1,3 +1,4 @@
+import shutil
 import subprocess as sp
 from textwrap import dedent
 
@@ -5,6 +6,7 @@ import pytest
 from snakemake.utils import read_job_properties
 
 from cgr_gwas_qc.testing import chdir, make_snakefile
+from cgr_gwas_qc.testing.data import FakeData
 
 
 def test_basic_grouping(tmp_path, qsub):
@@ -13,32 +15,13 @@ def test_basic_grouping(tmp_path, qsub):
     Here is the most basic job group. The job script just runs for the output
     of `b/1.out`.
     """
-    make_snakefile(
-        tmp_path,
-        dedent(
-            """
-            rule all:
-                input: expand("b/{sample}.out", sample=[1])
-
-            rule a:
-                output: "a/{sample}.out"
-                group: 0
-                shell: "touch {output}"
-
-            rule b:
-                input: "a/{sample}.out"
-                output: "b/{sample}.out"
-                group: 0
-                shell: "touch {output}"
-            """
-        ),
-    )
+    shutil.copyfile(FakeData() / "job_scripts/basic_group.smk", tmp_path / "Snakefile")
     with chdir(tmp_path):
         sp.run(["snakemake", "--cluster", qsub, "-j", "1"], check=True)
 
     expected_properties = {
         "cluster": {},
-        "groupid": 0,
+        "groupid": "grp0",
         "input": [],
         "local": False,
         "output": ["b/1.out"],
@@ -213,22 +196,8 @@ def test_basic_component_grouping(tmp_path, qsub):
     .. warning::
         Component grouping sums the number of threads and resources.
     """
-    make_snakefile(
-        tmp_path,
-        dedent(
-            """
-            rule all:
-                input: expand("b/{sample}.out", sample=[x for x in range(1, 11)])
-
-            rule b:
-                output: "b/{sample}.out"
-                group: "grp0"
-                threads: 1
-                resources:
-                    mem=2
-                shell: "touch {output}"
-            """
-        ),
+    shutil.copyfile(
+        FakeData() / "job_scripts/single_rule_10_samples_with_resources.smk", tmp_path / "Snakefile"
     )
     with chdir(tmp_path):
         sp.run(
@@ -238,7 +207,7 @@ def test_basic_component_grouping(tmp_path, qsub):
     job_properties = read_job_properties(tmp_path / "job_script.sh")
 
     assert len(job_properties["output"]) == 5  # 5 samples per job
-    assert job_properties["threads"] == 5  # NOTE: threads is the sum!!
+    assert job_properties["threads"] == 10  # NOTE: threads is the sum!!
     assert job_properties["resources"]["mem"] == 10  # NOTE: resources use the sum!!
 
 
