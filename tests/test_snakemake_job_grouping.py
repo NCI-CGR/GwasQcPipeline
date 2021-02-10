@@ -1,34 +1,10 @@
-import stat
 import subprocess as sp
-from pathlib import Path
 from textwrap import dedent
 
 import pytest
 from snakemake.utils import read_job_properties
 
 from cgr_gwas_qc.testing import chdir, make_snakefile
-
-
-@pytest.fixture(scope="session")
-def qsub(tmp_path_factory) -> str:
-    """A mock version of qsub.
-
-    Instead of running qsub, just save out the job script and run it with SH.
-    """
-    tmp_path: Path = tmp_path_factory.mktemp("bin")
-    qsub = tmp_path / "qsub"
-    qsub.write_text(
-        dedent(
-            """
-            #!/bin/bash
-            cat $1 >> job_script.sh
-            echo $RANDOM
-            sh $1
-            """
-        )
-    )
-    qsub.chmod(stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
-    return qsub.resolve().as_posix()
 
 
 def test_basic_grouping(tmp_path, qsub):

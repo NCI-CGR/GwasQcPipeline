@@ -91,6 +91,15 @@ def change_default_behavior_of_ConfigMgr(monkeypatch):
     monkeypatch.setattr(ConfigMgr, "instance", mock_instance)
 
 
+@pytest.fixture(scope="session")
+def qsub():
+    """A mock version of qsub.
+
+    Instead of running qsub, just save out the job script and run it with SH.
+    """
+    return Path("data/scripts/qsub").resolve().as_posix()
+
+
 ##################################################################################
 # Small Test Data (Fake)
 ##################################################################################
