@@ -17,7 +17,7 @@ def test_basic_grouping(tmp_path, qsub):
     """
     shutil.copyfile(FakeData() / "job_scripts/basic_group.smk", tmp_path / "Snakefile")
     with chdir(tmp_path):
-        sp.run(["snakemake", "--cluster", qsub, "-j", "1"], check=True)
+        sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
 
     expected_properties = {
         "cluster": {},
@@ -66,7 +66,7 @@ def test_wildcard_grouping(tmp_path, qsub):
         ),
     )
     with chdir(tmp_path):
-        sp.run(["snakemake", "--cluster", qsub, "-j", "1"], check=True)
+        sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
 
     expected_properties = {
         "cluster": {},
@@ -119,7 +119,7 @@ def test_basic_grouping_max_resource(a_mem, b_mem, tmp_path, qsub):
         ),
     )
     with chdir(tmp_path):
-        sp.run(["snakemake", "--cluster", qsub, "-j", "1"], check=True)
+        sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
 
     expected_properties = {
         "cluster": {},
@@ -168,7 +168,7 @@ def test_basic_grouping_max_threads(a_cpu, b_cpu, tmp_path, qsub):
         ),
     )
     with chdir(tmp_path):
-        sp.run(["snakemake", "--cluster", qsub, "-j", "1"], check=True)
+        sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
 
     expected_properties = {
         "cluster": {},
@@ -201,7 +201,8 @@ def test_basic_component_grouping(tmp_path, qsub):
     )
     with chdir(tmp_path):
         sp.run(
-            ["snakemake", "--cluster", qsub, "-j", "1", "--group-components", "grp0=5"], check=True
+            ["snakemake", "--cluster", "qsub", "-j", "1", "--group-components", "grp0=5"],
+            check=True,
         )
 
     job_properties = read_job_properties(tmp_path / "job_script.sh")
@@ -239,7 +240,8 @@ def test_basic_component_grouping_cluster_override(tmp_path, qsub):
     )
     with chdir(tmp_path):
         sp.run(
-            ["snakemake", "--cluster", qsub, "-j", "2", "--group-components", "grp0=5"], check=True,
+            ["snakemake", "--cluster", "qsub", "-j", "2", "--group-components", "grp0=5"],
+            check=True,
         )
 
     job_properties = read_job_properties(tmp_path / "job_script.sh")

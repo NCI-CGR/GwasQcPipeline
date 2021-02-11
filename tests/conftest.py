@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -7,7 +8,7 @@ import pytest
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 from cgr_gwas_qc.testing.conda import CondaEnv
-from cgr_gwas_qc.testing.data import FakeData, RealData
+from cgr_gwas_qc.testing.data import RealData
 
 
 ##################################################################################
@@ -91,13 +92,11 @@ def change_default_behavior_of_ConfigMgr(monkeypatch):
     monkeypatch.setattr(ConfigMgr, "instance", mock_instance)
 
 
-@pytest.fixture(scope="session")
-def qsub():
-    """A mock version of qsub.
-
-    Instead of running qsub, just save out the job script and run it with SH.
-    """
-    return (FakeData() / "scripts/qsub").resolve().as_posix()
+@pytest.fixture
+def qsub(monkeypatch):
+    """Adds the mock version of qsub/qstat/qacct to the path."""
+    qsub_dir = Path("tests/data/scripts").resolve().as_posix()
+    monkeypatch.setenv("PATH", qsub_dir, prepend=os.pathsep)
 
 
 ##################################################################################
