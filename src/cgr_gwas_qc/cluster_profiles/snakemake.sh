@@ -17,4 +17,4 @@ set -euo pipefail
 cd {{ working_dir }}
 [[ -d logs ]] || mkdir -p logs
 
-{{ python_executable }} -m cgr_gwas_qc snakemake --profile {{ profile }}
+{{ python_executable }} -m cgr_gwas_qc snakemake --profile {{ profile }} {{ group_options }}
