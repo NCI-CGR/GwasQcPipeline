@@ -1,7 +1,10 @@
+from dataclasses import dataclass
+
 import pytest
 from pytest_mock import MockerFixture
 
 from cgr_gwas_qc.testing import chdir
+from cgr_gwas_qc.testing.data import FakeData
 
 
 @pytest.mark.parametrize(
@@ -81,6 +84,72 @@ def test_check_custom_cluster_profile_no_cmd(tmp_path):
         check_custom_cluster_profile(cluster_profile, queue, cmd)
 
 
+@pytest.fixture
+def mock_sample_sheet(request):
+    """Fake sample sheet where I can set arbitrary sample sizes"""
+
+    @dataclass
+    class FakeDataFrame:
+        n_samples: int
+
+        @property
+        def shape(self):
+            return self.n_samples, 0
+
+    class FakeSampleSheet:
+        ss = FakeDataFrame(request.param)
+
+    return FakeSampleSheet()
+
+
+@pytest.mark.parametrize(
+    "mock_sample_sheet,expected",
+    [(10, None), (101, 10), (10_000, 10)],
+    indirect=["mock_sample_sheet"],
+)
+def test_get_group_size_mocks(mock_sample_sheet, expected):
+    from cgr_gwas_qc.cli.submit import get_group_size
+
+    assert expected == get_group_size(mock_sample_sheet.ss)
+
+
+def test_get_per_sample_rules():
+    from cgr_gwas_qc.cli.submit import get_per_sample_rules
+
+    per_sample_rules = get_per_sample_rules()
+    assert all(x.startswith("per_sample_") for x in per_sample_rules)
+    assert 4 == len(per_sample_rules)
+
+
+@pytest.mark.parametrize(
+    "mock_sample_sheet,n", [(10, None), (101, 10), (10_000, 10)], indirect=["mock_sample_sheet"],
+)
+def test_get_grouping_settings(mock_sample_sheet, n, monkeypatch):
+    from cgr_gwas_qc.cli.submit import get_grouping_settings
+
+    def mock_load_config():
+        return mock_sample_sheet
+
+    monkeypatch.setattr("cgr_gwas_qc.cli.submit.load_config", mock_load_config)
+
+    if n is None:
+        expected = ""
+    else:
+        expected = (
+            "--groups "
+            "per_sample_gtc_to_adpc=submit0 "
+            "per_sample_gtc_to_ped=submit1 "
+            "per_sample_median_idat_intensity=submit2 "
+            "per_sample_verifyIDintensity_contamination=submit3 "
+            "--group-components "
+            f"submit0={n} "
+            f"submit1={n} "
+            f"submit2={n} "
+            f"submit3={n}"
+        )
+    assert expected == get_grouping_settings()
+
+
 def test_create_submission_script_cgems(tmp_path):
     import os
 
@@ -95,6 +164,7 @@ def test_create_submission_script_cgems(tmp_path):
             "time_h": 12,
             "queue": "all.q",
             "profile": "test_profile",
+            "group_options": "",
         }
         create_submission_script(payload)
 
@@ -117,6 +187,7 @@ def test_create_submission_script_biowulf(tmp_path):
             "time_h": 12,
             "queue": "all.q",
             "profile": "test_profile",
+            "group_options": "",
         }
         create_submission_script(payload)
 
@@ -148,6 +219,7 @@ def test_run_submit_with_right_command(cluster, cmd, tmp_path, mocker: MockerFix
         )
 
     spy = mocker.patch("cgr_gwas_qc.cli.submit.sp.run")
+    FakeData(tmp_path).add_sample_sheet().make_config()
     with chdir(tmp_path):
         submit.main(
             cgems=cgems,
