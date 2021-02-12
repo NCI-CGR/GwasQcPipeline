@@ -16,7 +16,7 @@ if cfg.config.user_files.gtc_pattern:
     ################################################################################
     # GTC To Plink
     ################################################################################
-    rule gtc_to_ped:
+    rule per_sample_gtc_to_ped:
         """Converts a sample's GTC/BPM to PED/MAP.
 
         .. warning::
@@ -42,8 +42,8 @@ if cfg.config.user_files.gtc_pattern:
         a simple space delimited file where each sample is on it's own row.
         """
         input:
-            ped=cfg.expand(rules.gtc_to_ped.output.ped),
-            map_=cfg.expand(rules.gtc_to_ped.output.map_),
+            ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
+            map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
         output:
             temp("sample_level/initial_mergeList.txt"),
         group:
@@ -60,8 +60,8 @@ if cfg.config.user_files.gtc_pattern:
         format.
         """
         input:
-            ped=cfg.expand(rules.gtc_to_ped.output.ped),
-            map_=cfg.expand(rules.gtc_to_ped.output.map_),
+            ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
+            map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
             merge_list=rules.create_gtc_sample_merge_list.output[0],
         params:
             prefix="sample_level/samples",
