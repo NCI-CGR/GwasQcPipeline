@@ -17,16 +17,21 @@ from cgr_gwas_qc.cluster_profiles import (
 @dataclass
 class CgemsOptions(ClusterOptions):
     queue: List[str] = field(default_factory=lambda: ["all.q"])
-    log: str = "logs/$JOB_ID.{rulename}.{job_id}.log"
+    log: str = "logs/{rulename}_{job_id}.$JOB_ID"
 
     def __str__(self):
         # See cgems_jobscript.sh for default sge options
-        cmd = "qsub -q {queue} -l mem={mem} h_rt={time} -pe by_node {threads} -o {log}"
+        cmd = "qsub -q {queue} -N gqc.{job_id} -l mem_free={mem} -l h_rt={time} -o {log}"
+
+        if self.threads > 1:
+            cmd += " -pe by_node {threads}"
+
         return cmd.format(
             queue=",".join(self.queue),
             mem=self.mem_mb,
             time=str(self.time),
             threads=self.threads,
+            job_id=self.job_id,
             log=self.log.format(rulename=self.rulename, job_id=self.job_id),
         )
 
