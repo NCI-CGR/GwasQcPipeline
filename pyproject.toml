@@ -28,6 +28,7 @@ ryd = "^0.4.1"
 pydantic = "^1.6.1"
 networkx = "^2.5"
 Jinja2 = "^2.11.3"
+more-itertools = "^8.7.0"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
