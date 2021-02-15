@@ -17,7 +17,7 @@ def main(
     cgems: bool = typer.Option(False, help="Run using the CGEMs/CCAD cluster profile."),
     biowulf: bool = typer.Option(False, help="Run using the Biowulf cluster profile."),
     cluster_profile: Optional[Path] = typer.Option(None, help="Path to a custom cluster profile."),
-    time_h: int = typer.Option(
+    time_hr: int = typer.Option(
         12, help="The walltime limit (in hours) for the main snakemake process."
     ),
     queue: Optional[str] = typer.Option(
@@ -39,17 +39,17 @@ def main(
         "working_dir": os.getcwd(),
         "cgems": cgems,
         "biowulf": biowulf,
-        "time_h": time_h,
+        "time_hr": time_hr,
     }
 
     if cgems:
         payload["profile"] = get_profile("cgems")
-        payload["queue"] = queue or ("all.q" if time_h <= 24 else "long.q")
+        payload["queue"] = queue or ("all.q" if time_hr <= 24 else "long.q")
         payload["group_options"] = get_grouping_settings()
         submission_cmd = "qsub"
     elif biowulf:
         payload["profile"] = get_profile("biowulf")
-        payload["queue"] = queue or ("all.q" if time_h <= 24 else "long.q")
+        payload["queue"] = queue or ("all.q" if time_hr <= 24 else "long.q")
         payload["group_options"] = get_grouping_settings()
         submission_cmd = "sbatch"
     else:
