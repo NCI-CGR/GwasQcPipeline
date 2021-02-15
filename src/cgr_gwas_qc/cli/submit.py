@@ -59,7 +59,7 @@ def main(
 
     run_script = create_submission_script(payload)
     if not dry_run:
-        sp.run([submission_cmd, run_script], shell=True, check=True)  # type: ignore
+        sp.check_output([submission_cmd, run_script])  # type: ignore
 
 
 def check_exclusive_options(cgems, biowulf, cluster_profile):
