@@ -14,8 +14,10 @@ def main(ctx: typer.Context):
     args = ctx.args
 
     if not is_arg(args, ["-h", "--help"]):
-        check_and_prepend_arg(args, ["-j", "--cores", "--jobs"], "1")
         check_and_prepend_arg(args, ["-s", "--snakefile"], ConfigMgr.SNAKEFILE.as_posix())
+
+    if not is_arg(args, ["--profile"]):
+        check_and_prepend_arg(args, ["-j", "--cores", "--jobs"], "1")
 
     print(f"cgr running: snakemake {' '.join(args)}")
     snakemake.main(args)
