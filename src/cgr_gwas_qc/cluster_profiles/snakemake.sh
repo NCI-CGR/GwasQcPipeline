@@ -2,10 +2,15 @@
 {% if cgems %}
 #$ -S /bin/bash
 #$ -N GwasQcPipeline
+#$ -V
+#$ -cwd
+#$ -j yes
 #$ -q {{ queue }}
 #$ -l h_rt={{ time_hr }}:00:00
-source /etc/profile.d/module.sh
+source /etc/profile.d/modules.sh;
 module load sge
+unset module
+
 {% endif %}
 {% if biowulf %}
 #SBATCH --job-name="GwasQcPipeline"
