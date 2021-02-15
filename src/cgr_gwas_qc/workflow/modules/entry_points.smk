@@ -77,7 +77,7 @@ if cfg.config.user_files.gtc_pattern:
         envmodules:
             cfg.envmodules("plink2"),
         conda:
-            "../conda/plink2.yml"
+            cfg.conda("plink2.yml")
         threads: 20
         resources:
             mem=24000,
@@ -112,7 +112,7 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
         envmodules:
             cfg.envmodules("plink2"),
         conda:
-            "../conda/plink2.yml"
+            cfg.conda("plink2.yml")
         resources:
             mem=10000,
         shell:
