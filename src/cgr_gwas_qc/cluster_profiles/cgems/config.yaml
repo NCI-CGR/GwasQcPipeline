@@ -1,8 +1,11 @@
-restart-times: 3
 jobscript: cgems_jobscript.sh
 cluster: cgems_submit.py
 cluster-status: cgems_status.py
-max-jobs-per-second: 1
-max-status-checks-per-second: 1
-latency-wait: 300
-local-cores: 1
+max-jobs-per-second: 10
+max-status-checks-per-second: .1
+local-cores: 2
+latency-wait: 120
+jobs: 999
+keep-going: true
+rerun-incomplete: true
+use-conda: true
