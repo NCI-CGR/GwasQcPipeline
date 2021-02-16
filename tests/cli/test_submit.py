@@ -218,7 +218,7 @@ def test_run_submit_with_right_command(cluster, cmd, tmp_path, mocker: MockerFix
             cmd,
         )
 
-    spy = mocker.patch("cgr_gwas_qc.cli.submit.sp.run")
+    spy = mocker.patch("cgr_gwas_qc.cli.submit.sp.check_output")
     FakeData(tmp_path).add_sample_sheet().make_config()
     with chdir(tmp_path):
         submit.main(
@@ -227,9 +227,8 @@ def test_run_submit_with_right_command(cluster, cmd, tmp_path, mocker: MockerFix
             cluster_profile=cluster_profile,
             queue=queue,
             submission_cmd=submission_cmd,
-            time_h=12,
+            time_hr=12,
+            dry_run=False,
         )
 
-    spy.assert_called_once_with(
-        [cmd, ".snakemake/GwasQcPipeline_submission.sh"], shell=True, check=True
-    )
+    spy.assert_called_once_with([cmd, ".snakemake/GwasQcPipeline_submission.sh"])
