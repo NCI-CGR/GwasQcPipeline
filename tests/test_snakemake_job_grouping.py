@@ -5,8 +5,50 @@ from textwrap import dedent
 import pytest
 from snakemake.utils import read_job_properties
 
-from cgr_gwas_qc.testing import chdir, make_snakefile
+from cgr_gwas_qc.testing import chdir, make_snakefile, run_snakemake
 from cgr_gwas_qc.testing.data import FakeData
+
+
+def test_wildcards(tmp_path):
+    make_snakefile(
+        tmp_path,
+        """
+        wildcard_constraints:
+            name="samples|subjects|controls",
+            filter=".*"
+
+        rule all:
+            input: "done.txt"
+
+        rule base:
+            output: "{prefix}/{name}.bed"
+            shell: "touch {output}"
+
+        rule maf:
+            input: "{prefix}/{name}{filter}.bed"
+            output: "{prefix}/{name}{filter}_maf.bed"
+            shell: "touch {output}"
+
+        rule ld:
+            input: "{prefix}/{name}{filter}.bed"
+            output: "{prefix}/{name}{filter}_ld.bed"
+            shell: "touch {output}"
+
+        rule stat:
+            input: "{prefix}/{name}{filter}.bed"
+            output: "{prefix}/{name}{filter}.imiss"
+            shell: "touch {output}"
+
+        rule done:
+            input:
+                "a/samples.imiss",
+                "b/samples_maf.imiss",
+                "b/samples_maf_ld.imiss",
+            output: "done.txt"
+            shell: "touch {output}"
+        """,
+    )
+    run_snakemake(tmp_path)
 
 
 def test_basic_grouping(tmp_path, qsub):
