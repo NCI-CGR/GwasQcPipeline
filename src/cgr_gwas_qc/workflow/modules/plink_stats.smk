@@ -8,6 +8,9 @@ Calculate a variety of statistics that are supported by plink.
 """
 
 
+include: cfg.modules("common.smk")
+
+
 rule plink_stats_call_rate:
     """Runs ``plink`` missingness statistics.
 
@@ -16,14 +19,16 @@ rule plink_stats_call_rate:
         :lmiss`: variant-based missing data report
     """
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
+    params:
+        out_prefix="{prefix}/{name}{filters}",
     output:
-        imiss="{prefix}.imiss",
-        lmiss="{prefix}.lmiss",
+        imiss="{prefix}/{name}{filters}.imiss",
+        lmiss="{prefix}/{name}{filters}.lmiss",
     group:
-        "plink_stats"
+        "{prefix}/{name}"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -40,18 +45,20 @@ rule plink_stats_call_rate:
         "--missing "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {wildcards.prefix}"
+        "--out {params.out_prefix}"
 
 
 rule plink_stats_sexcheck:
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
+    params:
+        out_prefix="{prefix}/{name}{filters}",
     output:
-        sexcheck="{prefix}.sexcheck",
+        sexcheck="{prefix}/{name}{filters}.sexcheck",
     group:
-        "plink_stats"
+        "{prefix}/{name}"
     threads: 2
     resources:
         mem=10000,
@@ -67,18 +74,20 @@ rule plink_stats_sexcheck:
         "--check-sex "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {wildcards.prefix}"
+        "--out {params.out_prefix}"
 
 
 rule plink_stats_allele_freq:
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
+    params:
+        out_prefix="{prefix}/{name}{filters}",
     output:
-        sexcheck="{prefix}.frq",
+        sexcheck="{prefix}/{name}{filters}.frq",
     group:
-        "plink_stats"
+        "{prefix}/{name}"
     threads: 2
     resources:
         mem=10000,
@@ -94,18 +103,20 @@ rule plink_stats_allele_freq:
         "--freq "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {wildcards.prefix}"
+        "--out {params.out_prefix}"
 
 
 rule plink_stats_hardy:
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
+    params:
+        out_prefix="{prefix}/{name}{filters}",
     output:
-        sexcheck="{prefix}.hwe",
+        sexcheck="{prefix}/{name}{filters}.hwe",
     group:
-        "plink_stats"
+        "{prefix}/{name}"
     threads: 2
     resources:
         mem=10000,
@@ -121,7 +132,7 @@ rule plink_stats_hardy:
         "--hardy "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {wildcards.prefix}"
+        "--out {params.out_prefix}"
 
 
 rule plink_stats_ibd:
@@ -132,17 +143,18 @@ rule plink_stats_ibd:
     LD pruning before. This calculation excludes non-autosomes.
     """
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
     params:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
+        out_prefix="{prefix}/{name}{filters}",
     output:
-        genome="{prefix}.genome",
-        nosex="{prefix}.nosex",
+        genome="{prefix}/{name}{filters}.genome",
+        nosex="{prefix}/{name}{filters}.nosex",
     group:
-        "plink_stats"
+        "{prefix}/{name}"
     threads: 2
     resources:
         mem=10000,
@@ -160,19 +172,21 @@ rule plink_stats_ibd:
         "--max {params.ibd_max} "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {wildcards.prefix}"
+        "--out {params.out_prefix}"
 
 
 rule plink_stats_het:
     """Calculates autosomal heterozygosity."""
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
+    params:
+        out_prefix="{prefix}/{name}{filters}",
     output:
-        genome="{prefix}.het",
+        genome="{prefix}/{name}{filters}.het",
     group:
-        "plink_stats"
+        "{prefix}/{name}"
     threads: 2
     resources:
         mem=10000,
@@ -188,4 +202,4 @@ rule plink_stats_het:
         "--het "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {wildcards.prefix}"
+        "--out {params.out_prefix}"

@@ -3,10 +3,19 @@ from textwrap import dedent
 
 import pandas as pd
 
-from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
+
+def get_numSNPs():
+    from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
+
+    return BeadPoolManifest(cfg.config.reference_files.illumina_manifest_file).num_loci
 
 
-numSNPs = BeadPoolManifest(cfg.config.reference_files.illumina_manifest_file).num_loci
+wildcard_constraints:
+    name="samples|subjects|controls|snps",
+    filters=".*",
+    cr="1|2",
+    maf="0\.\d+",
+    ld="0\.\d+",
 
 
 rule plink_bed_to_ped:

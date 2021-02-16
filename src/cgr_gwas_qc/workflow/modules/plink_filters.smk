@@ -1,3 +1,6 @@
+include: cfg.modules("common.smk")
+
+
 def _snp_call_rate_filter(wildcards):
     if wildcards.cr == "2":
         return {
@@ -92,21 +95,21 @@ rule maf_filter:
         The current default MAF threshold is 0.2. This seems really high.
     """
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
     params:
         maf=lambda wc: float(wc.maf),
-        out_prefix="{prefix}_maf{maf}",
+        out_prefix="{prefix}/{name}{filters}_maf{maf}",
     output:
-        bed=temp("{prefix}_maf{maf}.bed"),
-        bim=temp("{prefix}_maf{maf}.bim"),
-        fam=temp("{prefix}_maf{maf}.fam"),
-        nosex=temp("{prefix}_maf{maf}.nosex"),
-    wildcard_constraints:
-        maf="0\.\d+",
+        bed=temp("{prefix}/{name}{filters}_maf{maf}.bed"),
+        bim=temp("{prefix}/{name}{filters}_maf{maf}.bim"),
+        fam=temp("{prefix}/{name}{filters}_maf{maf}.fam"),
+        nosex=temp("{prefix}/{name}{filters}_maf{maf}.nosex"),
     log:
-        "{prefix}_maf{maf}.log",
+        "{prefix}/{name}{filters}_maf{maf}.log",
+    group:
+        "{prefix}/{name}"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -149,22 +152,20 @@ rule approx_ld:
         modifier?
     """
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
     params:
         r2=lambda wc: float(wc.ld), # r2 threshold: currently 0.1
-        out_prefix="{prefix}_ld{ld}",
+        out_prefix="{prefix}/{name}{filters}_ld{ld}",
     output:
-        to_keep=temp("{prefix}_ld{ld}.prune.in"), # Markers in approx. linkage equilibrium
-        to_remove=temp("{prefix}_ld{ld}.prune.out"), # Markers in LD
-        nosex=temp("{prefix}_ld{ld}.nosex"), # Markers in LD
-    wildcard_constraints:
-        ld="0\.\d+",
+        to_keep=temp("{prefix}/{name}{filters}_ld{ld}.prune.in"), # Markers in approx. linkage equilibrium
+        to_remove=temp("{prefix}/{name}{filters}_ld{ld}.prune.out"), # Markers in LD
+        nosex=temp("{prefix}/{name}{filters}_ld{ld}.nosex"), # Markers in LD
     log:
-        "{prefix}_ld{ld}.log",
+        "{prefix}/{name}{filters}_ld{ld}.log",
     group:
-        "ld"
+        "{prefix}/{name}"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -190,23 +191,21 @@ rule ld_prune:
     ``plink`` dataset.
     """
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
-        prune="{prefix}_ld{ld}.prune.in",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
+        prune="{prefix}/{name}{filters}_ld{ld}.prune.in",
     params:
-        out_prefix="{prefix}_ld{ld}_pruned",
+        out_prefix="{prefix}/{name}{filters}_ld{ld}_pruned",
     output:
-        bed="{prefix}_ld{ld}_pruned.bed",
-        bim="{prefix}_ld{ld}_pruned.bim",
-        fam="{prefix}_ld{ld}_pruned.fam",
-        nosex="{prefix}_ld{ld}_pruned.nosex",
-    wildcard_constraints:
-        ld="0\.\d+",
+        bed="{prefix}/{name}{filters}_ld{ld}_pruned.bed",
+        bim="{prefix}/{name}{filters}_ld{ld}_pruned.bim",
+        fam="{prefix}/{name}{filters}_ld{ld}_pruned.fam",
+        nosex="{prefix}/{name}{filters}_ld{ld}_pruned.nosex",
     log:
-        "{prefix}_ld{ld}_pruned.log",
+        "{prefix}/{name}{filters}_ld{ld}_pruned.log",
     group:
-        "ld"
+        "{prefix}/{name}"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -229,18 +228,20 @@ rule ld_prune:
 rule snps_only_filter:
     """Exclude all variants with one or more multi-character allele codes"""
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
     params:
-        out_prefix="{prefix}_snps",
+        out_prefix="{prefix}/{name}{filters}_snps",
     output:
-        bed=temp("{prefix}_snps.bed"),
-        bim=temp("{prefix}_snps.bim"),
-        fam=temp("{prefix}_snps.fam"),
-        nosex=temp("{prefix}_snps.nosex"),
+        bed=temp("{prefix}/{name}{filters}_snps.bed"),
+        bim=temp("{prefix}/{name}{filters}_snps.bim"),
+        fam=temp("{prefix}/{name}{filters}_snps.fam"),
+        nosex=temp("{prefix}/{name}{filters}_snps.nosex"),
     log:
-        "{prefix}_snps.log",
+        "{prefix}/{name}{filters}_snps.log",
+    group:
+        "{prefix}/{name}"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -263,18 +264,20 @@ rule snps_only_filter:
 rule autosome_only_filter:
     """Exclude all unplaced and non-autosomal variants"""
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
     params:
-        out_prefix="{prefix}_autosome",
+        out_prefix="{prefix}/{name}{filters}_autosome",
     output:
-        bed=temp("{prefix}_autosome.bed"),
-        bim=temp("{prefix}_autosome.bim"),
-        fam=temp("{prefix}_autosome.fam"),
-        nosex=temp("{prefix}_autosome.nosex"),
+        bed=temp("{prefix}/{name}{filters}_autosome.bed"),
+        bim=temp("{prefix}/{name}{filters}_autosome.bim"),
+        fam=temp("{prefix}/{name}{filters}_autosome.fam"),
+        nosex=temp("{prefix}/{name}{filters}_autosome.nosex"),
     log:
-        "{prefix}_autosome.log",
+        "{prefix}/{name}{filters}_autosome.log",
+    group:
+        "{prefix}/{name}"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -302,18 +305,20 @@ rule cleaned_filter:
     create files that are kept by snakemake.
     """
     input:
-        bed="{prefix}.bed",
-        bim="{prefix}.bim",
-        fam="{prefix}.fam",
+        bed="{prefix}/{name}{filters}.bed",
+        bim="{prefix}/{name}{filters}.bim",
+        fam="{prefix}/{name}{filters}.fam",
     params:
-        out_prefix="{prefix}_cleaned",
+        out_prefix="{prefix}/{name}{filters}_cleaned",
     output:
-        bed="{prefix}_cleaned.bed",
-        bim="{prefix}_cleaned.bim",
-        fam="{prefix}_cleaned.fam",
-        nosex="{prefix}_cleaned.nosex",
+        bed="{prefix}/{name}{filters}_cleaned.bed",
+        bim="{prefix}/{name}{filters}_cleaned.bim",
+        fam="{prefix}/{name}{filters}_cleaned.fam",
+        nosex="{prefix}/{name}{filters}_cleaned.nosex",
     log:
-        "{prefix}_cleaned.log",
+        "{prefix}/{name}{filters}_cleaned.log",
+    group:
+        "{prefix}/{name}"
     envmodules:
         cfg.envmodules("plink2"),
     conda:

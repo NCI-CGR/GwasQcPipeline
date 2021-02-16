@@ -1,6 +1,9 @@
 import pandas as pd
 
 
+include: cfg.modules("common.smk")
+
+
 ################################################################################
 # Additional Filters and Conversions
 ################################################################################
@@ -152,7 +155,7 @@ if (
             adpc=rules.per_sample_gtc_to_adpc.output.adpc,
             abf=rules.pull_1KG_allele_b_freq.output.abf_file,
         params:
-            snps=numSNPs,
+            snps=get_numSNPs(),
         output:
             temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
         conda:
