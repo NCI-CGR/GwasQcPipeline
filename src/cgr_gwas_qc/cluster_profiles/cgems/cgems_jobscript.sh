@@ -2,11 +2,12 @@
 # properties = {properties}
 #$ -terse
 #$ -S /bin/bash
-#$ -V
+#$ -v CONDA_EXE,CONDA_PREFIX
 #$ -cwd
 #$ -j yes
+export PATH=${CONDA_PREFIX}/bin$(dirname ${CONDA_EXE}):${PATH}
 
-set -e
+set -euo pipefail
 
 {exec_job}
 
