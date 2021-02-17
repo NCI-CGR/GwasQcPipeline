@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-
 import logging
-import re
 import shlex
 import subprocess as sp
 import sys
 import time
+from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger("__name__")
@@ -42,21 +41,15 @@ def check_queue(job_id: int) -> Optional[str]:
 
 
 def check_job_history(job_id: int) -> Optional[str]:
-    # if the job has finished it won't appear in qstat and we should check qacct
-    # this will also provide the exit status (0 on success, 128 + exit_status on fail)
-    # Try getting job with scontrol instead in case sacct is misconfigured
+    # If the job has finished it won't appear in qstat. Typically, I would use
+    # qacct to check the exit code for each job_id, but it is extremely slow.
+    # Instead I am parsing each job's log and making sure it is marked as
+    # (100%) done.
     try:
-        qacct_res = sp.check_output(shlex.split(f"qacct -j {job_id}"))
-    except sp.CalledProcessError as err:
-        logger.warning("qacct process error")
-        logger.warning(err)
-
-    match = re.search("exit_status  ([0-9]+)", qacct_res.decode())
-    if match:
-        exit_code = int(match.group(1))
-        return "success" if exit_code == 0 else "failed"
-
-    return None
+        log = next(Path("logs").glob(f"*.{job_id}")).read_text().strip()
+        return "success" if log.endswith("(100%) done") else None
+    except StopIteration:
+        return None
 
 
 if __name__ == "__main__":
