@@ -109,7 +109,7 @@ if (
             bpm=cfg.config.reference_files.illumina_manifest_file,
         output:
             adpc=temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
-            snp_count="sample_level/per_sample_num_snps/{Sample_ID}.txt",
+            snp_count=temp("sample_level/per_sample_num_snps/{Sample_ID}.txt"),
         script:
             "../scripts/gtc2adpc.py"
 
