@@ -60,9 +60,9 @@ rule sample_call_rate_filter:
         mind=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"samp_cr_{wc.cr}")),
         out_prefix="{prefix}/call_rate_{cr}/samples",
     output:
-        bed=temp("{prefix}/call_rate_{cr}/samples.bed"),
-        bim=temp("{prefix}/call_rate_{cr}/samples.bim"),
-        fam=temp("{prefix}/call_rate_{cr}/samples.fam"),
+        bed="{prefix}/call_rate_{cr}/samples.bed",
+        bim="{prefix}/call_rate_{cr}/samples.bim",
+        fam="{prefix}/call_rate_{cr}/samples.fam",
     wildcard_constraints:
         samp_cr="[1, 2]",
     log:
@@ -109,7 +109,7 @@ rule maf_filter:
     log:
         "{prefix}/{name}{filters}_maf{maf}.log",
     group:
-        "{prefix}/{name}"
+        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -165,7 +165,7 @@ rule approx_ld:
     log:
         "{prefix}/{name}{filters}_ld{ld}.log",
     group:
-        "{prefix}/{name}"
+        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -205,7 +205,7 @@ rule ld_prune:
     log:
         "{prefix}/{name}{filters}_ld{ld}_pruned.log",
     group:
-        "{prefix}/{name}"
+        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -241,7 +241,7 @@ rule snps_only_filter:
     log:
         "{prefix}/{name}{filters}_snps.log",
     group:
-        "{prefix}/{name}"
+        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -277,7 +277,7 @@ rule autosome_only_filter:
     log:
         "{prefix}/{name}{filters}_autosome.log",
     group:
-        "{prefix}/{name}"
+        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -318,7 +318,7 @@ rule cleaned_filter:
     log:
         "{prefix}/{name}{filters}_cleaned.log",
     group:
-        "{prefix}/{name}"
+        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:

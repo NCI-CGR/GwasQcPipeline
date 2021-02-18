@@ -45,7 +45,7 @@ rule plink_split_population:
     wildcard_constraints:
         population="\w+",
     group:
-        "population_level/{population}/subjects"
+        "population_level_{population}_subjects"
     envmodules:
         cfg.envmodules("plink2"),
     conda:

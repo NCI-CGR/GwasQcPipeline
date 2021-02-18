@@ -28,7 +28,7 @@ rule plink_stats_call_rate:
         imiss="{prefix}/{name}{filters}.imiss",
         lmiss="{prefix}/{name}{filters}.lmiss",
     group:
-        "{prefix}/{name}"
+        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -58,7 +58,7 @@ rule plink_stats_sexcheck:
     output:
         sexcheck="{prefix}/{name}{filters}.sexcheck",
     group:
-        "{prefix}/{name}"
+        rule_group
     threads: 2
     resources:
         mem=10000,
@@ -87,7 +87,7 @@ rule plink_stats_allele_freq:
     output:
         sexcheck="{prefix}/{name}{filters}.frq",
     group:
-        "{prefix}/{name}"
+        rule_group
     threads: 2
     resources:
         mem=10000,
@@ -116,7 +116,7 @@ rule plink_stats_hardy:
     output:
         sexcheck="{prefix}/{name}{filters}.hwe",
     group:
-        "{prefix}/{name}"
+        rule_group
     threads: 2
     resources:
         mem=10000,
@@ -152,9 +152,8 @@ rule plink_stats_ibd:
         out_prefix="{prefix}/{name}{filters}",
     output:
         genome="{prefix}/{name}{filters}.genome",
-        nosex="{prefix}/{name}{filters}.nosex",
     group:
-        "{prefix}/{name}"
+        rule_group
     threads: 2
     resources:
         mem=10000,
@@ -184,9 +183,9 @@ rule plink_stats_het:
     params:
         out_prefix="{prefix}/{name}{filters}",
     output:
-        genome="{prefix}/{name}{filters}.het",
+        het="{prefix}/{name}{filters}.het",
     group:
-        "{prefix}/{name}"
+        rule_group
     threads: 2
     resources:
         mem=10000,

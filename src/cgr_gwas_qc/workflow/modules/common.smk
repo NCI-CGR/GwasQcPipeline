@@ -4,18 +4,24 @@ from textwrap import dedent
 import pandas as pd
 
 
-def get_numSNPs():
-    from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
-
-    return BeadPoolManifest(cfg.config.reference_files.illumina_manifest_file).num_loci
-
-
 wildcard_constraints:
     name="samples|subjects|controls|snps",
     filters=".*",
     cr="1|2",
     maf="0\.\d+",
     ld="0\.\d+",
+
+
+def get_numSNPs():
+    from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
+
+    return BeadPoolManifest(cfg.config.reference_files.illumina_manifest_file).num_loci
+
+
+def rule_group(wildcards):
+    prefix = wildcards.get("prefix", "").replace("/", "_")
+    name = wildcards.get("name", "")
+    return f"{prefix}_{name}"
 
 
 rule plink_bed_to_ped:
@@ -57,7 +63,7 @@ rule concordance_table:
     input:
         "{prefix}.genome",
     output:
-        temp("{prefix}.concordance.csv"),
+        "{prefix}.concordance.csv",
     run:
         (
             pd.read_csv(input[0], delim_whitespace=True)
@@ -154,7 +160,7 @@ rule eigensoft_smartpca:
     output:
         gen="{prefix}.eigenvec",
     group:
-        "convert"
+        "pca"
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:
