@@ -7,7 +7,7 @@
 #$ -j yes
 #$ -q {{ queue }}
 #$ -l h_rt={{ time_hr }}:00:00
-export PATH=${CONDA_PREFIX}/bin$(dirname ${CONDA_EXE}):${PATH}
+export PATH=$CONDA_PREFIX/bin:$(dirname $CONDA_EXE):$PATH
 source /etc/profile.d/modules.sh; module load sge; unset module
 {% endif %}
 {% if biowulf %}

@@ -129,38 +129,11 @@ def update_properties(options: Dict, cluster_config: Dict, job_properties: Dict)
 
 def update_group_properties(
     options: Dict, cluster_config: Dict, job_properties: Dict, jobscript: str
-) -> None:
-    rulenames = set(_get_rule_names(jobscript))
-    rulename = ".".join(sorted(rulenames))  # concatenate rulenames: rule1.rule2
+):
+    rulenames = _get_rule_names(jobscript)
+    rulename = ".".join(sorted(set(rulenames)))  # concatenate rulenames: rule1.rule2
     options["rulename"] = f"GROUP.{rulename}"
-
-    if len(rulenames) == 1:
-        # One rule with multiple samples
-        try:
-            n = len(job_properties.get("output", []))
-            n_jobs = _update_group_component_properties(rulename, n, options, cluster_config)
-            _update_jobscript(n_jobs, jobscript)
-        except KeyError as err:
-            logger.error(
-                "You must place a rule's minimum {threads, mem_gb, time_min} into "
-                "`cluster_profile/cluster.yaml` if you want to group multiple "
-                "samples when sending to cluster."
-            )
-            logger.error(err)
-
-        return None
-
-    # Multiple rules one sample
-
-    # snakemake already uses max resources in job_properties
-    options.update(
-        job_properties.get("resources", {})
-    )  # this is already done in update_properties but doing it here to be thorough
-
-    # NOTE: In the future you may want to handle time differently. Ideally
-    # we would use the sum of time, but this would not be possible without
-    # defining all rules in cluster_config or parsing the workflow ourselves.
-
+    update_properties(options, cluster_config, job_properties)
     return None
 
 
@@ -177,29 +150,3 @@ def _get_rule_names(jobscript: str) -> List[str]:
 
     allowed_rules = match.group(1)
     return allowed_rules.strip().split()
-
-
-def _update_group_component_properties(
-    rulename: str, n: int, options: Dict, cluster_config: Dict
-) -> int:
-
-    # How many sample to run in parallele
-    n_parallel = cluster_config.get("n_parallel", 4)
-    if n <= n_parallel:
-        n_parallel = n
-
-    # set resources based on the number of parallel jobs
-    options["threads"] = cluster_config[rulename]["threads"] * n_parallel
-    options["mem_gb"] = cluster_config[rulename]["mem_gb"] * n_parallel
-
-    # set time based on the number of parallel jobs
-    time_min = cluster_config[rulename]["time_min"]
-    options["time_hr"] = (time_min * n / n_parallel) / 60
-
-    return n_parallel
-
-
-def _update_jobscript(n_jobs, jobscript):
-    jobscript_txt = Path(jobscript).read_text()
-    updated_txt = re.sub(r"-j ", f"-j {n_jobs} ", jobscript_txt)
-    Path(jobscript).write_text(updated_txt)
