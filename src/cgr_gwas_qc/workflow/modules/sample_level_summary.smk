@@ -1,31 +1,17 @@
 import pandas as pd
 
 
-def sample_qc_report_inputs(wildcards):
-    inputs = {
-        "imiss_start": "sample_level/samples.imiss",
-        "imiss_cr1": "sample_level/call_rate_1/samples.imiss",
-        "imiss_cr2": "sample_level/call_rate_2/samples.imiss",
-        "sexcheck_cr1": "sample_level/call_rate_1/samples.sexcheck",
-        "ancestry": "sample_level/ancestry/graf_ancestry.txt",
-        "known_replicates": "sample_level/concordance/KnownReplicates.csv",
-        "unknown_replicates": "sample_level/concordance/UnknownReplicates.csv",
-    }
-
-    if (
-        cfg.config.user_files.idat_pattern
-        and cfg.config.user_files.gtc_pattern
-        and cfg.config.workflow_params.remove_contam
-    ):
-        inputs["contam"] = "sample_level/contamination/verifyIDintensity_contamination.csv"
-        inputs["intensity"] = "sample_level/median_idat_intensity.csv"
-
-    return inputs
-
-
 checkpoint sample_qc_report:
     input:
-        unpack(sample_qc_report_inputs),
+        imiss_start="sample_level/samples.imiss",
+        imiss_cr1="sample_level/call_rate_1/samples.imiss",
+        imiss_cr2="sample_level/call_rate_2/samples.imiss",
+        sexcheck_cr1="sample_level/call_rate_1/samples.sexcheck",
+        ancestry="sample_level/ancestry/graf_ancestry.txt",
+        known_replicates="sample_level/concordance/KnownReplicates.csv",
+        unknown_replicates="sample_level/concordance/UnknownReplicates.csv",
+        contam="sample_level/contamination/verifyIDintensity_contamination.csv",
+        intensity="sample_level/median_idat_intensity.csv",
     output:
         all_samples="sample_level/qc_summary.csv",
     script:
