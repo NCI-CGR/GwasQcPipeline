@@ -1,37 +1,22 @@
 include: cfg.modules("common.smk")
 
 
-def _snp_call_rate_filter(wildcards):
-    if wildcards.cr == "2":
-        return {
-            "bed": "{prefix}/call_rate_1/samples.bed",
-            "bim": "{prefix}/call_rate_1/samples.bim",
-            "fam": "{prefix}/call_rate_1/samples.fam",
-        }
-
-    return {
-        "bed": "{prefix}/samples.bed",
-        "bim": "{prefix}/samples.bim",
-        "fam": "{prefix}/samples.fam",
-    }
-
-
-rule snp_call_rate_filter:
+rule snp_call_rate_1:
     input:
-        unpack(_snp_call_rate_filter),
+        bed="sample_level/samples.bed",
+        bim="sample_level/samples.bim",
+        fam="sample_level/samples.fam",
     params:
-        geno=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"snp_cr_{wc.cr}")),
-        out_prefix="{prefix}/call_rate_{cr}/snps",
+        geno=1 - cfg.config.software_params.snp_cr_1,
+        out_prefix="sample_level/call_rate_1/snps",
     output:
-        bed=temp("{prefix}/call_rate_{cr}/snps.bed"),
-        bim=temp("{prefix}/call_rate_{cr}/snps.bim"),
-        fam=temp("{prefix}/call_rate_{cr}/snps.fam"),
-    wildcard_constraints:
-        snp_cr="[1, 2]",
+        bed=temp("sample_level/call_rate_1/snps.bed"),
+        bim=temp("sample_level/call_rate_1/snps.bim"),
+        fam=temp("sample_level/call_rate_1/snps.fam"),
     log:
-        "{prefix}/call_rate_{cr}/snps.log",
+        "sample_level/call_rate_1/snps.log",
     group:
-        "call_rate_filters"
+        "call_rate"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -51,24 +36,92 @@ rule snp_call_rate_filter:
         "--out {params.out_prefix}"
 
 
-rule sample_call_rate_filter:
+rule sample_call_rate_1:
     input:
-        bed="{prefix}/call_rate_{cr}/snps.bed",
-        bim="{prefix}/call_rate_{cr}/snps.bim",
-        fam="{prefix}/call_rate_{cr}/snps.fam",
+        bed="sample_level/call_rate_1/snps.bed",
+        bim="sample_level/call_rate_1/snps.bim",
+        fam="sample_level/call_rate_1/snps.fam",
     params:
-        mind=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"samp_cr_{wc.cr}")),
-        out_prefix="{prefix}/call_rate_{cr}/samples",
+        mind=1 - cfg.config.software_params.samp_cr_1,
+        out_prefix="sample_level/call_rate_1/samples",
     output:
-        bed="{prefix}/call_rate_{cr}/samples.bed",
-        bim="{prefix}/call_rate_{cr}/samples.bim",
-        fam="{prefix}/call_rate_{cr}/samples.fam",
-    wildcard_constraints:
-        samp_cr="[1, 2]",
+        bed="sample_level/call_rate_1/samples.bed",
+        bim="sample_level/call_rate_1/samples.bim",
+        fam="sample_level/call_rate_1/samples.fam",
     log:
-        "{prefix}/call_rate_{cr}/samples.log",
+        "sample_level/call_rate_1/samples.log",
     group:
-        "call_rate_filters"
+        "call_rate"
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    threads: 20
+    resources:
+        mem=10000,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--mind {params.mind} "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
+
+
+rule snp_call_rate_2:
+    input:
+        bed="sample_level/call_rate_1/samples.bed",
+        bim="sample_level/call_rate_1/samples.bim",
+        fam="sample_level/call_rate_1/samples.fam",
+    params:
+        geno=1 - cfg.config.software_params.snp_cr_2,
+        out_prefix="sample_level/call_rate_2/snps",
+    output:
+        bed=temp("sample_level/call_rate_2/snps.bed"),
+        bim=temp("sample_level/call_rate_2/snps.bim"),
+        fam=temp("sample_level/call_rate_2/snps.fam"),
+    log:
+        "sample_level/call_rate_2/snps.log",
+    group:
+        "call_rate"
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    threads: 20
+    resources:
+        mem=10000,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--geno {params.geno} "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem} "
+        "--out {params.out_prefix}"
+
+
+rule sample_call_rate_2:
+    input:
+        bed="sample_level/call_rate_2/snps.bed",
+        bim="sample_level/call_rate_2/snps.bim",
+        fam="sample_level/call_rate_2/snps.fam",
+    params:
+        mind=1 - cfg.config.software_params.samp_cr_2,
+        out_prefix="sample_level/call_rate_2/samples",
+    output:
+        bed="sample_level/call_rate_2/samples.bed",
+        bim="sample_level/call_rate_2/samples.bim",
+        fam="sample_level/call_rate_2/samples.fam",
+    log:
+        "sample_level/call_rate_2/samples.log",
+    group:
+        "call_rate"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
