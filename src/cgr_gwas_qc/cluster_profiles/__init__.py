@@ -130,10 +130,10 @@ def update_properties(options: Dict, cluster_config: Dict, job_properties: Dict)
 def update_group_properties(
     options: Dict, cluster_config: Dict, job_properties: Dict, jobscript: str
 ):
+    update_properties(options, cluster_config, job_properties)
     rulenames = _get_rule_names(jobscript)
     rulename = ".".join(sorted(set(rulenames)))  # concatenate rulenames: rule1.rule2
     options["rulename"] = f"GROUP.{rulename}"
-    update_properties(options, cluster_config, job_properties)
     return None
 
 
