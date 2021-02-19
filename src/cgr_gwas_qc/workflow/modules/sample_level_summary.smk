@@ -1,6 +1,20 @@
 import pandas as pd
 
 
+def _contam(wildcards):
+    uf, wf = cfg.config.user_files, cfg.config.workflow_params
+    if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:
+        return "sample_level/contamination/verifyIDintensity_contamination.csv"
+    return []
+
+
+def _intensity(wildcards):
+    uf, wf = cfg.config.user_files, cfg.config.workflow_params
+    if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:
+        return ("sample_level/median_idat_intensity.csv",)
+    return []
+
+
 checkpoint sample_qc_report:
     input:
         imiss_start="sample_level/samples.imiss",
@@ -10,8 +24,8 @@ checkpoint sample_qc_report:
         ancestry="sample_level/ancestry/graf_ancestry.txt",
         known_replicates="sample_level/concordance/KnownReplicates.csv",
         unknown_replicates="sample_level/concordance/UnknownReplicates.csv",
-        contam="sample_level/contamination/verifyIDintensity_contamination.csv",
-        intensity="sample_level/median_idat_intensity.csv",
+        contam=_contam,
+        intensity=_intensity,
     output:
         all_samples="sample_level/qc_summary.csv",
     script:
