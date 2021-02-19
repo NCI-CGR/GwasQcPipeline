@@ -30,8 +30,8 @@ if cfg.config.user_files.gtc_pattern:
         params:
             strand=cfg.config.software_params.strand,
         output:
-            ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
-            map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
+            ped="sample_level/per_sample_plink_files/{Sample_ID}.ped", # TEMP
+            map_="sample_level/per_sample_plink_files/{Sample_ID}.map",
         script:
             "../scripts/gtc2plink.py"
 

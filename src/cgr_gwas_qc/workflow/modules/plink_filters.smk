@@ -68,7 +68,7 @@ rule sample_call_rate_1:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} && sleep 5"
 
 
 rule snp_call_rate_2:
@@ -138,7 +138,7 @@ rule sample_call_rate_2:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} && sleep 5"
 
 
 rule maf_filter:
