@@ -11,7 +11,7 @@ def _contam(wildcards):
 def _intensity(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
     if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:
-        return ("sample_level/median_idat_intensity.csv",)
+        return "sample_level/median_idat_intensity.csv"
     return []
 
 
