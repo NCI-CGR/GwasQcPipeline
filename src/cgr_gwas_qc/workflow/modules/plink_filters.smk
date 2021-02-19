@@ -33,7 +33,8 @@ rule snp_call_rate_1:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule sample_call_rate_1:
@@ -68,7 +69,8 @@ rule sample_call_rate_1:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix} && sleep 5"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule snp_call_rate_2:
@@ -103,7 +105,8 @@ rule snp_call_rate_2:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule sample_call_rate_2:
@@ -138,7 +141,8 @@ rule sample_call_rate_2:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix} && sleep 5"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule maf_filter:
@@ -179,7 +183,8 @@ rule maf_filter:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule approx_ld:
@@ -234,7 +239,8 @@ rule approx_ld:
         "--indep-pairwise 50 5 {params.r2}  "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule ld_prune:
@@ -275,7 +281,8 @@ rule ld_prune:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule snps_only_filter:
@@ -311,7 +318,8 @@ rule snps_only_filter:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule autosome_only_filter:
@@ -347,7 +355,8 @@ rule autosome_only_filter:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule cleaned_filter:
@@ -387,4 +396,5 @@ rule cleaned_filter:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"

@@ -62,7 +62,8 @@ rule plink_split_population:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 def required_population_results(wildcards):
@@ -175,7 +176,8 @@ rule plink_split_controls:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 def required_population_controls(wildcards):

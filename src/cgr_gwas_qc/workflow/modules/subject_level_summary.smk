@@ -47,7 +47,8 @@ rule kept_samples:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule sample_to_subject_map:
@@ -97,7 +98,8 @@ rule renamed_subjects:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule related_subjects:
@@ -146,4 +148,5 @@ rule remove_related_subjects:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"

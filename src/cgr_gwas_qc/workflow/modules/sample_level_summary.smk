@@ -84,4 +84,5 @@ rule remove_contaminated:
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"

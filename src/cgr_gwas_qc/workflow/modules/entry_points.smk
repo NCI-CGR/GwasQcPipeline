@@ -87,7 +87,8 @@ if cfg.config.user_files.gtc_pattern:
             "--make-bed "
             "--out {params.prefix} "
             "--threads {threads} "
-            "--memory {resources.mem}"
+            "--memory {resources.mem} "
+            "&& sleep 5"
 
 
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
@@ -121,7 +122,8 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
             "--map {input.map_} "
             "--make-bed "
             "--out {params.prefix} "
-            "--memory {resources.mem}"
+            "--memory {resources.mem} "
+            "&& sleep 5"
 
 
 elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user_files.fam:

@@ -43,7 +43,8 @@ rule plink_stats_call_rate:
         "--missing "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule plink_stats_sexcheck:
@@ -70,7 +71,8 @@ rule plink_stats_sexcheck:
         "--check-sex "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule plink_stats_allele_freq:
@@ -97,7 +99,8 @@ rule plink_stats_allele_freq:
         "--freq "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule plink_stats_hardy:
@@ -124,7 +127,8 @@ rule plink_stats_hardy:
         "--hardy "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule plink_stats_ibd:
@@ -161,7 +165,8 @@ rule plink_stats_ibd:
         "--max {params.ibd_max} "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
 
 
 rule plink_stats_het:
@@ -189,4 +194,5 @@ rule plink_stats_het:
         "--het "
         "--threads {threads} "
         "--memory {resources.mem} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix} "
+        "&& sleep 5"
