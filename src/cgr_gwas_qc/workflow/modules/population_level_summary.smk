@@ -158,7 +158,7 @@ rule plink_split_controls:
     wildcard_constraints:
         pi="[01].\d+",
     group:
-        "population_level/{population}/controls"
+        "population_level_{population}_controls"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
