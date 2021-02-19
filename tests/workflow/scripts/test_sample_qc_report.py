@@ -14,8 +14,9 @@ from cgr_gwas_qc.testing.data import RealData
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def data_cache_and_cfg(tmp_path_factory):
+def data_cache_and_cfg(tmp_path_factory, pytestconfig):
     """Real data and config object for QC table unit tests."""
+    pytestconfig.getoption("--real-data", skip=True)
     session_tmp_path: Path = tmp_path_factory.mktemp("sample_qc_report_script")
     data_cache = (
         RealData(session_tmp_path)
