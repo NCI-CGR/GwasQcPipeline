@@ -13,9 +13,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -29,7 +26,7 @@ jobs:
         # If conda should be updated before running other commands (Default: 'false')
         update-conda: true
         # Python version which should be installed with conda (default: 'Default')
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.8"
         # Additional channels like 'conda-forge' which can be used to install packages
         conda-channels: conda-forge, bioconda, default
     - name: Install dependencies
