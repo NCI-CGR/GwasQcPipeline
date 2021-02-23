@@ -64,13 +64,8 @@ rule concordance_table:
         "{prefix}.genome",
     output:
         "{prefix}.concordance.csv",
-    run:
-        (
-            pd.read_csv(input[0], delim_whitespace=True)
-            .assign(concordance=lambda x: x.IBS2 / (x.IBS0 + x.IBS1 + x.IBS2))
-            .reindex(["IID1", "IID2", "PI_HAT", "concordance"], axis=1)
-            .to_csv(output[0])
-        )
+    script:
+        "../scripts/concordance_table.py"
 
 
 def eigensoft_config_inputs(wildcards):
