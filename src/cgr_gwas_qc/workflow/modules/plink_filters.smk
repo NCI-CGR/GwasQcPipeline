@@ -148,7 +148,7 @@ rule maf_filter:
         bim="{prefix}/{name}{filters}.bim",
         fam="{prefix}/{name}{filters}.fam",
     params:
-        maf=lambda wc: float(wc.maf),
+        maf="{maf}",
         out_prefix="{prefix}/{name}{filters}_maf{maf}",
     output:
         bed=temp("{prefix}/{name}{filters}_maf{maf}.bed"),
