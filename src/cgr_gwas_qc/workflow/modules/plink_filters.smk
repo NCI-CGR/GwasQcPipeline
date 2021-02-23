@@ -159,10 +159,10 @@ rule maf_filter:
         maf=lambda wc: float(wc.maf),
         out_prefix="{prefix}/{name}{filters}_maf{maf}",
     output:
-        bed=temp("{prefix}/{name}{filters}_maf{maf}.bed"),
-        bim=temp("{prefix}/{name}{filters}_maf{maf}.bim"),
-        fam=temp("{prefix}/{name}{filters}_maf{maf}.fam"),
-        nosex=temp("{prefix}/{name}{filters}_maf{maf}.nosex"),
+        bed="{prefix}/{name}{filters}_maf{maf}.bed", # TEMP
+        bim="{prefix}/{name}{filters}_maf{maf}.bim",
+        fam="{prefix}/{name}{filters}_maf{maf}.fam",
+        nosex="{prefix}/{name}{filters}_maf{maf}.nosex",
     log:
         "{prefix}/{name}{filters}_maf{maf}.log",
     group:
@@ -217,9 +217,9 @@ rule approx_ld:
         r2=lambda wc: float(wc.ld), # r2 threshold: currently 0.1
         out_prefix="{prefix}/{name}{filters}_ld{ld}",
     output:
-        to_keep=temp("{prefix}/{name}{filters}_ld{ld}.prune.in"), # Markers in approx. linkage equilibrium
-        to_remove=temp("{prefix}/{name}{filters}_ld{ld}.prune.out"), # Markers in LD
-        nosex=temp("{prefix}/{name}{filters}_ld{ld}.nosex"), # Markers in LD
+        to_keep="{prefix}/{name}{filters}_ld{ld}.prune.in", # Markers in approx. linkage equilibrium
+        to_remove="{prefix}/{name}{filters}_ld{ld}.prune.out", # Markers in LD
+        nosex="{prefix}/{name}{filters}_ld{ld}.nosex", # Markers in LD
     log:
         "{prefix}/{name}{filters}_ld{ld}.log",
     group:
