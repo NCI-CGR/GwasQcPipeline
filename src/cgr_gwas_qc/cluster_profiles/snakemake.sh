@@ -2,21 +2,20 @@
 {% if cgems %}
 #$ -S /bin/bash
 #$ -N GwasQcPipeline
-#$ -V
+#$ -v CONDA_EXE,CONDA_PREFIX
 #$ -cwd
 #$ -j yes
 #$ -q {{ queue }}
 #$ -l h_rt={{ time_hr }}:00:00
-source /etc/profile.d/modules.sh;
-module load sge
-unset module
-
+export PATH=$CONDA_PREFIX/bin:$(dirname $CONDA_EXE):$PATH
+source /etc/profile.d/modules.sh; module load sge; unset module
 {% endif %}
 {% if biowulf %}
 #SBATCH --job-name="GwasQcPipeline"
 #SBATCH --partition="{{ queue }}"
 #SBATCH --time={{ time_hr }}:00:00
 {% endif %}
+
 set -euo pipefail
 
 cd {{ working_dir }}

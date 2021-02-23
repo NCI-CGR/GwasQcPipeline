@@ -94,7 +94,7 @@ class SampleSheet:
     @staticmethod
     def _clean_data(data) -> pd.DataFrame:
         """Converts Data section into a dataframe."""
-        return pd.read_csv(StringIO(data)).dropna(how="all")
+        return pd.read_csv(StringIO(data), low_memory=False).dropna(how="all")
 
     def add_group_by_column(self, col_name: Optional[str] = None) -> "SampleSheet":
         """Select which column in the sample sheet to use for subject grouping.

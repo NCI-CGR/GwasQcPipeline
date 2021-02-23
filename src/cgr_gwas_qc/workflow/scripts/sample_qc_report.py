@@ -618,7 +618,7 @@ def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {"contam": None, "intensity": None}
-        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
+        defaults.update({k: (Path(v) if v else None) for k, v in snakemake.input.items()})  # type: ignore # noqa
         defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
         main(**defaults)
     else:

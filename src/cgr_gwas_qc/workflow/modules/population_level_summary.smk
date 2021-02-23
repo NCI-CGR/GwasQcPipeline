@@ -2,6 +2,9 @@ import pandas as pd
 from more_itertools import flatten
 
 
+include: cfg.modules("common.smk")
+
+
 ################################################################################
 # Population Level Analysis
 #   - PCA
@@ -41,6 +44,8 @@ rule plink_split_population:
         "population_level/{population}/subjects.log",
     wildcard_constraints:
         population="\w+",
+    group:
+        "population_level_{population}_subjects"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -152,6 +157,8 @@ rule plink_split_controls:
         "population_level/{population}/controls_unrelated{pi}.log",
     wildcard_constraints:
         pi="[01].\d+",
+    group:
+        "population_level_{population}_controls"
     envmodules:
         cfg.envmodules("plink2"),
     conda:

@@ -216,9 +216,9 @@ def test_per_sample_gtc_to_adpc(tmp_path):
                     assert obs_row.genotype == 3
                 else:
                     # floats should be really close
-                    assert np.isclose(exp_row.x_norm, obs_row.x_norm)
-                    assert np.isclose(exp_row.y_norm, obs_row.y_norm)
-                    assert np.isclose(exp_row.genotype_score, obs_row.genotype_score)
+                    assert pytest.approx(exp_row.x_norm, abs=1e-6) == obs_row.x_norm
+                    assert pytest.approx(exp_row.y_norm, abs=1e-6) == obs_row.y_norm
+                    assert pytest.approx(exp_row.genotype_score, abs=1e-6) == obs_row.genotype_score
 
         obs_counts = tmp_path / f"sample_level/per_sample_num_snps/{r.Sample_ID}.txt"
         exp_counts = data_cache / f"production_outputs/contam/{r.Sample_ID}.adpc.bin.numSnps.txt"
@@ -276,7 +276,7 @@ def test_per_sample_verifyIDintensity_contamination(tmp_path, conda_envs):
 @pytest.mark.regression
 @pytest.mark.workflow
 @pytest.mark.slow
-def test_contamination_test_with_missing_abf_values(tmp_path):
+def test_contamination_test_with_missing_abf_values(tmp_path, conda_envs):
     """Does verifyIDintensity run with missing abf values.
 
     In issue #30 we found that the legacy pipeline was setting missing values
@@ -286,6 +286,7 @@ def test_contamination_test_with_missing_abf_values(tmp_path):
     generates similar outputs.
     """
     # GIVEN: Real data using GTC entry point and the per sample adpc files.
+    conda_envs.copy_env("verifyidintensity", tmp_path)
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
@@ -310,7 +311,7 @@ def test_contamination_test_with_missing_abf_values(tmp_path):
     )
 
     # WHEN: I run snakemake to calculate contamination
-    run_snakemake(tmp_path, keep_temp=True)
+    run_snakemake(tmp_path, keep_temp=True, print_stdout=True)
 
     # THEN: The observed contamination file is similar to the expected file for each sample.
     for r in data_cache.ss.data.itertuples(index=False):
@@ -321,9 +322,9 @@ def test_contamination_test_with_missing_abf_values(tmp_path):
 
         obs = obs_file.read_text().strip().split("\n")[-1].split()
         exp_ = exp_file.read_text().strip().split("\n")[-1].split()
-        assert np.isclose(float(obs[1]), float(exp_[1]), atol=1e-5, rtol=0)
-        assert np.isclose(float(obs[2]), float(exp_[2]), atol=10, rtol=0)
-        assert np.isclose(float(obs[3]), float(exp_[3]), atol=10, rtol=0)
+        assert pytest.approx(float(exp_[1]), abs=0.01) == float(obs[1])  # within 1% of each other
+        assert pytest.approx(float(exp_[2]), rel=0.1) == float(obs[2])  # within 1000
+        assert pytest.approx(float(exp_[3]), rel=0.1) == float(obs[3])  # within 1000
 
 
 @pytest.mark.real_data
