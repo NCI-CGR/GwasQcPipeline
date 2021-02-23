@@ -1,5 +1,7 @@
 from textwrap import dedent
 
+import pytest
+
 from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
 from cgr_gwas_qc.testing.data import FakeData, RealData
 
@@ -88,6 +90,7 @@ def test_eigenstrat_config(tmp_path):
     assert obs_ == exp_
 
 
+@pytest.mark.real_data
 def test_eigensoft_convert(tmp_path, conda_envs):
     # GIVEN:
     conda_envs.copy_env("eigensoft", tmp_path)
@@ -132,6 +135,7 @@ def test_eigensoft_convert(tmp_path, conda_envs):
     )
 
 
+@pytest.mark.real_data
 def test_eigensoft_smartpca(tmp_path, conda_envs):
     # GIVEN:
     conda_envs.copy_env("eigensoft", tmp_path)
