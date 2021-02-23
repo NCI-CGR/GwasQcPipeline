@@ -214,7 +214,7 @@ rule approx_ld:
         bim="{prefix}/{name}{filters}.bim",
         fam="{prefix}/{name}{filters}.fam",
     params:
-        r2=lambda wc: float(wc.ld), # r2 threshold: currently 0.1
+        r2="{ld}", # r2 threshold: currently 0.1
         out_prefix="{prefix}/{name}{filters}_ld{ld}",
     output:
         to_keep="{prefix}/{name}{filters}_ld{ld}.prune.in", # Markers in approx. linkage equilibrium
