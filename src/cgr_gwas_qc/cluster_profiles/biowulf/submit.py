@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass, field
+from datetime import timedelta
 from typing import Set
 
 from snakemake.utils import read_job_properties
@@ -21,17 +22,17 @@ class BiowulfOptions(ClusterOptions):
 
     def __str__(self):
         # See cgems_jobscript.sh for default sge options
-        cmd = "sbatch --partition={queue} --job-name=gqc.{job_id} --mem={mem} --time={time} --output={log} "
+        cmd = "sbatch --partition={queue} --job-name=gqc.{job_id} --mem={mem_gb:0.0f}gb --time={time} --output={log}"
 
         if self.threads > 1:
-            cmd += "--ntasks=1 --cpus-per-task={threads}"
+            cmd += " --cpus-per-task={threads}"
 
-        if self.time > 4:
+        if self.time > timedelta(hours=4):
             self.queue.discard("quick")
 
         return cmd.format(
             queue=",".join(self.queue),
-            mem=self.mem_mb,
+            mem_gb=self.mem_gb,
             time=str(self.time),
             threads=self.threads,
             job_id=self.job_id,
