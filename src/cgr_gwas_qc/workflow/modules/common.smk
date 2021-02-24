@@ -38,9 +38,9 @@ rule plink_bed_to_ped:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -49,7 +49,7 @@ rule plink_bed_to_ped:
         "--recode "
         "--keep-allele-order "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {wildcards.prefix}"
 
 
