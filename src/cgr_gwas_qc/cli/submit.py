@@ -59,7 +59,8 @@ def main(
 
     run_script = create_submission_script(payload)
     if not dry_run:
-        sp.check_output([submission_cmd, run_script])  # type: ignore
+        job_id = sp.check_output([submission_cmd, run_script]).decode().strip()  # type: ignore
+        print(f"Submitted {job_id}")
 
 
 def check_exclusive_options(cgems, biowulf, cluster_profile):
