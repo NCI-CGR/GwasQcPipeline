@@ -23,7 +23,8 @@ rule snp_call_rate_1:
         cfg.conda("plink2.yml")
     threads: 20
     resources:
-        mem=10000,
+    group:
+        "call_rate_1"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -59,6 +60,8 @@ rule sample_call_rate_1:
     threads: 20
     resources:
         mem=10000,
+    group:
+        "call_rate_1"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -93,7 +96,8 @@ rule snp_call_rate_2:
         cfg.conda("plink2.yml")
     threads: 20
     resources:
-        mem=10000,
+    group:
+        "call_rate_2"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -128,7 +132,8 @@ rule sample_call_rate_2:
         cfg.conda("plink2.yml")
     threads: 20
     resources:
-        mem=10000,
+    group:
+        "call_rate_2"
     shell:
         "plink "
         "--bed {input.bed} "
