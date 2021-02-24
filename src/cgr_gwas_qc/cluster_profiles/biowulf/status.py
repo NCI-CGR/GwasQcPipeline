@@ -50,8 +50,11 @@ def check_sacct(job_id: int) -> Optional[str]:
         logger.error(err)
         return None
 
-    status = {x.split("|")[0]: x.split("|")[1] for x in job_info.decode().strip().split("\n")}
-    return STATUS_CODES.get(status["{job_id}"], None)
+    try:
+        status = {x.split("|")[0]: x.split("|")[1] for x in job_info.decode().strip().split("\n")}
+        return STATUS_CODES.get(status[f"{job_id}"], None)
+    except IndexError:
+        return None
 
 
 def check_scontrol(job_id: int) -> Optional[str]:
