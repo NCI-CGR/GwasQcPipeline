@@ -14,6 +14,10 @@ source /etc/profile.d/modules.sh; module load sge; unset module
 #SBATCH --job-name="GwasQcPipeline"
 #SBATCH --partition="{{ queue }}"
 #SBATCH --time={{ time_hr }}:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=2gb
 {% endif %}
 
 set -euo pipefail
