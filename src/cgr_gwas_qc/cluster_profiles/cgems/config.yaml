@@ -4,10 +4,8 @@ cluster-status: cgems_status.py
 jobs: 1000
 keep-going: true
 latency-wait: 60
-local-cores: 1
-max-jobs-per-second: 1
+max-jobs-per-second: 10
 max-status-checks-per-second: 10
 rerun-incomplete: true
 restart-times: 3
 use-conda: true
-notemp: true
