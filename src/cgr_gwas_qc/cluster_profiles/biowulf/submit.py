@@ -22,10 +22,7 @@ class BiowulfOptions(ClusterOptions):
 
     def __str__(self):
         # See cgems_jobscript.sh for default sge options
-        cmd = "sbatch --partition={queue} --job-name=gqc.{job_id} --mem={mem_gb:0.0f}gb --time={time} --output={log}"
-
-        if self.threads > 1:
-            cmd += " --cpus-per-task={threads}"
+        cmd = "sbatch --partition={queue} --job-name=gqc.{job_id} --cpus-per-task={threads} --mem={mem_gb:0.0f}gb --time={time} --output={log}"
 
         if self.time > timedelta(hours=4):
             self.queue.discard("quick")
