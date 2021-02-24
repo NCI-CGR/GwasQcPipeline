@@ -123,7 +123,7 @@ rule eigensoft_config:
     params:
         eigensoft_config_params,
     output:
-        par="{prefix}.{tool}.par",
+        par=temp("{prefix}.{tool}.par"),
     wildcard_constraints:
         tool="convert|pca",
     group:
