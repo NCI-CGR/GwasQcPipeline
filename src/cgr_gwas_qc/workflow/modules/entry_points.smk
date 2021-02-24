@@ -30,8 +30,8 @@ if cfg.config.user_files.gtc_pattern:
         params:
             strand=cfg.config.software_params.strand,
         output:
-            ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
-            map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
+            ped="sample_level/per_sample_plink_files/{Sample_ID}.ped", # TEMP
+            map_="sample_level/per_sample_plink_files/{Sample_ID}.map",
         resources:
             mem_gb=1,
         group:
@@ -49,7 +49,7 @@ if cfg.config.user_files.gtc_pattern:
             ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
             map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
         output:
-            temp("sample_level/initial_mergeList.txt"),
+            "sample_level/initial_mergeList.txt", # TEMP
         group:
             "merge_gtc_sample_peds"
         run:
