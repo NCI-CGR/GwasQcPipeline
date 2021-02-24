@@ -49,7 +49,7 @@ def main(
         submission_cmd = "qsub"
     elif biowulf:
         payload["profile"] = get_profile("biowulf")
-        payload["queue"] = queue or ("all.q" if time_hr <= 24 else "long.q")
+        payload["queue"] = queue or ("quick,norm" if time_hr <= 4 else "norm")
         payload["group_options"] = get_grouping_settings()
         submission_cmd = "sbatch"
     else:
