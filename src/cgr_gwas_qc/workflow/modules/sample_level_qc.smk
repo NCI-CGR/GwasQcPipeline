@@ -75,6 +75,10 @@ if (
             temp(
                 "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
             ),
+        resources:
+            mem_gb=1,
+        group:
+            "per_sample_median_idat_intensity"
         envmodules:
             cfg.envmodules("r"),
         conda:
@@ -110,6 +114,10 @@ if (
         output:
             adpc=temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
             snp_count=temp("sample_level/per_sample_num_snps/{Sample_ID}.txt"),
+        resources:
+            mem_gb=1,
+        group:
+            "per_sample_gtc_to_adpc"
         script:
             "../scripts/gtc2adpc.py"
 
@@ -158,6 +166,10 @@ if (
             snps=get_numSNPs(),
         output:
             temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
+        resources:
+            mem_gb=1,
+        group:
+            "per_sample_verifyIDintensity_contamination"
         conda:
             cfg.conda("verifyidintensity.yml")
         shell:

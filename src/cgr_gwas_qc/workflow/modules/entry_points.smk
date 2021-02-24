@@ -32,6 +32,10 @@ if cfg.config.user_files.gtc_pattern:
         output:
             ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
             map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
+        resources:
+            mem_gb=1,
+        group:
+            "per_sample_gtc_to_ped"
         script:
             "../scripts/gtc2plink.py"
 

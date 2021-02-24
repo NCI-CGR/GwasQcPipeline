@@ -142,13 +142,9 @@ def get_grouping_settings():
     # 3. Build group setting string
     group_options = []
     if rules_to_group:
-        group_options.append("--groups")
-        for i, rule in enumerate(rules_to_group):
-            group_options.append(f"{rule}=submit{i}")
-
         group_options.append("--group-components")
-        for i, _ in enumerate(rules_to_group):
-            group_options.append(f"submit{i}={group_size}")
+        for rule in rules_to_group:
+            group_options.append(f"{rule}={group_size}")
 
     return " ".join(group_options)
 
