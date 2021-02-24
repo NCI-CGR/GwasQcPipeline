@@ -48,9 +48,9 @@ rule plink_split_population:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -59,7 +59,7 @@ rule plink_split_population:
         "--keep {input.to_keep} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -159,9 +159,9 @@ rule plink_split_controls:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -170,7 +170,7 @@ rule plink_split_controls:
         "--keep {input.to_keep} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 

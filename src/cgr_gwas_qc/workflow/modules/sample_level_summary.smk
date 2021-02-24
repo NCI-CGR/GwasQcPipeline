@@ -72,9 +72,9 @@ rule remove_contaminated:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -83,5 +83,5 @@ rule remove_contaminated:
         "--remove {input.to_remove} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
