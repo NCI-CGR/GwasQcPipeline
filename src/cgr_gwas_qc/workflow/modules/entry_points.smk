@@ -50,8 +50,6 @@ if cfg.config.user_files.gtc_pattern:
             map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
         output:
             temp("sample_level/initial_mergeList.txt"),
-        group:
-            "merge_gtc_sample_peds"
         run:
             with open(output[0], "w") as fh:
                 for ped, map_ in zip(input.ped, input.map_):
@@ -76,8 +74,6 @@ if cfg.config.user_files.gtc_pattern:
             nosex="sample_level/samples.nosex",
         log:
             "sample_level/samples.log",
-        group:
-            "merge_gtc_sample_peds"
         envmodules:
             cfg.envmodules("plink2"),
         conda:

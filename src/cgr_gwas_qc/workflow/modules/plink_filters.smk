@@ -10,9 +10,9 @@ rule snp_call_rate_1:
         geno=1 - cfg.config.software_params.snp_cr_1,
         out_prefix="sample_level/call_rate_1/snps",
     output:
-        bed=temp("sample_level/call_rate_1/snps.bed"),
-        bim=temp("sample_level/call_rate_1/snps.bim"),
-        fam=temp("sample_level/call_rate_1/snps.fam"),
+        bed=pipe("sample_level/call_rate_1/snps.bed"),
+        bim=pipe("sample_level/call_rate_1/snps.bim"),
+        fam=pipe("sample_level/call_rate_1/snps.fam"),
     log:
         "sample_level/call_rate_1/snps.log",
     envmodules:
@@ -22,8 +22,6 @@ rule snp_call_rate_1:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "call_rate_1"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -57,8 +55,6 @@ rule sample_call_rate_1:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "call_rate_1"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -80,9 +76,9 @@ rule snp_call_rate_2:
         geno=1 - cfg.config.software_params.snp_cr_2,
         out_prefix="sample_level/call_rate_2/snps",
     output:
-        bed=temp("sample_level/call_rate_2/snps.bed"),
-        bim=temp("sample_level/call_rate_2/snps.bim"),
-        fam=temp("sample_level/call_rate_2/snps.fam"),
+        bed=pipe("sample_level/call_rate_2/snps.bed"),
+        bim=pipe("sample_level/call_rate_2/snps.bim"),
+        fam=pipe("sample_level/call_rate_2/snps.fam"),
     log:
         "sample_level/call_rate_2/snps.log",
     envmodules:
@@ -92,8 +88,6 @@ rule snp_call_rate_2:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "call_rate_2"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -127,8 +121,6 @@ rule sample_call_rate_2:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "call_rate_2"
     shell:
         "plink "
         "--bed {input.bed} "

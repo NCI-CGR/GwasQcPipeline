@@ -126,8 +126,6 @@ rule eigensoft_config:
         par=temp("{prefix}.{tool}.par"),
     wildcard_constraints:
         tool="convert|pca",
-    group:
-        "{tool}"
     run:
         Path(output.par).write_text(dedent(params[0]))
 
@@ -141,8 +139,6 @@ rule eigensoft_convert:
         gen="{prefix}.gen",
         snp="{prefix}.snp",
         ind="{prefix}.ind",
-    group:
-        "convert"
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:
@@ -159,8 +155,6 @@ rule eigensoft_smartpca:
         par="{prefix}.pca.par",
     output:
         gen="{prefix}.eigenvec",
-    group:
-        "pca"
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:
