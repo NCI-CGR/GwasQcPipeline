@@ -49,7 +49,7 @@ if cfg.config.user_files.gtc_pattern:
             ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
             map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
         output:
-            "sample_level/initial_mergeList.txt", # TEMP
+            temp("sample_level/initial_mergeList.txt"),
         group:
             "merge_gtc_sample_peds"
         run:
