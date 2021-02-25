@@ -56,7 +56,7 @@ rule sample_call_rate_1:
         cfg.conda("plink2.yml")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     group:
         "call_rate_1"
     shell:
