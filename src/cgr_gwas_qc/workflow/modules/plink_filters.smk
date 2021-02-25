@@ -13,7 +13,7 @@ rule snp_call_rate_1:
         bed=temp("sample_level/call_rate_1/snps.bed"),
         bim=temp("sample_level/call_rate_1/snps.bim"),
         fam=temp("sample_level/call_rate_1/snps.fam"),
-        nosex=temp("sample_level/call_rate_2/snps.nosex"),
+        nosex=temp("sample_level/call_rate_1/snps.nosex"),
     log:
         "sample_level/call_rate_1/snps.log",
     envmodules:
@@ -47,6 +47,7 @@ rule sample_call_rate_1:
         bed="sample_level/call_rate_1/samples.bed",
         bim="sample_level/call_rate_1/samples.bim",
         fam="sample_level/call_rate_1/samples.fam",
+        nosex="sample_level/call_rate_1/samples.nosex",
     log:
         "sample_level/call_rate_1/samples.log",
     envmodules:
@@ -114,6 +115,7 @@ rule sample_call_rate_2:
         bed="sample_level/call_rate_2/samples.bed",
         bim="sample_level/call_rate_2/samples.bim",
         fam="sample_level/call_rate_2/samples.fam",
+        nosex="sample_level/call_rate_2/samples.nosex",
     log:
         "sample_level/call_rate_2/samples.log",
     envmodules:
