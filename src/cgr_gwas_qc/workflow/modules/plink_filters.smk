@@ -10,9 +10,10 @@ rule snp_call_rate_1:
         geno=1 - cfg.config.software_params.snp_cr_1,
         out_prefix="sample_level/call_rate_1/snps",
     output:
-        bed=pipe("sample_level/call_rate_1/snps.bed"),
-        bim=pipe("sample_level/call_rate_1/snps.bim"),
-        fam=pipe("sample_level/call_rate_1/snps.fam"),
+        bed=temp("sample_level/call_rate_1/snps.bed"),
+        bim=temp("sample_level/call_rate_1/snps.bim"),
+        fam=temp("sample_level/call_rate_1/snps.fam"),
+        nosex=temp("sample_level/call_rate_2/snps.nosex"),
     log:
         "sample_level/call_rate_1/snps.log",
     envmodules:
@@ -76,9 +77,10 @@ rule snp_call_rate_2:
         geno=1 - cfg.config.software_params.snp_cr_2,
         out_prefix="sample_level/call_rate_2/snps",
     output:
-        bed=pipe("sample_level/call_rate_2/snps.bed"),
-        bim=pipe("sample_level/call_rate_2/snps.bim"),
-        fam=pipe("sample_level/call_rate_2/snps.fam"),
+        bed=temp("sample_level/call_rate_2/snps.bed"),
+        bim=temp("sample_level/call_rate_2/snps.bim"),
+        fam=temp("sample_level/call_rate_2/snps.fam"),
+        nosex=temp("sample_level/call_rate_2/snps.nosex"),
     log:
         "sample_level/call_rate_2/snps.log",
     envmodules:
