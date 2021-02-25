@@ -31,9 +31,9 @@ rule plink_stats_call_rate:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bfile {wildcards.prefix} "
@@ -42,7 +42,7 @@ rule plink_stats_call_rate:
         "--fam {input.fam} "
         "--missing "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -55,9 +55,9 @@ rule plink_stats_sexcheck:
         out_prefix="{prefix}/{name}{filters}",
     output:
         sexcheck="{prefix}/{name}{filters}.sexcheck",
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -69,7 +69,7 @@ rule plink_stats_sexcheck:
         "--fam {input.fam} "
         "--check-sex "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -82,9 +82,9 @@ rule plink_stats_allele_freq:
         out_prefix="{prefix}/{name}{filters}",
     output:
         sexcheck="{prefix}/{name}{filters}.frq",
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -96,7 +96,7 @@ rule plink_stats_allele_freq:
         "--fam {input.fam} "
         "--freq "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -109,9 +109,9 @@ rule plink_stats_hardy:
         out_prefix="{prefix}/{name}{filters}",
     output:
         sexcheck="{prefix}/{name}{filters}.hwe",
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -123,7 +123,7 @@ rule plink_stats_hardy:
         "--fam {input.fam} "
         "--hardy "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -144,9 +144,9 @@ rule plink_stats_ibd:
         out_prefix="{prefix}/{name}{filters}",
     output:
         genome="{prefix}/{name}{filters}.genome",
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -160,7 +160,7 @@ rule plink_stats_ibd:
         "--min {params.ibd_min} "
         "--max {params.ibd_max} "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -174,9 +174,9 @@ rule plink_stats_het:
         out_prefix="{prefix}/{name}{filters}",
     output:
         het="{prefix}/{name}{filters}.het",
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -188,5 +188,5 @@ rule plink_stats_het:
         "--fam {input.fam} "
         "--het "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"

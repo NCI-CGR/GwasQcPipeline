@@ -17,6 +17,48 @@ include: cfg.modules("subject_level_summary.smk")
 include: cfg.modules("population_level_summary.smk")
 
 
+localrules: # Always run these rules locally b/c they are quick
+    all,
+    concordance_table,
+    sample_concordance_plink,
+    sample_qc_report,
+    sample_qc_report_summary_stats,
+    sample_lists_from_qc_flags,
+    subject_representative,
+    sample_to_subject_map,
+    subjects_per_population,
+    phony_population_results,
+    phony_population_controls,
+
+
+if cfg.ss.shape[0] < 1_000:
+    # With a small number of samples, these steps take < 1 min, so just run
+    # them locally.
+
+    localrules:
+        plink_bed_to_ped, # common
+         # plink_filters
+        maf_filter,
+        approx_ld,
+        ld_prune,
+        snps_only_filter,
+        autosome_only_filter,
+        cleaned_filter,
+        remove_contaminated, # plink_stats
+        plink_stats_call_rate,
+        plink_stats_sexcheck,
+        plink_stats_allele_freq,
+        plink_stats_hardy,
+        plink_stats_ibd,
+        plink_stats_het, # subject_level_summary
+        kept_samples,
+        renamed_subjects,
+        related_subjects,
+        remove_related_subjects, # population_level_summary
+        plink_split_population,
+        plink_split_controls,
+
+
 rule all:
     input:
         "sample_level/qc_summary.csv",

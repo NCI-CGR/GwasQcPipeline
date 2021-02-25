@@ -103,13 +103,16 @@ def test_get_rule_names_multisample_group(multisample_group):
     "cluster_config,job_properties,expected",
     [
         pytest.param(
-            {}, {"type": "group"}, {"rulename": "GROUP.a.b"}, id="basic group properties",
+            {},
+            {"type": "group", "jobid": 1, "threads": 1},
+            {"rulename": "GROUP.a.b", "job_id": 1, "threads": 1},
+            id="basic group",
         ),
         pytest.param(
             {},
-            {"type": "group", "resources": {"mem_gb": 2}},
-            {"rulename": "GROUP.a.b", "mem_gb": 2},
-            id="basic group properties",
+            {"type": "group", "jobid": 1, "threads": 1, "resources": {"mem_gb": 2}},
+            {"rulename": "GROUP.a.b", "job_id": 1, "threads": 1, "mem_gb": 2},
+            id="basic group with resources",
         ),
     ],
 )
@@ -117,29 +120,3 @@ def test_update_group_properties_basic_group(cluster_config, job_properties, exp
     options = {}
     update_group_properties(options, cluster_config, job_properties, basic_group)
     assert expected == options
-
-
-@pytest.mark.parametrize(
-    "cluster_config,job_properties,expected",
-    [
-        pytest.param(
-            {"n_parallel": 1, "a": {"threads": 1, "mem_gb": 1, "time_min": 12}},
-            {"type": "group", "output": ["a/1.out", "a/2.out", "a/3.out", "a/4.out", "a/5.out"]},
-            {"rulename": "GROUP.a", "threads": 1, "mem_gb": 1, "time_hr": 1},
-            id="multisample group 1x",
-        ),
-        pytest.param(
-            {"n_parallel": 2, "a": {"threads": 1, "mem_gb": 1, "time_min": 12}},
-            {"type": "group", "output": ["a/1.out", "a/2.out", "a/3.out", "a/4.out", "a/5.out"]},
-            {"rulename": "GROUP.a", "threads": 2, "mem_gb": 2, "time_hr": 0.5},
-            id="multisample group 2x",
-        ),
-    ],
-)
-def test_update_group_properties_multisample_group(
-    cluster_config, job_properties, expected, multisample_group
-):
-    options = {}
-    update_group_properties(options, cluster_config, job_properties, multisample_group)
-    assert expected == options
-    assert f"-j {cluster_config['n_parallel']} " in multisample_group.read_text()

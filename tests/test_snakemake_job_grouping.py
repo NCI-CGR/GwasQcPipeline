@@ -58,6 +58,7 @@ def test_basic_grouping(tmp_path, qsub):
     of `b/1.out`.
     """
     shutil.copyfile(FakeData() / "job_scripts/basic_group.smk", tmp_path / "Snakefile")
+    (tmp_path / "logs").mkdir(exist_ok=True)
     with chdir(tmp_path):
         sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
 
@@ -107,6 +108,7 @@ def test_wildcard_grouping(tmp_path, qsub):
             """
         ),
     )
+    (tmp_path / "logs").mkdir(exist_ok=True)
     with chdir(tmp_path):
         sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
 
@@ -160,6 +162,7 @@ def test_basic_grouping_max_resource(a_mem, b_mem, tmp_path, qsub):
             """
         ),
     )
+    (tmp_path / "logs").mkdir(exist_ok=True)
     with chdir(tmp_path):
         sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
 
@@ -209,6 +212,7 @@ def test_basic_grouping_max_threads(a_cpu, b_cpu, tmp_path, qsub):
             """
         ),
     )
+    (tmp_path / "logs").mkdir(exist_ok=True)
     with chdir(tmp_path):
         sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
 
@@ -241,6 +245,7 @@ def test_basic_component_grouping(tmp_path, qsub):
     shutil.copyfile(
         FakeData() / "job_scripts/single_rule_10_samples_with_resources.smk", tmp_path / "Snakefile"
     )
+    (tmp_path / "logs").mkdir(exist_ok=True)
     with chdir(tmp_path):
         sp.run(
             ["snakemake", "--cluster", "qsub", "-j", "1", "--group-components", "grp0=5"],
@@ -280,6 +285,7 @@ def test_basic_component_grouping_cluster_override(tmp_path, qsub):
             """
         ),
     )
+    (tmp_path / "logs").mkdir(exist_ok=True)
     with chdir(tmp_path):
         sp.run(
             ["snakemake", "--cluster", "qsub", "-j", "2", "--group-components", "grp0=5"],

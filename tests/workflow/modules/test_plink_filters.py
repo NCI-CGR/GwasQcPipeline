@@ -158,12 +158,9 @@ def test_call_rate_filters(tmp_path, conda_envs):
     )
 
     # WHEN: I run snakemake
-    snake_log = run_snakemake(tmp_path)
+    run_snakemake(tmp_path)
 
     # THEN:
-    # I should remove the 3 temporary filtered SNP files.
-    assert snake_log.count("Removing temporary output") == 12
-
     # the number of variants and samples filtered should be close to production outputs
     def parse_call_rate_log(file_name: Path):
         """Parse a plink log to find out how many snps/samples passed filtering."""

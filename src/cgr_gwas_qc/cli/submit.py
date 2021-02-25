@@ -5,7 +5,6 @@ from pathlib import Path
 from textwrap import wrap
 from typing import List, Optional
 
-import pandas as pd
 import typer
 from snakemake.io import load_configfile
 
@@ -40,17 +39,25 @@ def main(
         "cgems": cgems,
         "biowulf": biowulf,
         "time_hr": time_hr,
+        "local_mem_mb": 500,
+        "local_tasks": 1,
     }
+
+    cfg = load_config()
+    sample_size = cfg.ss.shape[0]
+    if sample_size < 1_000:  # bump up local resources and run a bunch or rules there
+        payload["local_tasks"] = 4
+        payload["local_mem_mb"] = 1024 * 4
 
     if cgems:
         payload["profile"] = get_profile("cgems")
         payload["queue"] = queue or ("all.q" if time_hr <= 24 else "long.q")
-        payload["group_options"] = get_grouping_settings()
+        payload["group_options"] = get_grouping_settings(sample_size)
         submission_cmd = "qsub"
     elif biowulf:
         payload["profile"] = get_profile("biowulf")
-        payload["queue"] = queue or ("all.q" if time_hr <= 24 else "long.q")
-        payload["group_options"] = get_grouping_settings()
+        payload["queue"] = queue or ("quick,norm" if time_hr <= 4 else "norm")
+        payload["group_options"] = get_grouping_settings(sample_size)
         submission_cmd = "sbatch"
     else:
         payload["profile"] = check_custom_cluster_profile(cluster_profile, queue, submission_cmd)
@@ -59,7 +66,8 @@ def main(
 
     run_script = create_submission_script(payload)
     if not dry_run:
-        sp.check_output([submission_cmd, run_script])  # type: ignore
+        job_id = sp.check_output([submission_cmd, run_script]).decode().strip()  # type: ignore
+        print(f"Submitted {job_id}")
 
 
 def check_exclusive_options(cgems, biowulf, cluster_profile):
@@ -107,9 +115,8 @@ def get_profile(cluster: str):
         return (cgr_profiles / "biowulf").as_posix()
 
 
-def get_group_size(sample_table: pd.DataFrame) -> Optional[int]:
+def get_group_size(n_samples: int) -> Optional[int]:
     """Return how many samples to group together"""
-    n_samples = sample_table.shape[0]
 
     if n_samples < 50:
         return None
@@ -127,10 +134,9 @@ def get_per_sample_rules() -> List[str]:
     return sorted([key for key in cluster_profile.keys() if key.startswith("per_sample")])
 
 
-def get_grouping_settings():
+def get_grouping_settings(sample_size: int):
     # 1. Figure out the group size to use
-    sample_table = load_config().ss
-    group_size = get_group_size(sample_table)
+    group_size = get_group_size(sample_size)
 
     if group_size is None:
         return ""
@@ -141,13 +147,9 @@ def get_grouping_settings():
     # 3. Build group setting string
     group_options = []
     if rules_to_group:
-        group_options.append("--groups")
-        for i, rule in enumerate(rules_to_group):
-            group_options.append(f"{rule}=submit{i}")
-
         group_options.append("--group-components")
-        for i, _ in enumerate(rules_to_group):
-            group_options.append(f"submit{i}={group_size}")
+        for rule in rules_to_group:
+            group_options.append(f"{rule}={group_size}")
 
     return " ".join(group_options)
 

@@ -70,7 +70,7 @@ def test_eigenstrat_config(tmp_path):
     )
 
     # WHEN: I run snakemake to create the par file
-    run_snakemake(tmp_path)
+    run_snakemake(tmp_path, keep_temp=True)
 
     # THEN: The config file is generated as expected
     obs_ = (tmp_path / "samples.convert.par").read_text()

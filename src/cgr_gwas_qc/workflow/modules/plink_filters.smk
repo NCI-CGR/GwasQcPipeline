@@ -15,15 +15,15 @@ rule snp_call_rate_1:
         fam=temp("sample_level/call_rate_1/snps.fam"),
     log:
         "sample_level/call_rate_1/snps.log",
-    group:
-        "call_rate"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    group:
+        "call_rate_1"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -32,7 +32,7 @@ rule snp_call_rate_1:
         "--geno {params.geno} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -50,15 +50,15 @@ rule sample_call_rate_1:
         fam="sample_level/call_rate_1/samples.fam",
     log:
         "sample_level/call_rate_1/samples.log",
-    group:
-        "call_rate"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    group:
+        "call_rate_1"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -67,7 +67,7 @@ rule sample_call_rate_1:
         "--mind {params.mind} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -85,15 +85,15 @@ rule snp_call_rate_2:
         fam=temp("sample_level/call_rate_2/snps.fam"),
     log:
         "sample_level/call_rate_2/snps.log",
-    group:
-        "call_rate"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    group:
+        "call_rate_2"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -102,7 +102,7 @@ rule snp_call_rate_2:
         "--geno {params.geno} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -120,15 +120,15 @@ rule sample_call_rate_2:
         fam="sample_level/call_rate_2/samples.fam",
     log:
         "sample_level/call_rate_2/samples.log",
-    group:
-        "call_rate"
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    group:
+        "call_rate_2"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -137,7 +137,7 @@ rule sample_call_rate_2:
         "--mind {params.mind} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -161,15 +161,13 @@ rule maf_filter:
         nosex=temp("{prefix}/{name}{filters}_maf{maf}.nosex"),
     log:
         "{prefix}/{name}{filters}_maf{maf}.log",
-    group:
-        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -178,7 +176,7 @@ rule maf_filter:
         "--maf {params.maf} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -217,15 +215,13 @@ rule approx_ld:
         nosex=temp("{prefix}/{name}{filters}_ld{ld}.nosex"), # Markers in LD
     log:
         "{prefix}/{name}{filters}_ld{ld}.log",
-    group:
-        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -233,7 +229,7 @@ rule approx_ld:
         "--fam {input.fam} "
         "--indep-pairwise 50 5 {params.r2}  "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -257,15 +253,13 @@ rule ld_prune:
         nosex="{prefix}/{name}{filters}_ld{ld}_pruned.nosex",
     log:
         "{prefix}/{name}{filters}_ld{ld}_pruned.log",
-    group:
-        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -274,7 +268,7 @@ rule ld_prune:
         "--extract {input.prune} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -293,15 +287,13 @@ rule snps_only_filter:
         nosex=temp("{prefix}/{name}{filters}_snps.nosex"),
     log:
         "{prefix}/{name}{filters}_snps.log",
-    group:
-        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -310,7 +302,7 @@ rule snps_only_filter:
         "--snps-only "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -329,15 +321,13 @@ rule autosome_only_filter:
         nosex=temp("{prefix}/{name}{filters}_autosome.nosex"),
     log:
         "{prefix}/{name}{filters}_autosome.log",
-    group:
-        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -346,7 +336,7 @@ rule autosome_only_filter:
         "--autosome "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -370,15 +360,14 @@ rule cleaned_filter:
         nosex="{prefix}/{name}{filters}_cleaned.nosex",
     log:
         "{prefix}/{name}{filters}_cleaned.log",
-    group:
-        rule_group
     envmodules:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
     threads: 2
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -386,5 +375,5 @@ rule cleaned_filter:
         "--fam {input.fam} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"

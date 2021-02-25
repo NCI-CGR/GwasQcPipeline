@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 import pytest
 from pytest_mock import MockerFixture
 
@@ -84,33 +82,11 @@ def test_check_custom_cluster_profile_no_cmd(tmp_path):
         check_custom_cluster_profile(cluster_profile, queue, cmd)
 
 
-@pytest.fixture
-def mock_sample_sheet(request):
-    """Fake sample sheet where I can set arbitrary sample sizes"""
-
-    @dataclass
-    class FakeDataFrame:
-        n_samples: int
-
-        @property
-        def shape(self):
-            return self.n_samples, 0
-
-    class FakeSampleSheet:
-        ss = FakeDataFrame(request.param)
-
-    return FakeSampleSheet()
-
-
-@pytest.mark.parametrize(
-    "mock_sample_sheet,expected",
-    [(10, None), (101, 10), (10_000, 10)],
-    indirect=["mock_sample_sheet"],
-)
-def test_get_group_size_mocks(mock_sample_sheet, expected):
+@pytest.mark.parametrize("sample_size,group_size", [(10, None), (101, 10), (10_000, 10)])
+def test_get_group_size_mocks(sample_size, group_size):
     from cgr_gwas_qc.cli.submit import get_group_size
 
-    assert expected == get_group_size(mock_sample_sheet.ss)
+    assert group_size == get_group_size(sample_size)
 
 
 def test_get_per_sample_rules():
@@ -121,33 +97,21 @@ def test_get_per_sample_rules():
     assert 4 == len(per_sample_rules)
 
 
-@pytest.mark.parametrize(
-    "mock_sample_sheet,n", [(10, None), (101, 10), (10_000, 10)], indirect=["mock_sample_sheet"],
-)
-def test_get_grouping_settings(mock_sample_sheet, n, monkeypatch):
+@pytest.mark.parametrize("sample_size,group_size", [(10, None), (101, 10), (10_000, 10)])
+def test_get_grouping_settings(sample_size, group_size):
     from cgr_gwas_qc.cli.submit import get_grouping_settings
 
-    def mock_load_config():
-        return mock_sample_sheet
-
-    monkeypatch.setattr("cgr_gwas_qc.cli.submit.load_config", mock_load_config)
-
-    if n is None:
+    if group_size is None:
         expected = ""
     else:
         expected = (
-            "--groups "
-            "per_sample_gtc_to_adpc=submit0 "
-            "per_sample_gtc_to_ped=submit1 "
-            "per_sample_median_idat_intensity=submit2 "
-            "per_sample_verifyIDintensity_contamination=submit3 "
             "--group-components "
-            f"submit0={n} "
-            f"submit1={n} "
-            f"submit2={n} "
-            f"submit3={n}"
+            f"per_sample_gtc_to_adpc={group_size} "
+            f"per_sample_gtc_to_ped={group_size} "
+            f"per_sample_median_idat_intensity={group_size} "
+            f"per_sample_verifyIDintensity_contamination={group_size}"
         )
-    assert expected == get_grouping_settings()
+    assert expected == get_grouping_settings(sample_size)
 
 
 def test_create_submission_script_cgems(tmp_path):
@@ -164,6 +128,8 @@ def test_create_submission_script_cgems(tmp_path):
             "time_h": 12,
             "queue": "all.q",
             "profile": "test_profile",
+            "local_tasks": 1,
+            "local_mem_mb": 500,
             "group_options": "",
         }
         create_submission_script(payload)

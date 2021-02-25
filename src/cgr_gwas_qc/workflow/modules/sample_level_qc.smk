@@ -72,9 +72,11 @@ if (
                 cfg.config.user_files.idat_pattern.green, query=f"Sample_ID == '{wc.Sample_ID}'",
             ),
         output:
-            temp(
-                "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
-            ),
+            "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv", # TEMP
+        resources:
+            mem_gb=1,
+        group:
+            "per_sample_median_idat_intensity"
         envmodules:
             cfg.envmodules("r"),
         conda:
@@ -108,8 +110,12 @@ if (
             )[0],
             bpm=cfg.config.reference_files.illumina_manifest_file,
         output:
-            adpc=temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
-            snp_count=temp("sample_level/per_sample_num_snps/{Sample_ID}.txt"),
+            adpc="sample_level/per_sample_adpc/{Sample_ID}.adpc.bin", # TEMP
+            snp_count="sample_level/per_sample_num_snps/{Sample_ID}.txt",
+        resources:
+            mem_gb=1,
+        group:
+            "per_sample_gtc_to_adpc"
         script:
             "../scripts/gtc2adpc.py"
 
@@ -157,7 +163,11 @@ if (
         params:
             snps=get_numSNPs(),
         output:
-            temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
+            "sample_level/per_sample_contamination_test/{Sample_ID}.contam.out", # TEMP
+        resources:
+            mem_gb=1,
+        group:
+            "per_sample_verifyIDintensity_contamination"
         conda:
             cfg.conda("verifyidintensity.yml")
         shell:

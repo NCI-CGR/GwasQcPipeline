@@ -35,9 +35,9 @@ rule kept_samples:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -46,7 +46,7 @@ rule kept_samples:
         "--keep {input.to_keep} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -85,9 +85,9 @@ rule renamed_subjects:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -96,7 +96,7 @@ rule renamed_subjects:
         "--update-ids {input.to_rename} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
@@ -134,9 +134,9 @@ rule remove_related_subjects:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 20
+    threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem=10000,
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -145,5 +145,5 @@ rule remove_related_subjects:
         "--remove {input.to_remove} "
         "--make-bed "
         "--threads {threads} "
-        "--memory {resources.mem} "
+        "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"

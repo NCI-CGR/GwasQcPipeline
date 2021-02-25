@@ -1,6 +1,6 @@
-jobscript: cgems_jobscript.sh
-cluster: cgems_submit.py
-cluster-status: cgems_status.py
+jobscript: jobscript.sh
+cluster: submit.py
+cluster-status: status.py
 jobs: 1000
 keep-going: true
 latency-wait: 60
