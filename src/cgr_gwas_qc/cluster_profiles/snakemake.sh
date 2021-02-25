@@ -4,12 +4,15 @@
 #$ -N GwasQcPipeline
 #$ -v CONDA_EXE,CONDA_PREFIX
 #$ -cwd
+#$ -terse
 #$ -j yes
 #$ -o gwas_qc_log.$JOB_ID
 #$ -q {{ queue }}
 #$ -l h_rt={{ time_hr }}:00:00
-#$ -l mem={{ local_mem_mb }}
-{% if local_tasks > 1 %}#$ -pe by_node {{ local_tasks }}{% endif %}
+#$ -l mem_free={{ local_mem_mb }}
+{% if local_tasks > 1 %}
+#$ -pe by_node {{ local_tasks }}
+{% endif %}
 export PATH=$CONDA_PREFIX/bin:$(dirname $CONDA_EXE):$PATH
 source /etc/profile.d/modules.sh; module load sge; unset module
 {% endif %}
