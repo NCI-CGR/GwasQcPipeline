@@ -15,7 +15,7 @@ def _intensity(wildcards):
     return []
 
 
-checkpoint sample_qc_report:
+rule sample_qc_report:
     input:
         imiss_start="sample_level/samples.imiss",
         imiss_cr1="sample_level/call_rate_1/samples.imiss",
