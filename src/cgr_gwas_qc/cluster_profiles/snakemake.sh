@@ -25,6 +25,7 @@ source /etc/profile.d/modules.sh; module load sge; unset module
 #SBATCH --ntasks={{ local_tasks }}
 #SBATCH --cpus-per-task=1
 #SBATCH --mem={{ local_mem_mb }}
+JOB_ID=${SLURM_JOB_ID}
 {% endif %}
 
 set -euo pipefail
@@ -33,3 +34,10 @@ cd {{ working_dir }}
 [[ -d logs ]] || mkdir -p logs
 
 {{ python_executable }} -m cgr_gwas_qc snakemake --local-cores {{ local_tasks }} --profile {{ profile }} {{ group_options }}
+
+PCT_DONE=$(grep -B1 "Complete log" gwas_qc_log.$JOB_ID | sed -nr "s/.*\((.*)\%\).*/\1/p")
+
+if [ $PCT_DONE -ne 100 ]; then
+    echo "CGR SUBMIT: Re-Starting workflow to finish incomplete tasks"
+    {{ python_executable }} -m cgr_gwas_qc snakemake --local-cores {{ local_tasks }} --profile {{ profile }} {{ group_options }}
+fi
