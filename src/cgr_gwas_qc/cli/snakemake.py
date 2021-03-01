@@ -4,22 +4,32 @@ import typer
 from cgr_gwas_qc.config import ConfigMgr
 
 
+def fmt_doc_string(func):
+    func.__doc__ = func.__doc__.format(ConfigMgr.SNAKEFILE)
+    return func
+
+
+@fmt_doc_string
 def main(ctx: typer.Context):
     """Run the Gwas Qc Pipeline using Snakemake.
 
-    This is a wrapper around snakemake. It will pre-pend the `-s`
-    option to point at `cgr_gwas_qc/workflow/Snakemake`. This is how the user
-    should run snakemake locally.
+    This is a wrapper around snakemake. It will pre-pend the `-s` option:
+
+        snakemake -s {} OPTIONS TARGETS
+
+    This is how the user should run snakemake locally.
     """
     args = ctx.args
+    if is_arg(args, ["-h", "--help"]):
+        print(main.__doc__)
+        print("\nSnakemake help is below:\n")
+        snakemake.main(args)
 
-    if not is_arg(args, ["-h", "--help"]):
-        check_and_prepend_arg(args, ["-s", "--snakefile"], ConfigMgr.SNAKEFILE.as_posix())
+    check_and_prepend_arg(args, ["-s", "--snakefile"], ConfigMgr.SNAKEFILE.as_posix())
 
     if not is_arg(args, ["--profile"]):
         check_and_prepend_arg(args, ["-j", "--cores", "--jobs"], "1")
 
-    print(f"cgr running: snakemake {' '.join(args)}")
     snakemake.main(args)
 
 
