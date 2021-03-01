@@ -16,7 +16,7 @@ In this section we describe the different QC steps and point out optional parame
 Module Reference
 ----------------
 
-In this section we descbie technical details about each module and all of the assoicated file types.
+In this section we describe technical details about each module and all of the associated file types.
 
 Developer Documentation
 -----------------------
