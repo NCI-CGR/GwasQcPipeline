@@ -41,13 +41,13 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         poetry run flake8 . --count --exit-zero --statistics
         
-    - name: Run black --check .
-      run: poetry run black --check .
+    - name: Run black --check --exclude=tests/data .
+      run: poetry run black --check --exclude=test/data .
 
     - name: If needed, commit black changes to the pull request
       if: failure()
       run: |
-        poetry run black .
+        poetry run black --exclude=tests/data .
         git config --global user.name 'autoblack'
         git config --global user.email '1240432+jfear@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
