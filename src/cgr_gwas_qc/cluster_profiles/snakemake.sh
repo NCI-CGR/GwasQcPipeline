@@ -36,40 +36,57 @@ CLUSTER_JOB_ID=${SLURM_JOB_ID}
 
 shopt -s -o errexit pipefail nounset
 
+cgr_get_time() {
+    date +'%H:%M:%S %Y-%m-%d'
+}
+
+cgr_start_message() {
+    printf "################################################################################\n"
+    printf "# CGR SUBMIT: Starting GWAS QC Workflow\t" && cgr_get_time
+    printf "################################################################################\n"
+}
+
+cgr_restart_message() {
+    printf "\n\n"
+    printf "################################################################################\n"
+    printf "# CGR SUBMIT: Re-Starting workflow to finish incomplete tasks\t" && cgr_get_time
+    printf "################################################################################\n"
+    printf "\n\n"
+}
+
 cgr_exit_message() {
     printf "\n\n"
     printf "################################################################################\n"
     if [[ $? != 0 ]]; then
-        printf "# CGR SUBMIT: There was an error running the workflow\n"
+        printf "# CGR SUBMIT: There was an error running the workflow\t" && cgr_get_time
     else
-        printf "# CGR SUBMIT: Workflow complete\n"
+        printf "# CGR SUBMIT: Workflow complete\t" && cgr_get_time
     fi
     printf "################################################################################\n"
-    printf "\n\n"
 }
-trap cgr_exit_message EXIT
+trap cgr_exit_message EXIT  # capture exit signal and print exit message
 
+# Make sure logs dir exists
 cd {{ working_dir }}
 [[ -d logs ]] || mkdir -p logs
 
 # Run the workflow
+cgr_start_message
 run_workflow() {
-    {{ python_executable }} -m cgr_gwas_qc snakemake --local-cores {{ local_tasks }} --profile {{ profile }} {{ group_options }}
+    {{ python_executable }} -m cgr_gwas_qc snakemake \
+        --local-cores {{ local_tasks }} \
+        --profile {{ profile }} \
+        {{ group_options }}
 }
-
 run_workflow
 
-# Check the log and make sure everything completed as expected
-sleep 10  # in case of file latency
+# Check the log and make sure everything completed as expected i.e. "(100%) done"
+sleep 10  # in case of filesystem latency
 PCT_DONE=$(tail -n 5 gwas_qc_log.$CLUSTER_JOB_ID | sed -nr "s/.*[[:digit:]]+ of [[:digit:]]+ steps \((.*)\%\) done.*/\1/p")
 
 if [[ $PCT_DONE != "" && $PCT_DONE != 100 ]]; then
     # The pipeline ran successfully but ended early so restart
-    printf "\n\n"
-    printf "################################################################################\n"
-    printf "# CGR SUBMIT: Re-Starting workflow to finish incomplete tasks\n"
-    printf "################################################################################\n"
-    printf "\n\n"
+    cgr_restart_message
     run_workflow
 fi
 
