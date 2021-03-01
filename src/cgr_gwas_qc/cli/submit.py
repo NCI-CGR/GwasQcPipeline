@@ -10,6 +10,8 @@ from snakemake.io import load_configfile
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.cluster_profiles import env
+from cgr_gwas_qc.config import ConfigMgr
+from cgr_gwas_qc.version import __version__
 
 
 def main(
@@ -36,6 +38,8 @@ def main(
     payload = {
         "python_executable": sys.executable,
         "working_dir": os.getcwd(),
+        "snakefile": ConfigMgr.SNAKEFILE,
+        "version": __version__,
         "cgems": cgems,
         "biowulf": biowulf,
         "time_hr": time_hr,

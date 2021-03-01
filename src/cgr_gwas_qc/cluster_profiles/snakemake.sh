@@ -42,26 +42,33 @@ cgr_get_time() {
 
 cgr_start_message() {
     printf "################################################################################\n"
-    printf "# CGR SUBMIT: Starting GWAS QC Workflow\t" && cgr_get_time
+    printf "# CGR SUBMIT: Starting GWAS QC Workflow\n"
+    printf "# User: %s\n" $USER
+    printf "# Version: {{ version }}\n"
+    printf "# Profile: {{ profile }}\n"
+    printf "# Snakefile: {{ snakefile }}\n"
+    printf "# Start Time: %s\n# Date: %s\n" $(cgr_get_time)
     printf "################################################################################\n"
 }
 
 cgr_restart_message() {
-    printf "\n\n"
+    printf "\n"
     printf "################################################################################\n"
-    printf "# CGR SUBMIT: Re-Starting workflow to finish incomplete tasks\t" && cgr_get_time
+    printf "# CGR SUBMIT: Re-Starting workflow to finish incomplete tasks\n"
+    printf "# Start Time: %s\n# Date: %s\n" $(cgr_get_time)
     printf "################################################################################\n"
-    printf "\n\n"
+    printf "\n"
 }
 
 cgr_exit_message() {
-    printf "\n\n"
+    printf "\n"
     printf "################################################################################\n"
     if [[ $? != 0 ]]; then
-        printf "# CGR SUBMIT: There was an error running the workflow\t" && cgr_get_time
+        printf "# CGR SUBMIT: There was an error running the workflow\n"
     else
-        printf "# CGR SUBMIT: Workflow complete\t" && cgr_get_time
+        printf "# CGR SUBMIT: Workflow complete\n"
     fi
+    printf "# End Time: %s\n# Date: %s\n" $(cgr_get_time)
     printf "################################################################################\n"
 }
 trap cgr_exit_message EXIT  # capture exit signal and print exit message
