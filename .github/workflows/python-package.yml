@@ -42,7 +42,7 @@ jobs:
         poetry run flake8 . --count --exit-zero --statistics
         
     - name: Run black --check --exclude=tests/data .
-      run: poetry run black --check --exclude=test/data .
+      run: poetry run black --check --exclude=tests/data .
 
     - name: If needed, commit black changes to the pull request
       if: failure()
