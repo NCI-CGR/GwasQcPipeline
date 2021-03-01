@@ -73,7 +73,7 @@ if (
             ),
         output:
             temp(
-                "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv",
+                "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
             ),
         resources:
             mem_gb=1,
@@ -165,7 +165,7 @@ if (
         params:
             snps=get_numSNPs(),
         output:
-            temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out",),
+            temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
         resources:
             mem_gb=1,
         group:
