@@ -13,6 +13,7 @@ rule snp_call_rate_1:
         bed=temp("sample_level/call_rate_1/snps.bed"),
         bim=temp("sample_level/call_rate_1/snps.bim"),
         fam=temp("sample_level/call_rate_1/snps.fam"),
+        nosex=temp("sample_level/call_rate_1/snps.nosex"),
     log:
         "sample_level/call_rate_1/snps.log",
     envmodules:
@@ -22,8 +23,6 @@ rule snp_call_rate_1:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "call_rate_1"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -48,6 +47,7 @@ rule sample_call_rate_1:
         bed="sample_level/call_rate_1/samples.bed",
         bim="sample_level/call_rate_1/samples.bim",
         fam="sample_level/call_rate_1/samples.fam",
+        nosex="sample_level/call_rate_1/samples.nosex",
     log:
         "sample_level/call_rate_1/samples.log",
     envmodules:
@@ -57,8 +57,6 @@ rule sample_call_rate_1:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "call_rate_1"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -83,6 +81,7 @@ rule snp_call_rate_2:
         bed=temp("sample_level/call_rate_2/snps.bed"),
         bim=temp("sample_level/call_rate_2/snps.bim"),
         fam=temp("sample_level/call_rate_2/snps.fam"),
+        nosex=temp("sample_level/call_rate_2/snps.nosex"),
     log:
         "sample_level/call_rate_2/snps.log",
     envmodules:
@@ -92,8 +91,6 @@ rule snp_call_rate_2:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "call_rate_2"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -118,6 +115,7 @@ rule sample_call_rate_2:
         bed="sample_level/call_rate_2/samples.bed",
         bim="sample_level/call_rate_2/samples.bim",
         fam="sample_level/call_rate_2/samples.fam",
+        nosex="sample_level/call_rate_2/samples.nosex",
     log:
         "sample_level/call_rate_2/samples.log",
     envmodules:
@@ -127,8 +125,6 @@ rule sample_call_rate_2:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "call_rate_2"
     shell:
         "plink "
         "--bed {input.bed} "
@@ -152,7 +148,7 @@ rule maf_filter:
         bim="{prefix}/{name}{filters}.bim",
         fam="{prefix}/{name}{filters}.fam",
     params:
-        maf=lambda wc: float(wc.maf),
+        maf="{maf}",
         out_prefix="{prefix}/{name}{filters}_maf{maf}",
     output:
         bed=temp("{prefix}/{name}{filters}_maf{maf}.bed"),
@@ -207,7 +203,7 @@ rule approx_ld:
         bim="{prefix}/{name}{filters}.bim",
         fam="{prefix}/{name}{filters}.fam",
     params:
-        r2=lambda wc: float(wc.ld), # r2 threshold: currently 0.1
+        r2="{ld}", # r2 threshold: currently 0.1
         out_prefix="{prefix}/{name}{filters}_ld{ld}",
     output:
         to_keep=temp("{prefix}/{name}{filters}_ld{ld}.prune.in"), # Markers in approx. linkage equilibrium

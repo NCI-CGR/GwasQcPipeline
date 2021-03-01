@@ -48,21 +48,21 @@ def check_sample_sheet(ss: Path):
 def check_reference_files(reference_files: ReferenceFiles):
     bpm_ = reference_files.illumina_manifest_file
     try:
-        bpm.validate(bpm_)
+        bpm.validate(bpm_)  # type: ignore
         typer.secho(f"BPM OK ({bpm_})", fg=typer.colors.GREEN)
     except Exception:
         typer.secho(f"BPM FAILED ({bpm_})", fg=typer.colors.RED)
 
     vcf_ = reference_files.thousand_genome_vcf
     try:
-        bgzip.validate(vcf_)
+        bgzip.validate(vcf_)  # type: ignore
         typer.secho(f"VCF OK ({vcf_})", fg=typer.colors.GREEN)
     except Exception:
         typer.secho(f"VCF FAILED ({vcf_})", fg=typer.colors.RED)
 
     tbi_ = reference_files.thousand_genome_tbi
     try:
-        bgzip.validate(tbi_)
+        bgzip.validate(tbi_)  # type: ignore
         typer.secho(f"VCF.TBI OK ({tbi_})", fg=typer.colors.GREEN)
     except Exception:
         typer.secho(f"VCF.TBI FAILED ({tbi_})", fg=typer.colors.RED)

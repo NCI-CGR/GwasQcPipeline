@@ -11,20 +11,28 @@ include: cfg.modules("common.smk")
 #   - Autosomal Heterozygosity
 #   - IBS/IBD
 ################################################################################
-rule subjects_per_population:
+checkpoint subjects_per_population:
     input:
         "sample_level/qc_summary.csv",
+    params:
+        threshold=cfg.config.workflow_params.minimum_pop_subjects,
     output:
-        "population_level/{population}/subject_list.txt",
+        directory("population_level/subject_lists"), #"population_level/subject_lists/{population}.txt"
     run:
-        # TODO: Exclude subjects that are unexpected reps (issue #44)
-        (
-            pd.read_csv(input[0])
-            .query("Subject_Representative & Ancestry == @wildcards.population")
-            .assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
-            .reindex(["Group_By_Subject_ID", "Subject_ID2"], axis=1)
-            .to_csv(output[0], sep=" ", index=False, header=False)
-        )
+        df = pd.read_csv(input[0]).query("Subject_Representative")
+        for pop_, grp in df.groupby("Ancestry"):
+            if grp.shape[0] < params.threshold:
+                # Too few subjects to analyze population
+                continue
+
+            pop_path = Path(output[0])
+            pop_path.mkdir(exist_ok=True, parents=True)
+
+            (  # Save a list of subjects for each population
+                grp.assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
+                .reindex(["Group_By_Subject_ID", "Subject_ID2"], axis=1)
+                .to_csv(pop_path / f"{pop_}.txt", sep=" ", index=False, header=False)
+            )
 
 
 rule plink_split_population:
@@ -32,7 +40,7 @@ rule plink_split_population:
         bed="subject_level/subjects.bed",
         bim="subject_level/subjects.bim",
         fam="subject_level/subjects.fam",
-        to_keep=rules.subjects_per_population.output[0],
+        to_keep="population_level/subject_lists/{population}.txt",
     params:
         out_prefix="population_level/{population}/subjects",
     output:
@@ -69,39 +77,33 @@ def required_population_results(wildcards):
     If a population has fewer than `workflow_params.minimum_pop_subjects`
     subjects than ignore.
     """
-    qc_table = checkpoints.sample_qc_report.get(**wildcards).output[0]
+    _ = checkpoints.subjects_per_population.get(**wildcards).output[0]
+    populations = glob_wildcards("population_level/subject_lists/{population}.txt").population
 
     pi = cfg.config.software_params.pi_hat_threshold
     maf = cfg.config.software_params.maf_for_ibd
     ld = cfg.config.software_params.ld_prune_r2
-    population_threshold = cfg.config.workflow_params.minimum_pop_subjects
-
-    pops = (
-        pd.read_csv(qc_table)
-        .query("Subject_Representative")
-        .groupby("Ancestry")
-        .size()
-        .pipe(lambda x: x[x > population_threshold])
-        .index.values.tolist()
-    )
 
     return flatten(
         [
             expand(  # PCA
                 "population_level/{population}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec",
-                population=pops,
+                population=populations,
                 pi=pi,
                 maf=maf,
                 ld=ld,
             ),
             expand(  # IBS/IBD
                 "population_level/{population}/subjects_maf{maf}_ld{ld}_pruned.genome",
-                population=pops,
+                population=populations,
                 maf=maf,
                 ld=ld,
             ),
             expand(  # Autosomal Heterozygosity
-                "population_level/{population}/subjects.het", population=pops, maf=maf, ld=ld,
+                "population_level/{population}/subjects.het",
+                population=populations,
+                maf=maf,
+                ld=ld,
             ),
         ]
     )
@@ -120,22 +122,28 @@ rule phony_population_results:
 # Population Level Analysis (Controls Only)
 #   - HWE
 ################################################################################
-rule controls_per_population:
+checkpoint controls_per_population:
     input:
         "sample_level/qc_summary.csv",
+    params:
+        threshold=cfg.config.workflow_params.control_hwp_threshold,
     output:
-        "population_level/{population}/controls_list.txt",
+        directory("population_level/controls_lists"),
     run:
-        # TODO: Exclude subjects that are unexpected reps (issue #44)
-        (
-            pd.read_csv(input[0])
-            .query(
-                "Subject_Representative & Ancestry == @wildcards.population & `Case/Control_Status` == 0"
+        df = pd.read_csv(input[0]).query("Subject_Representative & `Case/Control_Status` == 0")
+        for pop_, grp in df.groupby("Ancestry"):
+            if grp.shape[0] < params.threshold:
+                # Too few controls to analyze population
+                continue
+
+            pop_path = Path(output[0])
+            pop_path.mkdir(exist_ok=True, parents=True)
+
+            (  # Save a list of subjects for each population
+                grp.assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
+                .reindex(["Group_By_Subject_ID", "Subject_ID2"], axis=1)
+                .to_csv(pop_path / f"{pop_}.txt", sep=" ", index=False, header=False)
             )
-            .assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
-            .reindex(["Group_By_Subject_ID", "Subject_ID2"], axis=1)
-            .to_csv(output[0], sep=" ", index=False, header=False)
-        )
 
 
 rule plink_split_controls:
@@ -143,7 +151,7 @@ rule plink_split_controls:
         bed="population_level/{population}/subjects_unrelated{pi}.bed",
         bim="population_level/{population}/subjects_unrelated{pi}.bim",
         fam="population_level/{population}/subjects_unrelated{pi}.fam",
-        to_keep=rules.controls_per_population.output[0],
+        to_keep="population_level/controls_lists/{population}.txt",
     params:
         out_prefix="population_level/{population}/controls_unrelated{pi}",
     output:
@@ -180,24 +188,15 @@ def required_population_controls(wildcards):
     If population controls have fewer than `workflow_params.control_hwp_threshold`
     subjects than ignore.
     """
-    qc_table = checkpoints.sample_qc_report.get(**wildcards).output[0]
+    _ = checkpoints.controls_per_population.get(**wildcards).output[0]
+    populations = glob_wildcards("population_level/controls_lists/{population}.txt").population
 
     maf = cfg.config.software_params.maf_for_hwe
     pi = cfg.config.software_params.pi_hat_threshold
-    control_threshold = cfg.config.workflow_params.control_hwp_threshold
-
-    pops = (
-        pd.read_csv(qc_table)
-        .query("Subject_Representative & `Case/Control_Status` == 0")
-        .groupby("Ancestry")
-        .size()
-        .pipe(lambda x: x[x > control_threshold])
-        .index.values.tolist()
-    )
 
     return expand(  # HWE
         "population_level/{population}/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.hwe",
-        population=pops,
+        population=populations,
         maf=maf,
         pi=pi,
     )

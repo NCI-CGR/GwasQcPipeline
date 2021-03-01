@@ -33,7 +33,7 @@ rule graf_extract_fingerprint_snps:
         bim="{prefix}.bim",
         fam="{prefix}.fam",
     output:
-        "{prefix}.fpg",
+        temp("{prefix}.fpg"),
     log:
         "{prefix}.fpg.log",
     envmodules:
@@ -72,7 +72,9 @@ if (
                 cfg.config.user_files.idat_pattern.green, query=f"Sample_ID == '{wc.Sample_ID}'",
             ),
         output:
-            "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv", # TEMP
+            temp(
+                "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
+            ),
         resources:
             mem_gb=1,
         group:
@@ -110,8 +112,8 @@ if (
             )[0],
             bpm=cfg.config.reference_files.illumina_manifest_file,
         output:
-            adpc="sample_level/per_sample_adpc/{Sample_ID}.adpc.bin", # TEMP
-            snp_count="sample_level/per_sample_num_snps/{Sample_ID}.txt",
+            adpc=temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
+            snp_count=temp("sample_level/per_sample_num_snps/{Sample_ID}.txt"),
         resources:
             mem_gb=1,
         group:
@@ -163,7 +165,7 @@ if (
         params:
             snps=get_numSNPs(),
         output:
-            "sample_level/per_sample_contamination_test/{Sample_ID}.contam.out", # TEMP
+            temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
         resources:
             mem_gb=1,
         group:

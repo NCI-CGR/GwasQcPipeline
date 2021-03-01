@@ -27,9 +27,24 @@ def test_subjects_per_population(tmp_path, qc_summary):
 
             rule all:
                 input:
-                    "population_level/AFR/subject_list.txt",
-                    "population_level/ASN/subject_list.txt",
-                    "population_level/EUR/subject_list.txt",
+                    "population_agg.txt",
+
+            def _input(wildcards):
+                _ = checkpoints.subjects_per_population.get(**wildcards).output[0]
+                subject_list = "population_level/subject_lists/{population}.txt"
+                return expand(
+                    subject_list,
+                    population=glob_wildcards(subject_list).population
+                )
+
+            rule agg:
+                input:
+                    _input
+                output:
+                    "population_agg.txt"
+                shell:
+                    "echo {input} > {output[0]}"
+
             """
         )
     )
@@ -41,17 +56,7 @@ def test_subjects_per_population(tmp_path, qc_summary):
 
     # THEN: The sorted keep lists should match legacy
     assert sorted_file_equal(
-        tmp_path / "population_level/AFR/subject_list.txt",
-        data_cache / "production_outputs/split_by_pop/AFR.keep.txt",
-    )
-
-    assert sorted_file_equal(
-        tmp_path / "population_level/ASN/subject_list.txt",
-        data_cache / "production_outputs/split_by_pop/ASN.keep.txt",
-    )
-
-    assert sorted_file_equal(
-        tmp_path / "population_level/EUR/subject_list.txt",
+        tmp_path / "population_level/subject_lists/EUR.txt",
         data_cache / "production_outputs/split_by_pop/EUR.keep.txt",
     )
 
@@ -68,7 +73,8 @@ def test_plink_split_population(tmp_path, conda_envs):
         RealData(tmp_path)
         .add_sample_sheet()
         .copy(
-            "production_outputs/split_by_pop/EUR.keep.txt", "population_level/EUR/subject_list.txt",
+            "production_outputs/split_by_pop/EUR.keep.txt",
+            "population_level/subject_lists/EUR.txt",
         )
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
@@ -124,41 +130,6 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
-        .add_user_files(entry_point="gtc", copy=False)
-        .copy("production_outputs/plink_start/samples_start.imiss", "sample_level/samples.imiss")
-        .copy(
-            "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss",
-            "sample_level/call_rate_1/samples.imiss",
-        )
-        .copy(
-            "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
-            "sample_level/call_rate_1/samples.sexcheck",
-        )
-        .copy(
-            "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
-            "sample_level/call_rate_2/samples.imiss",
-        )
-        .copy(
-            "production_outputs/snpweights/samples.snpweights.csv",
-            "sample_level/ancestry/graf_ancestry.txt",
-        )
-        .copy(
-            "production_outputs/concordance/KnownReplicates.csv",
-            "sample_level/concordance/KnownReplicates.csv",
-        )
-        .copy(
-            "production_outputs/concordance/UnknownReplicates.csv",
-            "sample_level/concordance/UnknownReplicates.csv",
-        )
-        .copy(
-            "production_outputs/all_contam/contam.csv",
-            "sample_level/contamination/verifyIDintensity_contamination.csv",
-        )
-        .copy(
-            "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-            "sample_level/median_idat_intensity.csv",
-        )
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
         .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
@@ -172,7 +143,6 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
             include: cfg.modules("common.smk")
             include: cfg.modules("plink_stats.smk")
             include: cfg.modules("plink_filters.smk")
-            include: cfg.modules("sample_level_summary.smk")
             include: cfg.modules("subject_level_summary.smk")
             include: cfg.modules("population_level_summary.smk")
 
@@ -183,10 +153,8 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
             """
         )
     )
+    (tmp_path / "sample_level").mkdir()
     shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
-    data_cache.copy(
-        "production_outputs/split_by_pop/EUR.keep.txt", "population_level/EUR/subject_list.txt",
-    )
 
     # WHEN: run snakemake to get all population level and all population-control level results
     run_snakemake(tmp_path)
@@ -242,7 +210,24 @@ def test_controls_per_population(tmp_path, qc_summary):
 
             rule all:
                 input:
-                    "population_level/EUR/controls_list.txt",
+                    "population_agg.txt",
+
+            def _input(wildcards):
+                _ = checkpoints.controls_per_population.get(**wildcards).output[0]
+                controls_list = "population_level/controls_lists/{population}.txt"
+                return expand(
+                    controls_list,
+                    population=glob_wildcards(controls_list).population
+                )
+
+            rule agg:
+                input:
+                    _input
+                output:
+                    "population_agg.txt"
+                shell:
+                    "echo {input} > {output[0]}"
+
             """
         )
     )
@@ -254,7 +239,7 @@ def test_controls_per_population(tmp_path, qc_summary):
 
     # THEN: The lis of control subjects per population matches legacy
     assert sorted_file_equal(
-        tmp_path / "population_level/EUR/controls_list.txt",
+        tmp_path / "population_level/controls_lists/EUR.txt",
         data_cache / "production_outputs/HWP/EUR_controls.txt",
     )
 
@@ -274,7 +259,7 @@ def test_plink_split_controls(tmp_path, conda_envs):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
-        .copy("production_outputs/HWP/EUR_controls.txt", "population_level/EUR/controls_list.txt",)
+        .copy("production_outputs/HWP/EUR_controls.txt", "population_level/controls_lists/EUR.txt",)
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed",
             f"population_level/EUR/subjects_unrelated{pi}.bed",
@@ -349,40 +334,6 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
         .add_sample_sheet()
         .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
-        .copy("production_outputs/plink_start/samples_start.imiss", "sample_level/samples.imiss")
-        .copy(
-            "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss",
-            "sample_level/call_rate_1/samples.imiss",
-        )
-        .copy(
-            "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
-            "sample_level/call_rate_1/samples.sexcheck",
-        )
-        .copy(
-            "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
-            "sample_level/call_rate_2/samples.imiss",
-        )
-        .copy(
-            "production_outputs/snpweights/samples.snpweights.csv",
-            "sample_level/ancestry/graf_ancestry.txt",
-        )
-        .copy(
-            "production_outputs/concordance/KnownReplicates.csv",
-            "sample_level/concordance/KnownReplicates.csv",
-        )
-        .copy(
-            "production_outputs/concordance/UnknownReplicates.csv",
-            "sample_level/concordance/UnknownReplicates.csv",
-        )
-        .copy(
-            "production_outputs/all_contam/contam.csv",
-            "sample_level/contamination/verifyIDintensity_contamination.csv",
-        )
-        .copy(
-            "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-            "sample_level/median_idat_intensity.csv",
-        )
-        .copy("production_outputs/HWP/EUR_controls.txt", "population_level/EUR/controls_list.txt",)
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed", "population_level/EUR/subjects.bed",
         )
@@ -402,7 +353,6 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
             include: cfg.modules("common.smk")
             include: cfg.modules("plink_stats.smk")
             include: cfg.modules("plink_filters.smk")
-            include: cfg.modules("sample_level_summary.smk")
             include: cfg.modules("subject_level_summary.smk")
             include: cfg.modules("population_level_summary.smk")
 
@@ -413,7 +363,7 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
             """
         )
     )
-
+    (tmp_path / "sample_level").mkdir()
     shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
 
     with chdir(tmp_path):

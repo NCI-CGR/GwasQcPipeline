@@ -30,8 +30,8 @@ rule plink_bed_to_ped:
         bim="{prefix}.bim",
         fam="{prefix}.fam",
     output:
-        ped="{prefix}.ped",
-        map_="{prefix}.map",
+        ped=temp("{prefix}.ped"),
+        map_=temp("{prefix}.map"),
     log:
         "{prefix}.log",
     envmodules:
@@ -63,7 +63,7 @@ rule concordance_table:
     input:
         "{prefix}.genome",
     output:
-        "{prefix}.concordance.csv",
+        temp("{prefix}.concordance.csv"),
     run:
         (
             pd.read_csv(input[0], delim_whitespace=True)
@@ -126,8 +126,6 @@ rule eigensoft_config:
         par=temp("{prefix}.{tool}.par"),
     wildcard_constraints:
         tool="convert|pca",
-    group:
-        "{tool}"
     run:
         Path(output.par).write_text(dedent(params[0]))
 
@@ -138,11 +136,9 @@ rule eigensoft_convert:
         map_="{prefix}.map",
         par="{prefix}.convert.par",
     output:
-        gen="{prefix}.gen",
-        snp="{prefix}.snp",
-        ind="{prefix}.ind",
-    group:
-        "convert"
+        gen=temp("{prefix}.gen"),
+        snp=temp("{prefix}.snp"),
+        ind=temp("{prefix}.ind"),
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:
@@ -159,8 +155,6 @@ rule eigensoft_smartpca:
         par="{prefix}.pca.par",
     output:
         gen="{prefix}.eigenvec",
-    group:
-        "pca"
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:

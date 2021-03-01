@@ -33,7 +33,7 @@ def test_bed_to_ped(tmp_path, conda_envs):
         )
     )
     # WHEN:
-    run_snakemake(tmp_path)
+    run_snakemake(tmp_path, keep_temp=True)
 
     # THEN: the files exists
     assert (tmp_path / "samples.ped").exists()

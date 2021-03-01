@@ -37,7 +37,8 @@ if cfg.ss.shape[0] < 1_000:
 
     localrules:
         plink_bed_to_ped, # common
-         # plink_filters
+        eigensoft_config, # entry points
+        create_gtc_sample_merge_list, # plink_filters
         maf_filter,
         approx_ld,
         ld_prune,
