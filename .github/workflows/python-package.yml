@@ -10,14 +10,41 @@ on:
     branches: [ default ]
 
 jobs:
-  build:
-
+  build_docs:
     runs-on: ubuntu-latest
+    if: "startsWith(github.event.head_commit.message, 'docs')"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip poetry
+        poetry install
+
+    - name: Build Docs
+      run: |
+        poetry run make -C docs html
+
+    - name: Deploy gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/_build/html
+
+  build_and_test:
+    runs-on: ubuntu-latest
+    if: "! startsWith(github.event.head_commit.message, 'docs')"
 
     steps:
     - uses: actions/checkout@v2
       with:
-        submodules: "recursive"  
+        submodules: "recursive"
     - name: setup-conda
       uses: s-weigand/setup-conda@v1.0.5
       with:
@@ -40,7 +67,7 @@ jobs:
         poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         poetry run flake8 . --count --exit-zero --statistics
-        
+
     - name: Run black --check --exclude=tests/data .
       run: poetry run black --check --exclude=tests/data .
 
@@ -54,7 +81,7 @@ jobs:
         git checkout $GITHUB_HEAD_REF
         git commit -am "fixup: Format Python code with Black"
         git push
-        
+
     - name: Test with pytest
       run: |
         poetry run pytest
