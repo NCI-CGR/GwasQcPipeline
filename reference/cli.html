@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Command Line Interface &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+</ul>
+<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="file_types.html">File Type Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rules.html">Rule Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Command Line Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/reference/cli.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="command-line-interface">
+<h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">--ibd_pi_hat_cutoff</span></code> is not used anywhere.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./GwasQcWrapper.py -h
+usage: GwasQcWrapper.py <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-p PATH_TO_PLINK_FILE<span class="o">]</span> <span class="o">[</span>-d DIRECTORY_FOR_OUTPUT<span class="o">]</span>
+                        <span class="o">[</span>--snp_cr_1 SNP_CR_1<span class="o">]</span> <span class="o">[</span>--samp_cr_1 SAMP_CR_1<span class="o">]</span>
+                        <span class="o">[</span>--snp_cr_2 SNP_CR_2<span class="o">]</span> <span class="o">[</span>--samp_cr_2 SAMP_CR_2<span class="o">]</span>
+                        <span class="o">[</span>--ld_prune_r2 LD_PRUNE_R2<span class="o">]</span>
+                        <span class="o">[</span>--maf_for_ibd MAF_FOR_IBD<span class="o">]</span> -s SAMPLE_SHEET
+                        <span class="o">[</span>--subject_id_to_use SUBJECT_ID_TO_USE<span class="o">]</span>
+                        <span class="o">[</span>--ibd_pi_hat_cutoff IBD_PI_HAT_CUTOFF<span class="o">]</span>
+                        <span class="o">[</span>--dup_concordance_cutoff DUP_CONCORDANCE_CUTOFF<span class="o">]</span>
+                        <span class="o">[</span>--lims_output_dir LIMS_OUTPUT_DIR<span class="o">]</span>
+                        <span class="o">[</span>--contam_threshold CONTAM_THRESHOLD<span class="o">]</span>
+                        <span class="o">[</span>-i ILLUMINA_MANIFEST_FILE<span class="o">]</span> <span class="o">[</span>-a ADPC_FILE<span class="o">]</span>
+                        <span class="o">[</span>-g GTC_DIR<span class="o">]</span>
+                        <span class="o">[</span>--expected_sex_col_name EXPECTED_SEX_COL_NAME<span class="o">]</span>
+                        <span class="o">[</span>-q QUEUE<span class="o">]</span> <span class="o">[</span>-u<span class="o">]</span>
+
+optional arguments:
+-h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+-i ILLUMINA_MANIFEST_FILE, --illumina_manifest_file ILLUMINA_MANIFEST_FILE
+                        Full path to illimina .bpm manifest file. Required <span class="k">for</span>
+                        gtc files.
+-a ADPC_FILE, --adpc_file ADPC_FILE
+                        Full path to adpc.bin file. Required <span class="k">for</span> PLINK input.
+-g GTC_DIR, --gtc_dir GTC_DIR
+                        Full path to gtc directory to use instead of project
+                        directory, which is the default. Will recursively find
+                        gtc files in this directory.
+-u, --unlock_snakemake
+                        OPTIONAL. If pipeline was killed unexpectedly you may
+                        need this flag to rerun
+
+Required Arguments:
+-d DIRECTORY_FOR_OUTPUT, --directory_for_output DIRECTORY_FOR_OUTPUT
+                        REQUIRED. Full path to the base directory <span class="k">for</span> the Gwas
+                        QC pipeline output. Defaults to
+                        /DCEG/CGF/GWAS/Scans/GSA_Lab_QC/SR#/builds/QC_v#_date
+-s SAMPLE_SHEET, --sample_sheet SAMPLE_SHEET
+                        Full path to illimina style sample sheet csv file.
+--subject_id_to_use SUBJECT_ID_TO_USE
+                        Name of column in sample sheet that corresponds to
+                        subject ID to use.
+--expected_sex_col_name EXPECTED_SEX_COL_NAME
+                        Name of column in sample sheet that corresponds to
+                        expected sex of sample.
+
+Exactly one of these arguments is required:
+-p PATH_TO_PLINK_FILE, --path_to_plink_file PATH_TO_PLINK_FILE
+                        Full path to either PLINK ped or bed to use as input.
+                        need either this or gtc file project directory -g
+
+Required arguments with default settings:
+--snp_cr_1 SNP_CR_1   REQUIRED. SNP call rate filter <span class="m">1</span>. <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.80
+--samp_cr_1 SAMP_CR_1
+                        REQUIRED. Sample call rate filter <span class="m">1</span>. <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.80
+--snp_cr_2 SNP_CR_2   REQUIRED. SNP call rate filter <span class="m">2</span>. <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.95
+--samp_cr_2 SAMP_CR_2
+                        REQUIRED. Sample call rate filter <span class="m">2</span>. <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.95
+--ld_prune_r2 LD_PRUNE_R2
+                        REQUIRED. r-squared cutoff <span class="k">for</span> ld pruning of SNPs to
+                        use <span class="k">for</span> IBD and concordance. <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.10
+--maf_for_ibd MAF_FOR_IBD
+                        REQUIRED. MAF cutoff of SNPs to use <span class="k">for</span> IBD and
+                        concordance. <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.20
+--ibd_pi_hat_cutoff IBD_PI_HAT_CUTOFF
+                        REQUIRED. PI_HAT cutoff to call samples replicates.
+                        <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.95
+--dup_concordance_cutoff DUP_CONCORDANCE_CUTOFF
+                        REQUIRED. SNP concordance cutoff to call samples
+                        replicates. <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.95
+--lims_output_dir LIMS_OUTPUT_DIR
+                        Directory to copy QC file to upload to LIMS
+--contam_threshold CONTAM_THRESHOLD
+                        REQUIRED. Cutoff to call a sample contaminated.
+                        <span class="nv">default</span><span class="o">=</span> <span class="m">0</span>.10
+-q QUEUE, --queue QUEUE
+                        OPTIONAL. Queue on cgemsiii to use to submit jobs.
+                        Defaults to all of the seq queues and all.q <span class="k">if</span> not
+                        supplied. <span class="nv">default</span><span class="o">=</span><span class="s2">&quot;all.q,seq-alignment.q,seq-calling.q</span>
+<span class="s2">                        ,seq-calling2.q,seq-gvcf.q&quot;</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

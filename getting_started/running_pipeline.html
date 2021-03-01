@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Running the Pipeline &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Sample QC" href="../qc_modules/sample_level.html" />
+    <link rel="prev" title="Installing GwasQcPipeline" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Running the Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-flight-checks">Pre-flight Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-snakemake">Running Snakemake</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Running the Pipeline</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/running_pipeline.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="running-the-pipeline">
+<h1>Running the Pipeline<a class="headerlink" href="#running-the-pipeline" title="Permalink to this headline">¶</a></h1>
+<p>Running the pipeline consists of three phases: configuration, pre-flight checks, running snakemake.</p>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>To start a new project simply run the <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> tool. This will ask you for a project name and location of the sample manifest. It will then populate a <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> in your current working directory with common settings for <code class="docutils literal notranslate"><span class="pre">cgems</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgr config  # if no options are given then you will be prompted for Project Name and Manifest path.
+
+or
+
+$ cgr config --project-name &quot;Test Project&quot; --sample-sheet /DCEG/CGF/Infinium/SampleSheets/&lt;file_name&gt;.csv
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The sample sheet must exists or we raise and error.</p>
+</div>
+<p>Now you should have a new file in your working directory called <code class="docutils literal notranslate"><span class="pre">config.yml</span></code>.</p>
+</div>
+<div class="section" id="pre-flight-checks">
+<h2>Pre-flight Checks<a class="headerlink" href="#pre-flight-checks" title="Permalink to this headline">¶</a></h2>
+<p>One goal of the pipeline is to fail fast if there are problems. One potential source of issues are user provided files. The <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code> command runs a set of data validations on user provided input files to make sure that they are (1) present, (2) readable, and (3) complete.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is fully implemented yet.</p>
+</div>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Adds docs after implementation of <code class="docutils literal notranslate"><span class="pre">pre-flight</span></code>.</p>
+</div>
+</div>
+<div class="section" id="running-snakemake">
+<h2>Running Snakemake<a class="headerlink" href="#running-snakemake" title="Permalink to this headline">¶</a></h2>
+<p>Currently, the only way to run the pipeline is locally. We have implemented a thin wrapper around <code class="docutils literal notranslate"><span class="pre">snakemake</span></code> called <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">snakemake</span></code>. You can run <code class="docutils literal notranslate"><span class="pre">snakemake</span></code> directly, but you must provide the full path the <code class="docutils literal notranslate"><span class="pre">Snakefile</span></code> which can be found by running <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">snakemake</span> <span class="pre">--help</span></code>.</p>
+<p>To run the workflow you would do something similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgr snakemake --cores 2 -k --use-conda
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The current <code class="docutils literal notranslate"><span class="pre">Snakefile</span></code> is just a small example to get things working. It does not actually do anything useful.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../qc_modules/sample_level.html" class="btn btn-neutral float-right" title="Sample QC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installing GwasQcPipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

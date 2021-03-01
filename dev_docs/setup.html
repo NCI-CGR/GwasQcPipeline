@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Setting-up the Development Environment &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Development Tools" href="dev_tools.html" />
+    <link rel="prev" title="Rule Reference" href="../reference/rules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+</ul>
+<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Setting-up the Development Environment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#download-gwasqcpipeline">Download GwasQcPipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-virtual-environment-conda">Create a virtual environment (<code class="docutils literal notranslate"><span class="pre">conda</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-dependencies-and-gwasqcpipeline-poetry">Install dependencies and GwasQcPipeline (<code class="docutils literal notranslate"><span class="pre">poetry</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-pre-commit-hooks-for-consistent-development">Install pre-commit hooks for consistent development</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dev_tools.html">Development Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_tests.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building_docs.html">Building Documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Setting-up the Development Environment</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dev_docs/setup.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="setting-up-the-development-environment">
+<h1>Setting-up the Development Environment<a class="headerlink" href="#setting-up-the-development-environment" title="Permalink to this headline">¶</a></h1>
+<p>The GwasQcPipeline is a python based workflow that uses snakemake for orchestration. There are a number of ways to setup the development environment, but bellow is our recommend method.</p>
+<div class="section" id="download-gwasqcpipeline">
+<h2>Download GwasQcPipeline<a class="headerlink" href="#download-gwasqcpipeline" title="Permalink to this headline">¶</a></h2>
+<p>First we need to download the development version of GwasQcPipeline. Major development is occurring on the <code class="docutils literal notranslate"><span class="pre">restructure</span></code> branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone -b restructure --recursive http://10.133.130.114/jfear/GwasQcPipeline.git
+$ cd GwasQcPipeline
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Our test data (<code class="docutils literal notranslate"><span class="pre">tests/data</span></code>) is stored in a separate git repository. This repository is embedded as a git submodule. The <code class="docutils literal notranslate"><span class="pre">--recursive</span></code> tells git to go ahead and download <code class="docutils literal notranslate"><span class="pre">tests/data</span></code>.</p>
+</div>
+</div>
+<div class="section" id="create-a-virtual-environment-conda">
+<h2>Create a virtual environment (<code class="docutils literal notranslate"><span class="pre">conda</span></code>)<a class="headerlink" href="#create-a-virtual-environment-conda" title="Permalink to this headline">¶</a></h2>
+<p>We recommend you to use virtual environments. There are a number of ways to do this, but since <code class="docutils literal notranslate"><span class="pre">conda</span></code> is needed to run the workflow we suggest you just use a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment. If you need to install <code class="docutils literal notranslate"><span class="pre">conda</span></code> see the <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda website</a>.</p>
+<p>Next you need to setup three channels in your conda config by running the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda config --add channels defaults
+$ conda config --add channels bioconda
+$ conda config --add channels conda-forge
+</pre></div>
+</div>
+<p>Next, To create our <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n GwasQcPipeline python=3.8 poetry psutil pysam make -y
+$ conda activate GwasQcPipeline        # Activates virtual environment
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">psutil</span></code> and <code class="docutils literal notranslate"><span class="pre">pysam</span></code> are runtime requirements. You can install both using poetry/pip (below), but then <code class="docutils literal notranslate"><span class="pre">psutil</span></code> requires <code class="docutils literal notranslate"><span class="pre">gcc</span></code> to be installed. Similarly, <code class="docutils literal notranslate"><span class="pre">pysam</span></code> is sometimes problematic so it is best just to use the <code class="docutils literal notranslate"><span class="pre">conda</span></code> version.</p>
+</div>
+</div>
+<div class="section" id="install-dependencies-and-gwasqcpipeline-poetry">
+<h2>Install dependencies and GwasQcPipeline (<code class="docutils literal notranslate"><span class="pre">poetry</span></code>)<a class="headerlink" href="#install-dependencies-and-gwasqcpipeline-poetry" title="Permalink to this headline">¶</a></h2>
+<p>This project uses <a class="reference external" href="https://python-poetry.org/">poetry</a> as a package manager and build tool. Poetry is a modern python build tool that uses the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> format to track dependencies and build settings.</p>
+<p>To install all runtime/development dependencies and GwasQcPipeline itself run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline    # Make sure we are in our conda environment
+$ poetry install                   # Install development and runtime dependencies
+</pre></div>
+</div>
+<p>Now lets make sure everything is working:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make -C docs html                   # This will build documentation into docs/_build/html
+$ pytest -v                           # This will run the test suite
+$ mypy                                # This will run type checking
+$ gtc2plink --help                    # Is one of this projects command line tools
+</pre></div>
+</div>
+<p>The main reason we are using poetry is because it makes building python packages easy. This won’t be useful until we are ready to deploy. However, if you wanted to build a python package that you could push to pypi or email someone you would run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ poetry build                        # Build artifacts are in ./dist
+</pre></div>
+</div>
+</div>
+<div class="section" id="install-pre-commit-hooks-for-consistent-development">
+<h2>Install pre-commit hooks for consistent development<a class="headerlink" href="#install-pre-commit-hooks-for-consistent-development" title="Permalink to this headline">¶</a></h2>
+<p>There are a number of tools out there to make coding cleaner and more consistent. For example, there are code formatters (i.e., <code class="docutils literal notranslate"><span class="pre">black</span></code>, <code class="docutils literal notranslate"><span class="pre">isort</span></code>, <code class="docutils literal notranslate"><span class="pre">snakefmt</span></code>), code linters (i.e., <code class="docutils literal notranslate"><span class="pre">flake8</span></code>, <code class="docutils literal notranslate"><span class="pre">rstcheck</span></code>), type checkers (i.e., <code class="docutils literal notranslate"><span class="pre">mypy</span></code>). These tools also help catch small mistakes. This repository has a set of git pre-commit hooks (<code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>) that will run a suite of tools at each commit. This helps keeps issues from making it into the code base.</p>
+<p>There is a one-time install that you need to setup in your local version of GwasQcPipeline:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pre-commit install             # Installs the hooks
+$ pre-commit run                 # Make sure everything is working
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The first time you run pre-commit it needs to download and setup virtual environments for each tool. This may take a few minutes.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Tools are only run on files with changes, if this is a fresh clone of the repository then all tools will be skipped.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Now every time you commit files it will run the required set of tools for the staged files. If an auto formatter detects a problem it will make the changes, but you will have to re-stage that file.</p>
+<p>This will slow down making commits, but I find the benefits out weight the inconvenience. If you want to force something and ignore the pre-commit hooks you can always run <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">--no-verify</span></code>. However, make sure it is absolutely necessary!</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dev_tools.html" class="btn btn-neutral float-right" title="Development Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../reference/rules.html" class="btn btn-neutral float-left" title="Rule Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
