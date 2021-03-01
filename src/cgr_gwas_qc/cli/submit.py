@@ -30,6 +30,7 @@ def main(
         help="Name of the command to use for submission (i.e., qsub). Only needed if using `cluster_profile`.",
     ),
     dry_run: bool = typer.Option(False, help="Perform a dry-run but don't submit."),
+    notemp: bool = typer.Option(False, help="Turn off temporary file deletion."),
 ):
     """Run CGR GwasQcPipeline on a cluster."""
 
@@ -45,6 +46,7 @@ def main(
         "time_hr": time_hr,
         "local_mem_mb": 500,
         "local_tasks": 1,
+        "added_options": "--notemp " if notemp else "",
     }
 
     cfg = load_config()
@@ -56,17 +58,16 @@ def main(
     if cgems:
         payload["profile"] = get_profile("cgems")
         payload["queue"] = queue or ("all.q" if time_hr <= 24 else "long.q")
-        payload["group_options"] = get_grouping_settings(sample_size)
+        payload["added_options"] += get_grouping_settings(sample_size)
         submission_cmd = "qsub"
     elif biowulf:
         payload["profile"] = get_profile("biowulf")
         payload["queue"] = queue or ("quick,norm" if time_hr <= 4 else "norm")
-        payload["group_options"] = get_grouping_settings(sample_size)
+        payload["added_options"] += get_grouping_settings(sample_size)
         submission_cmd = "sbatch"
     else:
         payload["profile"] = check_custom_cluster_profile(cluster_profile, queue, submission_cmd)
         payload["queue"] = queue
-        payload["group_options"] = ""  # I don't add grouping setting for 3rd party profiles
 
     run_script = create_submission_script(payload)
     if not dry_run:

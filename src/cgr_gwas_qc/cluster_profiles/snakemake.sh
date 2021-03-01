@@ -71,7 +71,7 @@ cgr_exit_message() {
     printf "# End Time: %s\n# Date: %s\n" $(cgr_get_time)
     printf "################################################################################\n"
 }
-trap cgr_exit_message EXIT  # capture exit signal and print exit message
+trap cgr_exit_message EXIT # capture exit signal and print exit message
 
 # Make sure logs dir exists
 cd {{ working_dir }}
@@ -83,12 +83,12 @@ run_workflow() {
     {{ python_executable }} -m cgr_gwas_qc snakemake \
         --local-cores {{ local_tasks }} \
         --profile {{ profile }} \
-        {{ group_options }}
+        {{ added_options }}
 }
 run_workflow
 
 # Check the log and make sure everything completed as expected i.e. "(100%) done"
-sleep 10  # in case of filesystem latency
+sleep 10 # in case of filesystem latency
 PCT_DONE=$(tail -n 5 gwas_qc_log.$CLUSTER_JOB_ID | sed -nr "s/.*[[:digit:]]+ of [[:digit:]]+ steps \((.*)\%\) done.*/\1/p")
 
 if [[ $PCT_DONE != "" && $PCT_DONE != 100 ]]; then
