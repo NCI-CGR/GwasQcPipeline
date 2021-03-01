@@ -30,8 +30,8 @@ rule plink_bed_to_ped:
         bim="{prefix}.bim",
         fam="{prefix}.fam",
     output:
-        ped="{prefix}.ped",
-        map_="{prefix}.map",
+        ped=temp("{prefix}.ped"),
+        map_=temp("{prefix}.map"),
     log:
         "{prefix}.log",
     envmodules:
@@ -63,7 +63,7 @@ rule concordance_table:
     input:
         "{prefix}.genome",
     output:
-        "{prefix}.concordance.csv",
+        temp("{prefix}.concordance.csv"),
     run:
         (
             pd.read_csv(input[0], delim_whitespace=True)
@@ -136,9 +136,9 @@ rule eigensoft_convert:
         map_="{prefix}.map",
         par="{prefix}.convert.par",
     output:
-        gen="{prefix}.gen",
-        snp="{prefix}.snp",
-        ind="{prefix}.ind",
+        gen=temp("{prefix}.gen"),
+        snp=temp("{prefix}.snp"),
+        ind=temp("{prefix}.ind"),
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:

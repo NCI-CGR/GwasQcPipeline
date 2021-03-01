@@ -30,8 +30,8 @@ if cfg.config.user_files.gtc_pattern:
         params:
             strand=cfg.config.software_params.strand,
         output:
-            ped="sample_level/per_sample_plink_files/{Sample_ID}.ped", # TEMP
-            map_="sample_level/per_sample_plink_files/{Sample_ID}.map",
+            ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
+            map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
         resources:
             mem_gb=1,
         group:
