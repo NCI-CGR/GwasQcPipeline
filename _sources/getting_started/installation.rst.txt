@@ -1,59 +1,70 @@
 Installing GwasQcPipeline
 =========================
 
-Installing on CGEMs
--------------------
+Installing on CGEMS/CCAD
+------------------------
 
-These are the recommended installation instructions for ``cgems`` HPC.
+These are the recommended installation instructions for ``CGEMS/CCAD``.
 
-Create a ``conda`` environment::
+Create a ``conda`` environment (python=3.8):
+
+.. code-block:: bash
 
     $ module load miniconda/4.8.3
     $ conda create -n GwasQcPipeline -y python=3.8 pip
     $ conda activate GwasQcPipeline
 
-.. note::
-    The GwasQcPipeline requires ``python>=3.8``. On ``cgems`` this is easiest to achieve by using a conda environment.
+Install the current release of the ``GwasQcPipeline``:
 
-Install ``GwasQcPipeline`` from the current version on ``cgems``::
+.. code-block:: bash
 
-    $ pip install /DCEG/CGF/Bioinformatics/Production/fearjm/cgr_gwas_qc-0.1.0-py3-none-any.whl
+    $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0-alpha.0/cgr_gwas_qc-1.0.0a0-py3-none-any.whl
     $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 
-To use ``GwasQcPipeline``::
+After the initial installation, to use ``GwasQcPipeline``:
 
-    $ module lod miniconda/4.8.3
+.. code-block:: bash
+
+    $ module load miniconda/4.8.3
     $ conda activate GwasQcPipeline
     $ cgr --help
 
-To update the ``GwasQcPipeline`` in the future::
+To update the ``GwasQcPipeline`` in the future:
 
-    $ module lod miniconda/4.8.3
+.. code-block:: bash
+
+    $ module load miniconda/4.8.3
     $ conda activate GwasQcPipeline
-    $ pip install --force-reinstall /DCEG/CGF/Bioinformatics/Production/fearjm/cgr_gwas_qc-0.1.0-py3-none-any.whl
+    $ pip install --force-reinstall # <url to latest *.whl>
+    # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 
 
 Installing on other systems
 ---------------------------
 
-Currently, the install able wheel is only available on ``cgems``. You could copy ``/DCEG/CGF/Bioinformatics/Production/fearjm/cgr_gwas_qc-0.1.0-py3-none-any.whl`` else where and follow the procedures outlined above.
+The ``GwasQcPipeline`` requires ``conda`` to run. We suggest you follow these directions to install Miniconda_. Once you have ``conda`` installed, you need to create a ``conda`` environment and install the ``GwasQcPipeline``.
 
-You can download and install from the GitLab repository with the following directions.
+.. _Miniconda: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
 
-Again setup a ``conda`` environment but this time install ``poetry`` instead of ``pip``::
+.. code-block:: bash
 
-    $ conda create -n GwasQcPipeline -y python=3.8 poetry
+    $ conda create -n GwasQcPipeline -y python=3.8 pip
     $ conda activate GwasQcPipeline
+    $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0-alpha.0/cgr_gwas_qc-1.0.0a0-py3-none-any.whl
+    $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 
 
-Clone the development version of GwasQcPipeline. Major development is occurring on the ``restructure`` branch::
+To use ``GwasQcPipeline`` first activate your ``conda`` environment:
 
-    $ git clone -b restructure --recursive http://10.133.130.114/jfear/GwasQcPipeline.git
-    $ cd GwasQcPipeline
+.. code-block:: bash
 
-Install the package using ``poetry``::
+    $ conda activate GwasQcPipeline
+    $ cgr --help
 
-    $ poetry install --no-dev
+And to update:
 
-.. note::
-    For more details see development docs.
+.. code-block:: bash
+
+    $ conda activate GwasQcPipeline
+    $ pip install --force-reinstall # <url to latest *.whl>
+    # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases

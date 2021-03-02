@@ -1,43 +1,96 @@
 Running the Pipeline
 ====================
 
-Running the pipeline consists of three phases: configuration, pre-flight checks, running snakemake.
+There are three phases: configuration, pre-flight checks, and running snakemake or submitting to a cluster.
 
 Configuration
 -------------
 
-To start a new project simply run the ``cgr config`` tool. This will ask you for a project name and location of the sample manifest. It will then populate a ``config.yml`` in your current working directory with common settings for ``cgems``::
+First, generate a configuration file by running the ``cgr config`` tool. You will be asked for a project name and the location of the sample sheet (manifest). We will then populate the ``config.yml`` file in your current working directory with our default settings
 
-    $ cgr config  # if no options are given then you will be prompted for Project Name and Manifest path.
+.. code-block:: bash
+
+    $ cgr config  # You will be prompted for the Project Name and Sample Sheet path.
 
     or
 
-    $ cgr config --project-name "Test Project" --sample-sheet /DCEG/CGF/Infinium/SampleSheets/<file_name>.csv
+    $ cgr config --project-name "Test Project" --sample-sheet <path to sample sheet>.csv
+
+You should check/edit the ``config.yml`` file. If you are not running on ``CGEMS/CCAD`` you will need to update paths for reference and user files.
 
 .. warning::
-    The sample sheet must exists or we raise and error.
-
-Now you should have a new file in your working directory called ``config.yml``.
+    We will raise an error if the sample sheet does not exist.
 
 Pre-flight Checks
 -----------------
 
-One goal of the pipeline is to fail fast if there are problems. One potential source of issues are user provided files. The ``cgr pre-flight`` command runs a set of data validations on user provided input files to make sure that they are (1) present, (2) readable, and (3) complete.
+One of our goals is to fail fast if there are problems. A common source of problems are input reference/user files. We provide the ``cgr pre-flight`` command, which tries to validate all input files to make sure that they are (1) present, (2) readable, and (3) complete.
+
+.. code-block:: bash
+
+    # Everything looks good
+    $ cgr pre-flight
+    Sample Sheet OK (sample-sheet-name.csv)
+    BPM OK (bpm-file-name.bpm)
+    VCF OK (vcf-file-name.vcf.gz)
+    VCF.TBI OK (tbi-file-name.vcf.gz.tbi)
+    Processing GTC files
+      [#################################] 100%
+    7,231 GTC Files OK.
+
+    or
+
+    # Missing a few GTC files
+    $ cgr pre-flight
+    Sample Sheet OK (sample-sheet-name.csv)
+    BPM OK (bpm-file-name.bpm)
+    VCF OK (vcf-file-name.vcf.gz)
+    VCF.TBI OK (tbi-file-name.vcf.gz.tbi)
+    Processing GTC files
+      [#################################] 100%
+    There was a problem with these GTC Files:
+      FileNotFound:
+        - missing-gtc-file1.gtc
+        - missing-gtc-file2.gtc
 
 .. warning::
-    This is fully implemented yet.
+    - These checks can take a while if you have a lot of files.
+    - We have not implemented checks for ``idat`` files.
 
-.. todo::
-    Adds docs after implementation of ``pre-flight``.
 
 Running Snakemake
 -----------------
 
-Currently, the only way to run the pipeline is locally. We have implemented a thin wrapper around ``snakemake`` called ``cgr snakemake``. You can run ``snakemake`` directly, but you must provide the full path the ``Snakefile`` which can be found by running ``cgr snakemake --help``.
+We use snakemake_ to orchestrate the ``GwasQcPipeline``. We provide a convenience wrapper, ``cgr snakemake``, for interacting/running snakemake locally. This wrapper adds ``-s <path to GwasQcPipeline Snakefile>`` to the snakemake command.
 
-To run the workflow you would do something similar to::
+.. _snakemake: https://snakemake.readthedocs.io/en/stable/
+
+To run ``GwasQcPipeline`` locally, you could run:
+
+.. code-block:: bash
 
     $ cgr snakemake --cores 2 -k --use-conda
 
-.. warning::
-    The current ``Snakefile`` is just a small example to get things working. It does not actually do anything useful.
+
+Submitting to a cluster
+-----------------------
+
+We provide the ``cgr submit`` command to easily submit to a cluster. For NCI users, we support ``CGEMS/CCAD`` and ``Biowulf``. External users will need to create their own `cluster profile`_.
+
+.. _`cluster profile`: https://github.com/snakemake-profiles/doc
+
+.. code-block:: bash
+
+    # Running on CGEMS/CCAD
+    $ cgr submit --cgems
+
+    or
+
+    # Running on Biowulf
+    $ cgr submit --biowulf
+
+    or
+
+    # Running on external cluster
+    $ cgr submit --profile /path/to/my/cluster_profile
+    # See https://github.com/snakemake-profiles/doc for suggestions

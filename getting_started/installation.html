@@ -85,7 +85,7 @@
               <p class="caption"><span class="caption-text">Getting Started:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installing GwasQcPipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installing-on-cgems">Installing on CGEMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-on-cgems-ccad">Installing on CGEMS/CCAD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-on-other-systems">Installing on other systems</a></li>
 </ul>
 </li>
@@ -175,58 +175,53 @@
             
   <div class="section" id="installing-gwasqcpipeline">
 <h1>Installing GwasQcPipeline<a class="headerlink" href="#installing-gwasqcpipeline" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="installing-on-cgems">
-<h2>Installing on CGEMs<a class="headerlink" href="#installing-on-cgems" title="Permalink to this headline">¶</a></h2>
-<p>These are the recommended installation instructions for <code class="docutils literal notranslate"><span class="pre">cgems</span></code> HPC.</p>
-<p>Create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
-$ conda create -n GwasQcPipeline -y python=3.8 pip
+<div class="section" id="installing-on-cgems-ccad">
+<h2>Installing on CGEMS/CCAD<a class="headerlink" href="#installing-on-cgems-ccad" title="Permalink to this headline">¶</a></h2>
+<p>These are the recommended installation instructions for <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code>.</p>
+<p>Create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment (python=3.8):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
+$ conda create -n GwasQcPipeline -y <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 pip
 $ conda activate GwasQcPipeline
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The GwasQcPipeline requires <code class="docutils literal notranslate"><span class="pre">python&gt;=3.8</span></code>. On <code class="docutils literal notranslate"><span class="pre">cgems</span></code> this is easiest to achieve by using a conda environment.</p>
-</div>
-<p>Install <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> from the current version on <code class="docutils literal notranslate"><span class="pre">cgems</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install /DCEG/CGF/Bioinformatics/Production/fearjm/cgr_gwas_qc-0.1.0-py3-none-any.whl
-$ cgr --help  # Should provide help information for running the GwasQcPipeline.
+<p>Install the current release of the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0-alpha.0/cgr_gwas_qc-1.0.0a0-py3-none-any.whl
+$ cgr --help  <span class="c1"># Should provide help information for running the GwasQcPipeline.</span>
 </pre></div>
 </div>
-<p>To use <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module lod miniconda/4.8.3
+<p>After the initial installation, to use <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
 $ conda activate GwasQcPipeline
 $ cgr --help
 </pre></div>
 </div>
 <p>To update the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> in the future:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module lod miniconda/4.8.3
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
 $ conda activate GwasQcPipeline
-$ pip install --force-reinstall /DCEG/CGF/Bioinformatics/Production/fearjm/cgr_gwas_qc-0.1.0-py3-none-any.whl
+$ pip install --force-reinstall <span class="c1"># &lt;url to latest *.whl&gt;</span>
+<span class="c1"># See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="installing-on-other-systems">
 <h2>Installing on other systems<a class="headerlink" href="#installing-on-other-systems" title="Permalink to this headline">¶</a></h2>
-<p>Currently, the install able wheel is only available on <code class="docutils literal notranslate"><span class="pre">cgems</span></code>. You could copy <code class="docutils literal notranslate"><span class="pre">/DCEG/CGF/Bioinformatics/Production/fearjm/cgr_gwas_qc-0.1.0-py3-none-any.whl</span></code> else where and follow the procedures outlined above.</p>
-<p>You can download and install from the GitLab repository with the following directions.</p>
-<p>Again setup a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment but this time install <code class="docutils literal notranslate"><span class="pre">poetry</span></code> instead of <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n GwasQcPipeline -y python=3.8 poetry
+<p>The <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> requires <code class="docutils literal notranslate"><span class="pre">conda</span></code> to run. We suggest you follow these directions to install <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/install/index.html">Miniconda</a>. Once you have <code class="docutils literal notranslate"><span class="pre">conda</span></code> installed, you need to create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment and install the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda create -n GwasQcPipeline -y <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 pip
 $ conda activate GwasQcPipeline
+$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0-alpha.0/cgr_gwas_qc-1.0.0a0-py3-none-any.whl
+$ cgr --help  <span class="c1"># Should provide help information for running the GwasQcPipeline.</span>
 </pre></div>
 </div>
-<p>Clone the development version of GwasQcPipeline. Major development is occurring on the <code class="docutils literal notranslate"><span class="pre">restructure</span></code> branch:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone -b restructure --recursive http://10.133.130.114/jfear/GwasQcPipeline.git
-$ cd GwasQcPipeline
+<p>To use <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> first activate your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline
+$ cgr --help
 </pre></div>
 </div>
-<p>Install the package using <code class="docutils literal notranslate"><span class="pre">poetry</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ poetry install --no-dev
+<p>And to update:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline
+$ pip install --force-reinstall <span class="c1"># &lt;url to latest *.whl&gt;</span>
+<span class="c1"># See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases</span>
 </pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For more details see development docs.</p>
 </div>
 </div>
 </div>

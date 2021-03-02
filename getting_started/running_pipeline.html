@@ -89,6 +89,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pre-flight-checks">Pre-flight Checks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-snakemake">Running Snakemake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#submitting-to-a-cluster">Submitting to a cluster</a></li>
 </ul>
 </li>
 </ul>
@@ -176,45 +177,85 @@
             
   <div class="section" id="running-the-pipeline">
 <h1>Running the Pipeline<a class="headerlink" href="#running-the-pipeline" title="Permalink to this headline">¶</a></h1>
-<p>Running the pipeline consists of three phases: configuration, pre-flight checks, running snakemake.</p>
+<p>There are three phases: configuration, pre-flight checks, and running snakemake or submitting to a cluster.</p>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
-<p>To start a new project simply run the <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> tool. This will ask you for a project name and location of the sample manifest. It will then populate a <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> in your current working directory with common settings for <code class="docutils literal notranslate"><span class="pre">cgems</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgr config  # if no options are given then you will be prompted for Project Name and Manifest path.
+<p>First, generate a configuration file by running the <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> tool. You will be asked for a project name and the location of the sample sheet (manifest). We will then populate the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file in your current working directory with our default settings</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cgr config  <span class="c1"># You will be prompted for the Project Name and Sample Sheet path.</span>
 
 or
 
-$ cgr config --project-name &quot;Test Project&quot; --sample-sheet /DCEG/CGF/Infinium/SampleSheets/&lt;file_name&gt;.csv
+$ cgr config --project-name <span class="s2">&quot;Test Project&quot;</span> --sample-sheet &lt;path to sample sheet&gt;.csv
+</pre></div>
+</div>
+<p>You should check/edit the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file. If you are not running on <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code> you will need to update paths for reference and user files.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>We will raise an error if the sample sheet does not exist.</p>
+</div>
+</div>
+<div class="section" id="pre-flight-checks">
+<h2>Pre-flight Checks<a class="headerlink" href="#pre-flight-checks" title="Permalink to this headline">¶</a></h2>
+<p>One of our goals is to fail fast if there are problems. A common source of problems are input reference/user files. We provide the <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code> command, which tries to validate all input files to make sure that they are (1) present, (2) readable, and (3) complete.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Everything looks good</span>
+$ cgr pre-flight
+Sample Sheet OK <span class="o">(</span>sample-sheet-name.csv<span class="o">)</span>
+BPM OK <span class="o">(</span>bpm-file-name.bpm<span class="o">)</span>
+VCF OK <span class="o">(</span>vcf-file-name.vcf.gz<span class="o">)</span>
+VCF.TBI OK <span class="o">(</span>tbi-file-name.vcf.gz.tbi<span class="o">)</span>
+Processing GTC files
+  <span class="o">[</span><span class="c1">#################################] 100%</span>
+<span class="m">7</span>,231 GTC Files OK.
+
+or
+
+<span class="c1"># Missing a few GTC files</span>
+$ cgr pre-flight
+Sample Sheet OK <span class="o">(</span>sample-sheet-name.csv<span class="o">)</span>
+BPM OK <span class="o">(</span>bpm-file-name.bpm<span class="o">)</span>
+VCF OK <span class="o">(</span>vcf-file-name.vcf.gz<span class="o">)</span>
+VCF.TBI OK <span class="o">(</span>tbi-file-name.vcf.gz.tbi<span class="o">)</span>
+Processing GTC files
+  <span class="o">[</span><span class="c1">#################################] 100%</span>
+There was a problem with these GTC Files:
+  FileNotFound:
+    - missing-gtc-file1.gtc
+    - missing-gtc-file2.gtc
 </pre></div>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The sample sheet must exists or we raise and error.</p>
-</div>
-<p>Now you should have a new file in your working directory called <code class="docutils literal notranslate"><span class="pre">config.yml</span></code>.</p>
-</div>
-<div class="section" id="pre-flight-checks">
-<h2>Pre-flight Checks<a class="headerlink" href="#pre-flight-checks" title="Permalink to this headline">¶</a></h2>
-<p>One goal of the pipeline is to fail fast if there are problems. One potential source of issues are user provided files. The <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code> command runs a set of data validations on user provided input files to make sure that they are (1) present, (2) readable, and (3) complete.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This is fully implemented yet.</p>
-</div>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">Todo</p>
-<p>Adds docs after implementation of <code class="docutils literal notranslate"><span class="pre">pre-flight</span></code>.</p>
+<ul class="simple">
+<li><p>These checks can take a while if you have a lot of files.</p></li>
+<li><p>We have not implemented checks for <code class="docutils literal notranslate"><span class="pre">idat</span></code> files.</p></li>
+</ul>
 </div>
 </div>
 <div class="section" id="running-snakemake">
 <h2>Running Snakemake<a class="headerlink" href="#running-snakemake" title="Permalink to this headline">¶</a></h2>
-<p>Currently, the only way to run the pipeline is locally. We have implemented a thin wrapper around <code class="docutils literal notranslate"><span class="pre">snakemake</span></code> called <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">snakemake</span></code>. You can run <code class="docutils literal notranslate"><span class="pre">snakemake</span></code> directly, but you must provide the full path the <code class="docutils literal notranslate"><span class="pre">Snakefile</span></code> which can be found by running <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">snakemake</span> <span class="pre">--help</span></code>.</p>
-<p>To run the workflow you would do something similar to:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgr snakemake --cores 2 -k --use-conda
+<p>We use <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> to orchestrate the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>. We provide a convenience wrapper, <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">snakemake</span></code>, for interacting/running snakemake locally. This wrapper adds <code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">GwasQcPipeline</span> <span class="pre">Snakefile&gt;</span></code> to the snakemake command.</p>
+<p>To run <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> locally, you could run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cgr snakemake --cores <span class="m">2</span> -k --use-conda
 </pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The current <code class="docutils literal notranslate"><span class="pre">Snakefile</span></code> is just a small example to get things working. It does not actually do anything useful.</p>
+</div>
+<div class="section" id="submitting-to-a-cluster">
+<h2>Submitting to a cluster<a class="headerlink" href="#submitting-to-a-cluster" title="Permalink to this headline">¶</a></h2>
+<p>We provide the <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">submit</span></code> command to easily submit to a cluster. For NCI users, we support <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code> and <code class="docutils literal notranslate"><span class="pre">Biowulf</span></code>. External users will need to create their own <a class="reference external" href="https://github.com/snakemake-profiles/doc">cluster profile</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Running on CGEMS/CCAD</span>
+$ cgr submit --cgems
+
+or
+
+<span class="c1"># Running on Biowulf</span>
+$ cgr submit --biowulf
+
+or
+
+<span class="c1"># Running on external cluster</span>
+$ cgr submit --profile /path/to/my/cluster_profile
+<span class="c1"># See https://github.com/snakemake-profiles/doc for suggestions</span>
+</pre></div>
 </div>
 </div>
 </div>
