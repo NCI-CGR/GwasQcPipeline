@@ -1,10 +1,16 @@
+import logging
 from pathlib import Path
+from typing import Optional
 
 import typer
 
 from cgr_gwas_qc.config import config_to_yaml
 from cgr_gwas_qc.models.config import Config
+from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
+from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
 app = typer.Typer(add_completion=False)
 
 
@@ -22,6 +28,9 @@ def main(
         cfg = cgems_config(project_name, sample_sheet)
     else:
         cfg = general_config(project_name, sample_sheet)
+
+    cfg.num_samples = get_number_samples(sample_sheet)
+    cfg.num_snps = get_number_snps(cfg.reference_files.illumina_manifest_file)
 
     config_to_yaml(cfg, exclude_none=True)
 
@@ -65,6 +74,28 @@ def general_config(project_name, sample_sheet):
             gtc_pattern="/expample/pattern/wildcards/are/columns/in/sample_sheet/{Project}/{Sample_ID}.gtc",
         ),
     )
+
+
+def get_number_samples(sample_sheet: Path) -> Optional[int]:
+    try:
+        ss = SampleSheet(sample_sheet)
+        return ss.data.shape[0]
+    except FileNotFoundError:
+        logger.warning(
+            "Could not parse the sample sheet file. Did not set num_samples in the config."
+        )
+        return None
+
+
+def get_number_snps(manifest_file: Path) -> Optional[int]:
+    try:
+        bpm = BeadPoolManifest(manifest_file)
+        return bpm.num_loci
+    except FileNotFoundError:
+        logger.warning(
+            "Could not parse the illumina manifest file. Did not set num_snps in the config."
+        )
+        return None
 
 
 if __name__ == "__main__":

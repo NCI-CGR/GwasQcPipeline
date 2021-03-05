@@ -39,6 +39,13 @@ class Config(BaseModel):
     sample_sheet: Path = Field(
         Path("sample_sheet.csv"), description="Path to the sample manifest from LIMs."
     )
+    num_samples: Optional[int] = Field(
+        None, help="Number of samples, automatically calculated from the sample sheet."
+    )
+    num_snps: Optional[int] = Field(
+        None,
+        help="Number of markers, automatically calculated from the `reference_files.illumina_manifest_file",
+    )
     reference_files: ReferenceFiles = ReferenceFiles()  # Paths to reference files.
     user_files: UserFiles = UserFiles()  # Paths to user provided files.
     software_params: SoftwareParams = SoftwareParams()  # Various software parameters.
