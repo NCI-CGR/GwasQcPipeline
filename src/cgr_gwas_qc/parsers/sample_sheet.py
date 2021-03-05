@@ -89,7 +89,20 @@ class SampleSheet:
     def _clean_manifest(data) -> Dict[str, str]:
         """Converts Manifests section into a key-value pairs."""
         stripped = _strip_terminal_commas(data)
-        return _convert_to_key_value_pair(stripped)
+
+        res = {}
+        for k, v in _convert_to_key_value_pair(stripped).items():
+            if v.endswith(".bpm"):
+                try:
+                    # typical pattern is `snp_array`_`bpm_file`
+                    res["snp_array"], res["bpm"] = v.split("_", 1)
+                except ValueError:
+                    # didn't follow the typical pattern to just set it as BPM
+                    res["bpm"] = v
+            else:
+                res[k] = v
+
+        return res
 
     @staticmethod
     def _clean_data(data) -> pd.DataFrame:
@@ -160,7 +173,4 @@ def _convert_to_key_value_pair(stripped: str) -> Dict[str, str]:
         >>> _convert_to_key_value_pair(stripped)
         {"key1": "value1", "key2": "value2"}
     """
-    if stripped.count("\n") == 1:
-        return {k: v for k, v in [stripped.strip().split(",")]}
-
-    return pd.read_csv(StringIO(stripped), header=None, index_col=0).squeeze().to_dict()
+    return {k: v for row in stripped.strip().splitlines() for k, v in [row.split(",", 1)]}

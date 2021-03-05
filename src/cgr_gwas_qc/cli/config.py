@@ -16,31 +16,40 @@ app = typer.Typer(add_completion=False)
 
 @app.command()
 def main(
-    project_name: str = typer.Option(..., prompt="Project Name", help="The current project title."),
     sample_sheet: Path = typer.Option(
         ..., prompt="Path to LIMs Sample Sheet", exists=True, readable=True, file_okay=True
     ),
+    project_name: Optional[str] = typer.Option(None, help="The current project title."),
     cgems: bool = typer.Option(True, help="Set common default paths for cgems"),
 ):
     """Creates a Gwas Qc Pipeline config file in the current working directory."""
 
-    if cgems:
-        cfg = cgems_config(project_name, sample_sheet)
-    else:
-        cfg = general_config(project_name, sample_sheet)
+    ss = SampleSheet(sample_sheet)
+    project_name = project_name or ss.header.get("Project Name", "No Project Name").split(";")[0]
+    num_samples = ss.data.shape[0]
+    snp_array = ss.manifests.get("snp_array", None)
+    bpm = ss.manifests.get("bpm", "GSAMD-24v1-0_20011747_A1.bpm")
 
-    cfg.num_samples = get_number_samples(sample_sheet)
+    if cgems:
+        cfg = cgems_config(ss.file_name, project_name, num_samples, snp_array, bpm)
+    else:
+        cfg = general_config(ss.file_name, project_name, num_samples, snp_array, bpm)
+
     cfg.num_snps = get_number_snps(cfg.reference_files.illumina_manifest_file)
 
     config_to_yaml(cfg, exclude_none=True)
 
 
-def cgems_config(project_name, sample_sheet):
+def cgems_config(
+    sample_sheet: Path, project_name: str, num_samples: int, snp_array: Optional[str], bpm: str
+) -> Config:
     return Config(
         project_name=project_name,
         sample_sheet=sample_sheet,
+        num_samples=num_samples,
+        snp_array=snp_array,
         reference_files=dict(
-            illumina_manifest_file="/DCEG/CGF/Infinium/Resources/Manifests/GSAMD-Files/build37/GSAMD-24v1-0_20011747_A1.bpm",
+            illumina_manifest_file=f"/DCEG/CGF/Infinium/Resources/Manifests/{bpm}",
             thousand_genome_vcf="/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz",
             thousand_genome_tbi="/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi",
         ),
@@ -57,12 +66,16 @@ def cgems_config(project_name, sample_sheet):
     )
 
 
-def general_config(project_name, sample_sheet):
+def general_config(
+    sample_sheet: Path, project_name: str, num_samples: int, snp_array: Optional[str], bpm: str
+) -> Config:
     return Config(
         project_name=project_name,
         sample_sheet=sample_sheet,
+        num_samples=num_samples,
+        snp_array=snp_array,
         reference_files=dict(
-            illumina_manifest_file="/path/to/illumina/manifest.bpm",
+            illumina_manifest_file=f"/path/to/illumina/{bpm}",
             thousand_genome_vcf="/path/to/thousand/genome/vcf.gz",
             thousand_genome_tbi="/path/to/thousand/genome/vcf.gz.tbi",
         ),
@@ -76,26 +89,16 @@ def general_config(project_name, sample_sheet):
     )
 
 
-def get_number_samples(sample_sheet: Path) -> Optional[int]:
-    try:
-        ss = SampleSheet(sample_sheet)
-        return ss.data.shape[0]
-    except FileNotFoundError:
-        logger.warning(
-            "Could not parse the sample sheet file. Did not set num_samples in the config."
-        )
-        return None
-
-
-def get_number_snps(manifest_file: Path) -> Optional[int]:
-    try:
-        bpm = BeadPoolManifest(manifest_file)
-        return bpm.num_loci
-    except FileNotFoundError:
-        logger.warning(
-            "Could not parse the illumina manifest file. Did not set num_snps in the config."
-        )
-        return None
+def get_number_snps(manifest_file: Optional[Path]) -> Optional[int]:
+    if manifest_file:
+        try:
+            bpm = BeadPoolManifest(manifest_file)
+            return bpm.num_loci
+        except FileNotFoundError:
+            logger.warning(
+                "Could not parse the illumina manifest file. Did not set num_snps in the config."
+            )
+    return None
 
 
 if __name__ == "__main__":

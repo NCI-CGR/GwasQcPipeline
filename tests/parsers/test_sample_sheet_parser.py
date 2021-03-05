@@ -78,6 +78,18 @@ def test_sample_sheet_properties_right_type(sample_sheet):
 
 
 ################################################################################
+# Check Header and Manifest sections
+################################################################################
+def test_header_contains_project_info(sample_sheet: SampleSheet):
+    assert "SR0001-001;SR0002-001" == sample_sheet.header["Project Name"]
+
+
+def test_manifests_contains_bpm_info(sample_sheet: SampleSheet):
+    assert "GSAMD-24v1-0" == sample_sheet.manifests["snp_array"]
+    assert "GSAMD-24v1-0_20011747_A1.bpm" == sample_sheet.manifests["bpm"]
+
+
+################################################################################
 # Sanity check that Data section gives expected results.
 ################################################################################
 def test_sample_sheet_data(sample_sheet):
