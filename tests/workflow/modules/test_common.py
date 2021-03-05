@@ -118,7 +118,7 @@ def test_eigensoft_convert(tmp_path, conda_envs):
         )
     )
     # WHEN:
-    run_snakemake(tmp_path)
+    run_snakemake(tmp_path, keep_temp=True)
 
     # THEN: the files exists
     file_hashes_equal(

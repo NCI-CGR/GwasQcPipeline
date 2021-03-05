@@ -12,12 +12,6 @@ wildcard_constraints:
     ld="0\.\d+",
 
 
-def get_numSNPs():
-    from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
-
-    return BeadPoolManifest(cfg.config.reference_files.illumina_manifest_file).num_loci
-
-
 def rule_group(wildcards):
     prefix = wildcards.get("prefix", "").replace("/", "_")
     name = wildcards.get("name", "")

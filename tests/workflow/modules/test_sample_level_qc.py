@@ -242,7 +242,7 @@ def test_per_sample_verifyIDintensity_contamination(tmp_path, conda_envs):
             "production_outputs/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
             "sample_level/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
         )
-        .make_config()
+        .make_config(num_snps=700078)
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -293,7 +293,7 @@ def test_contamination_test_with_missing_abf_values(tmp_path, conda_envs):
         .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/contam", "sample_level/per_sample_adpc")
-        .make_config()
+        .make_config(num_snps=700078)
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -351,7 +351,7 @@ def test_contamination_test_with_missing_adpc_values(tmp_path, conda_envs):
             "production_outputs/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
             "sample_level/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
         )
-        .make_config()
+        .make_config(num_snps=700078)
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
