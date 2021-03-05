@@ -39,6 +39,9 @@ class Config(BaseModel):
     sample_sheet: Path = Field(
         Path("sample_sheet.csv"), description="Path to the sample manifest from LIMs."
     )
+    snp_array: Optional[str] = Field(
+        None, help="Which SNP array was used. Only used for reporting."
+    )
     num_samples: Optional[int] = Field(
         None, help="Number of samples, automatically calculated from the sample sheet."
     )
