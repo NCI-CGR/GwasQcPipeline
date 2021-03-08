@@ -10,6 +10,10 @@ class UserFiles(BaseModel):
     The GWAS QC Pipeline requires GTC or IDAT files.
     """
 
+    output_pattern: str = Field(
+        "{prefix}/{file_type}.{ext}", description="File naming pattern for deliverable files."
+    )
+
     idat_pattern: Optional["Idat"]
 
     # GTC

@@ -1,13 +1,6 @@
 import pandas as pd
 
 
-def use_lims_name(pth, file_type, ext="csv"):
-    if "AnalysisManifest" in cfg.sample_sheet_file.stem:
-        lims_name = cfg.sample_sheet_file.stem.replace("AnalysisManifest", file_type)
-        return f"{pth}/{lims_name}.{ext}"
-    return f"{pth}/{file_type}.{ext}"
-
-
 ################################################################################
 # Files For Lab
 ################################################################################
@@ -15,7 +8,9 @@ rule lab_sample_level_qc_report:
     input:
         "sample_level/qc_summary.csv",
     output:
-        use_lims_name("files_for_lab", "all_sample_qc"),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="all_sample_qc", ext="csv"
+        ),
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -24,7 +19,9 @@ rule lab_lims_upload:
     input:
         "sample_level/qc_summary.csv",
     output:
-        use_lims_name("files_for_lab", "LimsUpload"),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="LimsUpload", ext="csv"
+        ),
     run:
         (
             pd.read_csv(input[0])
@@ -52,7 +49,9 @@ rule lab_identifiler_needed:
     input:
         "sample_level/qc_summary.csv",
     output:
-        use_lims_name("files_for_lab", "Identifiler"),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="Identifiler", ext="csv"
+        ),
     run:
         (
             pd.read_csv(input[0])
@@ -77,7 +76,9 @@ rule lab_known_replicates:
     input:
         "sample_level/concordance/KnownReplicates.csv",
     output:
-        use_lims_name("files_for_lab", "KnownReplicates"),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="KnownReplicates", ext="csv"
+        ),
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -86,7 +87,9 @@ rule lab_unknown_replicates:
     input:
         "sample_level/concordance/UnknownReplicates.csv",
     output:
-        use_lims_name("files_for_lab", "UnknownReplicates"),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="UnknownReplicates", ext="csv"
+        ),
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -98,7 +101,9 @@ rule deliver_manifest:
     input:
         cfg.sample_sheet_file.as_posix(),
     output:
-        use_lims_name("deliver", "AnalysisManifest"),
+        cfg.config.user_files.output_pattern.format(
+            prefix="deliver", file_type="AnalysisManifest", ext="csv"
+        ),
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -165,18 +170,3 @@ rule deliver_subject_list:
             .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
             .to_csv(output[0], index=False)
         )
-
-
-rule deliver_readme:
-    output:
-        "deliver/README",
-
-
-rule deliver_summary_writeup:
-    output:
-        use_lims_name("deliver", "QC_Report", "docx"),
-
-
-rule deliver_summary_table:
-    output:
-        use_lims_name("deliver", "QC_Report", "xlsx"),

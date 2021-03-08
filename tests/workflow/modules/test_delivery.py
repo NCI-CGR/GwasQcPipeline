@@ -28,7 +28,10 @@ def files_for_upload(tmp_path_factory, qc_summary):
             "production_outputs/concordance/UnknownReplicates.csv",
             "sample_level/concordance/UnknownReplicates.csv",
         )
-        .make_config(sample_sheet="SR001-001_00_AnalysisManifest_0000000.csv")
+        .make_config(
+            sample_sheet="SR001-001_00_AnalysisManifest_0000000.csv",
+            user_files=dict(output_pattern="{prefix}/SR001-001_00_{file_type}_0000000.{ext}"),
+        )
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -166,7 +169,10 @@ def files_for_deliver(tmp_path_factory, qc_summary):
         .copy("production_outputs/subject_level/samples.fam", "subject_level/samples.fam")
         # Use CGR manifest naming scheme
         .copy("original_data/manifest_full.csv", "SR001-001_00_AnalysisManifest_0000000.csv",)
-        .make_config(sample_sheet="SR001-001_00_AnalysisManifest_0000000.csv")
+        .make_config(
+            sample_sheet="SR001-001_00_AnalysisManifest_0000000.csv",
+            user_files=dict(output_pattern="{prefix}/SR001-001_00_{file_type}_0000000.{ext}"),
+        )
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
