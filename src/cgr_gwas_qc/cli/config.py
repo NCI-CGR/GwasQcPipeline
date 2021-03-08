@@ -29,11 +29,14 @@ def main(
     num_samples = ss.data.shape[0]
     snp_array = ss.manifests.get("snp_array", None)
     bpm = ss.manifests.get("bpm", "GSAMD-24v1-0_20011747_A1.bpm")
+    output_pattern = get_output_pattern(ss.file_name.stem)
 
     if cgems:
-        cfg = cgems_config(ss.file_name, project_name, num_samples, snp_array, bpm)
+        cfg = cgems_config(ss.file_name, project_name, num_samples, snp_array, bpm, output_pattern)
     else:
-        cfg = general_config(ss.file_name, project_name, num_samples, snp_array, bpm)
+        cfg = general_config(
+            ss.file_name, project_name, num_samples, snp_array, bpm, output_pattern
+        )
 
     cfg.num_snps = get_number_snps(cfg.reference_files.illumina_manifest_file)
 
@@ -41,7 +44,12 @@ def main(
 
 
 def cgems_config(
-    sample_sheet: Path, project_name: str, num_samples: int, snp_array: Optional[str], bpm: str
+    sample_sheet: Path,
+    project_name: str,
+    num_samples: int,
+    snp_array: Optional[str],
+    bpm: str,
+    output_pattern: str,
 ) -> Config:
     return Config(
         project_name=project_name,
@@ -54,6 +62,7 @@ def cgems_config(
             thousand_genome_tbi="/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi",
         ),
         user_files=dict(
+            output_pattern=output_pattern,
             idat_pattern=dict(
                 red="/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
                 green="/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat",
@@ -67,7 +76,12 @@ def cgems_config(
 
 
 def general_config(
-    sample_sheet: Path, project_name: str, num_samples: int, snp_array: Optional[str], bpm: str
+    sample_sheet: Path,
+    project_name: str,
+    num_samples: int,
+    snp_array: Optional[str],
+    bpm: str,
+    output_pattern: str,
 ) -> Config:
     return Config(
         project_name=project_name,
@@ -80,6 +94,7 @@ def general_config(
             thousand_genome_tbi="/path/to/thousand/genome/vcf.gz.tbi",
         ),
         user_files=dict(
+            output_pattern=output_pattern,
             idat_pattern=dict(
                 red="/expample/pattern/wildcards/are/columns/in/sample_sheet/{Project}/{Sample_ID}}_Red.idat",
                 green="/expample/pattern/wildcards/are/columns/in/sample_sheet/{Project}/{Sample_ID}}_Grn.idat",
@@ -87,6 +102,15 @@ def general_config(
             gtc_pattern="/expample/pattern/wildcards/are/columns/in/sample_sheet/{Project}/{Sample_ID}.gtc",
         ),
     )
+
+
+def get_output_pattern(sample_sheet_name):
+    if "AnalysisManifest" in sample_sheet_name:
+        return "{prefix}/" + sample_sheet_name.replace("AnalysisManifest", "{file_type}").replace(
+            ".csv", ".{ext}"
+        )
+
+    return "{prefix}/{file_type}.{ext}"
 
 
 def get_number_snps(manifest_file: Optional[Path]) -> Optional[int]:
