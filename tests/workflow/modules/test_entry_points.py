@@ -27,7 +27,6 @@ def test_gtc_to_ped_conversion(tmp_path):
     (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -64,7 +63,6 @@ def test_create_gtc_merge_list(tmp_path):
     data_repo = (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/per_sample_plink_files", "sample_level/per_sample_plink_files")
         .make_config()
@@ -99,7 +97,6 @@ def test_merge_gtc_sample_peds(tmp_path, conda_envs):
     data_repo = (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/per_sample_plink_files", "sample_level/per_sample_plink_files")
         .make_config()
@@ -148,7 +145,6 @@ def test_ped_entry(tmp_path, conda_envs):
     data_repo = (
         FakeData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="ped")
         .make_config()
         .make_snakefile(
@@ -201,7 +197,6 @@ def test_bed_entry(tmp_path):
     (
         FakeData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="bed")
         .make_config()
         .make_snakefile(

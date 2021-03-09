@@ -69,12 +69,27 @@ class DataRepo(ABC):
     _bed: str  # Name of the aggregate samples BED
     _bim: str  # Name of the aggregate samples BIM
     _fam: str  # Name of the aggregate samples FAM
+    _snp_array: str  # Name of the snps array
+    _num_snps: int  # Number of SNPs in the array
 
     def __init__(self, working_dir: Optional[Path] = None):
         self.working_dir = working_dir
         self.ss = SampleSheet(self / self._sample_sheet)
         self._config: MutableMapping = defaultdict(dict)
         self._config["project_name"] = self._data_type
+        self._config["num_samples"] = self.ss.data.shape[0]
+        self._config["snp_array"] = self._snp_array
+        self._config["num_snps"] = self._num_snps
+
+        self._config["reference_files"]["illumina_manifest_file"] = (
+            self / self._illumina_manifest_file
+        ).absolute()
+        self._config["reference_files"]["thousand_genome_vcf"] = (
+            self / self._thousand_genome_vcf
+        ).absolute()
+        self._config["reference_files"]["thousand_genome_tbi"] = (
+            self / self._thousand_genome_tbi
+        ).absolute()
 
     @abstractmethod
     def _add_gtcs(self):
@@ -102,58 +117,13 @@ class DataRepo(ABC):
         is given (``self.working_dir``) then it will be copied otherwise it
         will be referenced in the config.
         """
-        if self.working_dir is None or copy is False:
+        if self.working_dir is None or not copy:
             # Don't copy. Add full path to sample sheet in the data repository.
             self._config["sample_sheet"] = (self / self._sample_sheet).absolute()
         else:
             self._config["sample_sheet"] = "sample_sheet.csv"
             self.copy(self._sample_sheet, self._config["sample_sheet"])
 
-        return self
-
-    def add_reference_files(self, manifest: bool = True, vcf: bool = True, copy: bool = True) -> U:
-        """Add the various reference files.
-
-        The reference files can either be copied into the working directory or
-        have their full path referenced in the config. If a working directory is
-        given (``self.working_dir``) then they will be copied otherwise they
-        will be referenced in the config.
-
-        Args:
-            manifest: Include the Illumina manifest file (BPM). Defaults to True.
-            vcf: Include the Thousand Genomes VCF/TBI files. Defaults to True.
-        """
-        if self.working_dir is None or copy is False:
-            # Don't copy. Add full path to reference files in the data repository.
-            self._config["reference_files"]["illumina_manifest_file"] = (
-                self / self._illumina_manifest_file
-            ).absolute()
-            self._config["reference_files"]["thousand_genome_vcf"] = (
-                self / self._thousand_genome_vcf
-            ).absolute()
-            self._config["reference_files"]["thousand_genome_tbi"] = (
-                self / self._thousand_genome_tbi
-            ).absolute()
-        else:
-            if manifest:
-                self._config["reference_files"]["illumina_manifest_file"] = "manifest.bpm"
-                self.copy(
-                    self._illumina_manifest_file,
-                    self._config["reference_files"]["illumina_manifest_file"],
-                )
-
-            if vcf:
-                self._config["reference_files"]["thousand_genome_vcf"] = "thousG.vcf.gz"
-                self.copy(
-                    self._thousand_genome_vcf,
-                    self._config["reference_files"]["thousand_genome_vcf"],
-                )
-
-                self._config["reference_files"]["thousand_genome_tbi"] = "thousG.vcf.gz.tbi"
-                self.copy(
-                    self._thousand_genome_tbi,
-                    self._config["reference_files"]["thousand_genome_tbi"],
-                )
         return self
 
     def add_user_files(self, entry_point: str = "bed", copy: bool = True) -> U:
@@ -260,13 +230,12 @@ class DataRepo(ABC):
         Raises:
             ValueError: If the ``source`` does not exist in the repository.
         """
-        if self.working_dir:
-            source_path = (self._data_path / source).absolute()
-            destination_path = (self.working_dir / destination).absolute()
-            destination_path.parent.mkdir(exist_ok=True, parents=True)  # Make parent dirs if needed
-        else:
+        if not self.working_dir:
             raise ValueError("You need to have set ``self.working_dir``.")
 
+        source_path = (self._data_path / source).absolute()
+        destination_path = (self.working_dir / destination).absolute()
+        destination_path.parent.mkdir(exist_ok=True, parents=True)  # Make parent dirs if needed
         if source_path.is_dir():
             shutil.copytree(source_path, destination_path, copy_function=shutil.copy)
         elif source_path.is_file():
@@ -297,7 +266,6 @@ class FakeData(DataRepo):
         FileNotFoundError: ".../non_existing_file.txt"
 
         >>> cache.add_sample_sheet()  # copy sample sheet to working dir
-        >>> cache.add_reference_files()  # add reference files to working dir
         >>> cache.add_user_files()  # add BED/BIM/FAM to working dir
         >>> cache.make_config()  # make the config for files added using cache
     """
@@ -324,6 +292,9 @@ class FakeData(DataRepo):
 
     _test_gtc = "illumina/gtc/small_genotype.gtc"
     _test_idat = "illumina/idat/small_intensity.idat"
+
+    _snp_array = "Fake-GSA"
+    _num_snps = 2_000
 
     def add_user_files(self, entry_point: str = "bed", copy: bool = True) -> U:
         if (self.working_dir is None or not copy) and entry_point == "gtc":
@@ -370,7 +341,6 @@ class RealData(DataRepo):
         FileNotFoundError: "../../../.cache/cgr_gwas_qc/test_data/non_existing_file.txt"
 
         >>> cache.add_sample_sheet()  # copy sample sheet to working dir
-        >>> cache.add_reference_files(copy=False)  # add full path of reference files to config
         >>> cache.add_user_files(copy=False)  # add full path of user files to config
         >>> cache.make_config()  # make the config for files added using cache
     """
@@ -398,6 +368,9 @@ class RealData(DataRepo):
     _bed = "production_outputs/plink_start/samples.bed"
     _bim = "production_outputs/plink_start/samples.bim"
     _fam = "production_outputs/plink_start/samples.fam"
+
+    _snp_array = "GSAMD-24v1-0"
+    _num_snps = 700078
 
     def __init__(
         self, working_dir: Optional[Path] = None, sync: bool = False, GRCh_version: int = 37

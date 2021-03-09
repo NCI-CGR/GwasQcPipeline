@@ -11,13 +11,7 @@ def test_fake_data(tmp_path):
     #   - user files (bed entry point)
     #   - reference files (in a different location)
     #   - config
-    (
-        FakeData(tmp_path)
-        .add_sample_sheet()
-        .add_reference_files(copy=False)
-        .add_user_files()
-        .make_config()
-    )
+    (FakeData(tmp_path).add_sample_sheet().add_user_files().make_config())
 
     # WHEN: we load the config in the working dir
     with chdir(tmp_path):

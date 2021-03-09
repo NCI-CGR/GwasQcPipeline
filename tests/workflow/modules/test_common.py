@@ -12,7 +12,6 @@ def test_bed_to_ped(tmp_path, conda_envs):
     (
         FakeData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .copy("plink/samples.bed", tmp_path / "samples.bed")
         .copy("plink/samples.bim", tmp_path / "samples.bim")
         .copy("plink/samples.fam", tmp_path / "samples.fam")
@@ -50,7 +49,6 @@ def test_eigenstrat_config(tmp_path):
     (
         FakeData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .copy("plink/samples.ped", tmp_path / "samples.ped")
         .copy("plink/samples.map", tmp_path / "samples.map")
         .make_config()
@@ -97,7 +95,6 @@ def test_eigensoft_convert(tmp_path, conda_envs):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .copy("production_outputs/pca/EUR_subjects_ld_prune.ped", tmp_path / "subjects.ped")
         .copy("production_outputs/pca/EUR_subjects_ld_prune.map", tmp_path / "subjects.map")
         .make_config()
@@ -142,7 +139,6 @@ def test_eigensoft_smartpca(tmp_path, conda_envs):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .copy("production_outputs/pca/EUR_subjects.eigenstratgeno", tmp_path / "subjects.gen")
         .copy("production_outputs/pca/EUR_subjects.snp", tmp_path / "subjects.snp")
         .copy("production_outputs/pca/EUR_subjects.ind", tmp_path / "subjects.ind")

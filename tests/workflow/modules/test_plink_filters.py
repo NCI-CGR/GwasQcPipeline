@@ -31,7 +31,6 @@ def test_old_call_rate_filter_order(tmp_path, conda_envs):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .copy("production_outputs/plink_start/samples.bed", "sample_level/samples.bed")
         .copy("production_outputs/plink_start/samples.bim", "sample_level/samples.bim")
         .copy("production_outputs/plink_start/samples.fam", "sample_level/samples.fam")
@@ -138,7 +137,6 @@ def test_call_rate_filters(tmp_path, conda_envs):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .copy("production_outputs/plink_start/samples.bed", "sample_level/samples.bed")
         .copy("production_outputs/plink_start/samples.bim", "sample_level/samples.bim")
         .copy("production_outputs/plink_start/samples.fam", "sample_level/samples.fam")

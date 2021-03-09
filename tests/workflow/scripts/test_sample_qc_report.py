@@ -23,7 +23,6 @@ def data_cache_and_cfg(tmp_path_factory, pytestconfig):
     data_cache = (
         RealData(session_tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
     )

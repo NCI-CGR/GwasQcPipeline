@@ -6,7 +6,7 @@ import pytest
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr, scan_for_yaml
-from cgr_gwas_qc.testing import chdir, make_test_config
+from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import FakeData
 from cgr_gwas_qc.version import __version__
 
@@ -72,24 +72,6 @@ def test_config_only_uses_one_instance(example_working_dir: Path, monkeypatch):
 ################################################################################
 # Make sure ConfigMgr loads the yaml correctly.
 ################################################################################
-def test_load_config_missing_sample_sheet(tmp_path):
-    # GIVEN: A workding dir with a config.yml but no sample sheet
-    make_test_config(tmp_path)
-
-    # WHEN: We try to load the ConfigMgr
-    # THEN: We get warnings about the missing Sample Sheet and the ``cfg.ss`` is None
-    with chdir(tmp_path):
-        with pytest.warns(RuntimeWarning):
-            """Warn that sample_sheet.csv is not there"""
-            cfg = load_config()
-
-        with pytest.warns(RuntimeWarning):
-            """Trying to access sample raises warning and gives None"""
-            val = cfg.ss
-
-        assert val is None
-
-
 def test_manually_loading_config(example_working_dir: Path):
     # GIVEN: A working dir with a config.yml and a sample sheet
 

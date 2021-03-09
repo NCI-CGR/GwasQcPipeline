@@ -2,14 +2,7 @@ import os
 from pathlib import Path
 from textwrap import dedent
 
-from cgr_gwas_qc import load_config
-from cgr_gwas_qc.testing import (
-    chdir,
-    file_hashes_equal,
-    file_rows_almost_equal,
-    make_snakefile,
-    make_test_config,
-)
+from cgr_gwas_qc.testing import chdir, file_hashes_equal, file_rows_almost_equal, make_snakefile
 
 
 def test_chdir(tmp_path):
@@ -84,21 +77,6 @@ def test_files_almost_not_equal(tmp_path):
 
     # WHEN-THEN: we compare them they are the different
     assert file_rows_almost_equal(file1, file2, fuzzy_col=1) is False
-
-
-def test_make_test_config(sample_sheet_file, tmp_path):
-    # GIVEN: a test sample sheet and temporary directory
-
-    # WHEN:
-    # write a config.yml to tmp_path pointing at a sample sheet
-    make_test_config(tmp_path, sample_sheet=sample_sheet_file.as_posix())
-
-    # THEN:
-    # we read the config.yml file
-    with chdir(tmp_path):
-        cfg = load_config()
-    # the sample_sheet attribute points to our sample sheet
-    assert cfg.config.sample_sheet == sample_sheet_file
 
 
 def test_make_snakefile(tmp_path):

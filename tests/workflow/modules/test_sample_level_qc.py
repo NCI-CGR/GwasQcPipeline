@@ -25,7 +25,6 @@ def graf_inputs(tmp_path_factory, conda_envs):
     (
         RealData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",
@@ -121,7 +120,6 @@ def median_idat_intensity(tmp_path_factory, conda_envs) -> Path:
     (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -172,7 +170,6 @@ def test_per_sample_gtc_to_adpc(tmp_path):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -235,7 +232,6 @@ def test_per_sample_verifyIDintensity_contamination(tmp_path, conda_envs):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/contam", "sample_level/per_sample_adpc")
         .copy(
@@ -290,7 +286,6 @@ def test_contamination_test_with_missing_abf_values(tmp_path, conda_envs):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/contam", "sample_level/per_sample_adpc")
         .make_config(num_snps=700078)
@@ -345,7 +340,6 @@ def test_contamination_test_with_missing_adpc_values(tmp_path, conda_envs):
     data_store = (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
@@ -394,7 +388,6 @@ def test_agg_contamination_test(tmp_path, median_idat_intensity):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet(full_sample_sheet=False)
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/one_samp_b_1000g_contam",
@@ -453,7 +446,6 @@ def test_sample_concordance_plink(tmp_path):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
         .make_snakefile(
             """

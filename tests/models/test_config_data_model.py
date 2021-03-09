@@ -4,14 +4,12 @@ import pytest
 from pydantic import ValidationError
 
 from cgr_gwas_qc.models.config import (
-    Config,
     Idat,
     ReferenceFiles,
     SoftwareParams,
     UserFiles,
     WorkflowParams,
 )
-from cgr_gwas_qc.version import __version__
 
 
 def test_reference_files():
@@ -155,38 +153,6 @@ def test_workflow_params_defaults():
     assert workflow_params.remove_unexpected_rep is True
     assert workflow_params.minimum_pop_subjects == 50
     assert workflow_params.control_hwp_threshold == 50
-
-
-def test_basic_config():
-    # GIVEN-WHEN: we load the config object with no input
-    cfg = Config()
-
-    # THEN: we get its defaults
-    assert cfg.project_name == "Example Project Name"
-    assert cfg.sample_sheet == Path("sample_sheet.csv")
-    assert cfg.pipeline_version == __version__
-
-
-def test_basic_config_with_reference_files():
-    # GIVEN-WHEN: we load the config object but change the illumina_manifest_file
-    cfg = Config(reference_files=dict(illumina_manifest_file="test.bpm"))
-
-    # THEN: that illumina_manifest_file is what we set it to
-    assert cfg.reference_files.illumina_manifest_file == Path("test.bpm")
-
-
-def test_basic_config_with_user_files():
-    # GIVEN-WHEN: we load the config object but change the gtc and idat patterns
-    cfg = Config(
-        user_files={
-            "idat_pattern": {"red": "{test}_Red.idat", "green": "{test}_Grn.idat"},
-            "gtc_pattern": "{test}.gtc",
-        }
-    )
-
-    # THEN: the gtc and idat patterns are what we set them to
-    assert cfg.user_files.idat_pattern.red == "{test}_Red.idat"
-    assert cfg.user_files.gtc_pattern == "{test}.gtc"
 
 
 @pytest.mark.parametrize("value", [-0.01, 0, 1.01])

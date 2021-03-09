@@ -332,7 +332,6 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
     data_cache = (
         RealData(tmp_path)
         .add_sample_sheet()
-        .add_reference_files(copy=False)
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed", "population_level/EUR/subjects.bed",
