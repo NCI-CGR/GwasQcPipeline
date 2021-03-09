@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -38,8 +39,6 @@ def main(
             ss.file_name, project_name, num_samples, snp_array, bpm, output_pattern
         )
 
-    cfg.num_snps = get_number_snps(cfg.reference_files.illumina_manifest_file)
-
     config_to_yaml(cfg, exclude_none=True)
 
 
@@ -51,13 +50,15 @@ def cgems_config(
     bpm: str,
     output_pattern: str,
 ) -> Config:
+    bpm_file = Path(f"/DCEG/CGF/Infinium/Resources/Manifests/{bpm}")
     return Config(
         project_name=project_name,
         sample_sheet=sample_sheet,
         num_samples=num_samples,
         snp_array=snp_array,
+        num_snps=get_number_snps(bpm_file),
         reference_files=dict(
-            illumina_manifest_file=f"/DCEG/CGF/Infinium/Resources/Manifests/{bpm}",
+            illumina_manifest_file=bpm_file,
             thousand_genome_vcf="/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz",
             thousand_genome_tbi="/DCEG/CGF/Bioinformatics/Production/data/thousG/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi",
         ),
@@ -83,13 +84,15 @@ def general_config(
     bpm: str,
     output_pattern: str,
 ) -> Config:
+    bpm_file = Path(f"/path/to/illumina/{bpm}")
     return Config(
         project_name=project_name,
         sample_sheet=sample_sheet,
         num_samples=num_samples,
         snp_array=snp_array,
+        num_snps=get_number_snps(bpm_file),
         reference_files=dict(
-            illumina_manifest_file=f"/path/to/illumina/{bpm}",
+            illumina_manifest_file=bpm_file,
             thousand_genome_vcf="/path/to/thousand/genome/vcf.gz",
             thousand_genome_tbi="/path/to/thousand/genome/vcf.gz.tbi",
         ),
@@ -113,7 +116,7 @@ def get_output_pattern(sample_sheet_name):
     return "{prefix}/{file_type}.{ext}"
 
 
-def get_number_snps(manifest_file: Optional[Path]) -> Optional[int]:
+def get_number_snps(manifest_file: Optional[os.PathLike]) -> int:
     if manifest_file:
         try:
             bpm = BeadPoolManifest(manifest_file)
@@ -122,7 +125,7 @@ def get_number_snps(manifest_file: Optional[Path]) -> Optional[int]:
             logger.warning(
                 "Could not parse the illumina manifest file. Did not set num_snps in the config."
             )
-    return None
+    return 0
 
 
 if __name__ == "__main__":
