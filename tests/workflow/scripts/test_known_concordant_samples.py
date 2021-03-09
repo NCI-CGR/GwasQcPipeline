@@ -2,7 +2,8 @@ import pandas as pd
 import pytest
 from typer.testing import CliRunner
 
-from cgr_gwas_qc.models.config import Config
+from cgr_gwas_qc import load_config
+from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import RealData
 from cgr_gwas_qc.workflow.scripts.known_concordant_samples import app
 
@@ -17,8 +18,12 @@ def test_unknown_concordant_samples(tmp_path):
     that they are indeed written out.
     """
     # GIVEN: Real test data and the concordance threshold
-    data_cache = RealData()
-    threshold = str(Config().software_params.dup_concordance_cutoff)
+    data_cache = RealData(tmp_path).copy_sample_sheet().make_config()
+
+    with chdir(tmp_path):
+        cfg = load_config()
+
+    threshold = str(cfg.config.software_params.dup_concordance_cutoff)
 
     # Create a concordance table with 1 unknown concordant sample
     (

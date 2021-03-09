@@ -4,7 +4,7 @@ from cgr_gwas_qc.testing.data import FakeData
 
 
 @pytest.fixture
-def test_data(tmp_path) -> FakeData:
+def test_data(tmp_path):
     """Returns an test working directory.
 
     The working directory contains:
@@ -17,10 +17,4 @@ def test_data(tmp_path) -> FakeData:
             - Genotype Calls (GRC)
         - Config File
     """
-    return (
-        FakeData(tmp_path)
-        .add_sample_sheet()
-        .add_reference_files()
-        .add_user_files(entry_point="gtc")
-        .make_config()
-    )
+    return FakeData(tmp_path).copy_sample_sheet().add_user_files(entry_point="gtc").make_config()

@@ -6,7 +6,7 @@ import pytest
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr, scan_for_yaml
-from cgr_gwas_qc.testing import chdir, make_test_config
+from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import FakeData
 from cgr_gwas_qc.version import __version__
 
@@ -19,7 +19,7 @@ def example_working_dir(tmp_path):
         - Sample Sheet
         - Config File
     """
-    FakeData(tmp_path).add_sample_sheet().make_config()
+    FakeData(tmp_path).copy_sample_sheet().make_config()
     return tmp_path
 
 
@@ -72,24 +72,6 @@ def test_config_only_uses_one_instance(example_working_dir: Path, monkeypatch):
 ################################################################################
 # Make sure ConfigMgr loads the yaml correctly.
 ################################################################################
-def test_load_config_missing_sample_sheet(tmp_path):
-    # GIVEN: A workding dir with a config.yml but no sample sheet
-    make_test_config(tmp_path)
-
-    # WHEN: We try to load the ConfigMgr
-    # THEN: We get warnings about the missing Sample Sheet and the ``cfg.ss`` is None
-    with chdir(tmp_path):
-        with pytest.warns(RuntimeWarning):
-            """Warn that sample_sheet.csv is not there"""
-            cfg = load_config()
-
-        with pytest.warns(RuntimeWarning):
-            """Trying to access sample raises warning and gives None"""
-            val = cfg.ss
-
-        assert val is None
-
-
 def test_manually_loading_config(example_working_dir: Path):
     # GIVEN: A working dir with a config.yml and a sample sheet
 
@@ -123,7 +105,7 @@ def test_group_by_column_default(tmp_path):
     The default value should be the same as LIMS_Individual_ID.
     """
     # GIVEN: Fake sample sheet and config
-    FakeData(tmp_path).add_sample_sheet().make_config()
+    FakeData(tmp_path).copy_sample_sheet().make_config()
 
     # WHEN: I load the config and sample sheet
     with chdir(tmp_path):
@@ -141,7 +123,7 @@ def test_group_by_column_config_option(tmp_path):
     `workflow_params.subject_id_to_use`.
     """
     # GIVEN: Fake sample sheet and a config where I set the `subject_id_to_use`
-    FakeData(tmp_path).add_sample_sheet().make_config(
+    FakeData(tmp_path).copy_sample_sheet().make_config(
         workflow_params=dict(subject_id_to_use="Sample_ID")
     )
 
@@ -161,7 +143,7 @@ def test_group_by_column(tmp_path):
     `workflow_params.subject_id_to_use`.
     """
     # GIVEN: Fake sample sheet and config
-    FakeData(tmp_path).add_sample_sheet().make_config()
+    FakeData(tmp_path).copy_sample_sheet().make_config()
     # and the sample sheet has the `Group_By` column set
     (tmp_path / "sample_sheet.csv").write_text(
         dedent(

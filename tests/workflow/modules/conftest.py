@@ -24,17 +24,12 @@ def gtc_data_repo(request, tmp_path, conda_envs):
 
     if request.param == "real":
         return (
-            RealData(tmp_path)
-            .add_sample_sheet(full_sample_sheet=False)
-            .add_reference_files(copy=False)
+            RealData(tmp_path, full_sample_sheet=False)
+            .copy_sample_sheet()
             .add_user_files(copy=False, entry_point="gtc")
             .make_config()
         )
     else:
         return (
-            FakeData(tmp_path)
-            .add_sample_sheet()
-            .add_reference_files(copy=False)
-            .add_user_files(entry_point="gtc")
-            .make_config()
+            FakeData(tmp_path).copy_sample_sheet().add_user_files(entry_point="gtc").make_config()
         )

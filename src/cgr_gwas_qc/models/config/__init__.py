@@ -39,17 +39,15 @@ class Config(BaseModel):
     sample_sheet: Path = Field(
         Path("sample_sheet.csv"), description="Path to the sample manifest from LIMs."
     )
-    snp_array: Optional[str] = Field(
-        None, help="Which SNP array was used. Only used for reporting."
+    snp_array: str = Field(..., help="Which SNP array was used. Only used for reporting.")
+    num_samples: int = Field(
+        ..., help="Number of samples, automatically calculated from the sample sheet."
     )
-    num_samples: Optional[int] = Field(
-        None, help="Number of samples, automatically calculated from the sample sheet."
-    )
-    num_snps: Optional[int] = Field(
-        None,
+    num_snps: int = Field(
+        ...,
         help="Number of markers, automatically calculated from the `reference_files.illumina_manifest_file",
     )
-    reference_files: ReferenceFiles = ReferenceFiles()  # Paths to reference files.
+    reference_files: ReferenceFiles
     user_files: UserFiles = UserFiles()  # Paths to user provided files.
     software_params: SoftwareParams = SoftwareParams()  # Various software parameters.
     workflow_params: WorkflowParams = WorkflowParams()  # Parameters to control how the workflow is run.

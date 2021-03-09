@@ -69,12 +69,29 @@ class DataRepo(ABC):
     _bed: str  # Name of the aggregate samples BED
     _bim: str  # Name of the aggregate samples BIM
     _fam: str  # Name of the aggregate samples FAM
+    _num_snps: int  # Number of SNPs in the array
 
     def __init__(self, working_dir: Optional[Path] = None):
         self.working_dir = working_dir
         self.ss = SampleSheet(self / self._sample_sheet)
         self._config: MutableMapping = defaultdict(dict)
-        self._config["project_name"] = self._data_type
+
+        self._config["project_name"] = self.ss.header["Project Name"].split(";")[0]
+        self._config["snp_array"] = self.ss.manifests["snp_array"]
+        self._config["num_snps"] = self._num_snps
+
+        self._config["sample_sheet"] = (self / self._sample_sheet).absolute()
+        self._config["num_samples"] = self.ss.data.shape[0]
+
+        self._config["reference_files"]["illumina_manifest_file"] = (
+            self / self._illumina_manifest_file
+        ).absolute()
+        self._config["reference_files"]["thousand_genome_vcf"] = (
+            self / self._thousand_genome_vcf
+        ).absolute()
+        self._config["reference_files"]["thousand_genome_tbi"] = (
+            self / self._thousand_genome_tbi
+        ).absolute()
 
     @abstractmethod
     def _add_gtcs(self):
@@ -94,7 +111,7 @@ class DataRepo(ABC):
         """
         raise NotImplementedError
 
-    def add_sample_sheet(self, copy: bool = True) -> U:
+    def copy_sample_sheet(self) -> U:
         """Add sample sheet.
 
         The sample sheet can either be copied into the working directory or
@@ -102,58 +119,12 @@ class DataRepo(ABC):
         is given (``self.working_dir``) then it will be copied otherwise it
         will be referenced in the config.
         """
-        if self.working_dir is None or copy is False:
-            # Don't copy. Add full path to sample sheet in the data repository.
-            self._config["sample_sheet"] = (self / self._sample_sheet).absolute()
-        else:
-            self._config["sample_sheet"] = "sample_sheet.csv"
-            self.copy(self._sample_sheet, self._config["sample_sheet"])
+        if self.working_dir is None:
+            # No working directory provided to just ignore
+            return self
 
-        return self
-
-    def add_reference_files(self, manifest: bool = True, vcf: bool = True, copy: bool = True) -> U:
-        """Add the various reference files.
-
-        The reference files can either be copied into the working directory or
-        have their full path referenced in the config. If a working directory is
-        given (``self.working_dir``) then they will be copied otherwise they
-        will be referenced in the config.
-
-        Args:
-            manifest: Include the Illumina manifest file (BPM). Defaults to True.
-            vcf: Include the Thousand Genomes VCF/TBI files. Defaults to True.
-        """
-        if self.working_dir is None or copy is False:
-            # Don't copy. Add full path to reference files in the data repository.
-            self._config["reference_files"]["illumina_manifest_file"] = (
-                self / self._illumina_manifest_file
-            ).absolute()
-            self._config["reference_files"]["thousand_genome_vcf"] = (
-                self / self._thousand_genome_vcf
-            ).absolute()
-            self._config["reference_files"]["thousand_genome_tbi"] = (
-                self / self._thousand_genome_tbi
-            ).absolute()
-        else:
-            if manifest:
-                self._config["reference_files"]["illumina_manifest_file"] = "manifest.bpm"
-                self.copy(
-                    self._illumina_manifest_file,
-                    self._config["reference_files"]["illumina_manifest_file"],
-                )
-
-            if vcf:
-                self._config["reference_files"]["thousand_genome_vcf"] = "thousG.vcf.gz"
-                self.copy(
-                    self._thousand_genome_vcf,
-                    self._config["reference_files"]["thousand_genome_vcf"],
-                )
-
-                self._config["reference_files"]["thousand_genome_tbi"] = "thousG.vcf.gz.tbi"
-                self.copy(
-                    self._thousand_genome_tbi,
-                    self._config["reference_files"]["thousand_genome_tbi"],
-                )
+        self._config["sample_sheet"] = "sample_sheet.csv"
+        self.copy(self._sample_sheet, self._config["sample_sheet"])
         return self
 
     def add_user_files(self, entry_point: str = "bed", copy: bool = True) -> U:
@@ -168,59 +139,64 @@ class DataRepo(ABC):
             entry_point: Which entry point to use ("gtc", "ped", or "bed").
               Defaults to "bed".
 
-        Returns:
-            T: [description]
         """
-        if self.working_dir is None or copy is False:
-            # Don't copy. Add full path to user files in the data repository.
-            if entry_point == "gtc":
-                self._config["user_files"]["gtc_pattern"] = (
-                    self._data_path.absolute() / self._gtc_pattern
-                ).as_posix()
-                self._config["user_files"]["idat_pattern"] = {}
-                self._config["user_files"]["idat_pattern"]["red"] = (
-                    self._data_path.absolute() / self._idat_red_pattern
-                ).as_posix()
-                self._config["user_files"]["idat_pattern"]["green"] = (
-                    self._data_path.absolute() / self._idat_green_pattern
-                ).as_posix()
-
-            elif entry_point == "ped":
-                self._config["user_files"]["ped"] = (self / self._ped).absolute()
-                self._config["user_files"]["map"] = (self / self._map).absolute()
-
-            elif entry_point == "bed":
-                self._config["user_files"]["bed"] = (self / self._bed).absolute()
-                self._config["user_files"]["bim"] = (self / self._bim).absolute()
-                self._config["user_files"]["fam"] = (self / self._fam).absolute()
+        if self.working_dir and copy:
+            self._copy_user_files(entry_point)
         else:
-            if entry_point == "gtc":
-                self._config["user_files"]["gtc_pattern"] = self._gtc_pattern
-                self._add_gtcs()
-
-                self._config["user_files"]["idat_pattern"] = {}
-                self._config["user_files"]["idat_pattern"]["red"] = self._idat_red_pattern
-                self._config["user_files"]["idat_pattern"]["green"] = self._idat_green_pattern
-                self._add_idats()
-
-            elif entry_point == "ped":
-                self._config["user_files"]["ped"] = "samples.ped"
-                self.copy(self._ped, self._config["user_files"]["ped"])
-
-                self._config["user_files"]["map"] = "samples.map"
-                self.copy(self._map, self._config["user_files"]["map"])
-
-            elif entry_point == "bed":
-                self._config["user_files"]["bed"] = "samples.bed"
-                self.copy(self._bed, self._config["user_files"]["bed"])
-
-                self._config["user_files"]["bim"] = "samples.bim"
-                self.copy(self._bim, self._config["user_files"]["bim"])
-
-                self._config["user_files"]["fam"] = "samples.fam"
-                self.copy(self._fam, self._config["user_files"]["fam"])
+            self._link_user_files(entry_point)
 
         return self
+
+    def _link_user_files(self, entry_point: str):
+        # Don't copy. Add full path to user files in the data repository.
+        if entry_point == "gtc":
+            self._config["user_files"] = {
+                "gtc_pattern": (self._data_path.absolute() / self._gtc_pattern).as_posix(),
+                "idat_pattern": {
+                    "red": (self._data_path.absolute() / self._idat_red_pattern).as_posix(),
+                    "green": (self._data_path.absolute() / self._idat_green_pattern).as_posix(),
+                },
+            }
+
+        elif entry_point == "ped":
+            self._config["user_files"] = {
+                "ped": (self / self._ped).absolute(),
+                "map": (self / self._map).absolute(),
+            }
+
+        else:
+            self._config["user_files"] = {
+                "bed": (self / self._bed).absolute(),
+                "bim": (self / self._bim).absolute(),
+                "fam": (self / self._fam).absolute(),
+            }
+
+    def _copy_user_files(self, entry_point: str):
+        if entry_point == "gtc":
+            self._config["user_files"] = {
+                "gtc_pattern": self._gtc_pattern,
+                "idat_pattern": {"red": self._idat_red_pattern, "green": self._idat_green_pattern},
+            }
+            self._add_gtcs()
+            self._add_idats()
+
+        elif entry_point == "ped":
+            self._config["user_files"] = {
+                "ped": "samples.ped",
+                "map": "samples.map",
+            }
+            self.copy(self._ped, self._config["user_files"]["ped"])
+            self.copy(self._map, self._config["user_files"]["map"])
+
+        elif entry_point == "bed":
+            self._config["user_files"] = {
+                "bed": "samples.bed",
+                "bim": "samples.bim",
+                "fam": "samples.fam",
+            }
+            self.copy(self._bed, self._config["user_files"]["bed"])
+            self.copy(self._bim, self._config["user_files"]["bim"])
+            self.copy(self._fam, self._config["user_files"]["fam"])
 
     def make_config(self, **kwargs) -> U:
         """Create a config.yml in ``self.working_dir``.
@@ -260,13 +236,12 @@ class DataRepo(ABC):
         Raises:
             ValueError: If the ``source`` does not exist in the repository.
         """
-        if self.working_dir:
-            source_path = (self._data_path / source).absolute()
-            destination_path = (self.working_dir / destination).absolute()
-            destination_path.parent.mkdir(exist_ok=True, parents=True)  # Make parent dirs if needed
-        else:
+        if not self.working_dir:
             raise ValueError("You need to have set ``self.working_dir``.")
 
+        source_path = (self._data_path / source).absolute()
+        destination_path = (self.working_dir / destination).absolute()
+        destination_path.parent.mkdir(exist_ok=True, parents=True)  # Make parent dirs if needed
         if source_path.is_dir():
             shutil.copytree(source_path, destination_path, copy_function=shutil.copy)
         elif source_path.is_file():
@@ -296,8 +271,7 @@ class FakeData(DataRepo):
         >>> cache / non_existing_file.txt  # If file does not exist then raises exception
         FileNotFoundError: ".../non_existing_file.txt"
 
-        >>> cache.add_sample_sheet()  # copy sample sheet to working dir
-        >>> cache.add_reference_files()  # add reference files to working dir
+        >>> cache.copy_sample_sheet()  # copy sample sheet to working dir
         >>> cache.add_user_files()  # add BED/BIM/FAM to working dir
         >>> cache.make_config()  # make the config for files added using cache
     """
@@ -324,6 +298,9 @@ class FakeData(DataRepo):
 
     _test_gtc = "illumina/gtc/small_genotype.gtc"
     _test_idat = "illumina/idat/small_intensity.idat"
+
+    _snp_array = "Fake-GSA"
+    _num_snps = 2_000
 
     def add_user_files(self, entry_point: str = "bed", copy: bool = True) -> U:
         if (self.working_dir is None or not copy) and entry_point == "gtc":
@@ -369,8 +346,7 @@ class RealData(DataRepo):
         >>> cache / non_existing_file.txt  # If file does not exist then raises exception
         FileNotFoundError: "../../../.cache/cgr_gwas_qc/test_data/non_existing_file.txt"
 
-        >>> cache.add_sample_sheet()  # copy sample sheet to working dir
-        >>> cache.add_reference_files(copy=False)  # add full path of reference files to config
+        >>> cache.copy_sample_sheet()  # copy sample sheet to working dir
         >>> cache.add_user_files(copy=False)  # add full path of user files to config
         >>> cache.make_config()  # make the config for files added using cache
     """
@@ -399,8 +375,15 @@ class RealData(DataRepo):
     _bim = "production_outputs/plink_start/samples.bim"
     _fam = "production_outputs/plink_start/samples.fam"
 
+    _snp_array = "GSAMD-24v1-0"
+    _num_snps = 700078
+
     def __init__(
-        self, working_dir: Optional[Path] = None, sync: bool = False, GRCh_version: int = 37
+        self,
+        working_dir: Optional[Path] = None,
+        full_sample_sheet: bool = True,
+        sync: bool = False,
+        GRCh_version: int = 37,
     ):
         """A real test data repository of ~200 samples.
 
@@ -416,7 +399,8 @@ class RealData(DataRepo):
               genomes files.
 
         """
-        super().__init__(working_dir)
+        if full_sample_sheet:
+            self._sample_sheet = "original_data/manifest_full.csv"
 
         if sync:
             self._sync_data()
@@ -431,28 +415,7 @@ class RealData(DataRepo):
                 "reference_data/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz.tbi"
             )
 
-    def add_sample_sheet(self, copy: bool = True, full_sample_sheet: bool = True) -> U:
-        """Add sample sheet.
-
-         We have two different sample sheets for the Real Data. The first
-         `manifest_short.csv` that contains only the 2 samples that I have
-         GTC/IDAT files for. The second `manifest_full.csv` contains the ~200
-         samples. Essentially, you will only want the short sample sheet when
-         using the `gtc` entry_point.
-
-        Args:
-            working_dir: If the path to the working directory is given then
-              the sample sheet is copied into the working directory. Defaults to None.
-            full_sample_sheet: Should you use the full or short sample sheet.
-              Defaults to True.
-
-        Returns:
-            T: [description]
-        """
-        if full_sample_sheet:
-            self._sample_sheet = "original_data/manifest_full.csv"
-
-        return super().add_sample_sheet(copy=copy)
+        super().__init__(working_dir)
 
     def _add_gtcs(self):
         target_folder = self.working_dir / "original_data"
