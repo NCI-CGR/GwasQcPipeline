@@ -139,59 +139,64 @@ class DataRepo(ABC):
             entry_point: Which entry point to use ("gtc", "ped", or "bed").
               Defaults to "bed".
 
-        Returns:
-            T: [description]
         """
-        if self.working_dir is None or copy is False:
-            # Don't copy. Add full path to user files in the data repository.
-            if entry_point == "gtc":
-                self._config["user_files"]["gtc_pattern"] = (
-                    self._data_path.absolute() / self._gtc_pattern
-                ).as_posix()
-                self._config["user_files"]["idat_pattern"] = {}
-                self._config["user_files"]["idat_pattern"]["red"] = (
-                    self._data_path.absolute() / self._idat_red_pattern
-                ).as_posix()
-                self._config["user_files"]["idat_pattern"]["green"] = (
-                    self._data_path.absolute() / self._idat_green_pattern
-                ).as_posix()
-
-            elif entry_point == "ped":
-                self._config["user_files"]["ped"] = (self / self._ped).absolute()
-                self._config["user_files"]["map"] = (self / self._map).absolute()
-
-            elif entry_point == "bed":
-                self._config["user_files"]["bed"] = (self / self._bed).absolute()
-                self._config["user_files"]["bim"] = (self / self._bim).absolute()
-                self._config["user_files"]["fam"] = (self / self._fam).absolute()
+        if self.working_dir and copy:
+            self._copy_user_files(entry_point)
         else:
-            if entry_point == "gtc":
-                self._config["user_files"]["gtc_pattern"] = self._gtc_pattern
-                self._add_gtcs()
-
-                self._config["user_files"]["idat_pattern"] = {}
-                self._config["user_files"]["idat_pattern"]["red"] = self._idat_red_pattern
-                self._config["user_files"]["idat_pattern"]["green"] = self._idat_green_pattern
-                self._add_idats()
-
-            elif entry_point == "ped":
-                self._config["user_files"]["ped"] = "samples.ped"
-                self.copy(self._ped, self._config["user_files"]["ped"])
-
-                self._config["user_files"]["map"] = "samples.map"
-                self.copy(self._map, self._config["user_files"]["map"])
-
-            elif entry_point == "bed":
-                self._config["user_files"]["bed"] = "samples.bed"
-                self.copy(self._bed, self._config["user_files"]["bed"])
-
-                self._config["user_files"]["bim"] = "samples.bim"
-                self.copy(self._bim, self._config["user_files"]["bim"])
-
-                self._config["user_files"]["fam"] = "samples.fam"
-                self.copy(self._fam, self._config["user_files"]["fam"])
+            self._link_user_files(entry_point)
 
         return self
+
+    def _link_user_files(self, entry_point: str):
+        # Don't copy. Add full path to user files in the data repository.
+        if entry_point == "gtc":
+            self._config["user_files"] = {
+                "gtc_pattern": (self._data_path.absolute() / self._gtc_pattern).as_posix(),
+                "idat_pattern": {
+                    "red": (self._data_path.absolute() / self._idat_red_pattern).as_posix(),
+                    "green": (self._data_path.absolute() / self._idat_green_pattern).as_posix(),
+                },
+            }
+
+        elif entry_point == "ped":
+            self._config["user_files"] = {
+                "ped": (self / self._ped).absolute(),
+                "map": (self / self._map).absolute(),
+            }
+
+        else:
+            self._config["user_files"] = {
+                "bed": (self / self._bed).absolute(),
+                "bim": (self / self._bim).absolute(),
+                "fam": (self / self._fam).absolute(),
+            }
+
+    def _copy_user_files(self, entry_point: str):
+        if entry_point == "gtc":
+            self._config["user_files"] = {
+                "gtc_pattern": self._gtc_pattern,
+                "idat_pattern": {"red": self._idat_red_pattern, "green": self._idat_green_pattern},
+            }
+            self._add_gtcs()
+            self._add_idats()
+
+        elif entry_point == "ped":
+            self._config["user_files"] = {
+                "ped": "samples.ped",
+                "map": "samples.map",
+            }
+            self.copy(self._ped, self._config["user_files"]["ped"])
+            self.copy(self._map, self._config["user_files"]["map"])
+
+        elif entry_point == "bed":
+            self._config["user_files"] = {
+                "bed": "samples.bed",
+                "bim": "samples.bim",
+                "fam": "samples.fam",
+            }
+            self.copy(self._bed, self._config["user_files"]["bed"])
+            self.copy(self._bim, self._config["user_files"]["bim"])
+            self.copy(self._fam, self._config["user_files"]["fam"])
 
     def make_config(self, **kwargs) -> U:
         """Create a config.yml in ``self.working_dir``.
