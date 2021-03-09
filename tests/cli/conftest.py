@@ -17,4 +17,4 @@ def test_data(tmp_path):
             - Genotype Calls (GRC)
         - Config File
     """
-    return FakeData(tmp_path).add_sample_sheet().add_user_files(entry_point="gtc").make_config()
+    return FakeData(tmp_path).copy_sample_sheet().add_user_files(entry_point="gtc").make_config()

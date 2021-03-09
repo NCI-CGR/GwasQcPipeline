@@ -30,7 +30,7 @@ def test_old_call_rate_filter_order(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy("production_outputs/plink_start/samples.bed", "sample_level/samples.bed")
         .copy("production_outputs/plink_start/samples.bim", "sample_level/samples.bim")
         .copy("production_outputs/plink_start/samples.fam", "sample_level/samples.fam")
@@ -136,7 +136,7 @@ def test_call_rate_filters(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy("production_outputs/plink_start/samples.bed", "sample_level/samples.bed")
         .copy("production_outputs/plink_start/samples.bim", "sample_level/samples.bim")
         .copy("production_outputs/plink_start/samples.fam", "sample_level/samples.fam")
@@ -187,7 +187,7 @@ def maf_and_ld_outputs(tmp_path_factory, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",

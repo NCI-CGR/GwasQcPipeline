@@ -18,7 +18,7 @@ def sample_qc_report(tmp_path_factory) -> Path:
     tmp_path = tmp_path_factory.mktemp("sample_level_summary")
     (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/plink_start/samples_start.imiss", "sample_level/samples.imiss")
         .copy(
@@ -123,7 +123,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_report):
     # GIVEN: real data sample sheet, config, and sample_qc_summary table.
     (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -157,7 +157,7 @@ def test_qc_failures(tmp_path, sample_qc_report):
     # GIVEN: real data sample sheet, config, and sample_qc_summary table.
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -214,7 +214,7 @@ def test_remove_contaminated(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .copy(
@@ -278,7 +278,7 @@ def test_remove_contaminated_add_contam_samples(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .copy(

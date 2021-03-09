@@ -21,8 +21,8 @@ def data_cache_and_cfg(tmp_path_factory, pytestconfig):
 
     session_tmp_path: Path = tmp_path_factory.mktemp("sample_qc_report_script")
     data_cache = (
-        RealData(session_tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(session_tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
     )

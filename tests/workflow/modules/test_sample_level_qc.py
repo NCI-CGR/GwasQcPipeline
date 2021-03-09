@@ -24,7 +24,7 @@ def graf_inputs(tmp_path_factory, conda_envs):
     conda_envs.copy_env("graf", tmp_path)
     (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",
@@ -118,8 +118,8 @@ def median_idat_intensity(tmp_path_factory, conda_envs) -> Path:
     tmp_path = tmp_path_factory.mktemp("idat_intensity_outputs")
     conda_envs.copy_env("illuminaio", tmp_path)
     (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -168,8 +168,8 @@ def test_agg_median_idat_intensity(median_idat_intensity):
 def test_per_sample_gtc_to_adpc(tmp_path):
     # GIVEN: Real data using GTC entry point.
     data_cache = (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -230,8 +230,8 @@ def test_per_sample_verifyIDintensity_contamination(tmp_path, conda_envs):
     # frequencies, and verifyIDintensity conda environment.
     conda_envs.copy_env("verifyidintensity", tmp_path)
     data_cache = (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/contam", "sample_level/per_sample_adpc")
         .copy(
@@ -284,8 +284,8 @@ def test_contamination_test_with_missing_abf_values(tmp_path, conda_envs):
     # GIVEN: Real data using GTC entry point and the per sample adpc files.
     conda_envs.copy_env("verifyidintensity", tmp_path)
     data_cache = (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/contam", "sample_level/per_sample_adpc")
         .make_config(num_snps=700078)
@@ -338,8 +338,8 @@ def test_contamination_test_with_missing_adpc_values(tmp_path, conda_envs):
     # conda environment.
     conda_envs.copy_env("verifyidintensity", tmp_path)
     data_store = (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
@@ -386,8 +386,8 @@ def test_agg_contamination_test(tmp_path, median_idat_intensity):
     # GIVEN: Real data with per sample contamination estimates, final call
     # rates, and the Illuminaio conda env.
     data_cache = (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/one_samp_b_1000g_contam",
@@ -445,7 +445,7 @@ def test_sample_concordance_plink(tmp_path):
     # GIVEN: Real data
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
         .make_snakefile(
             """

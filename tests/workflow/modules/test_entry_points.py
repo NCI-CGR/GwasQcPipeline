@@ -25,8 +25,8 @@ from cgr_gwas_qc.testing.data import FakeData, RealData
 def test_gtc_to_ped_conversion(tmp_path):
     # GIVEN: A DataRepo with GTC files and the following snakefile
     (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -61,8 +61,8 @@ def test_gtc_to_ped_conversion(tmp_path):
 def test_create_gtc_merge_list(tmp_path):
     # GIVEN: A RealData repo with the following Snakefile
     data_repo = (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/per_sample_plink_files", "sample_level/per_sample_plink_files")
         .make_config()
@@ -95,8 +95,8 @@ def test_merge_gtc_sample_peds(tmp_path, conda_envs):
     # GIVEN: The plink conda env and the following RealData repo
     conda_envs.copy_env("plink2", tmp_path)
     data_repo = (
-        RealData(tmp_path)
-        .add_sample_sheet(full_sample_sheet=False)
+        RealData(tmp_path, full_sample_sheet=False)
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/per_sample_plink_files", "sample_level/per_sample_plink_files")
         .make_config()
@@ -144,7 +144,7 @@ def test_ped_entry(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_repo = (
         FakeData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .add_user_files(entry_point="ped")
         .make_config()
         .make_snakefile(
@@ -196,7 +196,7 @@ def test_bed_entry(tmp_path):
     # GIVEN: The the following FakeData repo
     (
         FakeData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .add_user_files(entry_point="bed")
         .make_config()
         .make_snakefile(

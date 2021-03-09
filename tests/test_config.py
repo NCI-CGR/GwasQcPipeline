@@ -19,7 +19,7 @@ def example_working_dir(tmp_path):
         - Sample Sheet
         - Config File
     """
-    FakeData(tmp_path).add_sample_sheet().make_config()
+    FakeData(tmp_path).copy_sample_sheet().make_config()
     return tmp_path
 
 
@@ -105,7 +105,7 @@ def test_group_by_column_default(tmp_path):
     The default value should be the same as LIMS_Individual_ID.
     """
     # GIVEN: Fake sample sheet and config
-    FakeData(tmp_path).add_sample_sheet().make_config()
+    FakeData(tmp_path).copy_sample_sheet().make_config()
 
     # WHEN: I load the config and sample sheet
     with chdir(tmp_path):
@@ -123,7 +123,7 @@ def test_group_by_column_config_option(tmp_path):
     `workflow_params.subject_id_to_use`.
     """
     # GIVEN: Fake sample sheet and a config where I set the `subject_id_to_use`
-    FakeData(tmp_path).add_sample_sheet().make_config(
+    FakeData(tmp_path).copy_sample_sheet().make_config(
         workflow_params=dict(subject_id_to_use="Sample_ID")
     )
 
@@ -143,7 +143,7 @@ def test_group_by_column(tmp_path):
     `workflow_params.subject_id_to_use`.
     """
     # GIVEN: Fake sample sheet and config
-    FakeData(tmp_path).add_sample_sheet().make_config()
+    FakeData(tmp_path).copy_sample_sheet().make_config()
     # and the sample sheet has the `Group_By` column set
     (tmp_path / "sample_sheet.csv").write_text(
         dedent(

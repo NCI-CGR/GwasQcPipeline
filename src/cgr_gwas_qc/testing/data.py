@@ -69,17 +69,19 @@ class DataRepo(ABC):
     _bed: str  # Name of the aggregate samples BED
     _bim: str  # Name of the aggregate samples BIM
     _fam: str  # Name of the aggregate samples FAM
-    _snp_array: str  # Name of the snps array
     _num_snps: int  # Number of SNPs in the array
 
     def __init__(self, working_dir: Optional[Path] = None):
         self.working_dir = working_dir
         self.ss = SampleSheet(self / self._sample_sheet)
         self._config: MutableMapping = defaultdict(dict)
-        self._config["project_name"] = self._data_type
-        self._config["num_samples"] = self.ss.data.shape[0]
-        self._config["snp_array"] = self._snp_array
+
+        self._config["project_name"] = self.ss.header["Project Name"].split(";")[0]
+        self._config["snp_array"] = self.ss.manifests["snp_array"]
         self._config["num_snps"] = self._num_snps
+
+        self._config["sample_sheet"] = (self / self._sample_sheet).absolute()
+        self._config["num_samples"] = self.ss.data.shape[0]
 
         self._config["reference_files"]["illumina_manifest_file"] = (
             self / self._illumina_manifest_file
@@ -109,7 +111,7 @@ class DataRepo(ABC):
         """
         raise NotImplementedError
 
-    def add_sample_sheet(self, copy: bool = True) -> U:
+    def copy_sample_sheet(self) -> U:
         """Add sample sheet.
 
         The sample sheet can either be copied into the working directory or
@@ -117,13 +119,12 @@ class DataRepo(ABC):
         is given (``self.working_dir``) then it will be copied otherwise it
         will be referenced in the config.
         """
-        if self.working_dir is None or not copy:
-            # Don't copy. Add full path to sample sheet in the data repository.
-            self._config["sample_sheet"] = (self / self._sample_sheet).absolute()
-        else:
-            self._config["sample_sheet"] = "sample_sheet.csv"
-            self.copy(self._sample_sheet, self._config["sample_sheet"])
+        if self.working_dir is None:
+            # No working directory provided to just ignore
+            return self
 
+        self._config["sample_sheet"] = "sample_sheet.csv"
+        self.copy(self._sample_sheet, self._config["sample_sheet"])
         return self
 
     def add_user_files(self, entry_point: str = "bed", copy: bool = True) -> U:
@@ -265,7 +266,7 @@ class FakeData(DataRepo):
         >>> cache / non_existing_file.txt  # If file does not exist then raises exception
         FileNotFoundError: ".../non_existing_file.txt"
 
-        >>> cache.add_sample_sheet()  # copy sample sheet to working dir
+        >>> cache.copy_sample_sheet()  # copy sample sheet to working dir
         >>> cache.add_user_files()  # add BED/BIM/FAM to working dir
         >>> cache.make_config()  # make the config for files added using cache
     """
@@ -340,7 +341,7 @@ class RealData(DataRepo):
         >>> cache / non_existing_file.txt  # If file does not exist then raises exception
         FileNotFoundError: "../../../.cache/cgr_gwas_qc/test_data/non_existing_file.txt"
 
-        >>> cache.add_sample_sheet()  # copy sample sheet to working dir
+        >>> cache.copy_sample_sheet()  # copy sample sheet to working dir
         >>> cache.add_user_files(copy=False)  # add full path of user files to config
         >>> cache.make_config()  # make the config for files added using cache
     """
@@ -373,7 +374,11 @@ class RealData(DataRepo):
     _num_snps = 700078
 
     def __init__(
-        self, working_dir: Optional[Path] = None, sync: bool = False, GRCh_version: int = 37
+        self,
+        working_dir: Optional[Path] = None,
+        full_sample_sheet: bool = True,
+        sync: bool = False,
+        GRCh_version: int = 37,
     ):
         """A real test data repository of ~200 samples.
 
@@ -389,7 +394,8 @@ class RealData(DataRepo):
               genomes files.
 
         """
-        super().__init__(working_dir)
+        if full_sample_sheet:
+            self._sample_sheet = "original_data/manifest_full.csv"
 
         if sync:
             self._sync_data()
@@ -404,28 +410,7 @@ class RealData(DataRepo):
                 "reference_data/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz.tbi"
             )
 
-    def add_sample_sheet(self, copy: bool = True, full_sample_sheet: bool = True) -> U:
-        """Add sample sheet.
-
-         We have two different sample sheets for the Real Data. The first
-         `manifest_short.csv` that contains only the 2 samples that I have
-         GTC/IDAT files for. The second `manifest_full.csv` contains the ~200
-         samples. Essentially, you will only want the short sample sheet when
-         using the `gtc` entry_point.
-
-        Args:
-            working_dir: If the path to the working directory is given then
-              the sample sheet is copied into the working directory. Defaults to None.
-            full_sample_sheet: Should you use the full or short sample sheet.
-              Defaults to True.
-
-        Returns:
-            T: [description]
-        """
-        if full_sample_sheet:
-            self._sample_sheet = "original_data/manifest_full.csv"
-
-        return super().add_sample_sheet(copy=copy)
+        super().__init__(working_dir)
 
     def _add_gtcs(self):
         target_folder = self.working_dir / "original_data"

@@ -15,7 +15,7 @@ def test_create_subjects(tmp_path, conda_envs, qc_summary):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",
@@ -72,7 +72,7 @@ def test_remove_related_subjects(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
         .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)

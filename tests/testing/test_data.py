@@ -11,7 +11,7 @@ def test_fake_data(tmp_path):
     #   - user files (bed entry point)
     #   - reference files (in a different location)
     #   - config
-    (FakeData(tmp_path).add_sample_sheet().add_user_files().make_config())
+    (FakeData(tmp_path).copy_sample_sheet().add_user_files().make_config())
 
     # WHEN: we load the config in the working dir
     with chdir(tmp_path):
@@ -39,7 +39,7 @@ def test_fake_data_tweak_config(tmp_path):
     #   - config
     (
         FakeData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .make_config(software_params=dict(strand="fwd"))  # WHEN: we change a software setting
     )
 
@@ -62,7 +62,7 @@ def test_real_data_caching():
 def test_copy_file_to_tmp_dir(tmp_path):
     # GIVEN: working dir with
     #   - sample sheet
-    RealData(tmp_path).add_sample_sheet()
+    RealData(tmp_path).copy_sample_sheet()
 
     # THEN: the sample sheet exists
     assert (tmp_path / "sample_sheet.csv").exists()

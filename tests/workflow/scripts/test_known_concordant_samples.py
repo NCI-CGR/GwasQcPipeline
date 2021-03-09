@@ -18,7 +18,7 @@ def test_unknown_concordant_samples(tmp_path):
     that they are indeed written out.
     """
     # GIVEN: Real test data and the concordance threshold
-    data_cache = RealData(tmp_path).add_sample_sheet().make_config()
+    data_cache = RealData(tmp_path).copy_sample_sheet().make_config()
 
     with chdir(tmp_path):
         cfg = load_config()

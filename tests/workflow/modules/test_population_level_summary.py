@@ -15,7 +15,7 @@ def test_subjects_per_population(tmp_path, qc_summary):
     # GIVEN: real data config and qc summary table
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .make_config()
         .make_snakefile(
             """
@@ -71,7 +71,7 @@ def test_plink_split_population(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy(
             "production_outputs/split_by_pop/EUR.keep.txt",
             "population_level/subject_lists/EUR.txt",
@@ -129,7 +129,7 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
     conda_envs.copy_env("eigensoft", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
         .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
@@ -198,7 +198,7 @@ def test_controls_per_population(tmp_path, qc_summary):
     # in test data
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .make_config()
         .make_snakefile(
             """
@@ -258,7 +258,7 @@ def test_plink_split_controls(tmp_path, conda_envs):
 
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .copy("production_outputs/HWP/EUR_controls.txt", "population_level/controls_lists/EUR.txt",)
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed",
@@ -331,7 +331,7 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
     conda_envs.copy_env("eigensoft", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .add_sample_sheet()
+        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed", "population_level/EUR/subjects.bed",
