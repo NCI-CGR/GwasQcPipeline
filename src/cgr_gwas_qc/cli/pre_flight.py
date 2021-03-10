@@ -145,13 +145,15 @@ def check_user_files(user_files: UserFiles, sample_sheet: SampleSheet, threads: 
 def update_config_file(
     config: Config, sample_sheet: SampleSheet, problem_samples: Optional[Set[str]]
 ):
+    if config.num_snps == 0:
+        config.num_snps = BeadPoolManifest(config.reference_files.illumina_manifest_file).num_loci
+
+    if config.num_samples == 0:
+        config.num_samples = sample_sheet.data.shape[0]
+
     if problem_samples:
         # Add problem samples and update num_samples
         config.Sample_IDs_to_remove = list(problem_samples)
-        config.num_samples = sample_sheet.data.query("Sample_ID not in @problem_samples").shape[0]
-
-    if config.num_snps == 0:
-        config.num_snps = BeadPoolManifest(config.reference_files.illumina_manifest_file).num_loci
 
     config_to_yaml(config)
 
