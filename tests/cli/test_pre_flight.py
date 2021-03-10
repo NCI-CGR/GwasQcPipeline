@@ -14,8 +14,8 @@ def test_preflight_refs_only(test_data):
     #   - config
 
     with chdir(test_data.working_dir):
-        # WHEN: Run `cgr pre-flight --no-gtc-check --no-idat-check`
-        results = runner.invoke(app, ["--no-gtc-check", "--no-idat-check"])
+        # WHEN: Run `cgr pre-flight --no-user-files-check`
+        results = runner.invoke(app, ["--user-files-check"])
         # THEN: pre-flight validation passes
         assert results.exit_code == 0
 
@@ -27,7 +27,7 @@ def test_preflight_refs_and_gtc_only(test_data):
     #   - user files (GTC entry point)
     #   - config
     with chdir(test_data.working_dir):
-        # WHEN: Run `cgr pre-flight --gtc-check --no-idat-check`
-        results = runner.invoke(app, ["--gtc-check", "--no-idat-check"])
+        # WHEN: Run `cgr pre-flight`
+        results = runner.invoke(app)
         # THEN: pre-flight validation passes
         assert results.exit_code == 0
