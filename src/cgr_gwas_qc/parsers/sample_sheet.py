@@ -2,7 +2,7 @@
 import re
 from io import StringIO
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import pandas as pd
 
@@ -140,6 +140,11 @@ class SampleSheet:
 
         self.data["Group_By_Subject_ID"] = self.data.apply(_get_subject_id, axis=1)
 
+        return self
+
+    def remove_Sample_IDs(self, sample_ids: Optional[Sequence[str]] = None) -> "SampleSheet":
+        if sample_ids:
+            self.data = self.data.query("Sample_ID not in @sample_ids")
         return self
 
 
