@@ -66,8 +66,10 @@ class ConfigMgr:
         self._sample_sheet: Optional[SampleSheet] = None
 
         try:
-            self._sample_sheet = SampleSheet(self.sample_sheet_file).add_group_by_column(
-                self.config.workflow_params.subject_id_to_use
+            self._sample_sheet = (
+                SampleSheet(self.sample_sheet_file)
+                .add_group_by_column(self.config.workflow_params.subject_id_to_use)
+                .remove_Sample_IDs(self.config.Sample_IDs_to_remove)
             )
         except Exception:
             warn(f"Sample Sheet: {self.sample_sheet_file} could not be loaded.", RuntimeWarning)

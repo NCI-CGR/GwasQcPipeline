@@ -2,7 +2,7 @@
 import re
 from io import StringIO
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import pandas as pd
 
@@ -104,10 +104,16 @@ class SampleSheet:
 
         return res
 
-    @staticmethod
-    def _clean_data(data) -> pd.DataFrame:
+    def _clean_data(self, data) -> pd.DataFrame:
         """Converts Data section into a dataframe."""
-        return pd.read_csv(StringIO(data), low_memory=False).dropna(how="all")
+        no_empty_rows = self._remove_empty_rows(data)
+        return pd.read_csv(StringIO(no_empty_rows), low_memory=False).dropna(how="all")
+
+    @staticmethod
+    def _remove_empty_rows(data: str) -> str:
+        data_no_empty_rows = re.sub("^,+$", "", data, flags=re.MULTILINE)
+        data_no_extra_breaks = re.sub("\n+", "\n", data_no_empty_rows)
+        return data_no_extra_breaks.lstrip()
 
     def add_group_by_column(self, col_name: Optional[str] = None) -> "SampleSheet":
         """Select which column in the sample sheet to use for subject grouping.
@@ -140,6 +146,11 @@ class SampleSheet:
 
         self.data["Group_By_Subject_ID"] = self.data.apply(_get_subject_id, axis=1)
 
+        return self
+
+    def remove_Sample_IDs(self, sample_ids: Optional[Sequence[str]] = None) -> "SampleSheet":
+        if sample_ids:
+            self.data = self.data.query("Sample_ID not in @sample_ids")
         return self
 
 

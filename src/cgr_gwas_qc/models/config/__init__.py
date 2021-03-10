@@ -1,7 +1,7 @@
 """Configuration system data models."""
 from logging import getLogger
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Sequence
 
 from pydantic import BaseModel, Field, validator
 
@@ -52,6 +52,7 @@ class Config(BaseModel):
     software_params: SoftwareParams = SoftwareParams()  # Various software parameters.
     workflow_params: WorkflowParams = WorkflowParams()  # Parameters to control how the workflow is run.
     env_modules: Optional[EnvModules]  # Use these HPC environmental modules."
+    Sample_IDs_to_remove: Optional[Sequence[str]]
 
     @validator("pipeline_version")
     def validate_pipeline_version(cls, v):

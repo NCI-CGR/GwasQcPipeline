@@ -56,7 +56,7 @@ def test_missing_sections(data: str):
     # GIVEN: a sample sheet with different sections missing
     # WHEN-THEN: we validate it raises a missing section error
     with pytest.raises(SampleSheetMissingSectionHeaderError):
-        check_section_headers("mock.csv", data)
+        check_section_headers(data)
 
 
 ################################################################################
@@ -93,7 +93,7 @@ def test_truncated_file(data):
     # WHEN-THEN: we validate it raises a truncation error
     """If file appears truncated should raise an error."""
     with pytest.raises(SampleSheetTruncatedFileError):
-        check_file_truncation("mock.csv", data)
+        check_file_truncation(data)
 
 
 ################################################################################
@@ -130,7 +130,7 @@ def test_null_row_in_data_section(data):
     # GIVEN: a sample sheet with an empty row
     # WHEN-THEN: we validate it raises a null row error
     with pytest.raises(SampleSheetNullRowError):
-        check_null_rows("mock.csv", data)
+        check_null_rows(data)
 
 
 ################################################################################
@@ -166,7 +166,7 @@ def test_null_row_in_another_section(data):
     """Empty rows in the other sections should do nothing."""
     # GIVEN: a sample sheet with an empty row in the header of manifests section
     # WHEN-THEN: we validate it and it raises no errors
-    check_null_rows("mock.csv", data)
+    check_null_rows(data)
 
 
 ################################################################################
@@ -209,7 +209,7 @@ def test_check_required_columns(missing_data_req_column):
     # GIVEN: a sample sheet with a missing required column
     # WHEN-THEN: we validate it and it raises a missing column error
     with pytest.raises(SampleSheetMissingRequiredColumnsError):
-        check_required_columns("mock.csv", SampleSheet(missing_data_req_column))
+        check_required_columns(SampleSheet(missing_data_req_column))
 
 
 ################################################################################
@@ -253,4 +253,4 @@ def test_null_columns(missing_data_values):
     # GIVEN: a sample sheet with a missing data in a required column
     # WHEN-THEN: we validate it and it raises a missing value error
     with pytest.raises(SampleSheetMissingValueRequiredColumnsError):
-        check_missing_values_required_columns("mock.csv", SampleSheet(missing_data_values))
+        check_missing_values_required_columns(SampleSheet(missing_data_values))
