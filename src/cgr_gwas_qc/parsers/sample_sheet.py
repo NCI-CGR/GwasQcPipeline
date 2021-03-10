@@ -104,10 +104,16 @@ class SampleSheet:
 
         return res
 
-    @staticmethod
-    def _clean_data(data) -> pd.DataFrame:
+    def _clean_data(self, data) -> pd.DataFrame:
         """Converts Data section into a dataframe."""
-        return pd.read_csv(StringIO(data), low_memory=False).dropna(how="all")
+        no_empty_rows = self._remove_empty_rows(data)
+        return pd.read_csv(StringIO(no_empty_rows), low_memory=False).dropna(how="all")
+
+    @staticmethod
+    def _remove_empty_rows(data: str) -> str:
+        data_no_empty_rows = re.sub("^,+$", "", data, flags=re.MULTILINE)
+        data_no_extra_breaks = re.sub("\n+", "\n", data_no_empty_rows)
+        return data_no_extra_breaks.lstrip()
 
     def add_group_by_column(self, col_name: Optional[str] = None) -> "SampleSheet":
         """Select which column in the sample sheet to use for subject grouping.
