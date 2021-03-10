@@ -86,7 +86,7 @@ def check_user_files(user_files: UserFiles, sample_sheet: pd.DataFrame, threads:
     args = list(
         product([user_files], [record._asdict() for record in sample_sheet.itertuples(index=False)])
     )
-    typer.secho("Checking files for {:,} samples.".format(len(args)))
+    typer.secho("Checking user files for {:,} samples.".format(len(args)))
     futures = pool.starmap(_check_user_files, args)
     with typer.progressbar(futures, length=len(args)) as bar:
         problem_user_files = []

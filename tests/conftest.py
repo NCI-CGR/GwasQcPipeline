@@ -103,6 +103,12 @@ def qsub(monkeypatch):
 # Small Test Data (Fake)
 ##################################################################################
 @pytest.fixture(scope="session")
+def idat_file() -> Path:
+    """Returns the path to a test idat file."""
+    return Path("tests/data/illumina/idat/small_intensity.idat").absolute()
+
+
+@pytest.fixture(scope="session")
 def gtc_file() -> Path:
     """Returns the path to a test gtc file."""
     return Path("tests/data/illumina/gtc/small_genotype.gtc").absolute()
