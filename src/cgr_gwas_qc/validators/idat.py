@@ -1,50 +1,23 @@
-from collections import defaultdict
 from pathlib import Path
-from textwrap import indent
-from typing import Dict, List, Union
 
-import typer
-
-from cgr_gwas_qc.paths import make_path_list
-from cgr_gwas_qc.validators import check_file
+from cgr_gwas_qc.exceptions import IdatMagicNumberError, IdatTruncatedFileError
 
 
-class IdatFileError(Exception):
-    pass
+def validate(file_name: Path):
+    check_magic_number(file_name)
+    check_end_file_metadata(file_name)
 
 
-def check_idat_files(files: Union[str, Path, List[Union[str, Path]]]) -> None:
-    counter = defaultdict(set)
-    for file_ in make_path_list(files):
-        try:
-            check_file(file_)
-        except FileNotFoundError:
-            counter["FileNotFoundError"].add(file_.as_posix())
-        except PermissionError:
-            counter["PermissionError"].add(file_.as_posix())
-
-        # TODO: Add Idat file checks
+def check_magic_number(file_name):
+    with file_name.open("rb") as fh:
+        idat_magic_number = b"IDAT"
+        if fh.read(4) != idat_magic_number:
+            raise IdatMagicNumberError
 
 
-def idat_summary(counter: Dict[str, set]):
-    """Check the exception counter and print out issues.
-
-    Raises:
-        IdatFileError
-    """
-    if not counter["exception"]:
-        return
-
-    message_strings = {
-        "FileNotFoundError": "Missing Idat files",
-        "PermissionError": "Idat files cannot be read",
-    }
-
-    for key, files in counter.items():
-        if not files:
-            continue
-
-        file_string = indent("\n".join(files), "  - ")
-        typer.echo(f"{message_strings[key]} (n = {len(files):,}):\n{file_string}")
-
-    raise IdatFileError
+def check_end_file_metadata(file_name):
+    with file_name.open("rb") as fh:
+        fh.seek(-200, 2)
+        data = fh.read().decode()
+        if "Extract Algorithm" not in data:
+            raise IdatTruncatedFileError

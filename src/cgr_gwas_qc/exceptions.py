@@ -63,20 +63,39 @@ class GtcError(GwasQcValidationError):
 
 
 class GtcMagicNumberError(GtcError):
-    def __init__(self, name):
-        message = f"{name} has missing or wrong GTC magic number."
+    def __init__(self):
+        message = "Missing or wrong GTC magic number."
         super().__init__(message)
 
 
 class GtcVersionError(GtcError):
-    def __init__(self, name):
-        message = f"{name} has unknown or unsupported BPM version."
+    def __init__(self):
+        message = "Unknown or unsupported GTC version."
         super().__init__(message)
 
 
 class GtcTruncatedFileError(GtcError):
-    def __init__(self, name):
-        message = f"{name} is missing the EOF mark."
+    def __init__(self):
+        message = "Missing the EOF mark."
+        super().__init__(message)
+
+
+################################################################################
+# IDAT
+################################################################################
+class IdatError(GwasQcValidationError):
+    pass
+
+
+class IdatMagicNumberError(IdatError):
+    def __init__(self):
+        message = "Missing or wrong IDAT magic number."
+        super().__init__(message)
+
+
+class IdatTruncatedFileError(IdatError):
+    def __init__(self):
+        message = "Missing the EOF metadata."
         super().__init__(message)
 
 
