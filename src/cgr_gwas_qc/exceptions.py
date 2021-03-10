@@ -13,14 +13,14 @@ class BgzipError(GwasQcValidationError):
 
 
 class BgzipMagicNumberError(BgzipError):
-    def __init__(self, name):
-        message = f"{name} is missing the GZIP magic number."
+    def __init__(self):
+        message = "Missing the GZIP magic number."
         super().__init__(message)
 
 
 class BgzipTruncatedFileError(BgzipError):
-    def __init__(self, name):
-        message = f"{name} is missing the EOF mark."
+    def __init__(self):
+        message = "Missing GZIP EOF mark."
         super().__init__(message)
 
 
@@ -32,26 +32,26 @@ class BpmError(GwasQcValidationError):
 
 
 class BpmMagicNumberError(BpmError):
-    def __init__(self, name):
-        message = f"{name} has missing or wrong BPM magic number."
+    def __init__(self):
+        message = "Missing or wrong BPM magic number."
         super().__init__(message)
 
 
 class BpmVersionError(BpmError):
-    def __init__(self, name):
-        message = f"{name} has unknown or unsupported BPM version."
+    def __init__(self):
+        message = "Unknown or unsupported BPM version."
         super().__init__(message)
 
 
 class BpmNormalizationError(BpmError):
-    def __init__(self, name):
-        message = f"{name} has an invalid normalization ID."
+    def __init__(self):
+        message = "Invalid BPM normalization ID."
         super().__init__(message)
 
 
 class BpmEntryError(BpmError):
-    def __init__(self, name):
-        message = f"{name} has an invalid number of assay entries."
+    def __init__(self):
+        message = "Invalid BPM number of assay entries."
         super().__init__(message)
 
 
@@ -76,7 +76,7 @@ class GtcVersionError(GtcError):
 
 class GtcTruncatedFileError(GtcError):
     def __init__(self):
-        message = "Missing the EOF mark."
+        message = "Missing GTC EOF mark."
         super().__init__(message)
 
 
@@ -95,7 +95,7 @@ class IdatMagicNumberError(IdatError):
 
 class IdatTruncatedFileError(IdatError):
     def __init__(self):
-        message = "Missing the EOF metadata."
+        message = "Missing IDAT EOF metadata."
         super().__init__(message)
 
 
@@ -107,34 +107,34 @@ class SampleSheetError(GwasQcValidationError):
 
 
 class SampleSheetMissingSectionHeaderError(SampleSheetError):
-    def __init__(self, name: str, missing_headers: List[str]):
+    def __init__(self, missing_headers: List[str]):
         self.missing_headers = missing_headers
         header_str = ", ".join(missing_headers)
-        message = f"{name} is missing sections: {header_str}"
+        message = f"Sample sheet is missing sections: {header_str}"
         super().__init__(message)
 
 
 class SampleSheetTruncatedFileError(SampleSheetError):
-    def __init__(self, name: str):
-        message = f"{name} is truncated."
+    def __init__(self):
+        message = "Sample sheet is truncated."
         super().__init__(message)
 
 
 class SampleSheetNullRowError(SampleSheetError):
-    def __init__(self, name: str):
-        message = f"{name} has completely empty rows."
+    def __init__(self):
+        message = "Sample sheet has empty rows."
         super().__init__(message)
 
 
 class SampleSheetMissingRequiredColumnsError(SampleSheetError):
-    def __init__(self, name: str, missing_required_columns: List[str]):
+    def __init__(self, missing_required_columns: List[str]):
         col_str = ", ".join(missing_required_columns)
-        message = f"{name} is missing the required columns: {col_str}"
+        message = f"Sample sheet is missing required columns: {col_str}"
         super().__init__(message)
 
 
 class SampleSheetMissingValueRequiredColumnsError(SampleSheetError):
-    def __init__(self, name: str, col_w_missing_values: List[str]):
+    def __init__(self, col_w_missing_values: List[str]):
         col_str = ", ".join(col_w_missing_values)
-        message = f"{name} had missing values in required columns: {col_str}"
+        message = f"Sample sheet has missing values in required columns: {col_str}"
         super().__init__(message)

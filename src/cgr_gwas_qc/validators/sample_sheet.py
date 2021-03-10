@@ -14,22 +14,21 @@ REQUIRED_COLUMNS = ["Sample_ID", "LIMS_Individual_ID"]
 
 
 def validate(file_name: Path):
-    name = file_name.name
     data = file_name.read_text()
-    check_section_headers(name, data)
-    check_file_truncation(name, data)
+    check_section_headers(data)
+    check_file_truncation(data)
 
     ss = SampleSheet(file_name)
-    check_required_columns(name, ss)
-    check_missing_values_required_columns(name, ss)
+    check_required_columns(ss)
+    check_missing_values_required_columns(ss)
 
     # Keep this check last, because I usually want to ignore it. This way if
-    # all other checks pass I can just catch the exception futher up the call
+    # all other checks pass I can just catch the exception further up the call
     # stack.
-    check_null_rows(name, data)
+    check_null_rows(data)
 
 
-def check_section_headers(name: str, data: str):
+def check_section_headers(data: str):
     """Checks that the three major section headers are present."""
     missing_headers = []
     if "[Header]" not in data:
@@ -42,10 +41,10 @@ def check_section_headers(name: str, data: str):
         missing_headers.append("Data")
 
     if missing_headers:
-        raise SampleSheetMissingSectionHeaderError(name, missing_headers)
+        raise SampleSheetMissingSectionHeaderError(missing_headers)
 
 
-def check_file_truncation(name: str, data: str):
+def check_file_truncation(data: str):
     """Checks for truncated files.
 
     Makes sure the first and last row have the same number of field
@@ -53,10 +52,10 @@ def check_file_truncation(name: str, data: str):
     """
     rows = data.splitlines()
     if rows[0].count(",") != rows[-1].count(",") or not data.endswith("\n"):
-        raise SampleSheetTruncatedFileError(name)
+        raise SampleSheetTruncatedFileError
 
 
-def check_null_rows(name: str, data: str):
+def check_null_rows(data: str):
     """Checks if there are any empty rows in the data section."""
     rows = data.splitlines()
     num_delim = rows[0].count(",")
@@ -65,10 +64,10 @@ def check_null_rows(name: str, data: str):
     data_rows = rows[data_idx:]
     null_row = "," * num_delim
     if null_row in data_rows:
-        raise SampleSheetNullRowError(name)
+        raise SampleSheetNullRowError
 
 
-def check_required_columns(name: str, ss: SampleSheet):
+def check_required_columns(ss: SampleSheet):
     """Checks if essential columns have missing values."""
 
     missing_required_columns = [
@@ -76,10 +75,10 @@ def check_required_columns(name: str, ss: SampleSheet):
     ]
 
     if missing_required_columns:
-        raise SampleSheetMissingRequiredColumnsError(name, missing_required_columns)
+        raise SampleSheetMissingRequiredColumnsError(missing_required_columns)
 
 
-def check_missing_values_required_columns(name: str, ss: SampleSheet):
+def check_missing_values_required_columns(ss: SampleSheet):
     """Checks if essential columns have missing values."""
     essential_columns = ["Sample_ID", "LIMS_Individual_ID"]
 
@@ -88,4 +87,4 @@ def check_missing_values_required_columns(name: str, ss: SampleSheet):
     ]
 
     if col_w_missing_values:
-        raise SampleSheetMissingValueRequiredColumnsError(name, col_w_missing_values)
+        raise SampleSheetMissingValueRequiredColumnsError(col_w_missing_values)
