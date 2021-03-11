@@ -22,6 +22,7 @@ rule update_snps_to_1kg_rsID:
         bed="{prefix}_1kg_rsID.bed",
         bim="{prefix}_1kg_rsID.bim",
         fam="{prefix}_1kg_rsID.fam",
+        id_map="{prefix}_1kg_rsID.csv",
     script:
         "../scripts/update_snps_to_1kg_rsID.py"
 
