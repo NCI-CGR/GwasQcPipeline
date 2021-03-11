@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 """Create a list of markers that do not match the VCF."""
-import re
 import shutil
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -76,8 +75,6 @@ def main(
 def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VcfFile):
     """Update the variant ID using the VCF IDs if present."""
     array_id = b_record.id
-    b_record.id = extract_rsID(b_record.id)  # convert IDs like GSA-rs#### to rs####
-
     for v_record in vcf_fh.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
         if b_record.pos != v_record.pos:
             # positions aren't the same, this should never happen b/c we are using fetch
@@ -86,8 +83,8 @@ def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VcfFile):
         if v_record.is_multiallelic() or not v_record.is_snp():
             continue
 
-        if v_record.id is None or not v_record.id.startswith("rs"):
-            # No rsID to update with
+        if v_record.id is None:
+            # No ID to update with
             continue
 
         thousand_genomes_id = v_record.id
@@ -100,11 +97,6 @@ def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VcfFile):
             return array_id, thousand_genomes_id
 
         return
-
-
-def extract_rsID(variant_id: str) -> str:
-    match = re.search(r"rs\d+", variant_id)
-    return match.group() if match else variant_id
 
 
 def alleles_equal(bim: Optional[Tuple[str, ...]], vcf: Optional[Tuple[str, ...]]) -> bool:
