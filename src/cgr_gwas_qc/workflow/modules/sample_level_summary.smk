@@ -1,6 +1,18 @@
 import pandas as pd
 
 
+rule snp_qc_table:
+    input:
+        initial="sample_level/samples.lmiss",
+        cr1="sample_level/call_rate_1/samples.lmiss",
+        cr2="sample_level/call_rate_2/samples.lmiss",
+        thousand_genomes="sample_level/call_rate_2/samples_1kg_rsID.csv",
+    output:
+        "sample_level/snp_qc.csv",
+    script:
+        "../scripts/snp_qc_table.py"
+
+
 def _contam(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
     if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:

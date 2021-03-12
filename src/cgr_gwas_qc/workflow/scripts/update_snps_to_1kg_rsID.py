@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 """Create a list of markers that do not match the VCF."""
-import re
 import shutil
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import typer
 
@@ -37,10 +36,13 @@ def main(
         writable=True,
     ),
     fam_out: Path = typer.Argument(
-        None,
+        ...,
         help="Just a copy of `fam_in`, done to keep naming schema simple.",
         file_okay=True,
         writable=True,
+    ),
+    id_map_out: Path = typer.Argument(
+        ..., help="CSV mapping array ids to thousand genome ids.", file_okay=True, writable=True,
     ),
 ):
     """Compares a plink BIM file with a VCF and updates IDs to match VCF.
@@ -54,20 +56,25 @@ def main(
         make using this output easier.
 
     """
-    with vcf.open(vcf_in, "r") as vcf_fh, bim.open(bim_in) as bin, bim.open(bim_out, "w") as bout:
-        for record in bin:
-            if not record.get_record_problems():
-                update_record_id(record, vcf_fh)
-            bout.write(record)
+    with bim.open(bim_in) as bim_in_fh, bim.open(bim_out, "w") as bim_out_fh:
+        with vcf.open(vcf_in, "r") as vcf_fh:
+            array2thousand_genomes = []
+            for record in bim_in_fh:
+                if not record.get_record_problems():
+                    id_map = update_record_id(record, vcf_fh)
+                    if id_map:
+                        array2thousand_genomes.append(id_map)
 
+                bim_out_fh.write(record)
+
+    save_id_map(array2thousand_genomes, id_map_out)
     shutil.copyfile(bed_in, bed_out)
     shutil.copyfile(fam_in, fam_out)
 
 
 def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VcfFile):
     """Update the variant ID using the VCF IDs if present."""
-    b_record.id = extract_rsID(b_record.id)  # convert IDs like GSA-rs#### to rs####
-
+    array_id = b_record.id
     for v_record in vcf_fh.fetch(b_record.chrom, b_record.pos - 1, b_record.pos):
         if b_record.pos != v_record.pos:
             # positions aren't the same, this should never happen b/c we are using fetch
@@ -76,24 +83,20 @@ def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VcfFile):
         if v_record.is_multiallelic() or not v_record.is_snp():
             continue
 
-        if v_record.id is None or not v_record.id.startswith("rs"):
-            # No rsID to update with
+        if v_record.id is None:
+            # No ID to update with
             continue
 
+        thousand_genomes_id = v_record.id
         if alleles_equal(b_record.alleles, v_record.alleles):
             b_record.id = v_record.id
-            return
+            return array_id, thousand_genomes_id
 
         if alleles_equal(b_record.complement_alleles(), v_record.alleles):
             b_record.id = v_record.id
-            return
+            return array_id, thousand_genomes_id
 
         return
-
-
-def extract_rsID(variant_id: str) -> str:
-    match = re.search(r"rs\d+", variant_id)
-    return match.group() if match else variant_id
 
 
 def alleles_equal(bim: Optional[Tuple[str, ...]], vcf: Optional[Tuple[str, ...]]) -> bool:
@@ -101,6 +104,12 @@ def alleles_equal(bim: Optional[Tuple[str, ...]], vcf: Optional[Tuple[str, ...]]
         return False
 
     return sorted(bim) == sorted(vcf)
+
+
+def save_id_map(array2thousand_genomes: List[Tuple[str, str]], id_map_out: Path):
+    with id_map_out.open(mode="w") as fh:
+        fh.write("array_id,thousand_genomes_id\n")
+        fh.write("\n".join(",".join(x) for x in array2thousand_genomes))
 
 
 if __name__ == "__main__":
