@@ -48,6 +48,7 @@ This is a guide meant to help other work on this project.
    :hidden:
    :maxdepth: 1
 
+   reference/cli
    reference/file_types
    reference/rules
 
@@ -57,10 +58,19 @@ This is a guide meant to help other work on this project.
    :hidden:
    :maxdepth: 1
 
-   dev_docs/setup.rst
+   dev_docs/building_docs
    dev_docs/dev_tools
    dev_docs/running_tests
-   dev_docs/building_docs
+   dev_docs/setup.rst
+   dev_docs/writing_docs
+
+.. toctree::
+   :caption: API Reference:
+   :name: api
+   :hidden:
+   :maxdepth: 1
+
+   api/cgr_gwas_qc.rst
 
 TODOs
 ------

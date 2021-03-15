@@ -231,7 +231,7 @@ class DataRepo(ABC):
               ``self._data_path`` that you want to copy to
               ``self.working_dir``.
             destination: The name where you want to copy the file or
-              folder in ``self.working_dir. Default None.
+              folder in ``self.working_dir``. Default None.
 
         Raises:
             ValueError: If the ``source`` does not exist in the repository.
