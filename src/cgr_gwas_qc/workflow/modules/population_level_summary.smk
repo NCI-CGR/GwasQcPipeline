@@ -209,3 +209,16 @@ rule phony_population_controls:
         "population_level/controls.done",
     shell:
         "echo {input} | xargs printf '%s\n' > {output[0]}"
+
+
+################################################################################
+# Summary of Population and Controls
+################################################################################
+rule population_qc_table:
+    input:
+        populations=rules.phony_population_results.output[0],
+        controls=rules.phony_population_controls.output[0],
+    output:
+        "population_level/population_qc.csv",
+    script:
+        "../scripts/population_qc_table.py"
