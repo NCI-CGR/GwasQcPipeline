@@ -48,6 +48,8 @@ commitizen = "^2.6.0"
 ptvsd = "^4.3.2"
 rope = "^0.18.0"
 pytest-mock = "^3.5.1"
+sphinx-pydantic = "^0.1.1"
+sphinx-jsonschema = "1.15"
 
 [tool.poetry.scripts]
 cgr = "cgr_gwas_qc.cli:app"
