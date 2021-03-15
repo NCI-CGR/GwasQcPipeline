@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Command Line Interface &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration" href="config.html" />
+    <link rel="prev" title="API Reference" href="cgr_gwas_qc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+</ul>
+<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/writing_docs.html">Writing Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="cgr_gwas_qc.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Command Line Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.cli.config">Config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.cli.pre_flight">Pre-Flight Checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.cli.snakemake">Snakemake</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.cli.submit">Submit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="cgr_gwas_qc.html">API Reference</a> &raquo;</li>
+        
+      <li>Command Line Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/cli.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="command-line-interface">
+<h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-cgr_gwas_qc.cli.config">
+<span id="config"></span><h2>Config<a class="headerlink" href="#module-cgr_gwas_qc.cli.config" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.config.main">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.config.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">sample_sheet: pathlib.Path = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">project_name: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/config.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.config.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Gwas Qc Pipeline config file in the current working directory.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgr_gwas_qc.cli.pre_flight">
+<span id="pre-flight-checks"></span><h2>Pre-Flight Checks<a class="headerlink" href="#module-cgr_gwas_qc.cli.pre_flight" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.cli.pre_flight.</code><code class="sig-name descname">ProblemFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Sample_ID</span></em>, <em class="sig-param"><span class="n">reason</span></em>, <em class="sig-param"><span class="n">file_type</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile.Sample_ID">
+<code class="sig-name descname">Sample_ID</code><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile.Sample_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile.file_type">
+<code class="sig-name descname">file_type</code><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile.file_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile.filename">
+<code class="sig-name descname">filename</code><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile.reason">
+<code class="sig-name descname">reason</code><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile.reason" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.pre_flight.main">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.pre_flight.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">config_file: pathlib.Path = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">reference_check: bool = True</em>, <em class="sig-param">user_files_check: bool = True</em>, <em class="sig-param">update_config: bool = True</em>, <em class="sig-param">threads: int = 4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/pre_flight.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pre-flight checks to make sure user input files are readable and complete.</p>
+<p>Pre-flight checks include the Sample Sheet, reference files, Idat files,
+and GTC files. For Idat and GTC files, the user provided file name
+pattern is extended using the columns in the sample sheet.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgr_gwas_qc.cli.snakemake">
+<span id="snakemake"></span><h2>Snakemake<a class="headerlink" href="#module-cgr_gwas_qc.cli.snakemake" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.snakemake.check_and_prepend_arg">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.snakemake.</code><code class="sig-name descname">check_and_prepend_arg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="n">options</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/snakemake.html#check_and_prepend_arg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.snakemake.check_and_prepend_arg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepend an option to the front of the arg list.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.snakemake.is_arg">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.snakemake.</code><code class="sig-name descname">is_arg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="n">options</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/snakemake.html#is_arg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.snakemake.is_arg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if an option is already in the argument list.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.snakemake.main">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.snakemake.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ctx</span><span class="p">:</span> <span class="n">typer.models.Context</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/snakemake.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.snakemake.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the Gwas Qc Pipeline using Snakemake.</p>
+<p>This is a wrapper around snakemake. It will pre-pend the <cite>-s</cite> option:</p>
+<blockquote>
+<div><p>snakemake -s /home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/Snakefile OPTIONS TARGETS</p>
+</div></blockquote>
+<p>This is how the user should run snakemake locally.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgr_gwas_qc.cli.submit">
+<span id="submit"></span><h2>Submit<a class="headerlink" href="#module-cgr_gwas_qc.cli.submit" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.submit.get_group_size">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">get_group_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_samples</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span>int<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#get_group_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.get_group_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return how many samples to group together</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.submit.get_per_sample_rules">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">get_per_sample_rules</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#get_per_sample_rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.get_per_sample_rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pull list of rules to group from cluster.yml</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.submit.main">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">biowulf: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cluster_profile: Optional[pathlib.Path] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">time_hr: int = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">queue: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">submission_cmd: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">dry_run: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">notemp: bool = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run CGR GwasQcPipeline on a cluster.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="config.html" class="btn btn-neutral float-right" title="Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cgr_gwas_qc.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

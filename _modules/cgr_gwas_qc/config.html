@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cgr_gwas_qc.config &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+</ul>
+<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../qc_modules/sample_level.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../qc_modules/variant_level.html">Variant QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../qc_modules/reporting.html">QC Report</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/file_types.html">File Type Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/rules.html">Rule Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/building_docs.html">Building Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/dev_tools.html">Development Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/running_tests.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/writing_docs.html">Writing Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/cgr_gwas_qc.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>cgr_gwas_qc.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cgr_gwas_qc.config</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">snakemake.rules</span> <span class="kn">import</span> <span class="n">expand</span>
+
+<span class="kn">import</span> <span class="nn">cgr_gwas_qc.yaml</span> <span class="k">as</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">cgr_gwas_qc.models.config</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">cgr_gwas_qc.parsers.sample_sheet</span> <span class="kn">import</span> <span class="n">SampleSheet</span>
+
+
+<span class="k">class</span> <span class="nc">CgrGwasQcConfigError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="ConfigMgr"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr">[docs]</a><span class="k">class</span> <span class="nc">ConfigMgr</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Manage all things config.</span>
+
+<span class="sd">    There should only be a single instance of this running at a time.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        SRC_DIR (Path): The absolute path to ``cgr_gwas_qc`` source code.</span>
+<span class="sd">        WORKFLOW_DIR (Path): The absolute path to the ``workflow`` source code.</span>
+<span class="sd">        CONFIG_DIR (Path): The absolute path to the ``workflow/config``.</span>
+<span class="sd">        RULE_DIR (Path): The absolute path to the ``workflow/rules``.</span>
+<span class="sd">        SCRIPTS_DIR (Path): The absolute path to the ``workflow/scripts``.</span>
+<span class="sd">        SNAKEFILE (Path): The absolute path to the ``workflow/Snakefile``.</span>
+
+<span class="sd">        root (Path): The current working directory.</span>
+<span class="sd">        user_config (Optional[Path]): The config.yml in the current working directory.</span>
+<span class="sd">        user_patterns (Optional[Path]): The patterns.yml in the current working directory.</span>
+
+<span class="sd">        config : Workflow configuration settings.</span>
+<span class="sd">        ss: User&#39;s sample sheet data.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        expand: Uses columns from the user&#39;s sample sheet to expand a file pattern.</span>
+<span class="sd">        envmodules: Pulls environmental module information from user&#39;s config.</span>
+<span class="sd">        conda: Creates the full path to conda environment.</span>
+<span class="sd">        rules: Creates the full path to snakemake rule.</span>
+<span class="sd">        scripts: Creates the full path to an internal script.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SRC_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+    <span class="n">WORKFLOW_DIR</span> <span class="o">=</span> <span class="n">SRC_DIR</span> <span class="o">/</span> <span class="s2">&quot;workflow&quot;</span>
+
+    <span class="n">CONDA_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;conda&quot;</span>
+    <span class="n">RULE_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span>
+    <span class="n">MODULE_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;modules&quot;</span>
+    <span class="n">SCRIPTS_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;scripts&quot;</span>
+    <span class="n">SNAKEFILE</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;Snakefile&quot;</span>
+
+    <span class="n">__instance</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1">################################################################################</span>
+    <span class="c1"># Set-up</span>
+    <span class="c1">################################################################################</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_config</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">user_config</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sample_sheet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleSheet</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">SampleSheet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">add_group_by_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">workflow_params</span><span class="o">.</span><span class="n">subject_id_to_use</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">remove_Sample_IDs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">Sample_IDs_to_remove</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample Sheet: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="si">}</span><span class="s2"> could not be loaded.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConfigMgr.instance"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.instance">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the active ConfigMgr instance.</span>
+
+<span class="sd">        This ensures that only 1 ConfigMgr is created per python session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">find_configs</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span></div>
+
+    <span class="c1">################################################################################</span>
+    <span class="c1"># Access to the user&#39;s config and Sample Sheet</span>
+    <span class="c1">################################################################################</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Access the sample sheet DataFrame.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample Sheet: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="si">}</span><span class="s2"> was not loaded.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="nd">@ss</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Replace the sample sheet DataFrame.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample Sheet: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="si">}</span><span class="s2"> was not loaded.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="c1">################################################################################</span>
+    <span class="c1"># Helper functions for snakemake</span>
+    <span class="c1">################################################################################</span>
+<div class="viewcode-block" id="ConfigMgr.expand"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.expand">[docs]</a>    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">file_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">combination</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Use sample sheet columns to fill in file pattern</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file_pattern: A snakemake compatible file name pattern.</span>
+<span class="sd">            combination: The combinatorial method to use (see</span>
+<span class="sd">              snakemake.rules.expand). Defaults to zip.</span>
+<span class="sd">            query: A pandas.DataFrame.query to use to filter before</span>
+<span class="sd">              expansion. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of expanded file names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span> <span class="k">if</span> <span class="n">query</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span>
+        <span class="k">return</span> <span class="n">expand</span><span class="p">(</span><span class="n">file_pattern</span><span class="p">,</span> <span class="n">combination</span><span class="p">,</span> <span class="o">**</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ConfigMgr.envmodules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.envmodules">[docs]</a>    <span class="k">def</span> <span class="nf">envmodules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the HPC environment module from user&#39;s config.</span>
+
+<span class="sd">        On HPC systems you can use environment modules instead of conda. The</span>
+<span class="sd">        specific module versions are stored in the main config.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env_modules&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">modules</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="ConfigMgr.conda"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.conda">[docs]</a>    <span class="k">def</span> <span class="nf">conda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return path to a conda env file.</span>
+
+<span class="sd">        Given a conda env file_name, prepends the full path to that file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CONDA_DIR</span> <span class="o">/</span> <span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConfigMgr.rules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.rules">[docs]</a>    <span class="k">def</span> <span class="nf">rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the path to a rule file.</span>
+
+<span class="sd">        Given a rule file_name, prepends the full path to that rule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RULE_DIR</span> <span class="o">/</span> <span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConfigMgr.modules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.modules">[docs]</a>    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the path to a module file.</span>
+
+<span class="sd">        Given a rule file_name, prepends the full path to that module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MODULE_DIR</span> <span class="o">/</span> <span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConfigMgr.scripts"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.scripts">[docs]</a>    <span class="k">def</span> <span class="nf">scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the path to an internal script.</span>
+
+<span class="sd">        Given a script file_name, prepends the full path to that script.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SCRIPTS_DIR</span> <span class="o">/</span> <span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div></div>
+
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Helper functions for Set-up</span>
+<span class="c1">################################################################################</span>
+<span class="k">def</span> <span class="nf">scan_for_yaml</span><span class="p">(</span><span class="n">base_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Scans a directory for Yaml configs.</span>
+
+<span class="sd">    The Yaml format commonly has ``*.yml`` or ``*.yaml`` file extensions.</span>
+<span class="sd">    This will search for ``{base_dir}/{name}.{yml,yaml}`` and returns</span>
+<span class="sd">    the path if present.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optiona[Path]: Path to the config file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">base_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.yml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">base_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.yml&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">base_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.yaml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">base_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.yaml&quot;</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">find_configs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+    <span class="n">user_config</span> <span class="o">=</span> <span class="n">scan_for_yaml</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Please run with a `config.yml` in your working directory.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">root</span><span class="p">,</span> <span class="n">user_config</span>
+
+
+<span class="k">def</span> <span class="nf">config_to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">,</span> <span class="n">yaml_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;config.yml&quot;</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scan for path objects and convert to strings.&quot;&quot;&quot;</span>
+        <span class="n">cleaned</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">cleaned</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">serialize</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+                <span class="n">cleaned</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cleaned</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">cleaned</span>
+
+    <span class="n">yaml</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">serialize</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="n">exclude_none</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)),</span> <span class="n">yaml_file</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

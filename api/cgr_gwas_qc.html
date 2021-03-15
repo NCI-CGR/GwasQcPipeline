@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Writing Documentation &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  <title>API Reference &mdash; GwasQcPipeline 0.1.0a documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API Reference" href="../api/cgr_gwas_qc.html" />
-    <link rel="prev" title="Setting-up the Development Environment" href="setup.html" /> 
+    <link rel="next" title="Command Line Interface" href="cli.html" />
+    <link rel="prev" title="Writing Documentation" href="../dev_docs/writing_docs.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -101,16 +101,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Documentation:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="running_tests.html">Running Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Writing Documentation</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/writing_docs.html">Writing Documentation</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -157,13 +161,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Writing Documentation</li>
+      <li>API Reference</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/dev_docs/writing_docs.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/cgr_gwas_qc.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,18 +180,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="writing-documentation">
-<h1>Writing Documentation<a class="headerlink" href="#writing-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
 <ul>
-<li><p>Paragraphs have no line breaks (use softwraps).</p></li>
-<li><p>Docstrings should be Google Style</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Dockstring paragraph descriptions should be hard wrapped at 100 characters.</p></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#module-cgr_gwas_qc.cli.config">Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#module-cgr_gwas_qc.cli.pre_flight">Pre-Flight Checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#module-cgr_gwas_qc.cli.snakemake">Snakemake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#module-cgr_gwas_qc.cli.submit">Submit</a></li>
 </ul>
-</div></blockquote>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config.html#data-models">Data Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#configuration-manager">Configuration Manager</a></li>
+</ul>
 </li>
 </ul>
+</div>
 </div>
 
 
@@ -198,10 +208,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../api/cgr_gwas_qc.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="cli.html" class="btn btn-neutral float-right" title="Command Line Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="setup.html" class="btn btn-neutral float-left" title="Setting-up the Development Environment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../dev_docs/writing_docs.html" class="btn btn-neutral float-left" title="Writing Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

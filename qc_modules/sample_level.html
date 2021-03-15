@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
 
   
   
@@ -30,6 +31,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -99,15 +101,21 @@
 </ul>
 <p class="caption"><span class="caption-text">Module Reference:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Developer Documentation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/writing_docs.html">Writing Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
 
             
@@ -178,13 +186,56 @@
 <div class="section" id="genotype-call-rate-filters">
 <h2>Genotype Call Rate Filters<a class="headerlink" href="#genotype-call-rate-filters" title="Permalink to this headline">¶</a></h2>
 <p>This module uses <code class="docutils literal notranslate"><span class="pre">plink</span></code> to look at Sample and SNP level genotype call rates. Two call rate thresholds are defined in the config (80%/95%). Low call rate is an indicator of poor sample quality or sample contamination resulting in a large amount of missing data. Quality control metrics (MAF, pct missing, HWE, autosomal homozygosity, X-linked homozygosity) are calculated for (starting data, filtered data at 80% thresholds, and filtered data at 95% threshold) using <code class="docutils literal notranslate"><span class="pre">plink</span></code>.</p>
-</div>
+<script>mermaid.initialize({startOnLoad:true});</script><div class="mermaid">
+            graph TD
+    D1{Genotype Calls}
+    D2{Illumina Manifest}
+    S1[gtc_to_ped]
+    S2[merge_sample_peds]
+    S3[plink_sample_qc_stats::start]
+    S4[filter_call_rate_1]
+    S5[plink_sample_qc_stats::filter1]
+    S6[filter_call_rate_2]
+    S7[plink_sample_qc_stats::filter2]
+    D1 --&gt;|&quot;{sample_id}.gtc&quot;| S1
+    D2 --&gt;|bpm| S1
+    S1 --&gt;|&quot;{sample_id}.ped + {sample_id}.map&quot;| S2
+    S2 --&gt;|bed + bim + fam| S3 &amp; S4
+    S4 --&gt;|bed + bim + fam| S5 &amp; S6
+    S6 --&gt;|bed + bim + fam| S7
+        </div></div>
 <div class="section" id="sample-contamination-detection">
 <h2>Sample Contamination Detection<a class="headerlink" href="#sample-contamination-detection" title="Permalink to this headline">¶</a></h2>
 <p>Mixing of 2+ samples or swapping sample labels is a common problem for high-throughput genomics. Contamination is detected by modeling allele intensities accounting for population level allele frequencies. Here we use the tool <code class="docutils literal notranslate"><span class="pre">verifyIDintensity</span></code> to perform this analysis on individual
 samples.</p>
 <p>Sample swaps between male and female samples can be detected by looking at X-linked SNP heterozygosity.</p>
-</div>
+<div class="mermaid">
+            graph TD
+    D1{Genotype Calls}
+    D2{Illumina Manifest}
+    D3{1000 Genome&lt;br&gt;VCF}
+
+    A[gtc_to_adpc]
+    D1 --&gt;|&lt;sample_id&gt;.gtc| A
+    D2 --&gt;|bmp| A
+
+    B[make_abf_txt]
+    D2 --&gt;|bmp| B
+    D3 --&gt;|vcf.gz| B
+
+    C[contam_test_GSA_1000g]
+    A  --&gt;|&lt;sample_id&gt;.adpc.bin| C
+    B --&gt;|abf.txt| C
+
+    D[combine_contam_one_samp_b_1000g]
+    C --&gt;|&lt;sample_id&gt;.contam.out| D
+
+    %% I don't know where these are from yet
+    intens(all_sample_idat_intensity/idat_intensity.csv)
+    imiss3(plink_filter_call_rate_2/samples_filter2.imiss)
+    intens --&gt; D
+    imiss3 --&gt; D
+        </div></div>
 </div>
 
 

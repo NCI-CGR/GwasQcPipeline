@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cgr_gwas_qc.cli.submit &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+</ul>
+<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../qc_modules/sample_level.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../qc_modules/variant_level.html">Variant QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../qc_modules/reporting.html">QC Report</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference/cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference/file_types.html">File Type Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference/rules.html">Rule Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/building_docs.html">Building Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/dev_tools.html">Development Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/running_tests.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/writing_docs.html">Writing Documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/cgr_gwas_qc.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cgr_gwas_qc.cli.submit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cgr_gwas_qc.cli.submit</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">wrap</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">typer</span>
+<span class="kn">from</span> <span class="nn">snakemake.io</span> <span class="kn">import</span> <span class="n">load_configfile</span>
+
+<span class="kn">from</span> <span class="nn">cgr_gwas_qc</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">cgr_gwas_qc.cluster_profiles</span> <span class="kn">import</span> <span class="n">env</span>
+<span class="kn">from</span> <span class="nn">cgr_gwas_qc.config</span> <span class="kn">import</span> <span class="n">ConfigMgr</span>
+<span class="kn">from</span> <span class="nn">cgr_gwas_qc.version</span> <span class="kn">import</span> <span class="n">__version__</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.submit.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span>
+    <span class="n">cgems</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run using the CGEMs/CCAD cluster profile.&quot;</span><span class="p">),</span>
+    <span class="n">biowulf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run using the Biowulf cluster profile.&quot;</span><span class="p">),</span>
+    <span class="n">cluster_profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to a custom cluster profile.&quot;</span><span class="p">),</span>
+    <span class="n">time_hr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="mi">12</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The walltime limit (in hours) for the main snakemake process.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">queue</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of the queue for the main process to use. Only needed if using `cluster_profile`.&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">submission_cmd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of the command to use for submission (i.e., qsub). Only needed if using `cluster_profile`.&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Perform a dry-run but don&#39;t submit.&quot;</span><span class="p">),</span>
+    <span class="n">notemp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Turn off temporary file deletion.&quot;</span><span class="p">),</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run CGR GwasQcPipeline on a cluster.&quot;&quot;&quot;</span>
+
+    <span class="n">check_exclusive_options</span><span class="p">(</span><span class="n">cgems</span><span class="p">,</span> <span class="n">biowulf</span><span class="p">,</span> <span class="n">cluster_profile</span><span class="p">)</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;python_executable&quot;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
+        <span class="s2">&quot;working_dir&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+        <span class="s2">&quot;snakefile&quot;</span><span class="p">:</span> <span class="n">ConfigMgr</span><span class="o">.</span><span class="n">SNAKEFILE</span><span class="p">,</span>
+        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">__version__</span><span class="p">,</span>
+        <span class="s2">&quot;cgems&quot;</span><span class="p">:</span> <span class="n">cgems</span><span class="p">,</span>
+        <span class="s2">&quot;biowulf&quot;</span><span class="p">:</span> <span class="n">biowulf</span><span class="p">,</span>
+        <span class="s2">&quot;time_hr&quot;</span><span class="p">:</span> <span class="n">time_hr</span><span class="p">,</span>
+        <span class="s2">&quot;local_mem_mb&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+        <span class="s2">&quot;local_tasks&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;added_options&quot;</span><span class="p">:</span> <span class="s2">&quot;--notemp &quot;</span> <span class="k">if</span> <span class="n">notemp</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+    <span class="n">sample_size</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">sample_size</span> <span class="o">&lt;</span> <span class="mi">1_000</span><span class="p">:</span>  <span class="c1"># bump up local resources and run a bunch or rules there</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;local_tasks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;local_mem_mb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span>
+
+    <span class="k">if</span> <span class="n">cgems</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_profile</span><span class="p">(</span><span class="s2">&quot;cgems&quot;</span><span class="p">)</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;queue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">queue</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;all.q&quot;</span> <span class="k">if</span> <span class="n">time_hr</span> <span class="o">&lt;=</span> <span class="mi">24</span> <span class="k">else</span> <span class="s2">&quot;long.q&quot;</span><span class="p">)</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;added_options&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">get_grouping_settings</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
+        <span class="n">submission_cmd</span> <span class="o">=</span> <span class="s2">&quot;qsub&quot;</span>
+    <span class="k">elif</span> <span class="n">biowulf</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_profile</span><span class="p">(</span><span class="s2">&quot;biowulf&quot;</span><span class="p">)</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;queue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">queue</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;quick,norm&quot;</span> <span class="k">if</span> <span class="n">time_hr</span> <span class="o">&lt;=</span> <span class="mi">4</span> <span class="k">else</span> <span class="s2">&quot;norm&quot;</span><span class="p">)</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;added_options&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">get_grouping_settings</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
+        <span class="n">submission_cmd</span> <span class="o">=</span> <span class="s2">&quot;sbatch&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_custom_cluster_profile</span><span class="p">(</span><span class="n">cluster_profile</span><span class="p">,</span> <span class="n">queue</span><span class="p">,</span> <span class="n">submission_cmd</span><span class="p">)</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;queue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">queue</span>
+
+    <span class="n">run_script</span> <span class="o">=</span> <span class="n">create_submission_script</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dry_run</span><span class="p">:</span>
+        <span class="n">job_id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="n">submission_cmd</span><span class="p">,</span> <span class="n">run_script</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">check_exclusive_options</span><span class="p">(</span><span class="n">cgems</span><span class="p">,</span> <span class="n">biowulf</span><span class="p">,</span> <span class="n">cluster_profile</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">sum</span><span class="p">([</span><span class="n">cgems</span><span class="p">,</span> <span class="n">biowulf</span><span class="p">,</span> <span class="p">(</span><span class="n">cluster_profile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">typer</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">wrap</span><span class="p">(</span>
+                    <span class="s2">&quot;Please only provide one of `--cgems`, `--biowulf`, or `--cluster_profile`. &quot;</span>
+                    <span class="s2">&quot;Run `cgr submit --help` for more information.&quot;</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">typer</span><span class="o">.</span><span class="n">Exit</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">check_custom_cluster_profile</span><span class="p">(</span><span class="n">cluster_profile</span><span class="p">,</span> <span class="n">queue</span><span class="p">,</span> <span class="n">submission_cmd</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">queue</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide a queue to use with `cluster_profile`.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">submission_cmd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide a submission_cmd with `cluster_profile`.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cluster_profile</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">cluster_profile</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">wrap</span><span class="p">(</span>
+                    <span class="s2">&quot;`cluster_profile` should point to a directory with a snakemake &quot;</span>
+                    <span class="s2">&quot;cluster profile as described at https://github.com/Snakemake-Profiles/doc&quot;</span><span class="p">,</span>
+                    <span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cluster_profile</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">get_profile</span><span class="p">(</span><span class="n">cluster</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">cgr_profiles</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="s2">&quot;cluster_profiles&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">cluster</span> <span class="o">==</span> <span class="s2">&quot;cgems&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">cgr_profiles</span> <span class="o">/</span> <span class="s2">&quot;cgems&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">cluster</span> <span class="o">==</span> <span class="s2">&quot;biowulf&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">cgr_profiles</span> <span class="o">/</span> <span class="s2">&quot;biowulf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="get_group_size"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.submit.get_group_size">[docs]</a><span class="k">def</span> <span class="nf">get_group_size</span><span class="p">(</span><span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Return how many samples to group together&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">10</span>
+
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_per_sample_rules"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.submit.get_per_sample_rules">[docs]</a><span class="k">def</span> <span class="nf">get_per_sample_rules</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Pull list of rules to group from cluster.yml&quot;&quot;&quot;</span>
+    <span class="n">cluster_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;cluster_profiles/cluster.yaml&quot;</span>
+    <span class="n">cluster_profile</span> <span class="o">=</span> <span class="n">load_configfile</span><span class="p">(</span><span class="n">cluster_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cluster_profile</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;per_sample&quot;</span><span class="p">)])</span></div>
+
+
+<span class="k">def</span> <span class="nf">get_grouping_settings</span><span class="p">(</span><span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="c1"># 1. Figure out the group size to use</span>
+    <span class="n">group_size</span> <span class="o">=</span> <span class="n">get_group_size</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">group_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># 2. Get a list of group rules</span>
+    <span class="n">rules_to_group</span> <span class="o">=</span> <span class="n">get_per_sample_rules</span><span class="p">()</span>
+
+    <span class="c1"># 3. Build group setting string</span>
+    <span class="n">group_options</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">rules_to_group</span><span class="p">:</span>
+        <span class="n">group_options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--group-components&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules_to_group</span><span class="p">:</span>
+            <span class="n">group_options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">group_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">group_options</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_submission_script</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;snakemake.sh&quot;</span><span class="p">)</span>
+    <span class="n">run_script</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;.snakemake/GwasQcPipeline_submission.sh&quot;</span><span class="p">)</span>
+    <span class="n">run_script</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">run_script</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">payload</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">run_script</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
