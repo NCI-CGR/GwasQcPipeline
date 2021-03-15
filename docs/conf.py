@@ -32,7 +32,7 @@ templates_path = ["templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build"]
+exclude_patterns = ["_build", "api/cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.rst"]
 
 
 # -- Extension Settings -------------------------------------------------
@@ -40,9 +40,10 @@ exclude_patterns = ["_build"]
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.todo",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
     "sphinxcontrib.mermaid",
 ]
 

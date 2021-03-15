@@ -356,7 +356,7 @@ The individual sample description file. Each row represents a sample.
 .. L
 
 lmiss (``plink --missing``)
--------------
+---------------------------
 
 Variant-based missing data report.
 
@@ -364,7 +364,7 @@ Variant-based missing data report.
 
 :CHR: Chromosome
 :SNP: Variant ID
-:N_MISS: The number of missing genotype calls no including obligatory missings or heterozygous haploids.
+:N_MISS: The number of missing genotype calls no including obligatory missing or heterozygous haploids.
 :N_GENO: Number of potentially valid calls
 :F_MISS: Missing call rate
 :Optional fields: if run with ``--within/--family``
@@ -434,7 +434,7 @@ prune.in (``plink --indep-pairwise``)
 A list of marker IDs to include after running LD pruning.
 
 prune.out (``plink --indep-pairwise``)
--------------------------------------
+--------------------------------------
 
 A list of marker IDs to exclude after running LD pruning.
 
