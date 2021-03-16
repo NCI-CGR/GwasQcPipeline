@@ -77,8 +77,8 @@ cgr_exit_message() {
         printf "# CGR SUBMIT: Workflow complete %b%b%b\n" $UNICORN $PENGUIN $DNA
     elif [[ $CLUSTER_KILLED == 1 ]]; then
         printf "# CGR SUBMIT: The workflow was KILLED by the cluster. Check resource limits and re-run.\n"
-        printf "#             For example, try increasing the walltime using the `--time-hr` option\n"
-        printf "#             `cgr submit --time-hr 300 `\n"
+        printf "#             For example, try increasing the walltime using the '--time-hr' option\n"
+        printf "#             'cgr submit --time-hr 300' \n"
         printf "# Exit Code: %d\n" ${exit_code}
     else
         printf "# CGR SUBMIT: There was a workflow error, check logs and re-run.\n"
