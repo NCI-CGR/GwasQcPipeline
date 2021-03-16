@@ -1,6 +1,7 @@
 import re
 import shutil
 
+import pandas as pd
 import pytest
 
 from cgr_gwas_qc import load_config
@@ -187,6 +188,48 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
         tmp_path / "population_level/EUR/subjects.het",
         data_cache / "production_outputs/autosomal_heterozygosity/EUR_subjects_qc.het",
     )
+
+
+@pytest.mark.workflow
+@pytest.mark.real_data
+@pytest.mark.slow
+def test_phony_no_population_results(tmp_path, conda_envs, qc_summary):
+    # GIVEN: real data config, qc_summary table, but requiring 500 samples per populations
+    conda_envs.copy_env("plink2", tmp_path)
+    conda_envs.copy_env("eigensoft", tmp_path)
+    (
+        RealData(tmp_path)
+        .copy_sample_sheet()
+        .make_config(
+            workflow_params={"subject_id_to_use": "PI_Subject_ID", "minimum_pop_subjects": 500}
+        )
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.modules("common.smk")
+            include: cfg.modules("plink_stats.smk")
+            include: cfg.modules("plink_filters.smk")
+            include: cfg.modules("subject_level_summary.smk")
+            include: cfg.modules("population_level_summary.smk")
+
+            rule all:
+                input:
+                    "population_level/results.done",
+
+            """
+        )
+    )
+    (tmp_path / "sample_level").mkdir()
+    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+
+    # WHEN: run snakemake to get all population level and all population-control level results
+    run_snakemake(tmp_path)
+
+    # THEN: There are not populations saved
+    assert "" == (tmp_path / "population_level/results.done").read_text().strip()
 
 
 @pytest.mark.regression
@@ -384,3 +427,50 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
         / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.hwe",
         data_cache / "production_outputs/HWP/EUR_subjects_qc.hwe",
     )
+
+
+@pytest.mark.workflow
+@pytest.mark.real_data
+@pytest.mark.slow
+def test_phony_population_missing_controls(tmp_path, conda_envs, qc_summary):
+    # GIVEN: real data config, qc_summary table
+    conda_envs.copy_env("plink2", tmp_path)
+    conda_envs.copy_env("eigensoft", tmp_path)
+    (
+        RealData(tmp_path)
+        .copy_sample_sheet()
+        .add_user_files(entry_point="gtc", copy=False)
+        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.modules("common.smk")
+            include: cfg.modules("plink_stats.smk")
+            include: cfg.modules("plink_filters.smk")
+            include: cfg.modules("subject_level_summary.smk")
+            include: cfg.modules("population_level_summary.smk")
+
+            rule all:
+                input:
+                    "population_level/controls.done",
+
+            """
+        )
+    )
+
+    # WHEN: I remove all of the controls
+    (tmp_path / "sample_level").mkdir()
+    (
+        pd.read_csv(qc_summary)
+        .assign(**{"Case/Control_Status": 1})
+        .to_csv(tmp_path / "sample_level/qc_summary.csv")
+    )
+
+    # and run snakemake
+    run_snakemake(tmp_path)
+
+    # THEN: There are no controls created
+    assert "" == (tmp_path / "population_level/controls.done").read_text().strip()
