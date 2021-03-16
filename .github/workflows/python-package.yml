@@ -12,7 +12,7 @@ on:
 jobs:
   build_docs:
     runs-on: ubuntu-latest
-    if: "startsWith(github.event.head_commit.message, 'docs')"
+    if: "!startsWith(github.event.head_commit.message, 'noci') && startsWith(github.event.head_commit.message, 'docs')"
 
     steps:
     - uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
 
   build_and_test:
     runs-on: ubuntu-latest
-    if: "! startsWith(github.event.head_commit.message, 'docs')"
+    if: "!startsWith(github.event.head_commit.message, 'noci') && !startsWith(github.event.head_commit.message, 'docs')"
 
     steps:
     - uses: actions/checkout@v2
