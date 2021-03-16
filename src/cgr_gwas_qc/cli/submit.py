@@ -19,7 +19,7 @@ def main(
     biowulf: bool = typer.Option(False, help="Run using the Biowulf cluster profile."),
     cluster_profile: Optional[Path] = typer.Option(None, help="Path to a custom cluster profile."),
     time_hr: int = typer.Option(
-        12, help="The walltime limit (in hours) for the main snakemake process."
+        120, help="The walltime limit (in hours) for the main snakemake process."
     ),
     queue: Optional[str] = typer.Option(
         None,
