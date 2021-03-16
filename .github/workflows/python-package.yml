@@ -42,7 +42,7 @@ jobs:
       with:
         credentials: ${{ secrets.GCP_CREDENTIALS }}
         path: ./docs/_build/html
-        destination: gs://gwasqc/docs
+        destination: gwasqc
 
   build_and_test:
     runs-on: ubuntu-latest
