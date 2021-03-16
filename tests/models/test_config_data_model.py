@@ -134,7 +134,7 @@ def test_software_params_defaults():
     assert software_params.ibd_pi_hat_min == 0.05
     assert software_params.ibd_pi_hat_max == 1.0
     assert software_params.dup_concordance_cutoff == 0.95
-    assert software_params.contam_threshold == 0.2
+    assert software_params.contam_threshold == 0.1
     assert software_params.contam_population == "AF"
     assert software_params.pi_hat_threshold == 0.2
     assert software_params.autosomal_het_threshold == 0.1
