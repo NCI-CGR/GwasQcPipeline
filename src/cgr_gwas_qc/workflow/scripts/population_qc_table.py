@@ -70,7 +70,7 @@ def main(sample_qc: Path, results: Path, controls: Path, outfile: Path):
         .reindex(col_order, axis=1)
     )
 
-    df.to_csv(outfile)
+    df.to_csv(outfile, index=False)
 
 
 def build_table(results: Path, controls: Path) -> pd.DataFrame:
@@ -79,14 +79,17 @@ def build_table(results: Path, controls: Path) -> pd.DataFrame:
         "het": _het,
     }
 
+    data = [
+        read_funcs[popfile.suffix](popfile)
+        for popfile in chain(extract_files(results), extract_files(controls))
+        if popfile.suffix in read_funcs
+    ]
+
+    if not data:
+        return pd.DataFrame()
+
     return (
-        pd.concat(
-            [
-                read_funcs[popfile.suffix](popfile)
-                for popfile in chain(extract_files(results), extract_files(controls))
-                if popfile.suffix in read_funcs
-            ],
-        )
+        pd.concat(data)
         .set_index(["Subject_ID", "population"])
         .stack()  # this gets ride of the NA and merges records together for each subject*population.
         .unstack()
@@ -103,7 +106,10 @@ def add_metadata(df: pd.DataFrame, filename: Path):
         .reindex(["Group_By_Subject_ID", "Sample_ID", "Case/Control_Status"], axis=1)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
     )
-    return df.merge(metadata, on="Subject_ID", how="left")
+    try:
+        return df.merge(metadata, on="Subject_ID", how="left")
+    except KeyError:
+        return pd.DataFrame()
 
 
 @dataclass
