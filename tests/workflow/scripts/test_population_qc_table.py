@@ -154,6 +154,7 @@ def test_extract_files_populations_no_data(tmp_path):
     assert 0 == side_effect
 
 
+@pytest.mark.real_data
 def test_run_population_qc_table(qc_summary, population_level, tmp_path):
     # GIVEN: population level data and the qc metadata
     # WHEN: I run the script
@@ -173,6 +174,7 @@ def test_run_population_qc_table(qc_summary, population_level, tmp_path):
     assert (326, 18) == pd.read_csv(tmp_path / "test.csv").shape
 
 
+@pytest.mark.real_data
 def test_run_population_qc_table_no_data(qc_summary, tmp_path):
     results = tmp_path / "results.done"
     results.touch()
