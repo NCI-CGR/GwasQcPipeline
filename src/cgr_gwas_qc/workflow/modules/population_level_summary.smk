@@ -216,6 +216,7 @@ rule phony_population_controls:
 ################################################################################
 rule population_qc_table:
     input:
+        sample_qc="sample_level/qc_summary.csv",
         populations=rules.phony_population_results.output[0],
         controls=rules.phony_population_controls.output[0],
     output:

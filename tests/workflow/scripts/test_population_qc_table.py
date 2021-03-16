@@ -4,7 +4,11 @@ import pytest
 
 from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import RealData
-from cgr_gwas_qc.workflow.scripts.population_qc_table import build_table, extract_files
+from cgr_gwas_qc.workflow.scripts.population_qc_table import (
+    add_metadata,
+    build_table,
+    extract_files,
+)
 
 
 @pytest.mark.real_data
@@ -62,6 +66,17 @@ def test_build_table(population_level):
         df = build_table(results, controls)
 
     assert (326, 16) == df.shape
+
+
+@pytest.mark.real_data
+def test_add_metadata(qc_summary, population_level):
+    with chdir(population_level):
+        results = Path("population_level/results.done")
+        controls = Path("population_level/controls.done")
+        df = build_table(results, controls)
+        df_w_metadata = add_metadata(df, qc_summary)
+
+    assert (326, 18) == df_w_metadata.shape
 
 
 @pytest.fixture(scope="module")

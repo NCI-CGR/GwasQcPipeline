@@ -4,6 +4,8 @@
     :header: name, dtype, description
 
     "Subject_ID", str, Subject ID
+    "Sample_ID", str, Sample ID
+    "Case/Control_Status", str, Case/Control Status
     "population", str, Population name
     "PC1", float, Principal component 1
     "PC2", float, Principal component 2
@@ -38,10 +40,36 @@ from cgr_gwas_qc.parsers import eigensoft, plink
 
 app = typer.Typer(add_completion=False)
 
+col_order = [
+    "Subject_ID",
+    "Sample_ID",
+    "Case/Control_Status",
+    "population",
+    "PC1",
+    "PC2",
+    "PC3",
+    "PC4",
+    "PC5",
+    "PC6",
+    "PC7",
+    "PC8",
+    "PC9",
+    "PC10",
+    "O(HOM)",
+    "E(HOM)",
+    "N(NM)",
+    "F",
+]
+
 
 @app.command()
-def main(results: Path, controls: Path, outfile: Path):
-    df = build_table(results, controls)
+def main(sample_qc: Path, results: Path, controls: Path, outfile: Path):
+    df = (
+        build_table(results, controls)
+        .pipe(add_metadata, filename=sample_qc)
+        .reindex(col_order, axis=1)
+    )
+
     df.to_csv(outfile)
 
 
@@ -66,6 +94,16 @@ def build_table(results: Path, controls: Path) -> pd.DataFrame:
         .sort_values(["population", "Subject_ID"])
         .astype({"O(HOM)": int, "E(HOM)": int, "N(NM)": int})
     )
+
+
+def add_metadata(df: pd.DataFrame, filename: Path):
+    metadata = (
+        pd.read_csv(filename)
+        .query("Subject_Representative")
+        .reindex(["Group_By_Subject_ID", "Sample_ID", "Case/Control_Status"], axis=1)
+        .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
+    )
+    return df.merge(metadata, on="Subject_ID", how="left")
 
 
 @dataclass
