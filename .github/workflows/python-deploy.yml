@@ -25,9 +25,11 @@ jobs:
           python -m pip install --upgrade pip poetry
 
       - name: Build project
+        id: poetry
         run: |
           poetry version ${GITHUB_REF##*/}
           poetry build
+          echo "::set-output name=whl_loc::$(find dist -type f -name *.whl)"
 
       - name: Create Release
         id: create_release
@@ -40,10 +42,16 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
+      - name: Upload Release Asset to GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag_name="${GITHUB_REF##*/}"
           hub release edit $(find ./dist/ -type f -printf "-a %p ") -m "" "$tag_name"
           
+      - name: Upload Release Asset to Google Cloud
+        uses: google-github-actions/upload-cloud-storage@v0.2.0
+        with:
+          credentials: ${{ secrets.GCP_CREDENTIALS }}
+          path: ${{ steps.poetry.outputs.whl_loc }}
+          destination: gwasqc/releases
