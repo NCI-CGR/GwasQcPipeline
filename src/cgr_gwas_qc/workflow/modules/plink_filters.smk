@@ -7,7 +7,7 @@ rule snp_call_rate_1:
         bim="sample_level/samples.bim",
         fam="sample_level/samples.fam",
     params:
-        geno=1 - cfg.config.software_params.snp_cr_1,
+        geno=1 - cfg.config.software_params.snp_call_rate_1,
         out_prefix="sample_level/call_rate_1/snps",
     output:
         bed=temp("sample_level/call_rate_1/snps.bed"),
@@ -41,7 +41,7 @@ rule sample_call_rate_1:
         bim="sample_level/call_rate_1/snps.bim",
         fam="sample_level/call_rate_1/snps.fam",
     params:
-        mind=1 - cfg.config.software_params.samp_cr_1,
+        mind=1 - cfg.config.software_params.sample_call_rate_1,
         out_prefix="sample_level/call_rate_1/samples",
     output:
         bed="sample_level/call_rate_1/samples.bed",
@@ -75,7 +75,7 @@ rule snp_call_rate_2:
         bim="sample_level/call_rate_1/samples.bim",
         fam="sample_level/call_rate_1/samples.fam",
     params:
-        geno=1 - cfg.config.software_params.snp_cr_2,
+        geno=1 - cfg.config.software_params.snp_call_rate_2,
         out_prefix="sample_level/call_rate_2/snps",
     output:
         bed=temp("sample_level/call_rate_2/snps.bed"),
@@ -109,7 +109,7 @@ rule sample_call_rate_2:
         bim="sample_level/call_rate_2/snps.bim",
         fam="sample_level/call_rate_2/snps.fam",
     params:
-        mind=1 - cfg.config.software_params.samp_cr_2,
+        mind=1 - cfg.config.software_params.sample_call_rate_2,
         out_prefix="sample_level/call_rate_2/samples",
     output:
         bed="sample_level/call_rate_2/samples.bed",

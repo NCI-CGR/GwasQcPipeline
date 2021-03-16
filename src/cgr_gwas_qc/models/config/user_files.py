@@ -14,6 +14,10 @@ class UserFiles(BaseModel):
         "{prefix}/{file_type}.{ext}", description="File naming pattern for deliverable files."
     )
 
+    lims_output_dir: Optional[Path] = Field(
+        None, description="Directory to copy QC files to upload to LIMS"
+    )
+
     idat_pattern: Optional["Idat"]
 
     # GTC

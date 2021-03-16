@@ -31,6 +31,8 @@ def test_user_files_defaults():
     user_files = UserFiles()
 
     # THEN: all values default to None
+    assert user_files.output_pattern == "{prefix}/{file_type}.{ext}"
+    assert user_files.lims_output_dir is None
     assert user_files.gtc_pattern is None
     assert user_files.idat_pattern is None
     assert user_files.ped is None
@@ -124,17 +126,17 @@ def test_software_params_defaults():
     software_params = SoftwareParams()
 
     # THEN: we get the defaults
-    assert software_params.samp_cr_1 == 0.8
-    assert software_params.snp_cr_1 == 0.8
-    assert software_params.samp_cr_2 == 0.95
-    assert software_params.snp_cr_2 == 0.95
+    assert software_params.sample_call_rate_1 == 0.8
+    assert software_params.snp_call_rate_1 == 0.8
+    assert software_params.sample_call_rate_2 == 0.95
+    assert software_params.snp_call_rate_2 == 0.95
     assert software_params.ld_prune_r2 == 0.1
     assert software_params.maf_for_ibd == 0.2
     assert software_params.maf_for_hwe == 0.05
     assert software_params.ibd_pi_hat_min == 0.05
     assert software_params.ibd_pi_hat_max == 1.0
     assert software_params.dup_concordance_cutoff == 0.95
-    assert software_params.contam_threshold == 0.2
+    assert software_params.contam_threshold == 0.1
     assert software_params.contam_population == "AF"
     assert software_params.pi_hat_threshold == 0.2
     assert software_params.autosomal_het_threshold == 0.1
@@ -167,13 +169,13 @@ def test_call_rate_param_limits(value):
 
     # THEN: they all raise ValidationErrors
     with pytest.raises(ValidationError):
-        SoftwareParams(samp_cr_1=value)
+        SoftwareParams(sample_call_rate_1=value)
 
     with pytest.raises(ValidationError):
-        SoftwareParams(snp_cr_1=value)
+        SoftwareParams(snp_call_rate_1=value)
 
     with pytest.raises(ValidationError):
-        SoftwareParams(samp_cr_2=value)
+        SoftwareParams(sample_call_rate_2=value)
 
     with pytest.raises(ValidationError):
-        SoftwareParams(snp_cr_2=value)
+        SoftwareParams(snp_call_rate_2=value)
