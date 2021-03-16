@@ -8,29 +8,38 @@ class WorkflowParams(BaseModel):
     """This set of parameters control what parts and how the workflow is run."""
 
     subject_id_to_use: Optional[str] = Field(
-        None, description="[Deprecated] The column which identifies unique subjects.",
+        None,
+        description="[Deprecated] The name of the column in the sample sheet which identifies unique subjects.",
     )
     expected_sex_col_name: str = Field(
         "Expected_Sex", description="Column in the sample sheet that describes the expected sex."
     )
 
     remove_contam: bool = Field(
-        True, description="Remove samples that exceed the contamination threshold."
+        True,
+        description="Contaminated samples will be removed prior to sample to subject transformation.",
     )
     remove_sex_discordant: bool = Field(
-        True, description="Remove samples that have sex discorance."
+        True,
+        description="Sex discordant samples will be removed prior to sample to subject transformation.",
     )
     remove_rep_discordant: bool = Field(
-        True, description="Remove samples that have replicate discorance."
+        True,
+        description="Discordant replicates will be pruned prior to sample to subject transformation.",
     )
     remove_unexpected_rep: bool = Field(
-        True, description="Remove samples that are unexpected replicates."
+        True,
+        description="Unexpected replicates will be pruned prior to sample to subject transformation.",
     )
 
     minimum_pop_subjects: int = Field(
-        50, description="Minimum number of subjects in a population", gt=0
+        50, description="Minimum number of subjects required in order to analyze a population", gt=0
     )
-    control_hwp_threshold: int = Field(50, description="Control samples HWP threshold.", gt=0)
+    control_hwp_threshold: int = Field(
+        50,
+        description="Minimum number of controls (in a population) required for HWE estimation",
+        gt=0,
+    )
 
     @validator("subject_id_to_use")
     def validate_subject_id_to_use(cls, v):
