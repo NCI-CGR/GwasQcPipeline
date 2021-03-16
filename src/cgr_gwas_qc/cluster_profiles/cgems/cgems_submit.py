@@ -21,7 +21,7 @@ class CgemsOptions(ClusterOptions):
 
     def __str__(self):
         # See cgems_jobscript.sh for default sge options
-        cmd = "qsub -q {queue} -N gqc.{job_id} -l mem_free={mem} -l h_rt={time} -o {log}"
+        cmd = "qsub -q {queue} -N gqc.{job_id} -o {log}"
 
         if self.threads > 1:
             cmd += " -pe by_node {threads}"
