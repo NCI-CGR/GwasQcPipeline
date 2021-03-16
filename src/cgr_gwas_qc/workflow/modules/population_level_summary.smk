@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from more_itertools import flatten
 
@@ -19,20 +21,23 @@ checkpoint subjects_per_population:
     output:
         directory("population_level/subject_lists"), #"population_level/subject_lists/{population}.txt"
     run:
+        output_path = Path(output[0])
+        output_path.mkdir(exist_ok=True, parents=True)
+
         df = pd.read_csv(input[0]).query("Subject_Representative")
         for pop_, grp in df.groupby("Ancestry"):
             if grp.shape[0] < params.threshold:
                 # Too few subjects to analyze population
                 continue
 
-            pop_path = Path(output[0])
-            pop_path.mkdir(exist_ok=True, parents=True)
-
             (  # Save a list of subjects for each population
                 grp.assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
                 .reindex(["Group_By_Subject_ID", "Subject_ID2"], axis=1)
-                .to_csv(pop_path / f"{pop_}.txt", sep=" ", index=False, header=False)
+                .to_csv(output_path / f"{pop_}.txt", sep=" ", index=False, header=False)
             )
+
+        if len(list(output_path.glob("*.txt"))) == 0:
+            (output_path / "no_populations.txt").touch()
 
 
 rule plink_split_population:
@@ -79,6 +84,9 @@ def required_population_results(wildcards):
     """
     _ = checkpoints.subjects_per_population.get(**wildcards).output[0]
     populations = glob_wildcards("population_level/subject_lists/{population}.txt").population
+
+    if populations == ["no_populations"]:
+        return []
 
     pi = cfg.config.software_params.pi_hat_threshold
     maf = cfg.config.software_params.maf_for_ibd
@@ -130,20 +138,23 @@ checkpoint controls_per_population:
     output:
         directory("population_level/controls_lists"),
     run:
+        output_path = Path(output[0])
+        output_path.mkdir(exist_ok=True, parents=True)
+
         df = pd.read_csv(input[0]).query("Subject_Representative & `Case/Control_Status` == 0")
         for pop_, grp in df.groupby("Ancestry"):
             if grp.shape[0] < params.threshold:
                 # Too few controls to analyze population
                 continue
 
-            pop_path = Path(output[0])
-            pop_path.mkdir(exist_ok=True, parents=True)
-
             (  # Save a list of subjects for each population
                 grp.assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
                 .reindex(["Group_By_Subject_ID", "Subject_ID2"], axis=1)
-                .to_csv(pop_path / f"{pop_}.txt", sep=" ", index=False, header=False)
+                .to_csv(output_path / f"{pop_}.txt", sep=" ", index=False, header=False)
             )
+
+        if len(list(output_path.glob("*.txt"))) == 0:
+            (output_path / "no_controls.txt").touch()
 
 
 rule plink_split_controls:
@@ -190,6 +201,9 @@ def required_population_controls(wildcards):
     """
     _ = checkpoints.controls_per_population.get(**wildcards).output[0]
     populations = glob_wildcards("population_level/controls_lists/{population}.txt").population
+
+    if populations == ["no_controls"]:
+        return []
 
     maf = cfg.config.software_params.maf_for_hwe
     pi = cfg.config.software_params.pi_hat_threshold
