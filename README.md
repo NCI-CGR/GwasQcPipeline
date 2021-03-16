@@ -1,4 +1,4 @@
-[![read-the-docs](https://img.shields.io/badge/Check%20Out-The%20Docs-blue.svg)](https://nci-cgr.github.io/GwasQcPipeline/)
+[![read-the-docs](https://img.shields.io/badge/Check%20Out-The%20Docs-blue.svg)](https://storage.googleapis.com/gwasqc/html/index.html)
 [![default-branch-status](https://github.com/NCI-CGR/GwasQcPipeline/actions/workflows/python-package.yml/badge.svg)](https://github.com/NCI-CGR/GwasQcPipeline/actions/workflows/python-package.yml)
 
 [![docs-by-sphinx-doc](https://img.shields.io/badge/Docs%20by-Sphinx-1f425f.svg)](https://www.sphinx-doc.org/)
