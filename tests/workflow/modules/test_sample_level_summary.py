@@ -53,7 +53,10 @@ def sample_qc_report(tmp_path_factory) -> Path:
             "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
             "sample_level/median_idat_intensity.csv",
         )
-        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+        .make_config(
+            workflow_params={"subject_id_to_use": "PI_Subject_ID"},
+            software_params={"contam_threshold": 0.2},
+        )
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config

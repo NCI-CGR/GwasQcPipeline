@@ -63,7 +63,7 @@ def test_old_call_rate_filter_order(tmp_path, conda_envs):
                 input:
                     unpack(_sample_call_rate_filter)
                 params:
-                    mind=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"samp_cr_{wc.cr}")),
+                    mind=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"sample_call_rate_{wc.cr}")),
                     out_prefix="{prefix}/call_rate_{cr}/samples"
                 output:
                     bed="{prefix}/call_rate_{cr}/samples.bed",
@@ -90,7 +90,7 @@ def test_old_call_rate_filter_order(tmp_path, conda_envs):
                     bim="{prefix}/call_rate_{cr}/samples.bim",
                     fam="{prefix}/call_rate_{cr}/samples.fam",
                 params:
-                    geno=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"snp_cr_{wc.cr}")),
+                    geno=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"snp_call_rate_{wc.cr}")),
                     out_prefix="{prefix}/call_rate_{cr}/snps",
                 output:
                     bed="{prefix}/call_rate_{cr}/snps.bed",
