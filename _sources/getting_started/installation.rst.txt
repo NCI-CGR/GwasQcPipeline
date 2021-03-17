@@ -18,7 +18,7 @@ Install the current release of the ``GwasQcPipeline``:
 
 .. code-block:: bash
 
-    $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0-alpha.0/cgr_gwas_qc-1.0.0a0-py3-none-any.whl
+    $ pip install https://storage.googleapis.com/gwasqc/releases/cgr_gwas_qc-1.0.0a1-py3-none-any.whl
     $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 
 After the initial installation, to use ``GwasQcPipeline``:
@@ -50,7 +50,7 @@ The ``GwasQcPipeline`` requires ``conda`` to run. We suggest you follow these di
 
     $ conda create -n GwasQcPipeline -y python=3.8 pip
     $ conda activate GwasQcPipeline
-    $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0-alpha.0/cgr_gwas_qc-1.0.0a0-py3-none-any.whl
+    $ pip install https://storage.googleapis.com/gwasqc/releases/cgr_gwas_qc-1.0.0a1-py3-none-any.whl
     $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 
 

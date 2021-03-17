@@ -92,7 +92,17 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="sample_level.html">Sample QC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="variant_level.html">Variant QC</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">QC Report</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">QC Report</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#readme">README</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#report">Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#summary-table">Summary Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supplemental-tables-and-parts">Supplemental Tables and Parts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sample-qc-summary">Sample QC Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#population-qc-summary">Population QC Summary</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Module Reference:</span></p>
 <ul>
@@ -178,6 +188,167 @@
             
   <div class="section" id="qc-report">
 <h1>QC Report<a class="headerlink" href="#qc-report" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="readme">
+<h2>README<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Describe the README</p>
+</div>
+<ul class="simple">
+<li><p><strong>Inputs</strong>:</p></li>
+<li><p><strong>Output</strong>:</p></li>
+<li><p><strong>Script</strong>:</p></li>
+</ul>
+</div>
+<div class="section" id="report">
+<h2>Report<a class="headerlink" href="#report" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<p>Describe the text report</p>
+</div>
+<ul class="simple">
+<li><p><strong>Inputs</strong>:</p></li>
+<li><p><strong>Output</strong>:</p></li>
+<li><p><strong>Script</strong>:</p></li>
+</ul>
+</div>
+<div class="section" id="summary-table">
+<h2>Summary Table<a class="headerlink" href="#summary-table" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="id3">
+<p class="admonition-title">Todo</p>
+<p>Describe the summary Excel file</p>
+</div>
+<ul class="simple">
+<li><p><strong>Inputs</strong>:</p></li>
+<li><p><strong>Output</strong>:</p></li>
+<li><p><strong>Script</strong>:</p></li>
+</ul>
+</div>
+<div class="section" id="supplemental-tables-and-parts">
+<h2>Supplemental Tables and Parts<a class="headerlink" href="#supplemental-tables-and-parts" title="Permalink to this headline">¶</a></h2>
+<p>We create a number of potentially useful tables in order to generate the above reports. These tables and their locations are briefly described below.</p>
+<div class="section" id="sample-qc-summary">
+<h3>Sample QC Summary<a class="headerlink" href="#sample-qc-summary" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition" id="id4">
+<p class="admonition-title">Todo</p>
+<p>Describe the sample QC table.</p>
+</div>
+<ul class="simple">
+<li><p><strong>Inputs</strong>:</p></li>
+<li><p><strong>Output</strong>:</p></li>
+<li><p><strong>Script</strong>:</p></li>
+</ul>
+</div>
+<div class="section" id="population-qc-summary">
+<h3>Population QC Summary<a class="headerlink" href="#population-qc-summary" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Inputs</strong>:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/qc_summary.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">population_level/{population}/subjects.het</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">population_level/{population}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Output</strong>: <code class="docutils literal notranslate"><span class="pre">population_level/population_qc.csv</span></code></p></li>
+<li><p><strong>Script</strong>: <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc/workflow/scripts/population_qc_table.py</span></code></p></li>
+</ul>
+<span class="target" id="module-cgr_gwas_qc.workflow.scripts.population_qc_table"></span><p>Population level summary table with the following columns:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Subject_ID</p></td>
+<td><p>str</p></td>
+<td><p>Subject ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample_ID</p></td>
+<td><p>str</p></td>
+<td><p>Sample ID</p></td>
+</tr>
+<tr class="row-even"><td><p>Case/Control_Status</p></td>
+<td><p>str</p></td>
+<td><p>Case/Control Status</p></td>
+</tr>
+<tr class="row-odd"><td><p>population</p></td>
+<td><p>str</p></td>
+<td><p>Population name</p></td>
+</tr>
+<tr class="row-even"><td><p>PC1</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>PC2</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 2</p></td>
+</tr>
+<tr class="row-even"><td><p>PC3</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 3</p></td>
+</tr>
+<tr class="row-odd"><td><p>PC4</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 4</p></td>
+</tr>
+<tr class="row-even"><td><p>PC5</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 5</p></td>
+</tr>
+<tr class="row-odd"><td><p>PC6</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 6</p></td>
+</tr>
+<tr class="row-even"><td><p>PC7</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 7</p></td>
+</tr>
+<tr class="row-odd"><td><p>PC8</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 8</p></td>
+</tr>
+<tr class="row-even"><td><p>PC9</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 9</p></td>
+</tr>
+<tr class="row-odd"><td><p>PC10</p></td>
+<td><p>float</p></td>
+<td><p>Principal component 10</p></td>
+</tr>
+<tr class="row-even"><td><p>O(HOM)</p></td>
+<td><p>int</p></td>
+<td><p>Observed number of homozygotes</p></td>
+</tr>
+<tr class="row-odd"><td><p>E(HOM)</p></td>
+<td><p>int</p></td>
+<td><p>Expected number of homozygotes</p></td>
+</tr>
+<tr class="row-even"><td><p>N(NM)</p></td>
+<td><p>int</p></td>
+<td><p>Number of non-missing autosomal genotypes</p></td>
+</tr>
+<tr class="row-odd"><td><p>F</p></td>
+<td><p>float</p></td>
+<td><p>Method-of-moments F coefficient estimate</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../api/parsers.html#cgr_gwas_qc.parsers.plink.read_het" title="cgr_gwas_qc.parsers.plink.read_het"><code class="xref py py-func docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.plink.read_het()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec" title="cgr_gwas_qc.parsers.eigensoft.Eigenvec"><code class="xref py py-class docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.eigensoft.Eigenvec</span></code></a></p></li>
+</ul>
+</div>
+</div>
 </div>
 
 

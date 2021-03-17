@@ -37,6 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parsers" href="parsers.html" />
     <link rel="prev" title="Command Line Interface" href="cli.html" /> 
 </head>
 
@@ -119,6 +120,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#configuration-manager">Configuration Manager</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="parsers.html">Parsers</a></li>
 </ul>
 </li>
 </ul>
@@ -298,7 +300,7 @@ schema and implementing data validation.</p>
 <td colspan="3"><p><em>User Files</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>OrderedDict([(‘output_pattern’, ‘{prefix}/{file_type}.{ext}’), (‘idat_pattern’, None), (‘gtc_pattern’, None), (‘ped’, None), (‘map’, None), (‘bed’, None), (‘bim’, None), (‘fam’, None)])</p></td>
+<td colspan="2"><p>OrderedDict([(‘output_pattern’, ‘{prefix}/{file_type}.{ext}’), (‘lims_output_dir’, None), (‘idat_pattern’, None), (‘gtc_pattern’, None), (‘ped’, None), (‘map’, None), (‘bed’, None), (‘bim’, None), (‘fam’, None)])</p></td>
 </tr>
 <tr class="row-even"><td><p>allOf</p></td>
 <td><ul class="simple">
@@ -314,7 +316,7 @@ schema and implementing data validation.</p>
 <td colspan="3"><p><em>Software Params</em></p></td>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
-<td colspan="2"><p>OrderedDict([(‘samp_cr_1’, 0.8), (‘snp_cr_1’, 0.8), (‘samp_cr_2’, 0.95), (‘snp_cr_2’, 0.95), (‘ld_prune_r2’, 0.1), (‘maf_for_ibd’, 0.2), (‘maf_for_hwe’, 0.05), (‘ibd_pi_hat_min’, 0.05), (‘ibd_pi_hat_max’, 1.0), (‘dup_concordance_cutoff’, 0.95), (‘intensity_threshold’, 6000), (‘contam_threshold’, 0.2), (‘contam_population’, ‘AF’), (‘pi_hat_threshold’, 0.2), (‘autosomal_het_threshold’, 0.1), (‘strand’, ‘top’)])</p></td>
+<td colspan="2"><p>OrderedDict([(‘sample_call_rate_1’, 0.8), (‘snp_call_rate_1’, 0.8), (‘sample_call_rate_2’, 0.95), (‘snp_call_rate_2’, 0.95), (‘ld_prune_r2’, 0.1), (‘maf_for_ibd’, 0.2), (‘maf_for_hwe’, 0.05), (‘ibd_pi_hat_min’, 0.05), (‘ibd_pi_hat_max’, 1.0), (‘dup_concordance_cutoff’, 0.95), (‘intensity_threshold’, 6000), (‘contam_threshold’, 0.1), (‘contam_population’, ‘AF’), (‘pi_hat_threshold’, 0.2), (‘autosomal_het_threshold’, 0.1), (‘strand’, ‘top’)])</p></td>
 </tr>
 <tr class="row-odd"><td><p>allOf</p></td>
 <td><ul class="simple">
@@ -469,7 +471,7 @@ schema and implementing data validation.</p>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-odd"><td rowspan="32"><ul class="simple">
+<tr class="row-odd"><td rowspan="36"><ul class="simple">
 <li><p>UserFiles</p></li>
 </ul>
 </td>
@@ -497,6 +499,20 @@ schema and implementing data validation.</p>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
 <td><p>{prefix}/{file_type}.{ext}</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>lims_output_dir</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Lims Output Dir</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Directory to copy QC files to upload to LIMS</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td><p>path</p></td>
 </tr>
 <tr class="row-odd"><td><ul class="simple">
 <li><p>idat_pattern</p></li>
@@ -597,10 +613,10 @@ schema and implementing data validation.</p>
 <tr class="row-odd"><td colspan="3"><p>properties</p></td>
 </tr>
 <tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>samp_cr_1</p></li>
+<li><p>sample_call_rate_1</p></li>
 </ul>
 </td>
-<td colspan="2"><p><em>Samp Cr 1</em></p></td>
+<td colspan="2"><p><em>Sample Call Rate 1</em></p></td>
 </tr>
 <tr class="row-odd"><td colspan="2"><p>Sample call rate filter 1</p></td>
 </tr>
@@ -617,12 +633,12 @@ schema and implementing data validation.</p>
 <td><p>0.8</p></td>
 </tr>
 <tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>snp_cr_1</p></li>
+<li><p>snp_call_rate_1</p></li>
 </ul>
 </td>
-<td colspan="2"><p><em>Snp Cr 1</em></p></td>
+<td colspan="2"><p><em>Snp Call Rate 1</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Marker call rate filter 1</p></td>
+<tr class="row-odd"><td colspan="2"><p>SNP call rate filter 1</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -637,10 +653,10 @@ schema and implementing data validation.</p>
 <td><p>0.8</p></td>
 </tr>
 <tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>samp_cr_2</p></li>
+<li><p>sample_call_rate_2</p></li>
 </ul>
 </td>
-<td colspan="2"><p><em>Samp Cr 2</em></p></td>
+<td colspan="2"><p><em>Sample Call Rate 2</em></p></td>
 </tr>
 <tr class="row-odd"><td colspan="2"><p>Sample call rate filter 2</p></td>
 </tr>
@@ -657,12 +673,12 @@ schema and implementing data validation.</p>
 <td><p>0.95</p></td>
 </tr>
 <tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>snp_cr_2</p></li>
+<li><p>snp_call_rate_2</p></li>
 </ul>
 </td>
-<td colspan="2"><p><em>Snp Cr 2</em></p></td>
+<td colspan="2"><p><em>Snp Call Rate 2</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Marker call rate filter 2</p></td>
+<tr class="row-odd"><td colspan="2"><p>SNP call rate filter 2</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -682,7 +698,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Ld Prune R2</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>r-squared threshold for LD pruning.</p></td>
+<tr class="row-odd"><td colspan="2"><p>r-squared threshold for LD pruning of SNPS for use with IBD and concordance.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -702,7 +718,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Maf For Ibd</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Minor allele frequency threshold for IBD.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Minor allele frequency threshold of SNPS for use with IBD and concordance.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -722,7 +738,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Maf For Hwe</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Minor allele frequency threshold for HWE.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Minor allele frequency threshold of SNPs for use with HWE.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -782,7 +798,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Dup Concordance Cutoff</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Duplicate concordance cutoff</p></td>
+<tr class="row-odd"><td colspan="2"><p>SNP concordance threshold to call samples as replicates.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -802,7 +818,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Intensity Threshold</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>IDAT intensity threshold.</p></td>
+<tr class="row-odd"><td colspan="2"><p>IDAT intensity threshold used for estimating contamination.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>integer</em></p></td>
@@ -819,7 +835,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Contam Threshold</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>Contamination threshold.</p></td>
+<tr class="row-even"><td colspan="2"><p>Threshold to call a sample contaminated.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -831,7 +847,7 @@ schema and implementing data validation.</p>
 <td><p>0</p></td>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
-<td><p>0.2</p></td>
+<td><p>0.1</p></td>
 </tr>
 <tr class="row-odd"><td rowspan="4"><ul class="simple">
 <li><p>contam_population</p></li>
@@ -839,7 +855,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Contam Population</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>Population from 1KG to use for contamination testing.</p></td>
+<tr class="row-even"><td colspan="2"><p>Population from 1KG to use for B allele frequencies during contamination testing {AF, EAS_AF, AMR_AF, AFR_AF, EUR_AF, SAS_AF}.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -853,7 +869,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Pi Hat Threshold</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>pi hat threshold.</p></td>
+<tr class="row-even"><td colspan="2"><p>PI hat threshold used for calling related subjects. The default of 0.2 removes 2nd degree or higher relatives.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -873,7 +889,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Autosomal Het Threshold</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>Autosomal heterozygosity threshold.</p></td>
+<tr class="row-even"><td colspan="2"><p>Autosomal heterozygosity F coefficient threshold to remove subjects.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>number</em></p></td>
@@ -893,7 +909,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Strand</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>Which strand to use when converting GTC to plink {TOP, FWD, PLUS}. default TOP</p></td>
+<tr class="row-even"><td colspan="2"><p>Which strand to use for genotypes when converting GTC to plink {TOP, FWD, PLUS}.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -920,7 +936,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Subject Id To Use</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>[Deprecated] The column which identifies unique subjects.</p></td>
+<tr class="row-even"><td colspan="2"><p>[Deprecated] The name of the column in the sample sheet which identifies unique subjects.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -945,7 +961,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Remove Contam</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Remove samples that exceed the contamination threshold.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Contaminated samples will be removed prior to sample to subject transformation.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
@@ -959,7 +975,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Remove Sex Discordant</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Remove samples that have sex discorance.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Sex discordant samples will be removed prior to sample to subject transformation.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
@@ -973,7 +989,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Remove Rep Discordant</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Remove samples that have replicate discorance.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Discordant replicates will be pruned prior to sample to subject transformation.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
@@ -987,7 +1003,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Remove Unexpected Rep</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Remove samples that are unexpected replicates.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Unexpected replicates will be pruned prior to sample to subject transformation.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
@@ -1001,7 +1017,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Minimum Pop Subjects</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Minimum number of subjects in a population</p></td>
+<tr class="row-odd"><td colspan="2"><p>Minimum number of subjects required in order to analyze a population</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>integer</em></p></td>
@@ -1018,7 +1034,7 @@ schema and implementing data validation.</p>
 </td>
 <td colspan="2"><p><em>Control Hwp Threshold</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>Control samples HWP threshold.</p></td>
+<tr class="row-even"><td colspan="2"><p>Minimum number of controls (in a population) required for HWE estimation</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>integer</em></p></td>
@@ -1311,6 +1327,8 @@ expansion. Defaults to None.</p></li>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parsers.html" class="btn btn-neutral float-right" title="Parsers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="cli.html" class="btn btn-neutral float-left" title="Command Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
