@@ -44,13 +44,13 @@ rule sample_qc_table:
         "../scripts/sample_qc_table.py"
 
 
-rule sample_qc_report_summary_stats:
+rule sample_qc_summary_stats:
     input:
         rules.sample_qc_table.output.all_samples,
     output:
-        "sample_level/qc_summary_stats.txt",
+        "sample_level/sample_qc_summary_stats.txt",
     script:
-        "../scripts/sample_qc_report_summary_stats.py"
+        "../scripts/sample_qc_summary_stats.py"
 
 
 rule sample_lists_from_qc_flags:

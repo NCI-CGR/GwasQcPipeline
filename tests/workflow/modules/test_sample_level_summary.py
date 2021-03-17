@@ -139,18 +139,18 @@ def test_sample_qc_stats(tmp_path, sample_qc_table):
 
             rule all:
                 input:
-                    "sample_level/qc_summary_stats.txt"
+                    "sample_level/sample_qc_summary_stats.txt"
             """
         )
     )
     (tmp_path / "sample_level").mkdir()
     shutil.copy(sample_qc_table, tmp_path / "sample_level/sample_qc.csv")
 
-    # WHEN: run snakemake to create qc_summary_stats.txt
+    # WHEN: run snakemake to create sample_qc_summary_stats.txt
     run_snakemake(tmp_path)
 
     # THEN: The file should end with my sample counts
-    assert (tmp_path / "sample_level/qc_summary_stats.txt").read_text().endswith("203  17\n")
+    assert (tmp_path / "sample_level/sample_qc_summary_stats.txt").read_text().endswith("203  17\n")
 
 
 @pytest.mark.workflow
@@ -184,7 +184,7 @@ def test_qc_failures(tmp_path, sample_qc_table):
     (tmp_path / "sample_level").mkdir()
     shutil.copy(sample_qc_table, tmp_path / "sample_level/sample_qc.csv")
 
-    # WHEN: run snakemake to create qc_summary_stats.txt
+    # WHEN: run snakemake to create sample_qc_summary_stats.txt
     run_snakemake(tmp_path)
 
     # THEN: The files should match production outputs

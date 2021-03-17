@@ -22,7 +22,7 @@ localrules: # Always run these rules locally b/c they are quick
     concordance_table,
     sample_concordance_plink,
     sample_qc_table,
-    sample_qc_report_summary_stats,
+    sample_qc_summary_stats,
     sample_lists_from_qc_flags,
     subject_representative,
     sample_to_subject_map,
