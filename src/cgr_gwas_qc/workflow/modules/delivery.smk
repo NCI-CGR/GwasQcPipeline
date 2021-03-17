@@ -6,7 +6,7 @@ import pandas as pd
 ################################################################################
 rule lab_sample_level_qc_report:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         cfg.config.user_files.output_pattern.format(
             prefix="files_for_lab", file_type="all_sample_qc", ext="csv"
@@ -17,7 +17,7 @@ rule lab_sample_level_qc_report:
 
 rule lab_lims_upload:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         cfg.config.user_files.output_pattern.format(
             prefix="files_for_lab", file_type="LimsUpload", ext="csv"
@@ -47,7 +47,7 @@ rule lab_lims_upload:
 
 rule lab_identifiler_needed:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         cfg.config.user_files.output_pattern.format(
             prefix="files_for_lab", file_type="Identifiler", ext="csv"
@@ -152,7 +152,7 @@ rule deliver_subject_data:
 
 rule deliver_subject_list:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         "deliver/SampleUsedforSubject.csv",
     run:

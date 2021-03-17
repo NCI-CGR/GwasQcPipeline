@@ -3,7 +3,7 @@ import pandas as pd
 
 rule subject_representative:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         temp("subject_level/subject_representative.txt"),
     run:
@@ -52,7 +52,7 @@ rule kept_samples:
 
 rule sample_to_subject_map:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         temp("subject_level/samples_to_subjects.txt"),
     run:

@@ -185,7 +185,7 @@ def vcf_mock():
 ##################################################################################
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def qc_summary(tmp_path_factory) -> Path:
+def sample_qc(tmp_path_factory) -> Path:
     """Add new QC columns to legacy QC summary table.
 
     The legacy QC summary table is missing several columns that are not

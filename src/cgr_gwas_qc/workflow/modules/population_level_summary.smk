@@ -15,7 +15,7 @@ include: cfg.modules("common.smk")
 ################################################################################
 checkpoint subjects_per_population:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     params:
         threshold=cfg.config.workflow_params.minimum_pop_subjects,
     output:
@@ -132,7 +132,7 @@ rule phony_population_results:
 ################################################################################
 checkpoint controls_per_population:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     params:
         threshold=cfg.config.workflow_params.control_hwp_threshold,
     output:
@@ -230,7 +230,7 @@ rule phony_population_controls:
 ################################################################################
 rule population_qc_table:
     input:
-        sample_qc="sample_level/qc_summary.csv",
+        sample_qc="sample_level/sample_qc.csv",
         populations=rules.phony_population_results.output[0],
         controls=rules.phony_population_controls.output[0],
     output:

@@ -46,7 +46,7 @@ Population QC Summary
 +++++++++++++++++++++
 
 - **Inputs**:
-    - ``sample_level/qc_summary.csv``
+    - ``sample_level/sample_qc.csv``
     - ``population_level/{population}/subjects.het``
     - ``population_level/{population}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec``
 - **Output**: ``population_level/population_qc.csv``

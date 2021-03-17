@@ -15,7 +15,7 @@ from cgr_gwas_qc.testing.data import RealData
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def files_for_upload(tmp_path_factory, qc_summary):
+def files_for_upload(tmp_path_factory, sample_qc):
     tmp_path = tmp_path_factory.mktemp("files_for_upload")
     data_cache = (
         RealData(tmp_path)
@@ -50,7 +50,7 @@ def files_for_upload(tmp_path_factory, qc_summary):
             """
         )
     )
-    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN:
     run_snakemake(tmp_path)
@@ -153,7 +153,7 @@ def test_unknown_replicate(files_for_upload):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def files_for_deliver(tmp_path_factory, qc_summary):
+def files_for_deliver(tmp_path_factory, sample_qc):
     tmp_path = tmp_path_factory.mktemp("files_for_deliver")
 
     # GIVEN: Real data
@@ -196,7 +196,7 @@ def files_for_deliver(tmp_path_factory, qc_summary):
         )
     )
     # The QC Summary
-    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     # HWE results for Europeans b/c they are the only non-empty files
     with chdir(tmp_path):

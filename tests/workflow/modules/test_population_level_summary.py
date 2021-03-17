@@ -12,7 +12,7 @@ from cgr_gwas_qc.testing.data import RealData
 @pytest.mark.regression
 @pytest.mark.workflow
 @pytest.mark.real_data
-def test_subjects_per_population(tmp_path, qc_summary):
+def test_subjects_per_population(tmp_path, sample_qc):
     # GIVEN: real data config and qc summary table
     data_cache = (
         RealData(tmp_path)
@@ -50,7 +50,7 @@ def test_subjects_per_population(tmp_path, qc_summary):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to generate population keep lists
     run_snakemake(tmp_path)
@@ -121,10 +121,10 @@ def test_plink_split_population(tmp_path, conda_envs):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_phony_population_results(tmp_path, conda_envs, qc_summary):
-    # GIVEN: real data config, qc_summary table, all of the inputs to generate
+def test_phony_population_results(tmp_path, conda_envs, sample_qc):
+    # GIVEN: real data config, sample_qc table, all of the inputs to generate
     # the summary table, and subject level plink data sets.
-    # NOTE: I had to include the qc_summary inputs to get snakemake to run the
+    # NOTE: I had to include the sample_qc inputs to get snakemake to run the
     # check point correctly.
     conda_envs.copy_env("plink2", tmp_path)
     conda_envs.copy_env("eigensoft", tmp_path)
@@ -155,7 +155,7 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to get all population level and all population-control level results
     run_snakemake(tmp_path)
@@ -193,8 +193,8 @@ def test_phony_population_results(tmp_path, conda_envs, qc_summary):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_phony_no_population_results(tmp_path, conda_envs, qc_summary):
-    # GIVEN: real data config, qc_summary table, but requiring 500 samples per populations
+def test_phony_no_population_results(tmp_path, conda_envs, sample_qc):
+    # GIVEN: real data config, sample_qc table, but requiring 500 samples per populations
     conda_envs.copy_env("plink2", tmp_path)
     conda_envs.copy_env("eigensoft", tmp_path)
     (
@@ -223,7 +223,7 @@ def test_phony_no_population_results(tmp_path, conda_envs, qc_summary):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to get all population level and all population-control level results
     run_snakemake(tmp_path)
@@ -235,8 +235,8 @@ def test_phony_no_population_results(tmp_path, conda_envs, qc_summary):
 @pytest.mark.regression
 @pytest.mark.workflow
 @pytest.mark.real_data
-def test_controls_per_population(tmp_path, qc_summary):
-    # GIVEN: real data config and the qc_summary table
+def test_controls_per_population(tmp_path, sample_qc):
+    # GIVEN: real data config and the sample_qc table
     # NOTE: we have to use EUR b/c other populations don't have enough subjects
     # in test data
     data_cache = (
@@ -275,7 +275,7 @@ def test_controls_per_population(tmp_path, qc_summary):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to generate population level control lists
     run_snakemake(tmp_path)
@@ -364,10 +364,10 @@ def test_plink_split_controls(tmp_path, conda_envs):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
-    # GIVEN: real data config, qc_summary table, all of the inputs to generate
+def test_phony_population_controls(tmp_path, conda_envs, sample_qc):
+    # GIVEN: real data config, sample_qc table, all of the inputs to generate
     # the summary table, the European control list, and subject level plink data sets.
-    # NOTE: I had to include the qc_summary inputs to get snakemake to run the
+    # NOTE: I had to include the sample_qc inputs to get snakemake to run the
     # check point correctly.
     # NOTE: I am using the legacy EUR control list b/c of different sort orders.
     conda_envs.copy_env("plink2", tmp_path)
@@ -406,7 +406,7 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     with chdir(tmp_path):
         cfg = load_config()
@@ -432,8 +432,8 @@ def test_phony_population_controls(tmp_path, conda_envs, qc_summary):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_phony_population_missing_controls(tmp_path, conda_envs, qc_summary):
-    # GIVEN: real data config, qc_summary table
+def test_phony_population_missing_controls(tmp_path, conda_envs, sample_qc):
+    # GIVEN: real data config, sample_qc table
     conda_envs.copy_env("plink2", tmp_path)
     conda_envs.copy_env("eigensoft", tmp_path)
     (
@@ -464,9 +464,9 @@ def test_phony_population_missing_controls(tmp_path, conda_envs, qc_summary):
     # WHEN: I remove all of the controls
     (tmp_path / "sample_level").mkdir()
     (
-        pd.read_csv(qc_summary)
+        pd.read_csv(sample_qc)
         .assign(**{"Case/Control_Status": 1})
-        .to_csv(tmp_path / "sample_level/qc_summary.csv")
+        .to_csv(tmp_path / "sample_level/sample_qc.csv")
     )
 
     # and run snakemake

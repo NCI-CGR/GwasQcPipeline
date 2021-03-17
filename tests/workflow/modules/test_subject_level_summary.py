@@ -10,7 +10,7 @@ from cgr_gwas_qc.testing.data import RealData
 @pytest.mark.workflow
 @pytest.mark.regression
 @pytest.mark.real_data
-def test_create_subjects(tmp_path, conda_envs, qc_summary):
+def test_create_subjects(tmp_path, conda_envs, sample_qc):
     # GIVEN:
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
@@ -45,7 +45,7 @@ def test_create_subjects(tmp_path, conda_envs, qc_summary):
             """
         )
     )
-    shutil.copyfile(qc_summary, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN:
     run_snakemake(tmp_path)

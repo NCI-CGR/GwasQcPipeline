@@ -89,18 +89,18 @@ def test_build_table_no_data(tmp_path):
 
 
 @pytest.mark.real_data
-def test_add_metadata(qc_summary, population_level):
+def test_add_metadata(sample_qc, population_level):
     with chdir(population_level):
         results = Path("population_level/results.done")
         controls = Path("population_level/controls.done")
         df = build_table(results, controls)
-        df_w_metadata = add_metadata(df, qc_summary)
+        df_w_metadata = add_metadata(df, sample_qc)
 
     assert (326, 18) == df_w_metadata.shape
 
 
 @pytest.mark.real_data
-def test_add_metadata_no_data(qc_summary, tmp_path):
+def test_add_metadata_no_data(sample_qc, tmp_path):
     # GIVEN: empty results files and qc metadata
     results = tmp_path / "results.done"
     results.touch()
@@ -109,7 +109,7 @@ def test_add_metadata_no_data(qc_summary, tmp_path):
 
     # WHEN: I build the population results table add the metadata
     df = build_table(results, controls)
-    df_w_metadata = add_metadata(df, qc_summary)
+    df_w_metadata = add_metadata(df, sample_qc)
 
     # THEN: I should get an empty dataframe
     assert (0, 0) == df_w_metadata.shape
@@ -155,14 +155,14 @@ def test_extract_files_populations_no_data(tmp_path):
 
 
 @pytest.mark.real_data
-def test_run_population_qc_table(qc_summary, population_level, tmp_path):
+def test_run_population_qc_table(sample_qc, population_level, tmp_path):
     # GIVEN: population level data and the qc metadata
     # WHEN: I run the script
     with chdir(population_level):
         res = runner.invoke(
             app,
             [
-                qc_summary.as_posix(),
+                sample_qc.as_posix(),
                 (population_level / "population_level/results.done").as_posix(),
                 (population_level / "population_level/controls.done").as_posix(),
                 (tmp_path / "test.csv").as_posix(),
@@ -175,7 +175,7 @@ def test_run_population_qc_table(qc_summary, population_level, tmp_path):
 
 
 @pytest.mark.real_data
-def test_run_population_qc_table_no_data(qc_summary, tmp_path):
+def test_run_population_qc_table_no_data(sample_qc, tmp_path):
     results = tmp_path / "results.done"
     results.touch()
     controls = tmp_path / "controls.done"
@@ -184,7 +184,7 @@ def test_run_population_qc_table_no_data(qc_summary, tmp_path):
     res = runner.invoke(
         app,
         [
-            qc_summary.as_posix(),
+            sample_qc.as_posix(),
             results.as_posix(),
             controls.as_posix(),
             (tmp_path / "test.csv").as_posix(),

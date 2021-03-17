@@ -67,7 +67,7 @@ def sample_qc_report(tmp_path_factory) -> Path:
 
             rule all:
                 input:
-                    "sample_level/qc_summary.csv"
+                    "sample_level/sample_qc.csv"
             """
         )
     )
@@ -75,7 +75,7 @@ def sample_qc_report(tmp_path_factory) -> Path:
     # WHEN: I run snakemake to generate the sample_qc_report
     run_snakemake(tmp_path)
 
-    return tmp_path / "sample_level/qc_summary.csv"
+    return tmp_path / "sample_level/sample_qc.csv"
 
 
 @pytest.mark.workflow
@@ -144,7 +144,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_report):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copy(sample_qc_report, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copy(sample_qc_report, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to create qc_summary_stats.txt
     run_snakemake(tmp_path)
@@ -182,7 +182,7 @@ def test_qc_failures(tmp_path, sample_qc_report):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copy(sample_qc_report, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copy(sample_qc_report, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to create qc_summary_stats.txt
     run_snakemake(tmp_path)

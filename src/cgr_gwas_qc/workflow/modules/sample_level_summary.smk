@@ -39,7 +39,7 @@ rule sample_qc_report:
         contam=_contam,
         intensity=_intensity,
     output:
-        all_samples="sample_level/qc_summary.csv",
+        all_samples="sample_level/sample_qc.csv",
     script:
         "../scripts/sample_qc_report.py"
 
