@@ -194,7 +194,7 @@ def sample_qc(tmp_path_factory) -> Path:
     Returns:
         Path to an updated sample qc summary table (CSV).
     """
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import (
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import (
         IDENTIFILER_FLAGS,
         QC_HEADER,
         _case_control_encoder,

@@ -12,7 +12,7 @@ from cgr_gwas_qc.testing.data import RealData
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc_report(tmp_path_factory) -> Path:
+def sample_qc_table(tmp_path_factory) -> Path:
     # GIVEN: All sample QC results (including contamination). NOTE: I am using
     # SNPweights ancestry b/c I don't have production GRAF output
     tmp_path = tmp_path_factory.mktemp("sample_level_summary")
@@ -72,7 +72,7 @@ def sample_qc_report(tmp_path_factory) -> Path:
         )
     )
 
-    # WHEN: I run snakemake to generate the sample_qc_report
+    # WHEN: I run snakemake to generate the sample_qc_table
     run_snakemake(tmp_path)
 
     return tmp_path / "sample_level/sample_qc.csv"
@@ -81,7 +81,7 @@ def sample_qc_report(tmp_path_factory) -> Path:
 @pytest.mark.workflow
 @pytest.mark.regression
 @pytest.mark.real_data
-def test_sample_qc_report(sample_qc_report):
+def test_sample_qc_table(sample_qc_table):
     # GIVEN: The sample qc report
     # THEN: This should be identical to the production outputs except for:
     exclude_cols = [
@@ -95,7 +95,7 @@ def test_sample_qc_report(sample_qc_report):
     ]
 
     obs_ = (
-        pd.read_csv(sample_qc_report)
+        pd.read_csv(sample_qc_table)
         .drop(exclude_cols, axis=1, errors="ignore")
         .sort_values("Sample_ID")
         .reset_index(drop=True)
@@ -112,7 +112,7 @@ def test_sample_qc_report(sample_qc_report):
 
 @pytest.mark.workflow
 @pytest.mark.real_data
-def test_sample_qc_stats(tmp_path, sample_qc_report):
+def test_sample_qc_stats(tmp_path, sample_qc_table):
     """Test the createion of summary_stats.txt
 
     I am not able to perform regression testing because there are some issues
@@ -144,7 +144,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_report):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copy(sample_qc_report, tmp_path / "sample_level/sample_qc.csv")
+    shutil.copy(sample_qc_table, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to create qc_summary_stats.txt
     run_snakemake(tmp_path)
@@ -156,7 +156,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_report):
 @pytest.mark.workflow
 @pytest.mark.regression
 @pytest.mark.real_data
-def test_qc_failures(tmp_path, sample_qc_report):
+def test_qc_failures(tmp_path, sample_qc_table):
     # GIVEN: real data sample sheet, config, and sample_qc_summary table.
     data_cache = (
         RealData(tmp_path)
@@ -182,7 +182,7 @@ def test_qc_failures(tmp_path, sample_qc_report):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copy(sample_qc_report, tmp_path / "sample_level/sample_qc.csv")
+    shutil.copy(sample_qc_table, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to create qc_summary_stats.txt
     run_snakemake(tmp_path)

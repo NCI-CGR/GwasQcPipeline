@@ -19,7 +19,7 @@ def data_cache_and_cfg(tmp_path_factory, pytestconfig):
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
-    session_tmp_path: Path = tmp_path_factory.mktemp("sample_qc_report_script")
+    session_tmp_path: Path = tmp_path_factory.mktemp("sample_qc_table_script")
     data_cache = (
         RealData(session_tmp_path, full_sample_sheet=False)
         .copy_sample_sheet()
@@ -37,7 +37,7 @@ def data_cache_and_cfg(tmp_path_factory, pytestconfig):
 @pytest.mark.skip(reason="Flaky test, need to look into it")
 @pytest.mark.parametrize("expected_sex_col", ["Expected_Sex", "LIMS_Individual_ID"])
 def test_wrangle_sample_sheet(data_cache_and_cfg, expected_sex_col):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _wrangle_sample_sheet
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _wrangle_sample_sheet
 
     # GIVEN: A test sample sheet and column to use as `Expected_Sex`
     _, cfg = data_cache_and_cfg
@@ -59,7 +59,7 @@ def test_wrangle_sample_sheet(data_cache_and_cfg, expected_sex_col):
 
 @pytest.mark.real_data
 def test_read_imiss_start(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_start
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss_start
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
     data_cache, cfg = data_cache_and_cfg
@@ -77,7 +77,7 @@ def test_read_imiss_start(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_imiss_cr1(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_cr1
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss_cr1
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
     data_cache, cfg = data_cache_and_cfg
@@ -96,7 +96,7 @@ def test_read_imiss_cr1(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_imiss_cr2(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_imiss_cr2
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss_cr2
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
     data_cache, cfg = data_cache_and_cfg
@@ -115,7 +115,7 @@ def test_read_imiss_cr2(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_sexcheck_cr1(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_sexcheck_cr1
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_sexcheck_cr1
 
     # GIVEN: A test sample sheet, real production outputs, and the expected sex
     # calls from the sample table
@@ -139,7 +139,7 @@ def test_read_sexcheck_cr1(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_ancestry_GRAF(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_ancestry
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_ancestry
 
     # GIVEN: A test sample sheet, example outputs from GRAF -pop, and a list of Sample_IDs
     _, cfg = data_cache_and_cfg
@@ -176,7 +176,7 @@ def test_read_ancestry_GRAF(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_known_replicates(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_known_replicates
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_known_replicates
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
     data_cache, cfg = data_cache_and_cfg
@@ -196,7 +196,7 @@ def test_read_known_replicates(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_unknown_replicates(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_unknown_replicates
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_unknown_replicates
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
     data_cache, cfg = data_cache_and_cfg
@@ -215,7 +215,7 @@ def test_read_unknown_replicates(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_contam(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_contam
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_contam
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
     data_cache, cfg = data_cache_and_cfg
@@ -237,7 +237,7 @@ def test_read_contam(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_contam_file_name_none(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_contam
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_contam
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
     _, cfg = data_cache_and_cfg
@@ -257,7 +257,7 @@ def test_read_contam_file_name_none(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_intensity(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_intensity
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_intensity
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
     data_cache, cfg = data_cache_and_cfg
@@ -276,7 +276,7 @@ def test_read_intensity(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_read_intensity_file_name_none(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _read_intensity
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_intensity
 
     # GIVEN: A test sample sheet, No production outputs, and a list of Sample_IDs
     _, cfg = data_cache_and_cfg
@@ -294,7 +294,7 @@ def test_read_intensity_file_name_none(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_check_idat_files(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _check_idats_files
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_idats_files
 
     # GIVEN: A test sample sheet and real production outputs
     _, cfg = data_cache_and_cfg
@@ -313,7 +313,7 @@ def test_check_idat_files(data_cache_and_cfg):
 
 @pytest.mark.real_data
 def test_check_idat_files_one_missing(data_cache_and_cfg):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _check_idats_files
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_idats_files
 
     # GIVEN: A test sample sheet, real production outputs, and a fake sample
     # with missing Idat files.
@@ -339,7 +339,7 @@ def test_check_idat_files_one_missing(data_cache_and_cfg):
 
 
 def test_identifiler_reason():
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _identifiler_reason
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _identifiler_reason
 
     df = pd.DataFrame(
         {
@@ -356,7 +356,7 @@ def test_identifiler_reason():
 
 
 def test_find_study_subject_representative():
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import _find_study_subject_representative
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _find_study_subject_representative
 
     # GIVEN: A slimmed down QC report
     df = pd.read_csv(
@@ -392,7 +392,7 @@ def test_find_study_subject_representative():
 
 
 def test_find_study_subject_with_no_representative():
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import (
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import (
         _find_study_subject_with_no_representative,
     )
 

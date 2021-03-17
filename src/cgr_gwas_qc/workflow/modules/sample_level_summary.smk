@@ -27,7 +27,7 @@ def _intensity(wildcards):
     return []
 
 
-rule sample_qc_report:
+rule sample_qc_table:
     input:
         imiss_start="sample_level/samples.imiss",
         imiss_cr1="sample_level/call_rate_1/samples.imiss",
@@ -41,12 +41,12 @@ rule sample_qc_report:
     output:
         all_samples="sample_level/sample_qc.csv",
     script:
-        "../scripts/sample_qc_report.py"
+        "../scripts/sample_qc_table.py"
 
 
 rule sample_qc_report_summary_stats:
     input:
-        rules.sample_qc_report.output.all_samples,
+        rules.sample_qc_table.output.all_samples,
     output:
         "sample_level/qc_summary_stats.txt",
     script:
@@ -55,7 +55,7 @@ rule sample_qc_report_summary_stats:
 
 rule sample_lists_from_qc_flags:
     input:
-        all_samples=rules.sample_qc_report.output.all_samples,
+        all_samples=rules.sample_qc_table.output.all_samples,
     output:
         cr="sample_level/qc_failures/low_call_rate.txt",
         contam="sample_level/qc_failures/contaminated.txt",
