@@ -34,7 +34,7 @@ QC_HEADER = {  # Header for main QC table
     "internal_control": "boolean",
     "case_control": CASE_CONTROL_DTYPE,
     "expected_sex": SEX_DTYPE,
-    "Predicted_Sex": SEX_DTYPE,
+    "predicted_sex": SEX_DTYPE,
     "IdatsInProjectDir": "boolean",
     "IdatIntensity": "float",
     "ChrX_Inbreed_estimate": "float",
@@ -278,7 +278,7 @@ def _read_imiss_cr2(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
 def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame:
     """Read sex predictions and summarize.
 
-    Read PLINK sex prediction file. Convert the `Predicted_Sex` indicator
+    Read PLINK sex prediction file. Convert the `predicted_sex` indicator
     variable to M/F designations. Compare predicted results with the expected
     sexes and create a summary column `sex_discordant` if predicted/expected sex
     calls do not match.
@@ -288,7 +288,7 @@ def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame
             - Sample_ID (pd.Index)
             - ChrX_Inbreed_estimate (float64): PLINK's inbreeding coefficient
               from sexcheck.
-            - Predicted_Sex (str): M/F/U based on PLINK sex predictions.
+            - predicted_sex (str): M/F/U based on PLINK sex predictions.
               are different. U if prediction was U.
             - sex_discordant (bool): True if SexMatch == "N"
     """
@@ -297,23 +297,23 @@ def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame
         pd.read_csv(file_name, delim_whitespace=True)
         .rename({"IID": "Sample_ID", "F": "ChrX_Inbreed_estimate"}, axis=1)
         .set_index("Sample_ID")
-        .assign(Predicted_Sex=lambda x: x.SNPSEX.map(plink_sex_code))
-        .astype({"Predicted_Sex": SEX_DTYPE})
+        .assign(predicted_sex=lambda x: x.SNPSEX.map(plink_sex_code))
+        .astype({"predicted_sex": SEX_DTYPE})
         .reindex(expected_sex.index)
-        .reindex(["ChrX_Inbreed_estimate", "Predicted_Sex"], axis=1)
+        .reindex(["ChrX_Inbreed_estimate", "predicted_sex"], axis=1)
     )
 
-    # Update PLINK Predicted_Sex Calls
+    # Update PLINK predicted_sex Calls
     # TODO: Decide if we want to keep this logic from the legacy workflow. See
     # http://10.133.130.114/jfear/GwasQcPipeline/issues/35
-    df.loc[df.ChrX_Inbreed_estimate < 0.5, "Predicted_Sex"] = "F"
-    df.loc[df.ChrX_Inbreed_estimate >= 0.5, "Predicted_Sex"] = "M"
+    df.loc[df.ChrX_Inbreed_estimate < 0.5, "predicted_sex"] = "F"
+    df.loc[df.ChrX_Inbreed_estimate >= 0.5, "predicted_sex"] = "M"
 
     # Note: This seems redundant but the legacy workflow has both of these flags.
     # indicator flag
-    df["sex_discordant"] = (df.Predicted_Sex != expected_sex).astype("boolean")
+    df["sex_discordant"] = (df.predicted_sex != expected_sex).astype("boolean")
     df.loc[
-        df.ChrX_Inbreed_estimate.isnull() | (df.Predicted_Sex == "U"), "sex_discordant"
+        df.ChrX_Inbreed_estimate.isnull() | (df.predicted_sex == "U"), "sex_discordant"
     ] = pd.NA  # If we could not predict sex then label as U
 
     return df

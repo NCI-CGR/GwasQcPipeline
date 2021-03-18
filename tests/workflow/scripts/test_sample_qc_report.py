@@ -134,7 +134,7 @@ def test_read_sexcheck_cr1(data_cache_and_cfg):
 
     # THEN: Basic properties
     assert df.index.name == "Sample_ID"
-    assert df.Predicted_Sex.dtype == pd.CategoricalDtype(categories=["M", "F", "U"])
+    assert df.predicted_sex.dtype == pd.CategoricalDtype(categories=["M", "F", "U"])
     assert isinstance(df.sex_discordant.dtype, pd.BooleanDtype)
     assert df.ChrX_Inbreed_estimate.dtype is np.dtype("float64")
 
