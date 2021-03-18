@@ -122,19 +122,18 @@ def test_read_sexcheck_cr1(data_cache_and_cfg):
     data_cache, cfg = data_cache_and_cfg
     file_name = data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
     expected_sex_calls = cfg.ss.set_index("Sample_ID")["Expected_Sex"]
+    expected_sex_calls[
+        "SB_missing_sample"
+    ] = "F"  # add an extra sample to check how missing values are handled
 
     # WHEN: read the sexcheck table
     df = _read_sexcheck_cr1(file_name, expected_sex_calls)
 
     # THEN: Basic properties
-    assert isinstance(df, pd.DataFrame)
     assert df.index.name == "Sample_ID"
-    assert "ChrX_Inbreed_estimate" in df.columns
-    assert "Predicted_Sex" in df.columns
-    assert "SexMatch" in df.columns
-    assert "Sex Discordant" in df.columns
-    assert df.dtypes["Sex Discordant"] is np.dtype("bool")
-    assert df.dtypes["ChrX_Inbreed_estimate"] is np.dtype("float64")
+    assert df.Predicted_Sex.dtype == pd.CategoricalDtype(categories=["M", "F", "U"])
+    assert isinstance(df.sex_discordant.dtype, pd.BooleanDtype)
+    assert df.ChrX_Inbreed_estimate.dtype is np.dtype("float64")
 
 
 @pytest.mark.real_data

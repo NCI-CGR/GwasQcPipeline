@@ -22,10 +22,51 @@ from cgr_gwas_qc.validators import check_file
 
 app = typer.Typer(add_completion=False)
 
+QC_HEADER = {  # Header for main QC table
+    "SR_Subject_ID": "string",
+    "Count_of_SR_SubjectID": "UInt8",
+    "LIMS_Individual_ID": "string",
+    "Project": "string",
+    "Sample_ID": "string",
+    "Project-Sample ID": "string",
+    "LIMSSample_ID": "string",
+    "IdatsInProjectDir": "boolean",
+    "IdatIntensity": "float",
+    "Expected_Sex": "category",
+    "Predicted_Sex": "category",
+    "ChrX_Inbreed_estimate": "float",
+    "AFR": "float",
+    "EUR": "float",
+    "ASN": "float",
+    "Ancestry": "category",
+    "Contamination_Rate": "float",
+    "Call_Rate_Initial": "float",
+    "Call_Rate_1_filter": "boolean",
+    "Call_Rate_1": "float",
+    "Call_Rate_2_filter": "boolean",
+    "Call_Rate_2": "float",
+    # TO-ADD: Any column names you want saved to the output table
+    "Low Call Rate": "boolean",
+    "Contaminated": "boolean",
+    "sex_discordant": "boolean",
+    "Expected Replicate Discordance": "boolean",
+    "Unexpected Replicate": "boolean",
+    # TO-ADD: Any binary flags you want saved to the output table
+    "Count_of_QC_Issue": "UInt8",
+    "Identifiler_Needed": "boolean",
+    "Identifiler_Reason": "string",
+    "Internal_Control": "boolean",
+    "Group_By_Subject_ID": "string",
+    "Case/Control_Status": "category",
+    "Subject_Representative": "boolean",
+    "Subject_Dropped_From_Study": "boolean",
+}
+
+
 QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
     "Low Call Rate",
     "Contaminated",
-    "Sex Discordant",
+    "sex_discordant",
     "Expected Replicate Discordance",
     "Unexpected Replicate",
     # TO-ADD: If you create a new summary binary flag you want to include
@@ -34,56 +75,11 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
 
 IDENTIFILER_FLAGS = [  # Set of binary flags used to determine if we need to run identifiler
     "Contaminated",
-    "Sex Discordant",
+    "sex_discordant",
     "Expected Replicate Discordance",
     "Unexpected Replicate",
     # TO-ADD: If you create a new binary flag do determine if you run
     # identifilder.
-]
-
-QC_HEADER = [  # Header for main QC table
-    "SR_Subject_ID",
-    "Count_of_SR_SubjectID",
-    "SR",
-    "Current_Subject_Status",
-    "Subject_Notes",
-    "LIMS_Individual_ID",
-    "Project",
-    "Sample_ID",
-    "Project-Sample ID",
-    "LIMSSample_ID",
-    "Sample_Status",
-    "IdatsInProjectDir",
-    "IdatIntensity",
-    "Expected_Sex",
-    "Predicted_Sex",
-    "SexMatch",
-    "ChrX_Inbreed_estimate",
-    "AFR",
-    "EUR",
-    "ASN",
-    "Ancestry",
-    "Contamination_Rate",
-    "Call_Rate_Initial",
-    "Call_Rate_1_filter",
-    "Call_Rate_1",
-    "Call_Rate_2_filter",
-    "Call_Rate_2",
-    # TO-ADD: Any column names you want saved to the output table
-    "Low Call Rate",
-    "Contaminated",
-    "Sex Discordant",
-    "Expected Replicate Discordance",
-    "Unexpected Replicate",
-    # TO-ADD: Any binary flags you want saved to the output table
-    "Count_of_QC_Issue",
-    "Identifiler_Needed",
-    "Identifiler_Reason",
-    "Internal_Control",
-    "Group_By_Subject_ID",
-    "Case/Control_Status",
-    "Subject_Representative",
-    "Subject_Dropped_From_Study",
 ]
 
 
@@ -281,28 +277,29 @@ def _read_sexcheck_cr1(file_name: Path, Expected_Sex: pd.Series) -> pd.DataFrame
 
     Read PLINK sex prediction file. Convert the `Predicted_Sex` indicator
     variable to M/F designations. Compare predicted results with the expected
-    sexes and create a summary column `SexMatch` if predicted/expected sex
-    calls match. Then flag samples as `Sex Discordant` if sex was predicted
-    to be different than expected.
+    sexes and create a summary column `sex_discordant` if predicted/expected sex
+    calls do not match.
 
     Returns:
         pd.DataFrame:
             - Sample_ID (pd.Index)
-            - ChrX_Inbreed_estimate (float): PLINK's inbreeding coefficient
+            - ChrX_Inbreed_estimate (float64): PLINK's inbreeding coefficient
               from sexcheck.
             - Predicted_Sex (str): M/F/U based on PLINK sex predictions.
-            - SexMatch (str): Y if expected and predicted are equal. N if they
               are different. U if prediction was U.
-            - Sex Discordant (bool): True if SexMatch == "N"
+            - sex_discordant (bool): True if SexMatch == "N"
     """
     df = (
         pd.read_csv(file_name, delim_whitespace=True)
         .rename({"IID": "Sample_ID", "F": "ChrX_Inbreed_estimate"}, axis=1)
         .set_index("Sample_ID")
-        .assign(Predicted_Sex=lambda x: x.SNPSEX.map({1: "M", 2: "F"}))
+        .assign(
+            Predicted_Sex=lambda x: pd.Categorical(
+                x.SNPSEX.map({0: "U", 1: "M", 2: "F"}), categories=["M", "F", "U"]
+            )
+        )
         .reindex(Expected_Sex.index)
-        .fillna({"Predicted_Sex": "U"})
-        .loc[:, ["ChrX_Inbreed_estimate", "Predicted_Sex"]]
+        .reindex(["ChrX_Inbreed_estimate", "Predicted_Sex"], axis=1)
     )
 
     # Update PLINK Predicted_Sex Calls
@@ -313,11 +310,10 @@ def _read_sexcheck_cr1(file_name: Path, Expected_Sex: pd.Series) -> pd.DataFrame
 
     # Note: This seems redundant but the legacy workflow has both of these flags.
     # indicator flag
-    df["SexMatch"] = np.where(Expected_Sex == df.Predicted_Sex, "Y", "N")
-    df.loc[df.Predicted_Sex == "U", "SexMatch"] = "U"  # If we could not predict sex then label as U
-
-    # bool flag
-    df["Sex Discordant"] = df.SexMatch.replace({"N": True, "Y": False, "U": np.nan})
+    df["sex_discordant"] = (df.Predicted_Sex != Expected_Sex).astype("boolean")
+    df.loc[
+        df.ChrX_Inbreed_estimate.isnull() | (df.Predicted_Sex == "U"), "sex_discordant"
+    ] = pd.NA  # If we could not predict sex then label as U
 
     return df
 
@@ -547,10 +543,10 @@ def _identifiler_reason(df: pd.DataFrame, cols: List[str]):
     concatenate the column names.
 
     Example:
-        >>> cols = ["Sex Discordant", "Contaminated"]
+        >>> cols = ["sex_discordant", "Contaminated"]
         >>> df.values == np.ndarray([[True, True], [True, False], [False, False]])
         >>> _identifiler_reason(df, cols)
-        pd.Series(["Sex Discordant;Contaminated", "Sex Discordant", ""])
+        pd.Series(["sex_discordant;Contaminated", "sex_discordant", ""])
     """
 
     def reason_string(row: pd.Series) -> str:
@@ -614,7 +610,7 @@ def _find_study_subject_with_no_representative(df: pd.DataFrame) -> pd.Series:
 
 def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
     """Save main QC table."""
-    df.reindex(QC_HEADER, axis=1).to_csv(file_name, index=False)
+    df.reindex(QC_HEADER.keys(), axis=1).to_csv(file_name, index=False)
 
 
 if __name__ == "__main__":
