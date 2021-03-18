@@ -22,18 +22,21 @@ from cgr_gwas_qc.validators import check_file
 
 app = typer.Typer(add_completion=False)
 
+SEX_DTYPE = pd.CategoricalDtype(categories=["M", "F", "U"])
+CASE_CONTROL_DTYPE = pd.CategoricalDtype(categories=["case", "control", "qc"])
+
 QC_HEADER = {  # Header for main QC table
-    "SR_Subject_ID": "string",
-    "Count_of_SR_SubjectID": "UInt8",
-    "LIMS_Individual_ID": "string",
-    "Project": "string",
+    # From Sample Sheet
     "Sample_ID": "string",
-    "Project-Sample ID": "string",
-    "LIMSSample_ID": "string",
+    "Group_By_Subject_ID": "string",
+    # Generated here
+    "num_samples_per_subject": "UInt8",
+    "internal_control": "boolean",
+    "case_control": CASE_CONTROL_DTYPE,
+    "expected_sex": SEX_DTYPE,
+    "Predicted_Sex": SEX_DTYPE,
     "IdatsInProjectDir": "boolean",
     "IdatIntensity": "float",
-    "Expected_Sex": "category",
-    "Predicted_Sex": "category",
     "ChrX_Inbreed_estimate": "float",
     "AFR": "float",
     "EUR": "float",
@@ -55,9 +58,6 @@ QC_HEADER = {  # Header for main QC table
     "Count_of_QC_Issue": "UInt8",
     "Identifiler_Needed": "boolean",
     "Identifiler_Reason": "string",
-    "Internal_Control": "boolean",
-    "Group_By_Subject_ID": "string",
-    "Case/Control_Status": "category",
     "Subject_Representative": "boolean",
     "Subject_Dropped_From_Study": "boolean",
 }
@@ -157,52 +157,55 @@ def main(
     _save_qc_table(df, all_samples)
 
 
-def _case_control_encoder(x):
-    _map = {"control": 0, "case": 1, "qc": 2}
-    return _map.get(x.lower(), 3)
-
-
 def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
     """Identify expected sex column and count number samples per subject.
 
     Users can specify which column in the `sample_sheet` holds the expected
-    sex information (`config.workflow_params.expected_sex_col_name`). While the QC
-    report calls this column `Expected_Sex`. Here we rename
-    `expected_sex_col_name` to "Expected_Sex".
+    sex information (`config.workflow_params.expected_sex_col_name`). Here we
+    rename `expected_sex_col_name` to `expected_sex`.
 
     We also add the summary column with the number of `Sample_ID`s per
-    `SR_Subject_ID`.
+    `Group_By_Subject_ID`.
 
     Returns:
         pd.DataFrame: The full sample sheet with the following adjustments.
             - Sample_ID (pd.Index)
-            - Expected_Sex (str): M/F based on the expected set column set in
-              the config.
-            - Count_of_SR_SubjectID (int): Number of `Sample_ID`s per
-              `SR_SubjectID`.
+            - num_samples_per_subject (int): Number of samples per
+              `Group_By_Subject_ID`.
+            - expected_sex (category): M/F/U based on the expected set column
+              set in the config.
+            - case_control (category): case/control/qc based on the
+              Case/Control_Status in the sample sheet.
     """
     _df = df.copy()
 
-    # Add Internal_Control Flag
-    _df["Internal_Control"] = _df.Sample_Group == "sVALD-001"
+    _df["internal_control"] = (_df.Sample_Group == "sVALD-001").astype("boolean")
 
-    # Set the user provided expected sex column as `Expected_Sex`. Note: by
-    # default this columns is already called `Expected_Sex`.
-    _df["Expected_Sex"] = _df[expected_sex_col_name]
+    sex_mapper = {"m": "M", "male": "M", "f": "F", "female": "F"}
+    _df["expected_sex"] = (
+        _df[expected_sex_col_name]
+        .str.lower()
+        .map(lambda sex: sex_mapper.get(sex, "U"))
+        .astype(SEX_DTYPE)
+    )
 
-    # For internal controls use the `Indentifiler_Sex` column as `Expected_Sex`
-    _df.loc[_df.Internal_Control, "Expected_Sex"] = _df.loc[_df.Internal_Control, "Identifiler_Sex"]
+    _df["case_control"] = (
+        _df["Case/Control_Status"]
+        .str.lower()
+        .map(lambda status: status if status in CASE_CONTROL_DTYPE.categories else pd.NA)
+        .astype(CASE_CONTROL_DTYPE)
+    )
 
-    # For internal controls make sure Case/Control_Status is QC
-    _df.loc[_df.Internal_Control, "Case/Control_Status"] = "QC"
+    # For internal controls use the `Indentifiler_Sex` column as `expected_sex`
+    _df.loc[_df.internal_control, "expected_sex"] = _df.loc[_df.internal_control, "Identifiler_Sex"]
 
-    # Convert Case/Control_status to numeric representation (control:0, case:1, qc:2, other:3)
-    _df["Case/Control_Status"] = _df["Case/Control_Status"].map(_case_control_encoder)
+    # For internal controls set case_control to qc
+    _df.loc[_df.internal_control, "case_control"] = "qc"
 
     # Count the number of samples per subject ID and set Sample_ID as index
     return _df.merge(
-        df.groupby("SR_Subject_ID", dropna=False).size().rename("Count_of_SR_SubjectID"),
-        on="SR_Subject_ID",
+        df.groupby("Group_By_Subject_ID", dropna=False).size().rename("num_samples_per_subject"),
+        on="Group_By_Subject_ID",
     ).set_index("Sample_ID")
 
 
@@ -272,7 +275,7 @@ def _read_imiss_cr2(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     )
 
 
-def _read_sexcheck_cr1(file_name: Path, Expected_Sex: pd.Series) -> pd.DataFrame:
+def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame:
     """Read sex predictions and summarize.
 
     Read PLINK sex prediction file. Convert the `Predicted_Sex` indicator
@@ -289,16 +292,14 @@ def _read_sexcheck_cr1(file_name: Path, Expected_Sex: pd.Series) -> pd.DataFrame
               are different. U if prediction was U.
             - sex_discordant (bool): True if SexMatch == "N"
     """
+    plink_sex_code = {0: "U", 1: "M", 2: "F"}
     df = (
         pd.read_csv(file_name, delim_whitespace=True)
         .rename({"IID": "Sample_ID", "F": "ChrX_Inbreed_estimate"}, axis=1)
         .set_index("Sample_ID")
-        .assign(
-            Predicted_Sex=lambda x: pd.Categorical(
-                x.SNPSEX.map({0: "U", 1: "M", 2: "F"}), categories=["M", "F", "U"]
-            )
-        )
-        .reindex(Expected_Sex.index)
+        .assign(Predicted_Sex=lambda x: x.SNPSEX.map(plink_sex_code))
+        .astype({"Predicted_Sex": SEX_DTYPE})
+        .reindex(expected_sex.index)
         .reindex(["ChrX_Inbreed_estimate", "Predicted_Sex"], axis=1)
     )
 
@@ -310,7 +311,7 @@ def _read_sexcheck_cr1(file_name: Path, Expected_Sex: pd.Series) -> pd.DataFrame
 
     # Note: This seems redundant but the legacy workflow has both of these flags.
     # indicator flag
-    df["sex_discordant"] = (df.Predicted_Sex != Expected_Sex).astype("boolean")
+    df["sex_discordant"] = (df.Predicted_Sex != expected_sex).astype("boolean")
     df.loc[
         df.ChrX_Inbreed_estimate.isnull() | (df.Predicted_Sex == "U"), "sex_discordant"
     ] = pd.NA  # If we could not predict sex then label as U
@@ -575,7 +576,7 @@ def _find_study_subject_representative(df: pd.DataFrame) -> pd.Series:
     return (
         df.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
         .query(
-            "not Internal_Control & not Contaminated & not `Low Call Rate` & not `Expected Replicate Discordance`"
+            "not internal_control & not Contaminated & not `Low Call Rate` & not `Expected Replicate Discordance`"
         )
         .groupby("Group_By_Subject_ID")  # Group sample by suject id
         .apply(
@@ -602,7 +603,7 @@ def _find_study_subject_with_no_representative(df: pd.DataFrame) -> pd.Series:
               samples) has no representative sample.
     """
     subject_w_no_rep = (
-        df.query("not Internal_Control").groupby("Group_By_Subject_ID").Subject_Representative.sum()
+        df.query("not internal_control").groupby("Group_By_Subject_ID").Subject_Representative.sum()
         == 0
     ).pipe(lambda x: x.index[x])
     return df.Group_By_Subject_ID.isin(subject_w_no_rep)

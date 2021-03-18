@@ -5,7 +5,7 @@
 
     "Subject_ID", str, Subject ID
     "Sample_ID", str, Sample ID
-    "Case/Control_Status", str, Case/Control Status
+    "case_control", str, Case/Control Status
     "population", str, Population name
     "PC1", float, Principal component 1
     "PC2", float, Principal component 2
@@ -43,7 +43,7 @@ app = typer.Typer(add_completion=False)
 col_order = [
     "Subject_ID",
     "Sample_ID",
-    "Case/Control_Status",
+    "case_control",
     "population",
     "PC1",
     "PC2",
@@ -103,7 +103,7 @@ def add_metadata(df: pd.DataFrame, filename: Path):
     metadata = (
         pd.read_csv(filename)
         .query("Subject_Representative")
-        .reindex(["Group_By_Subject_ID", "Sample_ID", "Case/Control_Status"], axis=1)
+        .reindex(["Group_By_Subject_ID", "Sample_ID", "case_control"], axis=1)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
     )
     try:

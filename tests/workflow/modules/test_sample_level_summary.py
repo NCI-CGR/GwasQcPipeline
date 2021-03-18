@@ -87,11 +87,11 @@ def test_sample_qc_table(sample_qc_table):
     exclude_cols = [
         "IdatsInProjectDir",  # This column does not match b/c I did not have all the Idat files
         "Identifiler_Reason",  # New column
-        "Internal_Control",  # New column
+        "internal_control",  # New column
         "Group_By_Subject_ID",  # New column
         "Subject_Representative",  # New column
         "Subject_Dropped_From_Study",  # New column
-        "Case/Control_Status",  # New column
+        "case_control",  # New column
     ]
 
     obs_ = (

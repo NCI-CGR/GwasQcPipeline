@@ -10,6 +10,7 @@ from pandas.testing import assert_series_equal
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import RealData
+from cgr_gwas_qc.workflow.scripts.sample_qc_table import CASE_CONTROL_DTYPE, SEX_DTYPE
 
 
 @pytest.mark.real_data
@@ -33,25 +34,27 @@ def data_cache_and_cfg(tmp_path_factory, pytestconfig):
     return data_cache, cfg
 
 
+# @pytest.mark.skip(reason="Flaky test, need to look into it")
 @pytest.mark.real_data
-@pytest.mark.skip(reason="Flaky test, need to look into it")
-@pytest.mark.parametrize("expected_sex_col", ["Expected_Sex", "LIMS_Individual_ID"])
+@pytest.mark.parametrize("expected_sex_col", ["Expected_Sex", "Identifiler_Sex"])
 def test_wrangle_sample_sheet(data_cache_and_cfg, expected_sex_col):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _wrangle_sample_sheet
 
-    # GIVEN: A test sample sheet and column to use as `Expected_Sex`
+    # GIVEN: A test sample sheet and column to use as `expected_sex_col`
     _, cfg = data_cache_and_cfg
 
     # WHEN: I wrangle the sample sheet
     ss = _wrangle_sample_sheet(cfg.ss, expected_sex_col)
 
     # THEN: Basic properties
-    assert isinstance(ss, pd.DataFrame)
     assert ss.index.name == "Sample_ID"
+    assert isinstance(ss.internal_control.dtype, pd.BooleanDtype)
+    assert ss.expected_sex.dtype == SEX_DTYPE
+    assert ss.case_control.dtype == CASE_CONTROL_DTYPE
 
-    # The `Expected_Sex` column should be the same as the column passed as `expected_sex_col`
+    # The `expected_sex` column should be the same as the column passed as `expected_sex_col`
     assert_series_equal(
-        ss["Expected_Sex"].sort_index(),
+        ss.expected_sex.sort_index().astype("object"),
         cfg.ss.set_index("Sample_ID")[expected_sex_col].sort_index(),
         check_names=False,
     )
@@ -333,8 +336,8 @@ def test_check_idat_files_one_missing(data_cache_and_cfg):
     assert sr.name == "IdatsInProjectDir"
 
     # I should have 2 samples with idat files found and 1 missing these files.
-    assert sum(sr == "YES") == 2
-    assert sum(sr == "NO") == 1
+    assert sum(sr) == 2
+    assert sum(~sr) == 1
 
 
 def test_identifiler_reason():
@@ -362,7 +365,7 @@ def test_find_study_subject_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Call_Rate_2,Low Call Rate,Contaminated,Expected Replicate Discordance,Internal_Control
+        Group_By_Subject_ID,Sample_ID,Call_Rate_2,Low Call Rate,Contaminated,Expected Replicate Discordance,internal_control
         SB001,S001,.98,False,False,False,False
         SB002,S002,.98,False,False,False,False
         SB002,S003,.99,False,False,False,False
@@ -400,7 +403,7 @@ def test_find_study_subject_with_no_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Subject_Representative,Internal_Control
+        Group_By_Subject_ID,Sample_ID,Subject_Representative,internal_control
         SB001,S001,True,False
         SB001,S002,False,False
         SB002,S003,False,False

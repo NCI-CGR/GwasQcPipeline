@@ -141,7 +141,7 @@ checkpoint controls_per_population:
         output_path = Path(output[0])
         output_path.mkdir(exist_ok=True, parents=True)
 
-        df = pd.read_csv(input[0]).query("Subject_Representative & `Case/Control_Status` == 0")
+        df = pd.read_csv(input[0]).query("Subject_Representative & case_control == 'control'")
         for pop_, grp in df.groupby("Ancestry"):
             if grp.shape[0] < params.threshold:
                 # Too few controls to analyze population

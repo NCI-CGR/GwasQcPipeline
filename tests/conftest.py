@@ -197,7 +197,6 @@ def sample_qc(tmp_path_factory) -> Path:
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import (
         IDENTIFILER_FLAGS,
         QC_HEADER,
-        _case_control_encoder,
         _find_study_subject_representative,
         _find_study_subject_with_no_representative,
         _identifiler_reason,
@@ -210,10 +209,9 @@ def sample_qc(tmp_path_factory) -> Path:
     ss = (
         SampleSheet(data_cache / "original_data/manifest_full.csv")
         .add_group_by_column("PI_Subject_ID")
-        .data.assign(Internal_Control=lambda x: x.Sample_Group == "sVALD-001")
-        .reindex(
-            ["Sample_ID", "Group_By_Subject_ID", "Internal_Control", "Case/Control_Status"], axis=1
-        )
+        .data.assign(internal_control=lambda x: x.Sample_Group == "sVALD-001")
+        .assign(case_control=lambda x: x["Case/Control_status"].str.lower())
+        .reindex(["Sample_ID", "Group_By_Subject_ID", "internal_control", "case_control"], axis=1)
     )
 
     legacy_qc_table = pd.read_csv(data_cache / "production_outputs/all_sample_qc.csv").merge(
@@ -221,14 +219,12 @@ def sample_qc(tmp_path_factory) -> Path:
     )
 
     # Use functions from QC script to add other columns
-    legacy_qc_table["Case/Control_Status"] = legacy_qc_table["Case/Control_Status"].map(
-        _case_control_encoder
-    )
+    legacy_qc_table["case_control"] = legacy_qc_table["Case/Control_Status"].str.lower()
     legacy_qc_table["Identifiler_Reason"] = _identifiler_reason(legacy_qc_table, IDENTIFILER_FLAGS)
     legacy_qc_table["Subject_Representative"] = _find_study_subject_representative(legacy_qc_table)
     legacy_qc_table["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(
         legacy_qc_table
     )
 
-    legacy_qc_table.reindex(QC_HEADER, axis=1).to_csv(tmp_path / "qc.csv", index=False)
+    legacy_qc_table.reindex(QC_HEADER.keys(), axis=1).to_csv(tmp_path / "qc.csv", index=False)
     return tmp_path / "qc.csv"

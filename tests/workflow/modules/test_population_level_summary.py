@@ -465,7 +465,7 @@ def test_phony_population_missing_controls(tmp_path, conda_envs, sample_qc):
     (tmp_path / "sample_level").mkdir()
     (
         pd.read_csv(sample_qc)
-        .assign(**{"Case/Control_Status": 1})
+        .assign(**{"case_control": "case"})
         .to_csv(tmp_path / "sample_level/sample_qc.csv")
     )
 
