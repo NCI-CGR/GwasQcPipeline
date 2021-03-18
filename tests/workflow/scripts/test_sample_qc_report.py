@@ -136,7 +136,7 @@ def test_read_sexcheck_cr1(data_cache_and_cfg):
     assert df.index.name == "Sample_ID"
     assert df.predicted_sex.dtype == pd.CategoricalDtype(categories=["M", "F", "U"])
     assert isinstance(df.sex_discordant.dtype, pd.BooleanDtype)
-    assert df.ChrX_Inbreed_estimate.dtype is np.dtype("float64")
+    assert df.X_inbreeding_coefficient.dtype is np.dtype("float64")
 
 
 @pytest.mark.real_data
@@ -381,7 +381,7 @@ def test_find_study_subject_representative():
         index_col="Sample_ID",
     )
 
-    # WHEN: I loook for the representative sample for each Subject Group
+    # WHEN: I look for the representative sample for each Subject Group
     # THEN: observed should be the same as expected.
     obs_ = _find_study_subject_representative(df)
     exp_ = pd.Series(

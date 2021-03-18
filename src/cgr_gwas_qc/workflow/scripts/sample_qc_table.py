@@ -35,9 +35,9 @@ QC_HEADER = {  # Header for main QC table
     "case_control": CASE_CONTROL_DTYPE,
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
+    "X_inbreeding_coefficient": "float",
     "IdatsInProjectDir": "boolean",
     "IdatIntensity": "float",
-    "ChrX_Inbreed_estimate": "float",
     "AFR": "float",
     "EUR": "float",
     "ASN": "float",
@@ -79,7 +79,7 @@ IDENTIFILER_FLAGS = [  # Set of binary flags used to determine if we need to run
     "Expected Replicate Discordance",
     "Unexpected Replicate",
     # TO-ADD: If you create a new binary flag do determine if you run
-    # identifilder.
+    # identifiler.
 ]
 
 
@@ -286,7 +286,7 @@ def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame
     Returns:
         pd.DataFrame:
             - Sample_ID (pd.Index)
-            - ChrX_Inbreed_estimate (float64): PLINK's inbreeding coefficient
+            - X_inbreeding_coefficient (float64): PLINK's inbreeding coefficient
               from sexcheck.
             - predicted_sex (str): M/F/U based on PLINK sex predictions.
               are different. U if prediction was U.
@@ -295,25 +295,25 @@ def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame
     plink_sex_code = {0: "U", 1: "M", 2: "F"}
     df = (
         pd.read_csv(file_name, delim_whitespace=True)
-        .rename({"IID": "Sample_ID", "F": "ChrX_Inbreed_estimate"}, axis=1)
+        .rename({"IID": "Sample_ID", "F": "X_inbreeding_coefficient"}, axis=1)
         .set_index("Sample_ID")
         .assign(predicted_sex=lambda x: x.SNPSEX.map(plink_sex_code))
         .astype({"predicted_sex": SEX_DTYPE})
         .reindex(expected_sex.index)
-        .reindex(["ChrX_Inbreed_estimate", "predicted_sex"], axis=1)
+        .reindex(["X_inbreeding_coefficient", "predicted_sex"], axis=1)
     )
 
     # Update PLINK predicted_sex Calls
     # TODO: Decide if we want to keep this logic from the legacy workflow. See
     # http://10.133.130.114/jfear/GwasQcPipeline/issues/35
-    df.loc[df.ChrX_Inbreed_estimate < 0.5, "predicted_sex"] = "F"
-    df.loc[df.ChrX_Inbreed_estimate >= 0.5, "predicted_sex"] = "M"
+    df.loc[df.X_inbreeding_coefficient < 0.5, "predicted_sex"] = "F"
+    df.loc[df.X_inbreeding_coefficient >= 0.5, "predicted_sex"] = "M"
 
     # Note: This seems redundant but the legacy workflow has both of these flags.
     # indicator flag
     df["sex_discordant"] = (df.predicted_sex != expected_sex).astype("boolean")
     df.loc[
-        df.ChrX_Inbreed_estimate.isnull() | (df.predicted_sex == "U"), "sex_discordant"
+        df.X_inbreeding_coefficient.isnull() | (df.predicted_sex == "U"), "sex_discordant"
     ] = pd.NA  # If we could not predict sex then label as U
 
     return df
@@ -440,8 +440,6 @@ def _read_unknown_replicates(file_name: Path, Sample_IDs: pd.Index) -> pd.Series
 
     return sr
 
-    pass
-
 
 def _read_contam(
     file_name: Optional[Path], contam_threshold: float, Sample_IDs: pd.Index
@@ -506,7 +504,7 @@ def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
     """Check that red and green IDAT files exist.
 
     Args:
-        df: A sample table with at least `Sampel_ID` and columns needed to fill wildcards.
+        df: A sample table with at least `Sample_ID` and columns needed to fill wildcards.
         red: A wildcard pattern for red files. Wildcards must be in `df`.
         green: A wildcard pattern for green files. Wildcards must be in `df`.
 
@@ -578,7 +576,7 @@ def _find_study_subject_representative(df: pd.DataFrame) -> pd.Series:
         .query(
             "not internal_control & not Contaminated & not `Low Call Rate` & not `Expected Replicate Discordance`"
         )
-        .groupby("Group_By_Subject_ID")  # Group sample by suject id
+        .groupby("Group_By_Subject_ID")  # Group sample by subject id
         .apply(
             lambda x: x.Call_Rate_2 == x.Call_Rate_2.max()
         )  # Select the sample with highest call rate as representative
