@@ -308,7 +308,7 @@ def test_check_idat_files(data_cache_and_cfg):
     assert sr.name == "IdatsInProjectDir"
 
     # All idat files should be found
-    assert all(sr == "YES")
+    assert all(sr)
 
 
 @pytest.mark.real_data

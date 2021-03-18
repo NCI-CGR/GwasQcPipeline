@@ -520,7 +520,7 @@ def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
     """
     if cfg.config.user_files.idat_pattern is None:
         # No Idat path specified in config, return all NaN.
-        return pd.Series(index=cfg.ss.Sample_ID, dtype="object", name="IdatsInProjectDir")
+        return pd.Series(index=cfg.ss.Sample_ID, dtype="boolean", name="IdatsInProjectDir")
 
     results = []
     for Sample_ID, red, green in zip(
@@ -531,11 +531,13 @@ def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
         try:
             check_file(Path(red))
             check_file(Path(green))
-            results.append((Sample_ID, "YES"))
+            results.append((Sample_ID, True))
         except (FileNotFoundError, PermissionError):
-            results.append((Sample_ID, "NO"))
+            results.append((Sample_ID, False))
 
-    return pd.Series(dict(results)).rename_axis("Sample_ID").rename("IdatsInProjectDir")
+    return pd.Series(dict(results), dtype="boolean", name="IdatsInProjectDir").rename_axis(
+        "Sample_ID"
+    )
 
 
 def _identifiler_reason(df: pd.DataFrame, cols: List[str]):
