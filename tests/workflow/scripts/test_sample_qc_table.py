@@ -324,7 +324,7 @@ def test_identifiler_reason():
 
     df = pd.DataFrame(
         {
-            "Identifiler_Needed": [False, True, True, True],
+            "identifiler_needed": [False, True, True, True],
             "one": [False, True, False, True],
             "two": [False, True, True, True],
             "three": [False, False, False, True],

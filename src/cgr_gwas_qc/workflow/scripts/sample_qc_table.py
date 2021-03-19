@@ -62,7 +62,7 @@ QC_HEADER = {  # Header for main QC table
     "is_replicate_discordant": "boolean",
     "is_unexpected_replicate": "boolean",
     "Count_of_QC_Issue": "UInt8",
-    "Identifiler_Needed": "boolean",
+    "identifiler_needed": "boolean",
     "Identifiler_Reason": "string",
     "Subject_Representative": "boolean",
     "Subject_Dropped_From_Study": "boolean",
@@ -175,7 +175,7 @@ def main(
     sample_qc["Count_of_QC_Issue"] = sample_qc[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
 
     # Add a flag to run identifiler based if any of these columns are True
-    sample_qc["Identifiler_Needed"] = sample_qc[IDENTIFILER_FLAGS].any(axis=1)
+    sample_qc["identifiler_needed"] = sample_qc[IDENTIFILER_FLAGS].any(axis=1)
     sample_qc["Identifiler_Reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
 
     # Add flag for which samples to keep as subject
@@ -544,7 +544,7 @@ def _check_idats_files(sample_sheet: pd.DataFrame, idat_pattern: Optional[Idat])
 def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
     """Summary string of the reason for needing identifiler.
 
-    If `Identifiler_Needed` then, if the binary flag in `cols` is True, then
+    If `identifiler_needed` then, if the binary flag in `cols` is True, then
     concatenate the column names.
 
     Example:
@@ -555,7 +555,7 @@ def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
     """
 
     def reason_string(row: pd.Series) -> str:
-        if row.Identifiler_Needed:
+        if row.identifiler_needed:
             flags = row[cols].fillna(False)
             return ";".join(IDENTIFILER_FLAGS.get(x, x) for x in flags.index[flags])
         return ""

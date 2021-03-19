@@ -58,7 +58,7 @@ rule lab_identifiler_needed:
     run:
         (
             pd.read_csv(input[0])
-            .query("Identifiler_Needed")
+            .query("identifiler_needed")
             .rename(REPORT_NAME_MAPPER, axis=1)
             .reindex(
                 [
