@@ -57,7 +57,7 @@ QC_HEADER = {  # Header for main QC table
     "is_cr2_filtered": "boolean",
     "Call_Rate_2": "float",
     "is_call_rate_filtered": "boolean",
-    "Contaminated": "boolean",
+    "is_contaminated": "boolean",
     "sex_discordant": "boolean",
     "Expected Replicate Discordance": "boolean",
     "Unexpected Replicate": "boolean",
@@ -71,7 +71,7 @@ QC_HEADER = {  # Header for main QC table
 
 QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
     "is_call_rate_filtered",
-    "Contaminated",
+    "is_contaminated",
     "sex_discordant",
     "Expected Replicate Discordance",
     "Unexpected Replicate",
@@ -80,7 +80,7 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
 ]
 
 IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run identifiler
-    "Contaminated": "Contaminated",
+    "is_contaminated": "Contaminated",
     "sex_discordant": "Sex Discordant",
     "Expected Replicate Discordance": "Expected Replicate Discordance",
     "Unexpected Replicate": "Unexpected Replicate",
@@ -460,12 +460,12 @@ def _read_contam(
             - Sample_ID (pd.index)
             - Contamination_Rate (float): The contamination rate as estimated
               by verifyIDintensity.
-            - Contaminated (bool): True if the contamination rate is greater
+            - is_contaminated (bool): True if the contamination rate is greater
               than the supplied threshold.
     """
 
     if file_name is None:
-        return pd.DataFrame(index=Sample_IDs, columns=["Contamination_Rate", "Contaminated"])
+        return pd.DataFrame(index=Sample_IDs, columns=["Contamination_Rate", "is_contaminated"])
 
     df = (
         pd.read_csv(file_name)
@@ -473,10 +473,10 @@ def _read_contam(
         .set_index("Sample_ID")
     )
 
-    df["Contaminated"] = df.Contamination_Rate > contam_threshold
-    df.loc[df.Contamination_Rate.isna(), "Contaminated"] = False
+    df["is_contaminated"] = df.Contamination_Rate > contam_threshold
+    df.loc[df.Contamination_Rate.isna(), "is_contaminated"] = False
 
-    return df.reindex(Sample_IDs)[["Contamination_Rate", "Contaminated"]]
+    return df.reindex(Sample_IDs)[["Contamination_Rate", "is_contaminated"]]
 
 
 def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Series:
@@ -548,10 +548,10 @@ def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
     concatenate the column names.
 
     Example:
-        >>> cols = ["sex_discordant", "Contaminated"]
+        >>> cols = ["sex_discordant", "is_contaminated"]
         >>> df.values == np.ndarray([[True, True], [True, False], [False, False]])
         >>> _identifiler_reason(df, cols)
-        pd.Series(["sex_discordant;Contaminated", "sex_discordant", ""])
+        pd.Series(["sex_discordant;is_contaminated", "sex_discordant", ""])
     """
 
     def reason_string(row: pd.Series) -> str:
@@ -568,7 +568,7 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
 
     We use a single representative sample for subject level analysis. First
     we remove all internal controls and poor quality samples (is_call_rate_filtered,
-    Contaminated, Replicate Discordance). For subject IDs with multiple
+    is_contaminated, Replicate Discordance). For subject IDs with multiple
     remaining samples, we select the sample that has the highest Call Rate 2.
 
     Returns:
@@ -580,7 +580,7 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     return (
         sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
         .query(
-            "not is_internal_control & not Contaminated & not is_call_rate_filtered & not `Expected Replicate Discordance`"
+            "not is_internal_control & not is_contaminated & not is_call_rate_filtered & not `Expected Replicate Discordance`"
         )
         .groupby("Group_By_Subject_ID")  # Group sample by subject id
         .apply(

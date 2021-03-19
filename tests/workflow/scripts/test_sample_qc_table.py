@@ -223,8 +223,8 @@ def test_read_contam(sample_ids_full):
     assert isinstance(df, pd.DataFrame)
     assert df.index.name == "Sample_ID"
     assert "Contamination_Rate" in df.columns
-    assert "Contaminated" in df.columns
-    assert df.dtypes["Contaminated"] is np.dtype("bool")
+    assert "is_contaminated" in df.columns
+    assert df.dtypes["is_contaminated"] is np.dtype("bool")
     assert df.dtypes["Contamination_Rate"] is np.dtype("float64")
 
 
@@ -243,7 +243,7 @@ def test_read_contam_file_name_none(sample_ids_full):
     assert isinstance(df, pd.DataFrame)
     assert df.index.name == "Sample_ID"
     assert "Contamination_Rate" in df.columns
-    assert "Contaminated" in df.columns
+    assert "is_contaminated" in df.columns
 
 
 @pytest.mark.real_data
@@ -344,7 +344,7 @@ def test_find_study_subject_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Call_Rate_2,is_call_rate_filtered,Contaminated,Expected Replicate Discordance,is_internal_control
+        Group_By_Subject_ID,Sample_ID,Call_Rate_2,is_call_rate_filtered,is_contaminated,Expected Replicate Discordance,is_internal_control
         SB001,S001,.98,False,False,False,False
         SB002,S002,.98,False,False,False,False
         SB002,S003,.99,False,False,False,False
