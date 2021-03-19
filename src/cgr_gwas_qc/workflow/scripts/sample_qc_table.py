@@ -8,6 +8,7 @@ function to parse/summarize its content. This makes it easier to add new
 components or change the behavior. Search for `TO-ADD` comments for where you
 would have to make modifications to add new components.
 """
+import os
 from pathlib import Path
 from typing import Optional, Sequence
 from warnings import warn
@@ -161,6 +162,16 @@ def main(
     # Save Output
     ################################################################################
     _save_qc_table(sample_qc, all_samples)
+
+
+def read_sample_qc(filename: os.PathLike) -> pd.DataFrame:
+    """Read the Sample Level QC Table
+
+    Returns:
+        pd.DataFrame:
+            Assigning specific data types for optimal parsing.
+    """
+    return pd.read_csv(filename, dtype=QC_HEADER)
 
 
 def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
