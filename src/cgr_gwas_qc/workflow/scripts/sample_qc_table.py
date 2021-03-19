@@ -59,7 +59,7 @@ QC_HEADER = {  # Header for main QC table
     "is_call_rate_filtered": "boolean",
     "is_contaminated": "boolean",
     "is_sex_discordant": "boolean",
-    "Expected Replicate Discordance": "boolean",
+    "is_replicate_discordant": "boolean",
     "Unexpected Replicate": "boolean",
     "Count_of_QC_Issue": "UInt8",
     "Identifiler_Needed": "boolean",
@@ -73,7 +73,7 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
     "is_call_rate_filtered",
     "is_contaminated",
     "is_sex_discordant",
-    "Expected Replicate Discordance",
+    "is_replicate_discordant",
     "Unexpected Replicate",
     # TO-ADD: If you create a new summary binary flag you want to include
     # in the count of QC issues then add the column here.
@@ -82,7 +82,7 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
 IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run identifiler
     "is_contaminated": "Contaminated",
     "is_sex_discordant": "Sex Discordant",
-    "Expected Replicate Discordance": "Expected Replicate Discordance",
+    "is_replicate_discordant": "Discordant Replicates",
     "Unexpected Replicate": "Unexpected Replicate",
     # TO-ADD: If you create a new binary flag do determine if you run
     # identifiler.
@@ -405,7 +405,7 @@ def _read_known_replicates(
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - Expected Replicate Discordance (bool): True if replicates show
+            - is_replicate_discordant (bool): True if replicates show
               a concordance below the supplied threshold. Otherwise False.
    """
 
@@ -418,7 +418,7 @@ def _read_known_replicates(
         .value.unique()
     )  # A set of Sample_IDs that were replicates were not concordant.
 
-    sr = pd.Series(False, index=Sample_IDs).rename("Expected Replicate Discordance")
+    sr = pd.Series(False, index=Sample_IDs, name="is_replicate_discordant")
     sr[sr.index.isin(discord_Sample_IDs)] = True
 
     return sr
@@ -433,7 +433,7 @@ def _read_unknown_replicates(file_name: Path, Sample_IDs: pd.Index) -> pd.Series
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - Expected Replicate Discordance (bool): True if replicates show
+            - is_replicate_discordant (bool): True if replicates show
               a concordance below the supplied threshold. Otherwise False.
    """
 
@@ -580,7 +580,7 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     return (
         sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
         .query(
-            "not is_internal_control & not is_contaminated & not is_call_rate_filtered & not `Expected Replicate Discordance`"
+            "not is_internal_control & not is_contaminated & not is_call_rate_filtered & not `is_replicate_discordant`"
         )
         .groupby("Group_By_Subject_ID")  # Group sample by subject id
         .apply(

@@ -187,7 +187,7 @@ def test_read_known_replicates(sample_ids_full):
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
     assert sr.index.name == "Sample_ID"
-    assert sr.name == "Expected Replicate Discordance"
+    assert sr.name == "is_replicate_discordant"
     assert sr.dtype is np.dtype("bool")
 
 
@@ -344,7 +344,7 @@ def test_find_study_subject_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Call_Rate_2,is_call_rate_filtered,is_contaminated,Expected Replicate Discordance,is_internal_control
+        Group_By_Subject_ID,Sample_ID,Call_Rate_2,is_call_rate_filtered,is_contaminated,is_replicate_discordant,is_internal_control
         SB001,S001,.98,False,False,False,False
         SB002,S002,.98,False,False,False,False
         SB002,S003,.99,False,False,False,False

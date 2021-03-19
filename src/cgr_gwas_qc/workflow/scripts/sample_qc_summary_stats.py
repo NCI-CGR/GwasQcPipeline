@@ -39,7 +39,7 @@ def main(file_name: Path, file_out: Path):
         "contaminated": _value_counts_w_na(df.is_contaminated),
         "call_rate_filterd": _value_counts_w_na(df["is_call_rate_filtered"]),
         "sex_discord": _value_counts_w_na(df["is_sex_discordant"]),
-        "rep_discord": _value_counts_w_na(df["Expected Replicate Discordance"]),
+        "rep_discord": _value_counts_w_na(df["is_replicate_discordant"]),
         "unexpected_rep": _value_counts_w_na(df["Unexpected Replicate"]),
         "identifiler": _value_counts_w_na(df["Identifiler_Needed"]),
         "issues": _value_counts_w_na(df["Count_of_QC_Issue"]),

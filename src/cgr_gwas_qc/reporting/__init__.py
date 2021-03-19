@@ -19,6 +19,6 @@ REPORT_NAME_MAPPER = {
     "idats_exist": "IdatsInProjectDir",
     "is_call_rate_filtered": "Low Call Rate",
     "is_contaminated": "Contaminated",
-    "predicted_sex": "Predicted_Sex",
+    "is_replicate_discordant": "Expected Replicate Discordance",
     "is_sex_discordant": "Sex Discordant",
 }
