@@ -92,6 +92,10 @@ def test_sample_qc_table(sample_qc_table):
         "SexMatch",  # old column no longer created
         "Subject_Notes",  # old column no longer created
         "Count_of_SR_SubjectID",  # old column no longer create
+        "Call_Rate_1_filter",  # old column version with Y/N
+        "cr1_filtered",  # new column version with bool
+        "Call_Rate_2_filter",  # old column version with Y/N
+        "cr2_filtered",  # new column version with bool
         "IdatsInProjectDir",  # This column does not match b/c I did not have all the Idat files
         "PI_Subject_ID",  # New column from LIMS
         "PI_Study_ID",  # New column from LIMS

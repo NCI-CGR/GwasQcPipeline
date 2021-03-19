@@ -51,9 +51,9 @@ QC_HEADER = {  # Header for main QC table
     "Ancestry": "category",
     "Contamination_Rate": "float",
     "Call_Rate_Initial": "float",
-    "Call_Rate_1_filter": "boolean",
+    "cr1_filtered": "boolean",
     "Call_Rate_1": "float",
-    "Call_Rate_2_filter": "boolean",
+    "cr2_filtered": "boolean",
     "Call_Rate_2": "float",
     # TO-ADD: Any column names you want saved to the output table
     "Low Call Rate": "boolean",
@@ -148,6 +148,23 @@ def main(
     ################################################################################
     # Add Summary Columns
     ################################################################################
+    # Add Call Rate Flags
+    # NOTE: Each call rate step will drop samples, so missing samples were
+    # filtered in the current or previous step(s). For example, a missing sample
+    # `Call_Rate_1` indicates the sample did not pass Call Rate 1 filter or
+    # was missing from before. If the sample was missing from before than I am
+    # setting it as missing (pd.NA). This will help with data provenance and
+    # hopefully make it clearer why a sample was removed.
+    cri = sample_qc.Call_Rate_Initial.isna()
+    cr1 = sample_qc.Call_Rate_1.isna()
+    cr2 = sample_qc.Call_Rate_2.isna()
+
+    sample_qc["cr1_filtered"] = cr1
+    sample_qc.loc[cri, "cr1_filtered"] = pd.NA
+
+    sample_qc["cr2_filtered"] = cr2
+    sample_qc.loc[cri | cr1, "cr2_filtered"] = pd.NA
+
     # Count the number of QC issues
     sample_qc["Count_of_QC_Issue"] = sample_qc[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
 
