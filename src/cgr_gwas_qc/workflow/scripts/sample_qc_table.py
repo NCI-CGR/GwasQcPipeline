@@ -56,7 +56,7 @@ QC_HEADER = {  # Header for main QC table
     "Call_Rate_1": "float",
     "is_cr2_filtered": "boolean",
     "Call_Rate_2": "float",
-    "call_rate_filtered": "boolean",
+    "is_call_rate_filtered": "boolean",
     "Contaminated": "boolean",
     "sex_discordant": "boolean",
     "Expected Replicate Discordance": "boolean",
@@ -70,7 +70,7 @@ QC_HEADER = {  # Header for main QC table
 
 
 QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
-    "call_rate_filtered",
+    "is_call_rate_filtered",
     "Contaminated",
     "sex_discordant",
     "Expected Replicate Discordance",
@@ -168,8 +168,8 @@ def main(
     # Add Call Rate Summary Flag
     # NOTE: This is `True` if filtered in CR1 or CR2. It is `pd.NA` if missing
     # in the initial data set (cri) and otherwise `False`.
-    sample_qc["call_rate_filtered"] = cr2
-    sample_qc.loc[cri, "call_rate_filtered"] = pd.NA
+    sample_qc["is_call_rate_filtered"] = cr2
+    sample_qc.loc[cri, "is_call_rate_filtered"] = pd.NA
 
     # Count the number of QC issues
     sample_qc["Count_of_QC_Issue"] = sample_qc[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
@@ -567,7 +567,7 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     """Flag indicating which sample to use as subject representative.
 
     We use a single representative sample for subject level analysis. First
-    we remove all internal controls and poor quality samples (call_rate_filtered,
+    we remove all internal controls and poor quality samples (is_call_rate_filtered,
     Contaminated, Replicate Discordance). For subject IDs with multiple
     remaining samples, we select the sample that has the highest Call Rate 2.
 
@@ -580,7 +580,7 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     return (
         sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
         .query(
-            "not is_internal_control & not Contaminated & not call_rate_filtered & not `Expected Replicate Discordance`"
+            "not is_internal_control & not Contaminated & not is_call_rate_filtered & not `Expected Replicate Discordance`"
         )
         .groupby("Group_By_Subject_ID")  # Group sample by subject id
         .apply(

@@ -116,7 +116,7 @@ def test_sample_qc_table(sample_qc_table):
         .fillna(
             {
                 "predicted_sex": "U",  # Legacy will have U instead of pd.NA
-                "call_rate_filtered": True,  # Legacy will have True instead of pd.NA
+                "is_call_rate_filtered": True,  # Legacy will have True instead of pd.NA
             }
         )
         .rename(REPORT_NAME_MAPPER, axis=1)
