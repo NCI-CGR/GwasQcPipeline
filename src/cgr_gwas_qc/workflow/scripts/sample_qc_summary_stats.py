@@ -32,7 +32,7 @@ def main(file_name: Path, file_out: Path):
         "working_dir": os.getcwd(),
         "n_samples": df.shape[0],
         "n_no_gtc": _number_missing_gtc_files(cfg, df),
-        "idats": _value_counts_w_na(df.IdatsInProjectDir),
+        "idats": _value_counts_w_na(df.idats_exist),
         "call_rate_initial": _table_summary_str(df.Call_Rate_Initial),
         "contamination_rate": _table_summary_w_na(df.Contamination_Rate),
         "intensity": _table_summary_str(df.IdatIntensity),

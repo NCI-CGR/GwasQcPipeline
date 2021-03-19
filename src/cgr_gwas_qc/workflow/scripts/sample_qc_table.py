@@ -40,10 +40,11 @@ QC_HEADER = {  # Header for main QC table
     "num_samples_per_subject": "UInt8",
     "internal_control": "boolean",
     "case_control": CASE_CONTROL_DTYPE,
+    "preflight_exclusion": "boolean",
+    "idats_exist": "boolean",
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
     "X_inbreeding_coefficient": "float",
-    "IdatsInProjectDir": "boolean",
     "IdatIntensity": "float",
     "AFR": "float",
     "EUR": "float",
@@ -123,6 +124,8 @@ def main(
         pd.concat(
             [
                 ss,
+                _check_preflight(cfg.config.Sample_IDs_to_remove, Sample_IDs),
+                _check_idats_files(ss, cfg.config.user_files.idat_pattern),
                 _read_imiss(imiss_start, Sample_IDs, "Call_Rate_Initial"),
                 _read_imiss(imiss_cr1, Sample_IDs, "Call_Rate_1"),
                 _read_imiss(imiss_cr2, Sample_IDs, "Call_Rate_2"),
@@ -134,7 +137,6 @@ def main(
                 _read_unknown_replicates(unknown_replicates, Sample_IDs),
                 _read_contam(contam, cfg.config.software_params.contam_threshold, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
-                _check_idats_files(ss, cfg.config.user_files.idat_pattern),
                 # TO-ADD: call function you created to parse/summarize new file
             ],
             axis=1,
@@ -246,6 +248,24 @@ def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str
         df.groupby("Group_By_Subject_ID", dropna=False).size().rename("num_samples_per_subject"),
         on="Group_By_Subject_ID",
     ).set_index("Sample_ID")
+
+
+def _check_preflight(samples_to_remove: Optional[Sequence[str]], Sample_IDs: pd.Index) -> pd.Series:
+    """Checks if any samples were flagged during pre-flight checks.
+
+    Pre-flight checks save samples with missing GTC or IDAT files to the
+    config file. This adds a column to the sample_qc table to indicate if a
+    sample was excluded due to pre-flight checks.
+    """
+    if samples_to_remove is None:
+        return pd.Series(False, index=Sample_IDs, name="preflight_exclusion", dtype="boolean")
+
+    return pd.Series(
+        Sample_IDs.isin(samples_to_remove),
+        index=Sample_IDs,
+        name="preflight_exclusion",
+        dtype="boolean",
+    )
 
 
 def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Series:
@@ -498,11 +518,11 @@ def _check_idats_files(sample_sheet: pd.DataFrame, idat_pattern: Optional[Idat])
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - IdatsInProjectDir (bool): True if both the red and green Idat files existed
+            - idats_exist (bool): True if both the red and green Idat files existed
     """
     if not idat_pattern:
         # No Idat path specified in config, return all NaN.
-        return pd.Series(index=sample_sheet.index, dtype="boolean", name="IdatsInProjectDir")
+        return pd.Series(index=sample_sheet.index, dtype="boolean", name="idats_exist")
 
     results = []
     for record in sample_sheet.itertuples():
@@ -516,9 +536,7 @@ def _check_idats_files(sample_sheet: pd.DataFrame, idat_pattern: Optional[Idat])
         except (FileNotFoundError, PermissionError):
             results.append((Sample_ID, False))
 
-    return pd.Series(dict(results), dtype="boolean", name="IdatsInProjectDir").rename_axis(
-        "Sample_ID"
-    )
+    return pd.Series(dict(results), dtype="boolean", name="idats_exist").rename_axis("Sample_ID")
 
 
 def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):

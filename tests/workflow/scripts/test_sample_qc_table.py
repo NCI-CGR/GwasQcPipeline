@@ -50,6 +50,25 @@ def test_wrangle_sample_sheet(sample_sheet_full, expected_sex_col):
 
 
 @pytest.mark.real_data
+def test_check_preflight_none(sample_ids_full):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_preflight
+
+    sr = _check_preflight(None, sample_ids_full)
+    assert not any(sr)
+
+
+@pytest.mark.real_data
+def test_check_preflight(sample_ids_full):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_preflight
+
+    sr = _check_preflight(sample_ids_full[:2], sample_ids_full)
+
+    assert "Sample_ID" == sr.index.name
+    assert "preflight_exclusion" == sr.name
+    assert 2 == sum(sr)
+
+
+@pytest.mark.real_data
 def test_read_imiss_start(sample_ids_full):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
 
@@ -273,7 +292,7 @@ def test_check_idat_files(tmp_path):
 
     # THEN: Basic properties
     assert sr.index.name == "Sample_ID"
-    assert sr.name == "IdatsInProjectDir"
+    assert sr.name == "idats_exist"
 
     # All idat files should be found
     assert all(sr)
@@ -294,10 +313,6 @@ def test_check_idat_files_one_missing(tmp_path):
         fake_record["SentrixBarcode_A"] = "fake_barcode"
         cfg.ss = cfg.ss.append(fake_record, ignore_index=True)
         sr = _check_idats_files(cfg.ss.set_index("Sample_ID"), cfg.config.user_files.idat_pattern)
-
-    # THEN: Basic properties
-    assert sr.index.name == "Sample_ID"
-    assert sr.name == "IdatsInProjectDir"
 
     # I should have 4 samples with idat files found and 1 missing these files.
     assert sum(sr) == 4
