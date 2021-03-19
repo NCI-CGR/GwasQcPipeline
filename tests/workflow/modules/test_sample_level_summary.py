@@ -106,7 +106,7 @@ def test_sample_qc_table(sample_qc_table):
         "is_internal_control",  # New column
         "Group_By_Subject_ID",  # New column
         "is_subject_representative",  # New column
-        "Subject_Dropped_From_Study",  # New column
+        "subject_dropped_from_study",  # New column
         "case_control",  # New column
     ]
 

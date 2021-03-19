@@ -65,7 +65,7 @@ QC_HEADER = {  # Header for main QC table
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
     "is_subject_representative": "boolean",
-    "Subject_Dropped_From_Study": "boolean",
+    "subject_dropped_from_study": "boolean",
 }
 
 
@@ -180,7 +180,7 @@ def main(
 
     # Add flag for which samples to keep as subject
     sample_qc["is_subject_representative"] = _find_study_subject_representative(sample_qc)
-    sample_qc["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(sample_qc)
+    sample_qc["subject_dropped_from_study"] = _find_study_subject_with_no_representative(sample_qc)
     ################################################################################
     # Save Output
     ################################################################################
