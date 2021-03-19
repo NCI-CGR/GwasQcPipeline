@@ -266,9 +266,11 @@ def sample_qc(tmp_path_factory) -> Path:
     ss = (
         SampleSheet(data_cache / "original_data/manifest_full.csv")
         .add_group_by_column("PI_Subject_ID")
-        .data.assign(internal_control=lambda x: x.Sample_Group == "sVALD-001")
+        .data.assign(is_internal_control=lambda x: x.Sample_Group == "sVALD-001")
         .assign(case_control=lambda x: x["Case/Control_Status"].str.lower())
-        .reindex(["Sample_ID", "Group_By_Subject_ID", "internal_control", "case_control"], axis=1)
+        .reindex(
+            ["Sample_ID", "Group_By_Subject_ID", "is_internal_control", "case_control"], axis=1
+        )
     )
 
     legacy_qc_table = (
@@ -280,7 +282,9 @@ def sample_qc(tmp_path_factory) -> Path:
     )
 
     # Add new columns
-    legacy_qc_table["Identifiler_Reason"] = _identifiler_reason(legacy_qc_table, IDENTIFILER_FLAGS)
+    legacy_qc_table["Identifiler_Reason"] = _identifiler_reason(
+        legacy_qc_table, list(IDENTIFILER_FLAGS)
+    )
     legacy_qc_table["Subject_Representative"] = _find_study_subject_representative(legacy_qc_table)
     legacy_qc_table["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(
         legacy_qc_table

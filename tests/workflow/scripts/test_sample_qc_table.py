@@ -34,7 +34,7 @@ def test_wrangle_sample_sheet(sample_sheet_full, expected_sex_col):
 
     # THEN: Basic properties
     assert ss.index.name == "Sample_ID"
-    assert isinstance(ss.internal_control.dtype, pd.BooleanDtype)
+    assert isinstance(ss.is_internal_control.dtype, pd.BooleanDtype)
     assert ss.expected_sex.dtype == SEX_DTYPE
     assert ss.case_control.dtype == CASE_CONTROL_DTYPE
 
@@ -344,7 +344,7 @@ def test_find_study_subject_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Call_Rate_2,call_rate_filtered,Contaminated,Expected Replicate Discordance,internal_control
+        Group_By_Subject_ID,Sample_ID,Call_Rate_2,call_rate_filtered,Contaminated,Expected Replicate Discordance,is_internal_control
         SB001,S001,.98,False,False,False,False
         SB002,S002,.98,False,False,False,False
         SB002,S003,.99,False,False,False,False
@@ -382,7 +382,7 @@ def test_find_study_subject_with_no_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Subject_Representative,internal_control
+        Group_By_Subject_ID,Sample_ID,Subject_Representative,is_internal_control
         SB001,S001,True,False
         SB001,S002,False,False
         SB002,S003,False,False

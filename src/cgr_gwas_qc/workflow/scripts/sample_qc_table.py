@@ -38,7 +38,7 @@ QC_HEADER = {  # Header for main QC table
     "Project-Sample ID": "string",
     # Generated here
     "num_samples_per_subject": "UInt8",
-    "internal_control": "boolean",
+    "is_internal_control": "boolean",
     "case_control": CASE_CONTROL_DTYPE,
     "preflight_exclusion": "boolean",
     "idats_exist": "boolean",
@@ -219,7 +219,7 @@ def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str
     """
     df = sample_sheet.copy()
 
-    df["internal_control"] = (df.Sample_Group == "sVALD-001").astype("boolean")
+    df["is_internal_control"] = (df.Sample_Group == "sVALD-001").astype("boolean")
 
     sex_mapper = {"m": "M", "male": "M", "f": "F", "female": "F"}
     df["expected_sex"] = (
@@ -238,10 +238,12 @@ def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str
     )
 
     # For internal controls use the `Indentifiler_Sex` column as `expected_sex`
-    df.loc[df.internal_control, "expected_sex"] = df.loc[df.internal_control, "Identifiler_Sex"]
+    df.loc[df.is_internal_control, "expected_sex"] = df.loc[
+        df.is_internal_control, "Identifiler_Sex"
+    ]
 
     # For internal controls set case_control to qc
-    df.loc[df.internal_control, "case_control"] = case_control_mapper["qc"]
+    df.loc[df.is_internal_control, "case_control"] = case_control_mapper["qc"]
 
     # Count the number of samples per subject ID and set Sample_ID as index
     return df.merge(
@@ -578,7 +580,7 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     return (
         sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
         .query(
-            "not internal_control & not Contaminated & not call_rate_filtered & not `Expected Replicate Discordance`"
+            "not is_internal_control & not Contaminated & not call_rate_filtered & not `Expected Replicate Discordance`"
         )
         .groupby("Group_By_Subject_ID")  # Group sample by subject id
         .apply(
@@ -605,7 +607,7 @@ def _find_study_subject_with_no_representative(sample_qc: pd.DataFrame) -> pd.Se
               samples) has no representative sample.
     """
     subject_w_no_rep = (
-        sample_qc.query("not internal_control")
+        sample_qc.query("not is_internal_control")
         .groupby("Group_By_Subject_ID")
         .Subject_Representative.sum()
         == 0

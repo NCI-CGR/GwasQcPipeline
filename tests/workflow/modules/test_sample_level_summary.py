@@ -103,7 +103,7 @@ def test_sample_qc_table(sample_qc_table):
         "num_samples_per_subject",  # New column
         "preflight_exclusion",  # New column
         "Identifiler_Reason",  # New column
-        "internal_control",  # New column
+        "is_internal_control",  # New column
         "Group_By_Subject_ID",  # New column
         "Subject_Representative",  # New column
         "Subject_Dropped_From_Study",  # New column

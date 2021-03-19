@@ -160,7 +160,7 @@ rule deliver_subject_list:
     output:
         "deliver/SampleUsedforSubject.csv",
     run:
-        qc = pd.read_csv(input[0]).query("not internal_control")  # exclude internal controls
+        qc = pd.read_csv(input[0]).query("not is_internal_control")  # exclude internal controls
 
         (
             qc.query("Subject_Representative")
