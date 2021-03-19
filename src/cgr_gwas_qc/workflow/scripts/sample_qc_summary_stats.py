@@ -38,7 +38,7 @@ def main(file_name: Path, file_out: Path):
         "intensity": _table_summary_str(df.IdatIntensity),
         "contaminated": _value_counts_w_na(df.is_contaminated),
         "call_rate_filterd": _value_counts_w_na(df["is_call_rate_filtered"]),
-        "sex_discord": _value_counts_w_na(df["sex_discordant"]),
+        "sex_discord": _value_counts_w_na(df["is_sex_discordant"]),
         "rep_discord": _value_counts_w_na(df["Expected Replicate Discordance"]),
         "unexpected_rep": _value_counts_w_na(df["Unexpected Replicate"]),
         "identifiler": _value_counts_w_na(df["Identifiler_Needed"]),

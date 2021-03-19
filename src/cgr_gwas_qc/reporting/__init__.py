@@ -20,5 +20,5 @@ REPORT_NAME_MAPPER = {
     "is_call_rate_filtered": "Low Call Rate",
     "is_contaminated": "Contaminated",
     "predicted_sex": "Predicted_Sex",
-    "sex_discordant": "Sex Discordant",
+    "is_sex_discordant": "Sex Discordant",
 }

@@ -58,7 +58,7 @@ QC_HEADER = {  # Header for main QC table
     "Call_Rate_2": "float",
     "is_call_rate_filtered": "boolean",
     "is_contaminated": "boolean",
-    "sex_discordant": "boolean",
+    "is_sex_discordant": "boolean",
     "Expected Replicate Discordance": "boolean",
     "Unexpected Replicate": "boolean",
     "Count_of_QC_Issue": "UInt8",
@@ -72,7 +72,7 @@ QC_HEADER = {  # Header for main QC table
 QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
     "is_call_rate_filtered",
     "is_contaminated",
-    "sex_discordant",
+    "is_sex_discordant",
     "Expected Replicate Discordance",
     "Unexpected Replicate",
     # TO-ADD: If you create a new summary binary flag you want to include
@@ -81,7 +81,7 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
 
 IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run identifiler
     "is_contaminated": "Contaminated",
-    "sex_discordant": "Sex Discordant",
+    "is_sex_discordant": "Sex Discordant",
     "Expected Replicate Discordance": "Expected Replicate Discordance",
     "Unexpected Replicate": "Unexpected Replicate",
     # TO-ADD: If you create a new binary flag do determine if you run
@@ -292,7 +292,7 @@ def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
 
     Read PLINK sex prediction file. Convert the `predicted_sex` indicator
     variable to M/F designations. Compare predicted results with the expected
-    sexes and create a summary column `sex_discordant` if predicted/expected sex
+    sexes and create a summary column `is_sex_discordant` if predicted/expected sex
     calls do not match.
 
     Returns:
@@ -302,7 +302,7 @@ def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
               from sexcheck.
             - predicted_sex (str): M/F/U based on PLINK sex predictions.
               are different. U if prediction was U.
-            - sex_discordant (bool): True if SexMatch == "N"
+            - is_sex_discordant (bool): True if SexMatch == "N"
     """
     plink_sex_code = {0: "U", 1: "M", 2: "F"}
     df = (
@@ -320,9 +320,9 @@ def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
     # http://10.133.130.114/jfear/GwasQcPipeline/issues/35
     df.loc[df.X_inbreeding_coefficient < 0.5, "predicted_sex"] = "F"
     df.loc[df.X_inbreeding_coefficient >= 0.5, "predicted_sex"] = "M"
-    df["sex_discordant"] = (df.predicted_sex != expected_sex).astype("boolean")
+    df["is_sex_discordant"] = (df.predicted_sex != expected_sex).astype("boolean")
     df.loc[
-        df.X_inbreeding_coefficient.isnull() | (df.predicted_sex == "U"), "sex_discordant"
+        df.X_inbreeding_coefficient.isnull() | (df.predicted_sex == "U"), "is_sex_discordant"
     ] = pd.NA  # If we could not predict sex then label as U
 
     return df
@@ -548,10 +548,10 @@ def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
     concatenate the column names.
 
     Example:
-        >>> cols = ["sex_discordant", "is_contaminated"]
+        >>> cols = ["is_sex_discordant", "is_contaminated"]
         >>> df.values == np.ndarray([[True, True], [True, False], [False, False]])
         >>> _identifiler_reason(df, cols)
-        pd.Series(["sex_discordant;is_contaminated", "sex_discordant", ""])
+        pd.Series(["is_sex_discordant;is_contaminated", "is_sex_discordant", ""])
     """
 
     def reason_string(row: pd.Series) -> str:
