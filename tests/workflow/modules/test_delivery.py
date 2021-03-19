@@ -61,26 +61,6 @@ def files_for_upload(tmp_path_factory, sample_qc):
 @pytest.mark.regression
 @pytest.mark.workflow
 @pytest.mark.real_data
-def test_lab_sample_level_qc_report(files_for_upload):
-    # GIVEN: Real data after running the delivery module
-    data_cache, tmp_path = files_for_upload
-
-    # THEN: The QC table for upload should be identical with production outputs.
-    # NOTE: After removing new columns
-    obs_ = pd.read_csv(tmp_path / "files_for_lab/SR001-001_00_all_sample_qc_0000000.csv")
-    exp_ = pd.read_csv(
-        data_cache
-        / "production_outputs/files_for_lab/SR0446-001_12_all_sample_qc_1011201995419_casecontrol_20191011.csv"
-    )
-
-    assert_frame_equal(
-        exp_, obs_.reindex(exp_.columns, axis=1)  # Exclude columns not in the original table.
-    )
-
-
-@pytest.mark.regression
-@pytest.mark.workflow
-@pytest.mark.real_data
 def test_lab_lims_upload(files_for_upload):
     # GIVEN: Real data after running the delivery module
     data_cache, tmp_path = files_for_upload
@@ -114,7 +94,7 @@ def test_identifiler_needed(files_for_upload):
         / "production_outputs/files_for_lab/SR0446-001_12_Identifiler_1011201995419_casecontrol_20191011.csv"
     ).rename({"Identifiler Reason": "Identifiler_Reason"}, axis=1)
 
-    assert_frame_equal(obs_, exp_)
+    assert_frame_equal(obs_, exp_, check_dtype=False)
 
 
 @pytest.mark.regression

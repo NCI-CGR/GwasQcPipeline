@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
+from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
 from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
 from cgr_gwas_qc.testing.data import RealData
 
@@ -85,7 +86,16 @@ def test_sample_qc_table(sample_qc_table):
     # GIVEN: The sample qc report
     # THEN: This should be identical to the production outputs except for:
     exclude_cols = [
+        "Current_Subject_Status",  # old column no longer created
+        "SR",  # old column no longer created
+        "Sample_Status",  # old column no longer created
+        "SexMatch",  # old column no longer created
+        "Subject_Notes",  # old column no longer created
+        "Count_of_SR_SubjectID",  # old column no longer create
         "IdatsInProjectDir",  # This column does not match b/c I did not have all the Idat files
+        "PI_Subject_ID",  # New column from LIMS
+        "PI_Study_ID",  # New column from LIMS
+        "num_samples_per_subject",  # New column
         "Identifiler_Reason",  # New column
         "internal_control",  # New column
         "Group_By_Subject_ID",  # New column
@@ -97,17 +107,21 @@ def test_sample_qc_table(sample_qc_table):
     obs_ = (
         pd.read_csv(sample_qc_table)
         .drop(exclude_cols, axis=1, errors="ignore")
+        .fillna(
+            {"predicted_sex": "U"}
+        )  # The legacy fill's all missing with U, I want to keep missing for data provenance (i.e., not analyzed [NaN] vs not estimated [U])
+        .rename(REPORT_NAME_MAPPER, axis=1)
         .sort_values("Sample_ID")
         .reset_index(drop=True)
     )
     exp_ = (
         pd.read_csv(RealData() / "production_outputs/all_sample_qc.csv")
-        .drop(exclude_cols, axis=1, errors="ignore")
+        .reindex(obs_.columns, axis=1)
         .sort_values("Sample_ID")
         .reset_index(drop=True)
     )
 
-    assert_frame_equal(obs_, exp_)
+    assert_frame_equal(obs_, exp_, check_dtype=False)
 
 
 @pytest.mark.workflow
