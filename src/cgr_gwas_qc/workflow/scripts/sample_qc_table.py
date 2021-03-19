@@ -40,7 +40,7 @@ QC_HEADER = {  # Header for main QC table
     "num_samples_per_subject": "UInt8",
     "is_internal_control": "boolean",
     "case_control": CASE_CONTROL_DTYPE,
-    "preflight_exclusion": "boolean",
+    "is_preflight_exclusion": "boolean",
     "idats_exist": "boolean",
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
@@ -260,12 +260,12 @@ def _check_preflight(samples_to_remove: Optional[Sequence[str]], Sample_IDs: pd.
     sample was excluded due to pre-flight checks.
     """
     if samples_to_remove is None:
-        return pd.Series(False, index=Sample_IDs, name="preflight_exclusion", dtype="boolean")
+        return pd.Series(False, index=Sample_IDs, name="is_preflight_exclusion", dtype="boolean")
 
     return pd.Series(
         Sample_IDs.isin(samples_to_remove),
         index=Sample_IDs,
-        name="preflight_exclusion",
+        name="is_preflight_exclusion",
         dtype="boolean",
     )
 

@@ -64,7 +64,7 @@ def test_check_preflight(sample_ids_full):
     sr = _check_preflight(sample_ids_full[:2], sample_ids_full)
 
     assert "Sample_ID" == sr.index.name
-    assert "preflight_exclusion" == sr.name
+    assert "is_preflight_exclusion" == sr.name
     assert 2 == sum(sr)
 
 
