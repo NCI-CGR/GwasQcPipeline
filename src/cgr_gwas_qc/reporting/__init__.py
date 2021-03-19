@@ -21,4 +21,5 @@ REPORT_NAME_MAPPER = {
     "is_contaminated": "Contaminated",
     "is_replicate_discordant": "Expected Replicate Discordance",
     "is_sex_discordant": "Sex Discordant",
+    "is_unexpected_replicate": "Unexpected Replicate",
 }

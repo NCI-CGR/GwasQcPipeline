@@ -204,7 +204,7 @@ def test_read_unknown_replicates(sample_ids_full):
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
     assert sr.index.name == "Sample_ID"
-    assert sr.name == "Unexpected Replicate"
+    assert sr.name == "is_unexpected_replicate"
     assert sr.dtype is np.dtype("bool")
 
 

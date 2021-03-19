@@ -60,7 +60,7 @@ QC_HEADER = {  # Header for main QC table
     "is_contaminated": "boolean",
     "is_sex_discordant": "boolean",
     "is_replicate_discordant": "boolean",
-    "Unexpected Replicate": "boolean",
+    "is_unexpected_replicate": "boolean",
     "Count_of_QC_Issue": "UInt8",
     "Identifiler_Needed": "boolean",
     "Identifiler_Reason": "string",
@@ -74,7 +74,7 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
     "is_contaminated",
     "is_sex_discordant",
     "is_replicate_discordant",
-    "Unexpected Replicate",
+    "is_unexpected_replicate",
     # TO-ADD: If you create a new summary binary flag you want to include
     # in the count of QC issues then add the column here.
 ]
@@ -83,7 +83,7 @@ IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run
     "is_contaminated": "Contaminated",
     "is_sex_discordant": "Sex Discordant",
     "is_replicate_discordant": "Discordant Replicates",
-    "Unexpected Replicate": "Unexpected Replicate",
+    "is_unexpected_replicate": "Unexpected Replicate",
     # TO-ADD: If you create a new binary flag do determine if you run
     # identifiler.
 }
@@ -444,7 +444,7 @@ def _read_unknown_replicates(file_name: Path, Sample_IDs: pd.Index) -> pd.Series
         .value.unique()
     )  # A set of Sample_IDs that look like a replicate with another sample from a different subject.
 
-    sr = pd.Series(False, index=Sample_IDs).rename("Unexpected Replicate")
+    sr = pd.Series(False, index=Sample_IDs, name="is_unexpected_replicate")
     sr[sr.index.isin(cord_Sample_IDs)] = True
 
     return sr
