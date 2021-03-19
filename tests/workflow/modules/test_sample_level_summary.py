@@ -93,7 +93,7 @@ def test_sample_qc_table(sample_qc_table):
         "Subject_Notes",  # old column no longer created
         "Count_of_SR_SubjectID",  # old column no longer create
         "Call_Rate_1_filter",  # old column version with Y/N
-        "cr1_filtered",  # new column version with bool
+        "is_cr1_filtered",  # new column version with bool
         "Call_Rate_2_filter",  # old column version with Y/N
         "cr2_filtered",  # new column version with bool
         "IdatsInProjectDir",  # old column version that does not match b/c test data doest not have all Idat files
