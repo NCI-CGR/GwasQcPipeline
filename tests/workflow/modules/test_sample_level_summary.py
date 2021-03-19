@@ -198,7 +198,7 @@ def test_qc_failures(tmp_path, sample_qc_table):
                 input:
                     "sample_level/qc_failures/low_call_rate.txt",
                     "sample_level/qc_failures/contaminated.txt",
-                    "sample_level/qc_failures/is_sex_discordant.txt",
+                    "sample_level/qc_failures/sex_discordant.txt",
                     "sample_level/qc_failures/replicate_discordant.txt",
                     "sample_level/internal_controls.txt",
             """

@@ -16,7 +16,9 @@ SEX_DTYPE = pd.CategoricalDtype(categories=["M", "F", "U"])
 REPORT_NAME_MAPPER = {
     "X_inbreeding_coefficient": "ChrX_Inbreed_estimate",
     "expected_sex": "Expected_Sex",
+    "predicted_sex": "Predicted_Sex",
     "idats_exist": "IdatsInProjectDir",
+    "identifiler_needed": "Identifiler_Needed",
     "is_call_rate_filtered": "Low Call Rate",
     "is_contaminated": "Contaminated",
     "is_replicate_discordant": "Expected Replicate Discordance",
