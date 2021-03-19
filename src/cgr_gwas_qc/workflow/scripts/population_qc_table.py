@@ -102,7 +102,7 @@ def build_table(results: Path, controls: Path) -> pd.DataFrame:
 def add_metadata(df: pd.DataFrame, filename: Path):
     metadata = (
         pd.read_csv(filename)
-        .query("Subject_Representative")
+        .query("is_subject_representative")
         .reindex(["Group_By_Subject_ID", "Sample_ID", "case_control"], axis=1)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
     )

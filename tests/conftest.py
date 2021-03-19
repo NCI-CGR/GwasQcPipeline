@@ -285,7 +285,9 @@ def sample_qc(tmp_path_factory) -> Path:
     legacy_qc_table["identifiler_reason"] = _identifiler_reason(
         legacy_qc_table, list(IDENTIFILER_FLAGS)
     )
-    legacy_qc_table["Subject_Representative"] = _find_study_subject_representative(legacy_qc_table)
+    legacy_qc_table["is_subject_representative"] = _find_study_subject_representative(
+        legacy_qc_table
+    )
     legacy_qc_table["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(
         legacy_qc_table
     )

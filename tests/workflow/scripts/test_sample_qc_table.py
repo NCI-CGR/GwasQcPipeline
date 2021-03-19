@@ -382,7 +382,7 @@ def test_find_study_subject_with_no_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Subject_Representative,is_internal_control
+        Group_By_Subject_ID,Sample_ID,is_subject_representative,is_internal_control
         SB001,S001,True,False
         SB001,S002,False,False
         SB002,S003,False,False

@@ -9,7 +9,7 @@ rule subject_representative:
     run:
         (
             pd.read_csv(input[0])
-            .query("Subject_Representative")
+            .query("is_subject_representative")
             .assign(Sample_ID2=lambda x: x.Sample_ID)
             .reindex(["Sample_ID", "Sample_ID2"], axis=1)
             .to_csv(output[0], sep=" ", index=False, header=False)
@@ -58,7 +58,7 @@ rule sample_to_subject_map:
     run:
         (
             pd.read_csv(input[0])
-            .query("Subject_Representative")
+            .query("is_subject_representative")
             .assign(Sample_ID2=lambda x: x.Sample_ID)
             .assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
             .reindex(["Sample_ID", "Sample_ID2", "Group_By_Subject_ID", "Subject_ID2"], axis=1)

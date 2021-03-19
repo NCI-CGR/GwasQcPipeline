@@ -64,7 +64,7 @@ QC_HEADER = {  # Header for main QC table
     "Count_of_QC_Issue": "UInt8",
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
-    "Subject_Representative": "boolean",
+    "is_subject_representative": "boolean",
     "Subject_Dropped_From_Study": "boolean",
 }
 
@@ -179,7 +179,7 @@ def main(
     sample_qc["identifiler_reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
 
     # Add flag for which samples to keep as subject
-    sample_qc["Subject_Representative"] = _find_study_subject_representative(sample_qc)
+    sample_qc["is_subject_representative"] = _find_study_subject_representative(sample_qc)
     sample_qc["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(sample_qc)
     ################################################################################
     # Save Output
@@ -609,7 +609,7 @@ def _find_study_subject_with_no_representative(sample_qc: pd.DataFrame) -> pd.Se
     subject_w_no_rep = (
         sample_qc.query("not is_internal_control")
         .groupby("Group_By_Subject_ID")
-        .Subject_Representative.sum()
+        .is_subject_representative.sum()
         == 0
     ).pipe(lambda x: x.index[x])
     return sample_qc.Group_By_Subject_ID.isin(subject_w_no_rep)

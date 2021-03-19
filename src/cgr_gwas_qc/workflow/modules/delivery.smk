@@ -163,7 +163,7 @@ rule deliver_subject_list:
         qc = pd.read_csv(input[0]).query("not is_internal_control")  # exclude internal controls
 
         (
-            qc.query("Subject_Representative")
+            qc.query("is_subject_representative")
             .reindex(["Group_By_Subject_ID", "Sample_ID"], axis=1)
             # For groups without representative set Sample_ID to NA
             .set_index("Group_By_Subject_ID")
