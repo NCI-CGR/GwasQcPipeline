@@ -39,14 +39,14 @@ rule sample_qc_table:
         contam=_contam,
         intensity=_intensity,
     output:
-        all_samples="sample_level/sample_qc.csv",
+        "sample_level/sample_qc.csv",
     script:
         "../scripts/sample_qc_table.py"
 
 
 rule sample_qc_summary_stats:
     input:
-        rules.sample_qc_table.output.all_samples,
+        rules.sample_qc_table.output[0],
     output:
         "sample_level/sample_qc_summary_stats.txt",
     script:
@@ -55,7 +55,7 @@ rule sample_qc_summary_stats:
 
 rule sample_lists_from_qc_flags:
     input:
-        all_samples=rules.sample_qc_table.output.all_samples,
+        all_samples=rules.sample_qc_table.output[0],
     output:
         cr="sample_level/qc_failures/low_call_rate.txt",
         contam="sample_level/qc_failures/contaminated.txt",

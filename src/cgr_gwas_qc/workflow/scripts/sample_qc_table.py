@@ -110,7 +110,7 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Outputs
-    all_samples: Path = typer.Argument(..., help="Path to all_samples_qc.csv"),
+    outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
 
     cfg = load_config()
@@ -184,7 +184,7 @@ def main(
     ################################################################################
     # Save Output
     ################################################################################
-    _save_qc_table(sample_qc, all_samples)
+    _save_qc_table(sample_qc, outfile)
 
 
 def read_sample_qc(filename: os.PathLike) -> pd.DataFrame:
@@ -624,7 +624,7 @@ if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {"contam": None, "intensity": None}
         defaults.update({k: (Path(v) if v else None) for k, v in snakemake.input.items()})  # type: ignore # noqa
-        defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
+        defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
         main(**defaults)
     else:
         app()
