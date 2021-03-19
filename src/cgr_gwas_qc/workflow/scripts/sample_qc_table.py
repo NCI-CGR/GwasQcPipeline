@@ -12,12 +12,12 @@ from pathlib import Path
 from typing import Optional, Sequence
 from warnings import warn
 
-import numpy as np
 import pandas as pd
 import typer
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.models.config.user_files import Idat
+from cgr_gwas_qc.parsers import plink
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.validators import check_file
 
@@ -124,9 +124,9 @@ def main(
         pd.concat(
             [
                 ss,
-                _read_imiss_start(imiss_start, Sample_IDs),
-                _read_imiss_cr1(imiss_cr1, Sample_IDs),
-                _read_imiss_cr2(imiss_cr2, Sample_IDs),
+                _read_imiss(imiss_start, Sample_IDs, "Call_Rate_Initial"),
+                _read_imiss(imiss_cr1, Sample_IDs, "Call_Rate_1"),
+                _read_imiss(imiss_cr2, Sample_IDs, "Call_Rate_2"),
                 _read_sexcheck_cr1(sexcheck_cr1, ss.expected_sex),
                 _read_ancestry(ancestry, Sample_IDs),
                 _read_known_replicates(
@@ -216,73 +216,24 @@ def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str
     ).set_index("Sample_ID")
 
 
-def _read_imiss_start(file_name: Path, Sample_IDs: pd.Index) -> pd.Series:
+def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Series:
     """Read the starting call rates.
 
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - Call_Rate_Initial (float): The starting call rate calculated as
-              `1 - F_MISS`.
+            - `col_name` (float): The starting call rate calculated as `1 - F_MISS`.
     """
     return (
-        pd.read_csv(file_name, delim_whitespace=True)  # FID IID MISS_PHENO N_MISS N_GENO F_MISS
-        .rename({"IID": "Sample_ID"}, axis=1)
-        .set_index("Sample_ID")
-        .assign(Call_Rate_Initial=lambda x: 1 - x.F_MISS)
-        .Call_Rate_Initial.squeeze()
+        plink.read_imiss(filename)
+        .rename_axis("Sample_ID")
+        .assign(**{col_name: lambda x: 1 - x.F_MISS})
         .reindex(Sample_IDs)
+        .loc[:, col_name]
     )
 
 
-def _read_imiss_cr1(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
-    """Read the call rates after level 1 filters.
-
-    Returns:
-        pd.DataFrame:
-            - Sample_ID (pd.Index)
-            - Call_Rate_1 (float): The call rate (`1 - F_MISS`) after level 1
-              filters.
-            - Call_Rate_1_filter (str): "Y" if call rate was less than the
-              level 1 threshold else "N".
-    """
-    out_headers = ("Call_Rate_1", "Call_Rate_1_filter")
-    return (
-        pd.read_csv(file_name, delim_whitespace=True)  # FID IID MISS_PHENO N_MISS N_GENO F_MISS
-        .rename({"IID": "Sample_ID"}, axis=1)
-        .set_index("Sample_ID")
-        .assign(Call_Rate_1=lambda x: 1 - x.F_MISS)
-        .reindex(Sample_IDs)
-        .assign(Call_Rate_1_filter=lambda x: np.where(x.Call_Rate_1.isnull(), "Y", "N"))
-        .loc[:, out_headers]
-    )
-
-
-def _read_imiss_cr2(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
-    """Read the call rates after level 2 filters.
-
-    Returns:
-        pd.DataFrame:
-            - Sample_ID (pd.Index)
-            - Call_Rate_2 (float): The call rate (`1 - F_MISS`) after level 2
-              filters.
-            - Call_Rate_2_filter (str): "Y" if call rate was less than the
-              level 2 threshold else "N".
-    """
-    out_headers = ("Call_Rate_2", "Call_Rate_2_filter", "Low Call Rate")
-    return (
-        pd.read_csv(file_name, delim_whitespace=True)  # FID IID MISS_PHENO N_MISS N_GENO F_MISS
-        .rename({"IID": "Sample_ID"}, axis=1)
-        .set_index("Sample_ID")
-        .assign(Call_Rate_2=lambda x: 1 - x.F_MISS)
-        .reindex(Sample_IDs)
-        .assign(Call_Rate_2_filter=lambda x: np.where(x.Call_Rate_2.isnull(), "Y", "N"))
-        .assign(**{"Low Call Rate": lambda x: x.Call_Rate_2_filter == "Y"})
-        .loc[:, out_headers]
-    )
-
-
-def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame:
+def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
     """Read sex predictions and summarize.
 
     Read PLINK sex prediction file. Convert the `predicted_sex` indicator
@@ -301,9 +252,9 @@ def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame
     """
     plink_sex_code = {0: "U", 1: "M", 2: "F"}
     df = (
-        pd.read_csv(file_name, delim_whitespace=True)
-        .rename({"IID": "Sample_ID", "F": "X_inbreeding_coefficient"}, axis=1)
-        .set_index("Sample_ID")
+        plink.read_sexcheck(filename)
+        .rename_axis("Sample_ID")
+        .rename({"F": "X_inbreeding_coefficient"}, axis=1)
         .assign(predicted_sex=lambda x: x.SNPSEX.map(plink_sex_code))
         .astype({"predicted_sex": SEX_DTYPE})
         .reindex(expected_sex.index)

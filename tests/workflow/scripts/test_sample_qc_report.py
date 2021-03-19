@@ -51,13 +51,13 @@ def test_wrangle_sample_sheet(sample_sheet_full, expected_sex_col):
 
 @pytest.mark.real_data
 def test_read_imiss_start(sample_ids_full):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss_start
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
 
     # GIVEN: the call rates from the initial starting point and a list of Sample IDs
     filename = RealData() / "production_outputs/plink_start/samples_start.imiss"
 
     # WHEN: I parse the imiss table.
-    sr = _read_imiss_start(filename, sample_ids_full)
+    sr = _read_imiss(filename, sample_ids_full, "Call_Rate_Initial")
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -67,36 +67,34 @@ def test_read_imiss_start(sample_ids_full):
 
 @pytest.mark.real_data
 def test_read_imiss_cr1(sample_ids_full):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss_cr1
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
 
     # GIVEN: the call rates after CR1 filters and a list of Sample IDs
     filename = RealData() / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss"
 
     # WHEN: I parse the imiss table.
-    df = _read_imiss_cr1(filename, sample_ids_full)
+    sr = _read_imiss(filename, sample_ids_full, "Call_Rate_1")
 
     # THEN: Basic properties
-    assert isinstance(df, pd.DataFrame)
-    assert df.index.name == "Sample_ID"
-    assert "Call_Rate_1" in df.columns
-    assert "Call_Rate_1_filter" in df.columns
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "Call_Rate_1"
 
 
 @pytest.mark.real_data
 def test_read_imiss_cr2(sample_ids_full):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss_cr2
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
 
     # GIVEN: the call rates after CR2 filters and a list of Sample IDs
     filename = RealData() / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
 
     # WHEN: I parse the imiss table.
-    df = _read_imiss_cr2(filename, sample_ids_full)
+    sr = _read_imiss(filename, sample_ids_full, "Call_Rate_2")
 
     # THEN: Basic properties
-    assert isinstance(df, pd.DataFrame)
-    assert df.index.name == "Sample_ID"
-    assert "Call_Rate_2" in df.columns
-    assert "Call_Rate_2_filter" in df.columns
+    assert isinstance(sr, pd.Series)
+    assert sr.index.name == "Sample_ID"
+    assert sr.name == "Call_Rate_2"
 
 
 @pytest.mark.real_data
