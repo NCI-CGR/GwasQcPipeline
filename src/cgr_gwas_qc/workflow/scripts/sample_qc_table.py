@@ -9,7 +9,7 @@ components or change the behavior. Search for `TO-ADD` comments for where you
 would have to make modifications to add new components.
 """
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional, Sequence
 from warnings import warn
 
 import numpy as np
@@ -17,18 +17,24 @@ import pandas as pd
 import typer
 
 from cgr_gwas_qc import load_config
-from cgr_gwas_qc.config import ConfigMgr
+from cgr_gwas_qc.models.config.user_files import Idat
+from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.validators import check_file
 
 app = typer.Typer(add_completion=False)
 
-SEX_DTYPE = pd.CategoricalDtype(categories=["M", "F", "U"])
-CASE_CONTROL_DTYPE = pd.CategoricalDtype(categories=["case", "control", "qc"])
 
 QC_HEADER = {  # Header for main QC table
     # From Sample Sheet
     "Sample_ID": "string",
     "Group_By_Subject_ID": "string",
+    "LIMSSample_ID": "string",
+    "LIMS_Individual_ID": "string",
+    "SR_Subject_ID": "string",
+    "PI_Subject_ID": "string",
+    "PI_Study_ID": "string",
+    "Project": "string",
+    "Project-Sample ID": "string",
     # Generated here
     "num_samples_per_subject": "UInt8",
     "internal_control": "boolean",
@@ -73,14 +79,14 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
     # in the count of QC issues then add the column here.
 ]
 
-IDENTIFILER_FLAGS = [  # Set of binary flags used to determine if we need to run identifiler
-    "Contaminated",
-    "sex_discordant",
-    "Expected Replicate Discordance",
-    "Unexpected Replicate",
+IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run identifiler
+    "Contaminated": "Contaminated",
+    "sex_discordant": "Sex Discordant",
+    "Expected Replicate Discordance": "Expected Replicate Discordance",
+    "Unexpected Replicate": "Unexpected Replicate",
     # TO-ADD: If you create a new binary flag do determine if you run
     # identifiler.
-]
+}
 
 
 @app.command()
@@ -114,14 +120,14 @@ def main(
     ################################################################################
     # Build QC Table
     ################################################################################
-    df = (
+    sample_qc = (
         pd.concat(
             [
                 ss,
                 _read_imiss_start(imiss_start, Sample_IDs),
                 _read_imiss_cr1(imiss_cr1, Sample_IDs),
                 _read_imiss_cr2(imiss_cr2, Sample_IDs),
-                _read_sexcheck_cr1(sexcheck_cr1, ss.Expected_Sex),
+                _read_sexcheck_cr1(sexcheck_cr1, ss.expected_sex),
                 _read_ancestry(ancestry, Sample_IDs),
                 _read_known_replicates(
                     known_replicates, cfg.config.software_params.dup_concordance_cutoff, Sample_IDs
@@ -129,7 +135,7 @@ def main(
                 _read_unknown_replicates(unknown_replicates, Sample_IDs),
                 _read_contam(contam, cfg.config.software_params.contam_threshold, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
-                _check_idats_files(cfg),
+                _check_idats_files(ss, cfg.config.user_files.idat_pattern),
                 # TO-ADD: call function you created to parse/summarize new file
             ],
             axis=1,
@@ -142,22 +148,22 @@ def main(
     # Add Summary Columns
     ################################################################################
     # Count the number of QC issues
-    df["Count_of_QC_Issue"] = df[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
+    sample_qc["Count_of_QC_Issue"] = sample_qc[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
 
     # Add a flag to run identifiler based if any of these columns are True
-    df["Identifiler_Needed"] = df[IDENTIFILER_FLAGS].any(axis=1)
-    df["Identifiler_Reason"] = _identifiler_reason(df, IDENTIFILER_FLAGS)
+    sample_qc["Identifiler_Needed"] = sample_qc[IDENTIFILER_FLAGS].any(axis=1)
+    sample_qc["Identifiler_Reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
 
     # Add flag for which samples to keep as subject
-    df["Subject_Representative"] = _find_study_subject_representative(df)
-    df["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(df)
+    sample_qc["Subject_Representative"] = _find_study_subject_representative(sample_qc)
+    sample_qc["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(sample_qc)
     ################################################################################
     # Save Output
     ################################################################################
-    _save_qc_table(df, all_samples)
+    _save_qc_table(sample_qc, all_samples)
 
 
-def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
+def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
     """Identify expected sex column and count number samples per subject.
 
     Users can specify which column in the `sample_sheet` holds the expected
@@ -177,33 +183,34 @@ def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.Da
             - case_control (category): case/control/qc based on the
               Case/Control_Status in the sample sheet.
     """
-    _df = df.copy()
+    df = sample_sheet.copy()
 
-    _df["internal_control"] = (_df.Sample_Group == "sVALD-001").astype("boolean")
+    df["internal_control"] = (df.Sample_Group == "sVALD-001").astype("boolean")
 
     sex_mapper = {"m": "M", "male": "M", "f": "F", "female": "F"}
-    _df["expected_sex"] = (
-        _df[expected_sex_col_name]
+    df["expected_sex"] = (
+        df[expected_sex_col_name]
         .str.lower()
         .map(lambda sex: sex_mapper.get(sex, "U"))
         .astype(SEX_DTYPE)
     )
 
-    _df["case_control"] = (
-        _df["Case/Control_Status"]
+    case_control_mapper = {cat.lower(): cat for cat in CASE_CONTROL_DTYPE.categories}
+    df["case_control"] = (
+        df["Case/Control_Status"]
         .str.lower()
-        .map(lambda status: status if status in CASE_CONTROL_DTYPE.categories else pd.NA)
+        .map(lambda status: case_control_mapper.get(status, pd.NA))
         .astype(CASE_CONTROL_DTYPE)
     )
 
     # For internal controls use the `Indentifiler_Sex` column as `expected_sex`
-    _df.loc[_df.internal_control, "expected_sex"] = _df.loc[_df.internal_control, "Identifiler_Sex"]
+    df.loc[df.internal_control, "expected_sex"] = df.loc[df.internal_control, "Identifiler_Sex"]
 
     # For internal controls set case_control to qc
-    _df.loc[_df.internal_control, "case_control"] = "qc"
+    df.loc[df.internal_control, "case_control"] = case_control_mapper["qc"]
 
     # Count the number of samples per subject ID and set Sample_ID as index
-    return _df.merge(
+    return df.merge(
         df.groupby("Group_By_Subject_ID", dropna=False).size().rename("num_samples_per_subject"),
         on="Group_By_Subject_ID",
     ).set_index("Sample_ID")
@@ -308,9 +315,6 @@ def _read_sexcheck_cr1(file_name: Path, expected_sex: pd.Series) -> pd.DataFrame
     # http://10.133.130.114/jfear/GwasQcPipeline/issues/35
     df.loc[df.X_inbreeding_coefficient < 0.5, "predicted_sex"] = "F"
     df.loc[df.X_inbreeding_coefficient >= 0.5, "predicted_sex"] = "M"
-
-    # Note: This seems redundant but the legacy workflow has both of these flags.
-    # indicator flag
     df["sex_discordant"] = (df.predicted_sex != expected_sex).astype("boolean")
     df.loc[
         df.X_inbreeding_coefficient.isnull() | (df.predicted_sex == "U"), "sex_discordant"
@@ -500,7 +504,7 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
 # TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
 
 
-def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
+def _check_idats_files(sample_sheet: pd.DataFrame, idat_pattern: Optional[Idat]) -> pd.Series:
     """Check that red and green IDAT files exist.
 
     Args:
@@ -513,16 +517,15 @@ def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
             - Sample_ID (pd.Index)
             - IdatsInProjectDir (bool): True if both the red and green Idat files existed
     """
-    if cfg.config.user_files.idat_pattern is None:
+    if not idat_pattern:
         # No Idat path specified in config, return all NaN.
-        return pd.Series(index=cfg.ss.Sample_ID, dtype="boolean", name="IdatsInProjectDir")
+        return pd.Series(index=sample_sheet.index, dtype="boolean", name="IdatsInProjectDir")
 
     results = []
-    for Sample_ID, red, green in zip(
-        cfg.ss.Sample_ID,
-        cfg.expand(cfg.config.user_files.idat_pattern.red),
-        cfg.expand(cfg.config.user_files.idat_pattern.green),
-    ):
+    for record in sample_sheet.itertuples():
+        Sample_ID = record.Index
+        red = idat_pattern.red.format(**record._asdict())
+        green = idat_pattern.green.format(**record._asdict())
         try:
             check_file(Path(red))
             check_file(Path(green))
@@ -535,7 +538,7 @@ def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
     )
 
 
-def _identifiler_reason(df: pd.DataFrame, cols: List[str]):
+def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
     """Summary string of the reason for needing identifiler.
 
     If `Identifiler_Needed` then, if the binary flag in `cols` is True, then
@@ -551,13 +554,13 @@ def _identifiler_reason(df: pd.DataFrame, cols: List[str]):
     def reason_string(row: pd.Series) -> str:
         if row.Identifiler_Needed:
             flags = row[cols].fillna(False)
-            return ";".join(flags.index[flags])
+            return ";".join(IDENTIFILER_FLAGS.get(x, x) for x in flags.index[flags])
         return ""
 
-    return df.apply(reason_string, axis=1)
+    return sample_qc.apply(reason_string, axis=1)
 
 
-def _find_study_subject_representative(df: pd.DataFrame) -> pd.Series:
+def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     """Flag indicating which sample to use as subject representative.
 
     We use a single representative sample for subject level analysis. First
@@ -567,12 +570,12 @@ def _find_study_subject_representative(df: pd.DataFrame) -> pd.Series:
 
     Returns:
         pd.Series:
-            - Sample_ID (pd.Index): sorted by `df.index`
+            - Sample_ID (pd.Index): sorted by `sample_qc.index`
             - A boolean flag where True indicates a sample was used as the
               subject representative.
     """
     return (
-        df.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
+        sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
         .query(
             "not internal_control & not Contaminated & not `Low Call Rate` & not `Expected Replicate Discordance`"
         )
@@ -582,13 +585,13 @@ def _find_study_subject_representative(df: pd.DataFrame) -> pd.Series:
         )  # Select the sample with highest call rate as representative
         .droplevel(0)  # drop the subject label b/c don't need
         .reindex(
-            df.index
+            sample_qc.index
         )  # Add the samples that were filtered by the query step and make sure everything aligns
         .fillna(False)
     )
 
 
-def _find_study_subject_with_no_representative(df: pd.DataFrame) -> pd.Series:
+def _find_study_subject_with_no_representative(sample_qc: pd.DataFrame) -> pd.Series:
     """Flag indicating which subjects have representative sample.
 
     This flag excludes internal controls which by nature are ignored in
@@ -596,20 +599,22 @@ def _find_study_subject_with_no_representative(df: pd.DataFrame) -> pd.Series:
 
     Returns:
         pd.Series:
-            - Sample_ID (pd.Index): sorted by `df.index`
+            - Sample_ID (pd.Index): sorted by `sample_qc.index`
             - A boolean flag where True indicates the subject (i.e., all
               samples) has no representative sample.
     """
     subject_w_no_rep = (
-        df.query("not internal_control").groupby("Group_By_Subject_ID").Subject_Representative.sum()
+        sample_qc.query("not internal_control")
+        .groupby("Group_By_Subject_ID")
+        .Subject_Representative.sum()
         == 0
     ).pipe(lambda x: x.index[x])
-    return df.Group_By_Subject_ID.isin(subject_w_no_rep)
+    return sample_qc.Group_By_Subject_ID.isin(subject_w_no_rep)
 
 
-def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
+def _save_qc_table(sample_qc: pd.DataFrame, file_name: Path) -> None:
     """Save main QC table."""
-    df.reindex(QC_HEADER.keys(), axis=1).to_csv(file_name, index=False)
+    sample_qc.reindex(QC_HEADER, axis=1).to_csv(file_name, index=False)
 
 
 if __name__ == "__main__":
