@@ -17,7 +17,7 @@ def main(
 ):
 
     df = pd.read_csv(all_samples)
-    _save_sample_flag_as_file(df, "Low Call Rate", cr)
+    _save_sample_flag_as_file(df, "call_rate_filtered", cr)
     _save_sample_flag_as_file(df, "Contaminated", contam)
     _save_sample_flag_as_file(df, "sex_discordant", sex)
     _save_sample_flag_as_file(df, "Expected Replicate Discordance", rep)
