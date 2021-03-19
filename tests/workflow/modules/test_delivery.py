@@ -75,7 +75,7 @@ def test_lab_lims_upload(files_for_upload):
         / "production_outputs/files_for_lab/SR0446-001_12_LimsUpload_1011201995419_casecontrol_20191011.csv"
     ).rename({"Sample ID": "Sample_ID"}, axis=1)
 
-    assert_frame_equal(obs_, exp_)
+    assert_frame_equal(obs_, exp_, check_dtype=False)
 
 
 @pytest.mark.regression

@@ -1,5 +1,7 @@
 import pandas as pd
 
+from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
+
 
 ################################################################################
 # Files For Lab
@@ -25,7 +27,8 @@ rule lab_lims_upload:
     run:
         (
             pd.read_csv(input[0])
-            .rename({"Call_Rate_Initial": "Call Rate", "sex_discordant": "Sex Discordant"}, axis=1)
+            .rename(REPORT_NAME_MAPPER, axis=1)
+            .rename({"Call_Rate_Initial": "Call Rate"}, axis=1)
             .reindex(
                 [
                     "SR_Subject_ID",
@@ -56,6 +59,7 @@ rule lab_identifiler_needed:
         (
             pd.read_csv(input[0])
             .query("Identifiler_Needed")
+            .rename(REPORT_NAME_MAPPER, axis=1)
             .reindex(
                 [
                     "Sample_ID",
