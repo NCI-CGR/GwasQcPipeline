@@ -68,7 +68,7 @@ rule lab_identifiler_needed:
                     "Project-Sample ID",
                     "SR_Subject_ID",
                     "LIMS_Individual_ID",
-                    "Identifiler_Reason",
+                    "identifiler_reason",
                 ],
                 axis=1,
             )

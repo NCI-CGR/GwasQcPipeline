@@ -63,7 +63,7 @@ QC_HEADER = {  # Header for main QC table
     "is_unexpected_replicate": "boolean",
     "Count_of_QC_Issue": "UInt8",
     "identifiler_needed": "boolean",
-    "Identifiler_Reason": "string",
+    "identifiler_reason": "string",
     "Subject_Representative": "boolean",
     "Subject_Dropped_From_Study": "boolean",
 }
@@ -176,7 +176,7 @@ def main(
 
     # Add a flag to run identifiler based if any of these columns are True
     sample_qc["identifiler_needed"] = sample_qc[IDENTIFILER_FLAGS].any(axis=1)
-    sample_qc["Identifiler_Reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
+    sample_qc["identifiler_reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
 
     # Add flag for which samples to keep as subject
     sample_qc["Subject_Representative"] = _find_study_subject_representative(sample_qc)

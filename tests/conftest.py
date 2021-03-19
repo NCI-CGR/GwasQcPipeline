@@ -282,7 +282,7 @@ def sample_qc(tmp_path_factory) -> Path:
     )
 
     # Add new columns
-    legacy_qc_table["Identifiler_Reason"] = _identifiler_reason(
+    legacy_qc_table["identifiler_reason"] = _identifiler_reason(
         legacy_qc_table, list(IDENTIFILER_FLAGS)
     )
     legacy_qc_table["Subject_Representative"] = _find_study_subject_representative(legacy_qc_table)

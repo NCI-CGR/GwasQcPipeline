@@ -102,7 +102,7 @@ def test_sample_qc_table(sample_qc_table):
         "PI_Study_ID",  # New column from LIMS
         "num_samples_per_subject",  # New column
         "is_preflight_exclusion",  # New column
-        "Identifiler_Reason",  # New column
+        "identifiler_reason",  # New column
         "is_internal_control",  # New column
         "Group_By_Subject_ID",  # New column
         "Subject_Representative",  # New column

@@ -86,13 +86,13 @@ def test_identifiler_needed(files_for_upload):
     data_cache, tmp_path = files_for_upload
 
     # THEN: The Identifiler table for upload should be identical with production outputs.
-    # NOTE: The legacy workflow uses `Identifiler Reason` where the dev workflow uses `Identifiler_Reason`.
+    # NOTE: The legacy workflow uses `Identifiler Reason` where the dev workflow uses `identifiler_reason`.
     # I need to rename production outputs prior to comparisons.
     obs_ = pd.read_csv(tmp_path / "files_for_lab/SR001-001_00_Identifiler_0000000.csv")
     exp_ = pd.read_csv(
         data_cache
         / "production_outputs/files_for_lab/SR0446-001_12_Identifiler_1011201995419_casecontrol_20191011.csv"
-    ).rename({"Identifiler Reason": "Identifiler_Reason"}, axis=1)
+    ).rename({"Identifiler Reason": "identifiler_reason"}, axis=1)
 
     assert_frame_equal(obs_, exp_, check_dtype=False)
 
