@@ -329,7 +329,7 @@ def test_find_study_subject_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Call_Rate_2,Low Call Rate,Contaminated,Expected Replicate Discordance,internal_control
+        Group_By_Subject_ID,Sample_ID,Call_Rate_2,call_rate_filtered,Contaminated,Expected Replicate Discordance,internal_control
         SB001,S001,.98,False,False,False,False
         SB002,S002,.98,False,False,False,False
         SB002,S003,.99,False,False,False,False

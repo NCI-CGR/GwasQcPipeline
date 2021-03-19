@@ -18,4 +18,5 @@ REPORT_NAME_MAPPER = {
     "predicted_sex": "Predicted_Sex",
     "sex_discordant": "Sex Discordant",
     "X_inbreeding_coefficient": "ChrX_Inbreed_estimate",
+    "call_rate_filtered": "Low Call Rate",
 }

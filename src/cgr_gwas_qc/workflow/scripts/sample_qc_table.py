@@ -55,13 +55,11 @@ QC_HEADER = {  # Header for main QC table
     "Call_Rate_1": "float",
     "cr2_filtered": "boolean",
     "Call_Rate_2": "float",
-    # TO-ADD: Any column names you want saved to the output table
-    "Low Call Rate": "boolean",
+    "call_rate_filtered": "boolean",
     "Contaminated": "boolean",
     "sex_discordant": "boolean",
     "Expected Replicate Discordance": "boolean",
     "Unexpected Replicate": "boolean",
-    # TO-ADD: Any binary flags you want saved to the output table
     "Count_of_QC_Issue": "UInt8",
     "Identifiler_Needed": "boolean",
     "Identifiler_Reason": "string",
@@ -71,7 +69,7 @@ QC_HEADER = {  # Header for main QC table
 
 
 QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
-    "Low Call Rate",
+    "call_rate_filtered",
     "Contaminated",
     "sex_discordant",
     "Expected Replicate Discordance",
@@ -164,6 +162,12 @@ def main(
 
     sample_qc["cr2_filtered"] = cr2
     sample_qc.loc[cri | cr1, "cr2_filtered"] = pd.NA
+
+    # Add Call Rate Summary Flag
+    # NOTE: This is `True` if filtered in CR1 or CR2. It is `pd.NA` if missing
+    # in the initial data set (cri) and otherwise `False`.
+    sample_qc["call_rate_filtered"] = cr2
+    sample_qc.loc[cri, "call_rate_filtered"] = pd.NA
 
     # Count the number of QC issues
     sample_qc["Count_of_QC_Issue"] = sample_qc[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
@@ -543,7 +547,7 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     """Flag indicating which sample to use as subject representative.
 
     We use a single representative sample for subject level analysis. First
-    we remove all internal controls and poor quality samples (Low Call Rate,
+    we remove all internal controls and poor quality samples (call_rate_filtered,
     Contaminated, Replicate Discordance). For subject IDs with multiple
     remaining samples, we select the sample that has the highest Call Rate 2.
 
@@ -556,7 +560,7 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     return (
         sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
         .query(
-            "not internal_control & not Contaminated & not `Low Call Rate` & not `Expected Replicate Discordance`"
+            "not internal_control & not Contaminated & not call_rate_filtered & not `Expected Replicate Discordance`"
         )
         .groupby("Group_By_Subject_ID")  # Group sample by subject id
         .apply(

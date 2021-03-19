@@ -112,8 +112,11 @@ def test_sample_qc_table(sample_qc_table):
         pd.read_csv(sample_qc_table)
         .drop(exclude_cols, axis=1, errors="ignore")
         .fillna(
-            {"predicted_sex": "U"}
-        )  # The legacy fill's all missing with U, I want to keep missing for data provenance (i.e., not analyzed [NaN] vs not estimated [U])
+            {
+                "predicted_sex": "U",  # Legacy will have U instead of pd.NA
+                "call_rate_filtered": True,  # Legacy will have True instead of pd.NA
+            }
+        )
         .rename(REPORT_NAME_MAPPER, axis=1)
         .sort_values("Sample_ID")
         .reset_index(drop=True)
