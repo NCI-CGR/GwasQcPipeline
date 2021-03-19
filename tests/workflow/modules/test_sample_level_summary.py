@@ -95,7 +95,7 @@ def test_sample_qc_table(sample_qc_table):
         "Call_Rate_1_filter",  # old column version with Y/N
         "is_cr1_filtered",  # new column version with bool
         "Call_Rate_2_filter",  # old column version with Y/N
-        "cr2_filtered",  # new column version with bool
+        "is_cr2_filtered",  # new column version with bool
         "IdatsInProjectDir",  # old column version that does not match b/c test data doest not have all Idat files
         "idats_exist",  # new column version that does not match b/c test data doest not have all Idat files
         "PI_Subject_ID",  # New column from LIMS

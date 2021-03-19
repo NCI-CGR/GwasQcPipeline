@@ -54,7 +54,7 @@ QC_HEADER = {  # Header for main QC table
     "Call_Rate_Initial": "float",
     "is_cr1_filtered": "boolean",
     "Call_Rate_1": "float",
-    "cr2_filtered": "boolean",
+    "is_cr2_filtered": "boolean",
     "Call_Rate_2": "float",
     "call_rate_filtered": "boolean",
     "Contaminated": "boolean",
@@ -162,8 +162,8 @@ def main(
     sample_qc["is_cr1_filtered"] = cr1
     sample_qc.loc[cri, "is_cr1_filtered"] = pd.NA
 
-    sample_qc["cr2_filtered"] = cr2
-    sample_qc.loc[cri | cr1, "cr2_filtered"] = pd.NA
+    sample_qc["is_cr2_filtered"] = cr2
+    sample_qc.loc[cri | cr1, "is_cr2_filtered"] = pd.NA
 
     # Add Call Rate Summary Flag
     # NOTE: This is `True` if filtered in CR1 or CR2. It is `pd.NA` if missing
