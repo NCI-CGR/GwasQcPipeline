@@ -8,83 +8,85 @@ function to parse/summarize its content. This makes it easier to add new
 components or change the behavior. Search for `TO-ADD` comments for where you
 would have to make modifications to add new components.
 """
+import os
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional, Sequence
 from warnings import warn
 
-import numpy as np
 import pandas as pd
 import typer
 
 from cgr_gwas_qc import load_config
-from cgr_gwas_qc.config import ConfigMgr
+from cgr_gwas_qc.models.config.user_files import Idat
+from cgr_gwas_qc.parsers import plink
+from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.validators import check_file
 
 app = typer.Typer(add_completion=False)
 
+
+QC_HEADER = {  # Header for main QC table
+    # From Sample Sheet
+    "Sample_ID": "string",
+    "Group_By_Subject_ID": "string",
+    "LIMSSample_ID": "string",
+    "LIMS_Individual_ID": "string",
+    "SR_Subject_ID": "string",
+    "PI_Subject_ID": "string",
+    "PI_Study_ID": "string",
+    "Project": "string",
+    "Project-Sample ID": "string",
+    # Generated here
+    "num_samples_per_subject": "UInt8",
+    "is_internal_control": "boolean",
+    "case_control": CASE_CONTROL_DTYPE,
+    "is_preflight_exclusion": "boolean",
+    "idats_exist": "boolean",
+    "expected_sex": SEX_DTYPE,
+    "predicted_sex": SEX_DTYPE,
+    "X_inbreeding_coefficient": "float",
+    "IdatIntensity": "float",
+    "AFR": "float",
+    "EUR": "float",
+    "ASN": "float",
+    "Ancestry": "category",
+    "Contamination_Rate": "float",
+    "Call_Rate_Initial": "float",
+    "is_cr1_filtered": "boolean",
+    "Call_Rate_1": "float",
+    "is_cr2_filtered": "boolean",
+    "Call_Rate_2": "float",
+    "is_call_rate_filtered": "boolean",
+    "is_contaminated": "boolean",
+    "is_sex_discordant": "boolean",
+    "is_replicate_discordant": "boolean",
+    "is_unexpected_replicate": "boolean",
+    "Count_of_QC_Issue": "UInt8",
+    "identifiler_needed": "boolean",
+    "identifiler_reason": "string",
+    "is_subject_representative": "boolean",
+    "subject_dropped_from_study": "boolean",
+}
+
+
 QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
-    "Low Call Rate",
-    "Contaminated",
-    "Sex Discordant",
-    "Expected Replicate Discordance",
-    "Unexpected Replicate",
+    "is_call_rate_filtered",
+    "is_contaminated",
+    "is_sex_discordant",
+    "is_replicate_discordant",
+    "is_unexpected_replicate",
     # TO-ADD: If you create a new summary binary flag you want to include
     # in the count of QC issues then add the column here.
 ]
 
-IDENTIFILER_FLAGS = [  # Set of binary flags used to determine if we need to run identifiler
-    "Contaminated",
-    "Sex Discordant",
-    "Expected Replicate Discordance",
-    "Unexpected Replicate",
+IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run identifiler
+    "is_contaminated": "Contaminated",
+    "is_sex_discordant": "Sex Discordant",
+    "is_replicate_discordant": "Discordant Replicates",
+    "is_unexpected_replicate": "Unexpected Replicate",
     # TO-ADD: If you create a new binary flag do determine if you run
-    # identifilder.
-]
-
-QC_HEADER = [  # Header for main QC table
-    "SR_Subject_ID",
-    "Count_of_SR_SubjectID",
-    "SR",
-    "Current_Subject_Status",
-    "Subject_Notes",
-    "LIMS_Individual_ID",
-    "Project",
-    "Sample_ID",
-    "Project-Sample ID",
-    "LIMSSample_ID",
-    "Sample_Status",
-    "IdatsInProjectDir",
-    "IdatIntensity",
-    "Expected_Sex",
-    "Predicted_Sex",
-    "SexMatch",
-    "ChrX_Inbreed_estimate",
-    "AFR",
-    "EUR",
-    "ASN",
-    "Ancestry",
-    "Contamination_Rate",
-    "Call_Rate_Initial",
-    "Call_Rate_1_filter",
-    "Call_Rate_1",
-    "Call_Rate_2_filter",
-    "Call_Rate_2",
-    # TO-ADD: Any column names you want saved to the output table
-    "Low Call Rate",
-    "Contaminated",
-    "Sex Discordant",
-    "Expected Replicate Discordance",
-    "Unexpected Replicate",
-    # TO-ADD: Any binary flags you want saved to the output table
-    "Count_of_QC_Issue",
-    "Identifiler_Needed",
-    "Identifiler_Reason",
-    "Internal_Control",
-    "Group_By_Subject_ID",
-    "Case/Control_Status",
-    "Subject_Representative",
-    "Subject_Dropped_From_Study",
-]
+    # identifiler.
+}
 
 
 @app.command()
@@ -108,7 +110,7 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Outputs
-    all_samples: Path = typer.Argument(..., help="Path to all_samples_qc.csv"),
+    outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
 
     cfg = load_config()
@@ -118,14 +120,16 @@ def main(
     ################################################################################
     # Build QC Table
     ################################################################################
-    df = (
+    sample_qc = (
         pd.concat(
             [
                 ss,
-                _read_imiss_start(imiss_start, Sample_IDs),
-                _read_imiss_cr1(imiss_cr1, Sample_IDs),
-                _read_imiss_cr2(imiss_cr2, Sample_IDs),
-                _read_sexcheck_cr1(sexcheck_cr1, ss.Expected_Sex),
+                _check_preflight(cfg.config.Sample_IDs_to_remove, Sample_IDs),
+                _check_idats_files(ss, cfg.config.user_files.idat_pattern),
+                _read_imiss(imiss_start, Sample_IDs, "Call_Rate_Initial"),
+                _read_imiss(imiss_cr1, Sample_IDs, "Call_Rate_1"),
+                _read_imiss(imiss_cr2, Sample_IDs, "Call_Rate_2"),
+                _read_sexcheck_cr1(sexcheck_cr1, ss.expected_sex),
                 _read_ancestry(ancestry, Sample_IDs),
                 _read_known_replicates(
                     known_replicates, cfg.config.software_params.dup_concordance_cutoff, Sample_IDs
@@ -133,7 +137,6 @@ def main(
                 _read_unknown_replicates(unknown_replicates, Sample_IDs),
                 _read_contam(contam, cfg.config.software_params.contam_threshold, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
-                _check_idats_files(cfg),
                 # TO-ADD: call function you created to parse/summarize new file
             ],
             axis=1,
@@ -145,179 +148,182 @@ def main(
     ################################################################################
     # Add Summary Columns
     ################################################################################
+    # Add Call Rate Flags
+    # NOTE: Each call rate step will drop samples, so missing samples were
+    # filtered in the current or previous step(s). For example, a missing sample
+    # `Call_Rate_1` indicates the sample did not pass Call Rate 1 filter or
+    # was missing from before. If the sample was missing from before than I am
+    # setting it as missing (pd.NA). This will help with data provenance and
+    # hopefully make it clearer why a sample was removed.
+    cri = sample_qc.Call_Rate_Initial.isna()
+    cr1 = sample_qc.Call_Rate_1.isna()
+    cr2 = sample_qc.Call_Rate_2.isna()
+
+    sample_qc["is_cr1_filtered"] = cr1
+    sample_qc.loc[cri, "is_cr1_filtered"] = pd.NA
+
+    sample_qc["is_cr2_filtered"] = cr2
+    sample_qc.loc[cri | cr1, "is_cr2_filtered"] = pd.NA
+
+    # Add Call Rate Summary Flag
+    # NOTE: This is `True` if filtered in CR1 or CR2. It is `pd.NA` if missing
+    # in the initial data set (cri) and otherwise `False`.
+    sample_qc["is_call_rate_filtered"] = cr2
+    sample_qc.loc[cri, "is_call_rate_filtered"] = pd.NA
+
     # Count the number of QC issues
-    df["Count_of_QC_Issue"] = df[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
+    sample_qc["Count_of_QC_Issue"] = sample_qc[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
 
     # Add a flag to run identifiler based if any of these columns are True
-    df["Identifiler_Needed"] = df[IDENTIFILER_FLAGS].any(axis=1)
-    df["Identifiler_Reason"] = _identifiler_reason(df, IDENTIFILER_FLAGS)
+    sample_qc["identifiler_needed"] = sample_qc[IDENTIFILER_FLAGS].any(axis=1)
+    sample_qc["identifiler_reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
 
     # Add flag for which samples to keep as subject
-    df["Subject_Representative"] = _find_study_subject_representative(df)
-    df["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(df)
+    sample_qc["is_subject_representative"] = _find_study_subject_representative(sample_qc)
+    sample_qc["subject_dropped_from_study"] = _find_study_subject_with_no_representative(sample_qc)
     ################################################################################
     # Save Output
     ################################################################################
-    _save_qc_table(df, all_samples)
+    _save_qc_table(sample_qc, outfile)
 
 
-def _case_control_encoder(x):
-    _map = {"control": 0, "case": 1, "qc": 2}
-    return _map.get(x.lower(), 3)
+def read_sample_qc(filename: os.PathLike) -> pd.DataFrame:
+    """Read the Sample Level QC Table
+
+    Returns:
+        pd.DataFrame:
+            Assigning specific data types for optimal parsing.
+    """
+    return pd.read_csv(filename, dtype=QC_HEADER)
 
 
-def _wrangle_sample_sheet(df: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
+def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
     """Identify expected sex column and count number samples per subject.
 
     Users can specify which column in the `sample_sheet` holds the expected
-    sex information (`config.workflow_params.expected_sex_col_name`). While the QC
-    report calls this column `Expected_Sex`. Here we rename
-    `expected_sex_col_name` to "Expected_Sex".
+    sex information (`config.workflow_params.expected_sex_col_name`). Here we
+    rename `expected_sex_col_name` to `expected_sex`.
 
     We also add the summary column with the number of `Sample_ID`s per
-    `SR_Subject_ID`.
+    `Group_By_Subject_ID`.
 
     Returns:
         pd.DataFrame: The full sample sheet with the following adjustments.
             - Sample_ID (pd.Index)
-            - Expected_Sex (str): M/F based on the expected set column set in
-              the config.
-            - Count_of_SR_SubjectID (int): Number of `Sample_ID`s per
-              `SR_SubjectID`.
+            - num_samples_per_subject (int): Number of samples per
+              `Group_By_Subject_ID`.
+            - expected_sex (category): M/F/U based on the expected set column
+              set in the config.
+            - case_control (category): case/control/qc based on the
+              Case/Control_Status in the sample sheet.
     """
-    _df = df.copy()
+    df = sample_sheet.copy()
 
-    # Add Internal_Control Flag
-    _df["Internal_Control"] = _df.Sample_Group == "sVALD-001"
+    df["is_internal_control"] = (df.Sample_Group == "sVALD-001").astype("boolean")
 
-    # Set the user provided expected sex column as `Expected_Sex`. Note: by
-    # default this columns is already called `Expected_Sex`.
-    _df["Expected_Sex"] = _df[expected_sex_col_name]
+    sex_mapper = {"m": "M", "male": "M", "f": "F", "female": "F"}
+    df["expected_sex"] = (
+        df[expected_sex_col_name]
+        .str.lower()
+        .map(lambda sex: sex_mapper.get(sex, "U"))
+        .astype(SEX_DTYPE)
+    )
 
-    # For internal controls use the `Indentifiler_Sex` column as `Expected_Sex`
-    _df.loc[_df.Internal_Control, "Expected_Sex"] = _df.loc[_df.Internal_Control, "Identifiler_Sex"]
+    case_control_mapper = {cat.lower(): cat for cat in CASE_CONTROL_DTYPE.categories}
+    df["case_control"] = (
+        df["Case/Control_Status"]
+        .str.lower()
+        .map(lambda status: case_control_mapper.get(status, pd.NA))
+        .astype(CASE_CONTROL_DTYPE)
+    )
 
-    # For internal controls make sure Case/Control_Status is QC
-    _df.loc[_df.Internal_Control, "Case/Control_Status"] = "QC"
+    # For internal controls use the `Indentifiler_Sex` column as `expected_sex`
+    df.loc[df.is_internal_control, "expected_sex"] = df.loc[
+        df.is_internal_control, "Identifiler_Sex"
+    ]
 
-    # Convert Case/Control_status to numeric representation (control:0, case:1, qc:2, other:3)
-    _df["Case/Control_Status"] = _df["Case/Control_Status"].map(_case_control_encoder)
+    # For internal controls set case_control to qc
+    df.loc[df.is_internal_control, "case_control"] = case_control_mapper["qc"]
 
     # Count the number of samples per subject ID and set Sample_ID as index
-    return _df.merge(
-        df.groupby("SR_Subject_ID", dropna=False).size().rename("Count_of_SR_SubjectID"),
-        on="SR_Subject_ID",
+    return df.merge(
+        df.groupby("Group_By_Subject_ID", dropna=False).size().rename("num_samples_per_subject"),
+        on="Group_By_Subject_ID",
     ).set_index("Sample_ID")
 
 
-def _read_imiss_start(file_name: Path, Sample_IDs: pd.Index) -> pd.Series:
+def _check_preflight(samples_to_remove: Optional[Sequence[str]], Sample_IDs: pd.Index) -> pd.Series:
+    """Checks if any samples were flagged during pre-flight checks.
+
+    Pre-flight checks save samples with missing GTC or IDAT files to the
+    config file. This adds a column to the sample_qc table to indicate if a
+    sample was excluded due to pre-flight checks.
+    """
+    if samples_to_remove is None:
+        return pd.Series(False, index=Sample_IDs, name="is_preflight_exclusion", dtype="boolean")
+
+    return pd.Series(
+        Sample_IDs.isin(samples_to_remove),
+        index=Sample_IDs,
+        name="is_preflight_exclusion",
+        dtype="boolean",
+    )
+
+
+def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Series:
     """Read the starting call rates.
 
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - Call_Rate_Initial (float): The starting call rate calculated as
-              `1 - F_MISS`.
+            - `col_name` (float): The starting call rate calculated as `1 - F_MISS`.
     """
     return (
-        pd.read_csv(file_name, delim_whitespace=True)  # FID IID MISS_PHENO N_MISS N_GENO F_MISS
-        .rename({"IID": "Sample_ID"}, axis=1)
-        .set_index("Sample_ID")
-        .assign(Call_Rate_Initial=lambda x: 1 - x.F_MISS)
-        .Call_Rate_Initial.squeeze()
+        plink.read_imiss(filename)
+        .rename_axis("Sample_ID")
+        .assign(**{col_name: lambda x: 1 - x.F_MISS})
         .reindex(Sample_IDs)
+        .loc[:, col_name]
     )
 
 
-def _read_imiss_cr1(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
-    """Read the call rates after level 1 filters.
-
-    Returns:
-        pd.DataFrame:
-            - Sample_ID (pd.Index)
-            - Call_Rate_1 (float): The call rate (`1 - F_MISS`) after level 1
-              filters.
-            - Call_Rate_1_filter (str): "Y" if call rate was less than the
-              level 1 threshold else "N".
-    """
-    out_headers = ("Call_Rate_1", "Call_Rate_1_filter")
-    return (
-        pd.read_csv(file_name, delim_whitespace=True)  # FID IID MISS_PHENO N_MISS N_GENO F_MISS
-        .rename({"IID": "Sample_ID"}, axis=1)
-        .set_index("Sample_ID")
-        .assign(Call_Rate_1=lambda x: 1 - x.F_MISS)
-        .reindex(Sample_IDs)
-        .assign(Call_Rate_1_filter=lambda x: np.where(x.Call_Rate_1.isnull(), "Y", "N"))
-        .loc[:, out_headers]
-    )
-
-
-def _read_imiss_cr2(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
-    """Read the call rates after level 2 filters.
-
-    Returns:
-        pd.DataFrame:
-            - Sample_ID (pd.Index)
-            - Call_Rate_2 (float): The call rate (`1 - F_MISS`) after level 2
-              filters.
-            - Call_Rate_2_filter (str): "Y" if call rate was less than the
-              level 2 threshold else "N".
-    """
-    out_headers = ("Call_Rate_2", "Call_Rate_2_filter", "Low Call Rate")
-    return (
-        pd.read_csv(file_name, delim_whitespace=True)  # FID IID MISS_PHENO N_MISS N_GENO F_MISS
-        .rename({"IID": "Sample_ID"}, axis=1)
-        .set_index("Sample_ID")
-        .assign(Call_Rate_2=lambda x: 1 - x.F_MISS)
-        .reindex(Sample_IDs)
-        .assign(Call_Rate_2_filter=lambda x: np.where(x.Call_Rate_2.isnull(), "Y", "N"))
-        .assign(**{"Low Call Rate": lambda x: x.Call_Rate_2_filter == "Y"})
-        .loc[:, out_headers]
-    )
-
-
-def _read_sexcheck_cr1(file_name: Path, Expected_Sex: pd.Series) -> pd.DataFrame:
+def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
     """Read sex predictions and summarize.
 
-    Read PLINK sex prediction file. Convert the `Predicted_Sex` indicator
+    Read PLINK sex prediction file. Convert the `predicted_sex` indicator
     variable to M/F designations. Compare predicted results with the expected
-    sexes and create a summary column `SexMatch` if predicted/expected sex
-    calls match. Then flag samples as `Sex Discordant` if sex was predicted
-    to be different than expected.
+    sexes and create a summary column `is_sex_discordant` if predicted/expected sex
+    calls do not match.
 
     Returns:
         pd.DataFrame:
             - Sample_ID (pd.Index)
-            - ChrX_Inbreed_estimate (float): PLINK's inbreeding coefficient
+            - X_inbreeding_coefficient (float64): PLINK's inbreeding coefficient
               from sexcheck.
-            - Predicted_Sex (str): M/F/U based on PLINK sex predictions.
-            - SexMatch (str): Y if expected and predicted are equal. N if they
+            - predicted_sex (str): M/F/U based on PLINK sex predictions.
               are different. U if prediction was U.
-            - Sex Discordant (bool): True if SexMatch == "N"
+            - is_sex_discordant (bool): True if SexMatch == "N"
     """
+    plink_sex_code = {0: "U", 1: "M", 2: "F"}
     df = (
-        pd.read_csv(file_name, delim_whitespace=True)
-        .rename({"IID": "Sample_ID", "F": "ChrX_Inbreed_estimate"}, axis=1)
-        .set_index("Sample_ID")
-        .assign(Predicted_Sex=lambda x: x.SNPSEX.map({1: "M", 2: "F"}))
-        .reindex(Expected_Sex.index)
-        .fillna({"Predicted_Sex": "U"})
-        .loc[:, ["ChrX_Inbreed_estimate", "Predicted_Sex"]]
+        plink.read_sexcheck(filename)
+        .rename_axis("Sample_ID")
+        .rename({"F": "X_inbreeding_coefficient"}, axis=1)
+        .assign(predicted_sex=lambda x: x.SNPSEX.map(plink_sex_code))
+        .astype({"predicted_sex": SEX_DTYPE})
+        .reindex(expected_sex.index)
+        .reindex(["X_inbreeding_coefficient", "predicted_sex"], axis=1)
     )
 
-    # Update PLINK Predicted_Sex Calls
+    # Update PLINK predicted_sex Calls
     # TODO: Decide if we want to keep this logic from the legacy workflow. See
     # http://10.133.130.114/jfear/GwasQcPipeline/issues/35
-    df.loc[df.ChrX_Inbreed_estimate < 0.5, "Predicted_Sex"] = "F"
-    df.loc[df.ChrX_Inbreed_estimate >= 0.5, "Predicted_Sex"] = "M"
-
-    # Note: This seems redundant but the legacy workflow has both of these flags.
-    # indicator flag
-    df["SexMatch"] = np.where(Expected_Sex == df.Predicted_Sex, "Y", "N")
-    df.loc[df.Predicted_Sex == "U", "SexMatch"] = "U"  # If we could not predict sex then label as U
-
-    # bool flag
-    df["Sex Discordant"] = df.SexMatch.replace({"N": True, "Y": False, "U": np.nan})
+    df.loc[df.X_inbreeding_coefficient < 0.5, "predicted_sex"] = "F"
+    df.loc[df.X_inbreeding_coefficient >= 0.5, "predicted_sex"] = "M"
+    df["is_sex_discordant"] = (df.predicted_sex != expected_sex).astype("boolean")
+    df.loc[
+        df.X_inbreeding_coefficient.isnull() | (df.predicted_sex == "U"), "is_sex_discordant"
+    ] = pd.NA  # If we could not predict sex then label as U
 
     return df
 
@@ -399,7 +405,7 @@ def _read_known_replicates(
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - Expected Replicate Discordance (bool): True if replicates show
+            - is_replicate_discordant (bool): True if replicates show
               a concordance below the supplied threshold. Otherwise False.
    """
 
@@ -412,7 +418,7 @@ def _read_known_replicates(
         .value.unique()
     )  # A set of Sample_IDs that were replicates were not concordant.
 
-    sr = pd.Series(False, index=Sample_IDs).rename("Expected Replicate Discordance")
+    sr = pd.Series(False, index=Sample_IDs, name="is_replicate_discordant")
     sr[sr.index.isin(discord_Sample_IDs)] = True
 
     return sr
@@ -427,7 +433,7 @@ def _read_unknown_replicates(file_name: Path, Sample_IDs: pd.Index) -> pd.Series
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - Expected Replicate Discordance (bool): True if replicates show
+            - is_replicate_discordant (bool): True if replicates show
               a concordance below the supplied threshold. Otherwise False.
    """
 
@@ -438,12 +444,10 @@ def _read_unknown_replicates(file_name: Path, Sample_IDs: pd.Index) -> pd.Series
         .value.unique()
     )  # A set of Sample_IDs that look like a replicate with another sample from a different subject.
 
-    sr = pd.Series(False, index=Sample_IDs).rename("Unexpected Replicate")
+    sr = pd.Series(False, index=Sample_IDs, name="is_unexpected_replicate")
     sr[sr.index.isin(cord_Sample_IDs)] = True
 
     return sr
-
-    pass
 
 
 def _read_contam(
@@ -456,12 +460,12 @@ def _read_contam(
             - Sample_ID (pd.index)
             - Contamination_Rate (float): The contamination rate as estimated
               by verifyIDintensity.
-            - Contaminated (bool): True if the contamination rate is greater
+            - is_contaminated (bool): True if the contamination rate is greater
               than the supplied threshold.
     """
 
     if file_name is None:
-        return pd.DataFrame(index=Sample_IDs, columns=["Contamination_Rate", "Contaminated"])
+        return pd.DataFrame(index=Sample_IDs, columns=["Contamination_Rate", "is_contaminated"])
 
     df = (
         pd.read_csv(file_name)
@@ -469,10 +473,10 @@ def _read_contam(
         .set_index("Sample_ID")
     )
 
-    df["Contaminated"] = df.Contamination_Rate > contam_threshold
-    df.loc[df.Contamination_Rate.isna(), "Contaminated"] = False
+    df["is_contaminated"] = df.Contamination_Rate > contam_threshold
+    df.loc[df.Contamination_Rate.isna(), "is_contaminated"] = False
 
-    return df.reindex(Sample_IDs)[["Contamination_Rate", "Contaminated"]]
+    return df.reindex(Sample_IDs)[["Contamination_Rate", "is_contaminated"]]
 
 
 def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Series:
@@ -505,93 +509,92 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
 # TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
 
 
-def _check_idats_files(cfg: ConfigMgr) -> pd.Series:
+def _check_idats_files(sample_sheet: pd.DataFrame, idat_pattern: Optional[Idat]) -> pd.Series:
     """Check that red and green IDAT files exist.
 
     Args:
-        df: A sample table with at least `Sampel_ID` and columns needed to fill wildcards.
+        df: A sample table with at least `Sample_ID` and columns needed to fill wildcards.
         red: A wildcard pattern for red files. Wildcards must be in `df`.
         green: A wildcard pattern for green files. Wildcards must be in `df`.
 
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - IdatsInProjectDir (bool): True if both the red and green Idat files existed
+            - idats_exist (bool): True if both the red and green Idat files existed
     """
-    if cfg.config.user_files.idat_pattern is None:
+    if not idat_pattern:
         # No Idat path specified in config, return all NaN.
-        return pd.Series(index=cfg.ss.Sample_ID, dtype="object", name="IdatsInProjectDir")
+        return pd.Series(index=sample_sheet.index, dtype="boolean", name="idats_exist")
 
     results = []
-    for Sample_ID, red, green in zip(
-        cfg.ss.Sample_ID,
-        cfg.expand(cfg.config.user_files.idat_pattern.red),
-        cfg.expand(cfg.config.user_files.idat_pattern.green),
-    ):
+    for record in sample_sheet.itertuples():
+        Sample_ID = record.Index
+        red = idat_pattern.red.format(**record._asdict())
+        green = idat_pattern.green.format(**record._asdict())
         try:
             check_file(Path(red))
             check_file(Path(green))
-            results.append((Sample_ID, "YES"))
+            results.append((Sample_ID, True))
         except (FileNotFoundError, PermissionError):
-            results.append((Sample_ID, "NO"))
+            results.append((Sample_ID, False))
 
-    return pd.Series(dict(results)).rename_axis("Sample_ID").rename("IdatsInProjectDir")
+    return pd.Series(dict(results), dtype="boolean", name="idats_exist").rename_axis("Sample_ID")
 
 
-def _identifiler_reason(df: pd.DataFrame, cols: List[str]):
+def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
     """Summary string of the reason for needing identifiler.
 
-    If `Identifiler_Needed` then, if the binary flag in `cols` is True, then
+    If `identifiler_needed` then, if the binary flag in `cols` is True, then
     concatenate the column names.
 
     Example:
-        >>> cols = ["Sex Discordant", "Contaminated"]
+        >>> cols = ["is_sex_discordant", "is_contaminated"]
         >>> df.values == np.ndarray([[True, True], [True, False], [False, False]])
         >>> _identifiler_reason(df, cols)
-        pd.Series(["Sex Discordant;Contaminated", "Sex Discordant", ""])
+        pd.Series(["is_sex_discordant;is_contaminated", "is_sex_discordant", ""])
     """
 
     def reason_string(row: pd.Series) -> str:
-        if row.Identifiler_Needed:
+        if row.identifiler_needed:
             flags = row[cols].fillna(False)
-            return ";".join(flags.index[flags])
+            return ";".join(IDENTIFILER_FLAGS.get(x, x) for x in flags.index[flags])
         return ""
 
-    return df.apply(reason_string, axis=1)
+    return sample_qc.apply(reason_string, axis=1)
 
 
-def _find_study_subject_representative(df: pd.DataFrame) -> pd.Series:
+def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     """Flag indicating which sample to use as subject representative.
 
     We use a single representative sample for subject level analysis. First
-    we remove all internal controls and poor quality samples (Low Call Rate,
-    Contaminated, Replicate Discordance). For subject IDs with multiple
+    we remove all internal controls and poor quality samples (is_call_rate_filtered,
+    is_contaminated, Replicate Discordance). For subject IDs with multiple
     remaining samples, we select the sample that has the highest Call Rate 2.
 
     Returns:
         pd.Series:
-            - Sample_ID (pd.Index): sorted by `df.index`
+            - Sample_ID (pd.Index): sorted by `sample_qc.index`
             - A boolean flag where True indicates a sample was used as the
               subject representative.
     """
     return (
-        df.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
+        sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
         .query(
-            "not Internal_Control & not Contaminated & not `Low Call Rate` & not `Expected Replicate Discordance`"
+            "not is_internal_control & not is_contaminated & not is_call_rate_filtered & not `is_replicate_discordant`"
         )
-        .groupby("Group_By_Subject_ID")  # Group sample by suject id
+        .groupby("Group_By_Subject_ID")  # Group sample by subject id
         .apply(
             lambda x: x.Call_Rate_2 == x.Call_Rate_2.max()
         )  # Select the sample with highest call rate as representative
         .droplevel(0)  # drop the subject label b/c don't need
         .reindex(
-            df.index
+            sample_qc.index
         )  # Add the samples that were filtered by the query step and make sure everything aligns
         .fillna(False)
     )
 
 
-def _find_study_subject_with_no_representative(df: pd.DataFrame) -> pd.Series:
+def _find_study_subject_with_no_representative(sample_qc: pd.DataFrame) -> pd.Series:
     """Flag indicating which subjects have representative sample.
 
     This flag excludes internal controls which by nature are ignored in
@@ -599,27 +602,29 @@ def _find_study_subject_with_no_representative(df: pd.DataFrame) -> pd.Series:
 
     Returns:
         pd.Series:
-            - Sample_ID (pd.Index): sorted by `df.index`
+            - Sample_ID (pd.Index): sorted by `sample_qc.index`
             - A boolean flag where True indicates the subject (i.e., all
               samples) has no representative sample.
     """
     subject_w_no_rep = (
-        df.query("not Internal_Control").groupby("Group_By_Subject_ID").Subject_Representative.sum()
+        sample_qc.query("not is_internal_control")
+        .groupby("Group_By_Subject_ID")
+        .is_subject_representative.sum()
         == 0
     ).pipe(lambda x: x.index[x])
-    return df.Group_By_Subject_ID.isin(subject_w_no_rep)
+    return sample_qc.Group_By_Subject_ID.isin(subject_w_no_rep)
 
 
-def _save_qc_table(df: pd.DataFrame, file_name: Path) -> None:
+def _save_qc_table(sample_qc: pd.DataFrame, file_name: Path) -> None:
     """Save main QC table."""
-    df.reindex(QC_HEADER, axis=1).to_csv(file_name, index=False)
+    sample_qc.reindex(QC_HEADER, axis=1).to_csv(file_name, index=False)
 
 
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {"contam": None, "intensity": None}
         defaults.update({k: (Path(v) if v else None) for k, v in snakemake.input.items()})  # type: ignore # noqa
-        defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
+        defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
         main(**defaults)
     else:
         app()

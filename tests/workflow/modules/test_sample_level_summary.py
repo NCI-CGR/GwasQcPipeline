@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
+from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
 from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
 from cgr_gwas_qc.testing.data import RealData
 
@@ -12,7 +13,7 @@ from cgr_gwas_qc.testing.data import RealData
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc_report(tmp_path_factory) -> Path:
+def sample_qc_table(tmp_path_factory) -> Path:
     # GIVEN: All sample QC results (including contamination). NOTE: I am using
     # SNPweights ancestry b/c I don't have production GRAF output
     tmp_path = tmp_path_factory.mktemp("sample_level_summary")
@@ -67,52 +68,74 @@ def sample_qc_report(tmp_path_factory) -> Path:
 
             rule all:
                 input:
-                    "sample_level/qc_summary.csv"
+                    "sample_level/sample_qc.csv"
             """
         )
     )
 
-    # WHEN: I run snakemake to generate the sample_qc_report
+    # WHEN: I run snakemake to generate the sample_qc_table
     run_snakemake(tmp_path)
 
-    return tmp_path / "sample_level/qc_summary.csv"
+    return tmp_path / "sample_level/sample_qc.csv"
 
 
 @pytest.mark.workflow
 @pytest.mark.regression
 @pytest.mark.real_data
-def test_sample_qc_report(sample_qc_report):
+def test_sample_qc_table(sample_qc_table):
     # GIVEN: The sample qc report
     # THEN: This should be identical to the production outputs except for:
     exclude_cols = [
-        "IdatsInProjectDir",  # This column does not match b/c I did not have all the Idat files
-        "Identifiler_Reason",  # New column
-        "Internal_Control",  # New column
+        "Current_Subject_Status",  # old column no longer created
+        "SR",  # old column no longer created
+        "Sample_Status",  # old column no longer created
+        "SexMatch",  # old column no longer created
+        "Subject_Notes",  # old column no longer created
+        "Count_of_SR_SubjectID",  # old column no longer create
+        "Call_Rate_1_filter",  # old column version with Y/N
+        "is_cr1_filtered",  # new column version with bool
+        "Call_Rate_2_filter",  # old column version with Y/N
+        "is_cr2_filtered",  # new column version with bool
+        "IdatsInProjectDir",  # old column version that does not match b/c test data doest not have all Idat files
+        "idats_exist",  # new column version that does not match b/c test data doest not have all Idat files
+        "PI_Subject_ID",  # New column from LIMS
+        "PI_Study_ID",  # New column from LIMS
+        "num_samples_per_subject",  # New column
+        "is_preflight_exclusion",  # New column
+        "identifiler_reason",  # New column
+        "is_internal_control",  # New column
         "Group_By_Subject_ID",  # New column
-        "Subject_Representative",  # New column
-        "Subject_Dropped_From_Study",  # New column
-        "Case/Control_Status",  # New column
+        "is_subject_representative",  # New column
+        "subject_dropped_from_study",  # New column
+        "case_control",  # New column
     ]
 
     obs_ = (
-        pd.read_csv(sample_qc_report)
+        pd.read_csv(sample_qc_table)
         .drop(exclude_cols, axis=1, errors="ignore")
+        .fillna(
+            {
+                "predicted_sex": "U",  # Legacy will have U instead of pd.NA
+                "is_call_rate_filtered": True,  # Legacy will have True instead of pd.NA
+            }
+        )
+        .rename(REPORT_NAME_MAPPER, axis=1)
         .sort_values("Sample_ID")
         .reset_index(drop=True)
     )
     exp_ = (
         pd.read_csv(RealData() / "production_outputs/all_sample_qc.csv")
-        .drop(exclude_cols, axis=1, errors="ignore")
+        .reindex(obs_.columns, axis=1)
         .sort_values("Sample_ID")
         .reset_index(drop=True)
     )
 
-    assert_frame_equal(obs_, exp_)
+    assert_frame_equal(obs_, exp_, check_dtype=False)
 
 
 @pytest.mark.workflow
 @pytest.mark.real_data
-def test_sample_qc_stats(tmp_path, sample_qc_report):
+def test_sample_qc_stats(tmp_path, sample_qc_table):
     """Test the createion of summary_stats.txt
 
     I am not able to perform regression testing because there are some issues
@@ -139,24 +162,24 @@ def test_sample_qc_stats(tmp_path, sample_qc_report):
 
             rule all:
                 input:
-                    "sample_level/qc_summary_stats.txt"
+                    "sample_level/sample_qc_summary_stats.txt"
             """
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copy(sample_qc_report, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copy(sample_qc_table, tmp_path / "sample_level/sample_qc.csv")
 
-    # WHEN: run snakemake to create qc_summary_stats.txt
+    # WHEN: run snakemake to create sample_qc_summary_stats.txt
     run_snakemake(tmp_path)
 
     # THEN: The file should end with my sample counts
-    assert (tmp_path / "sample_level/qc_summary_stats.txt").read_text().endswith("203  17\n")
+    assert (tmp_path / "sample_level/sample_qc_summary_stats.txt").read_text().endswith("203  17\n")
 
 
 @pytest.mark.workflow
 @pytest.mark.regression
 @pytest.mark.real_data
-def test_qc_failures(tmp_path, sample_qc_report):
+def test_qc_failures(tmp_path, sample_qc_table):
     # GIVEN: real data sample sheet, config, and sample_qc_summary table.
     data_cache = (
         RealData(tmp_path)
@@ -182,9 +205,9 @@ def test_qc_failures(tmp_path, sample_qc_report):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copy(sample_qc_report, tmp_path / "sample_level/qc_summary.csv")
+    shutil.copy(sample_qc_table, tmp_path / "sample_level/sample_qc.csv")
 
-    # WHEN: run snakemake to create qc_summary_stats.txt
+    # WHEN: run snakemake to create sample_qc_summary_stats.txt
     run_snakemake(tmp_path)
 
     # THEN: The files should match production outputs

@@ -1,12 +1,14 @@
 import pandas as pd
 
+from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
+
 
 ################################################################################
 # Files For Lab
 ################################################################################
 rule lab_sample_level_qc_report:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         cfg.config.user_files.output_pattern.format(
             prefix="files_for_lab", file_type="all_sample_qc", ext="csv"
@@ -17,7 +19,7 @@ rule lab_sample_level_qc_report:
 
 rule lab_lims_upload:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         cfg.config.user_files.output_pattern.format(
             prefix="files_for_lab", file_type="LimsUpload", ext="csv"
@@ -25,6 +27,7 @@ rule lab_lims_upload:
     run:
         (
             pd.read_csv(input[0])
+            .rename(REPORT_NAME_MAPPER, axis=1)
             .rename({"Call_Rate_Initial": "Call Rate"}, axis=1)
             .reindex(
                 [
@@ -47,7 +50,7 @@ rule lab_lims_upload:
 
 rule lab_identifiler_needed:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         cfg.config.user_files.output_pattern.format(
             prefix="files_for_lab", file_type="Identifiler", ext="csv"
@@ -55,7 +58,8 @@ rule lab_identifiler_needed:
     run:
         (
             pd.read_csv(input[0])
-            .query("Identifiler_Needed")
+            .query("identifiler_needed")
+            .rename(REPORT_NAME_MAPPER, axis=1)
             .reindex(
                 [
                     "Sample_ID",
@@ -64,7 +68,7 @@ rule lab_identifiler_needed:
                     "Project-Sample ID",
                     "SR_Subject_ID",
                     "LIMS_Individual_ID",
-                    "Identifiler_Reason",
+                    "identifiler_reason",
                 ],
                 axis=1,
             )
@@ -152,14 +156,14 @@ rule deliver_subject_data:
 
 rule deliver_subject_list:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     output:
         "deliver/SampleUsedforSubject.csv",
     run:
-        qc = pd.read_csv(input[0]).query("not Internal_Control")  # exclude internal controls
+        qc = pd.read_csv(input[0]).query("not is_internal_control")  # exclude internal controls
 
         (
-            qc.query("Subject_Representative")
+            qc.query("is_subject_representative")
             .reindex(["Group_By_Subject_ID", "Sample_ID"], axis=1)
             # For groups without representative set Sample_ID to NA
             .set_index("Group_By_Subject_ID")

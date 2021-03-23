@@ -5,10 +5,13 @@ import pandas as pd
 import pysam
 import pytest
 
+from cgr_gwas_qc import load_config
+from cgr_gwas_qc.models.config import Config
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.conda import CondaEnv
-from cgr_gwas_qc.testing.data import RealData
+from cgr_gwas_qc.testing.data import FakeData, RealData
 
 
 ##################################################################################
@@ -144,14 +147,23 @@ def sample_sheet_file() -> Path:
     return Path("tests/data/example_sample_sheet.csv").absolute()
 
 
-@pytest.fixture(scope="session")
-def sample_sheet(sample_sheet_file) -> SampleSheet:
-    """Returns a ``SampleSheet`` object.
+@pytest.fixture
+def sample_sheet(sample_sheet_file) -> pd.DataFrame:
+    """FAke Data sample sheet (4 samples)."""
+    return SampleSheet(sample_sheet_file).add_group_by_column().data
 
-    The data section in the sample sheet can be accessed as a
-    ``pandas.DataFrame`` using ``sample_sheet.data``.
-    """
-    return SampleSheet(sample_sheet_file)
+
+@pytest.fixture(scope="session")
+def fake_config(tmp_path_factory) -> Config:
+    """Fake Data config assuming GTC entrypoint."""
+    tmp_path = tmp_path_factory.mktemp("fake_config")
+
+    (FakeData(tmp_path).add_user_files("gtc").make_config())
+
+    with chdir(tmp_path):
+        cfg = load_config()
+
+    return cfg.config
 
 
 @pytest.fixture(scope="session")
@@ -181,11 +193,55 @@ def vcf_mock():
 
 
 ##################################################################################
+# Test Data (Real)
+##################################################################################
+@pytest.mark.real_data
+@pytest.fixture
+def sample_sheet_short(pytestconfig) -> pd.DataFrame:
+    """Real Data short sample sheet (2 samples)."""
+    if not pytestconfig.getoption("--real-data"):
+        pytest.skip("No real data")
+
+    return SampleSheet(RealData() / "original_data/manifest_short.csv").add_group_by_column().data
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def sample_sheet_full(pytestconfig) -> pd.DataFrame:
+    """Real Data full sample sheet (203 samples)."""
+    if not pytestconfig.getoption("--real-data"):
+        pytest.skip("No real data")
+
+    return SampleSheet(RealData() / "original_data/manifest_full.csv").add_group_by_column().data
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def real_config(tmp_path_factory, pytestconfig) -> Config:
+    """Real Data config assuming GTC entrypoint."""
+    if not pytestconfig.getoption("--real-data"):
+        pytest.skip("No real data")
+
+    tmp_path = tmp_path_factory.mktemp("real_config")
+
+    (
+        RealData(tmp_path)
+        .add_user_files("gtc")
+        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+    )
+
+    with chdir(tmp_path):
+        cfg = load_config()
+
+    return cfg.config
+
+
+##################################################################################
 # Update QC Summary Table
 ##################################################################################
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def qc_summary(tmp_path_factory) -> Path:
+def sample_qc(tmp_path_factory) -> Path:
     """Add new QC columns to legacy QC summary table.
 
     The legacy QC summary table is missing several columns that are not
@@ -194,10 +250,10 @@ def qc_summary(tmp_path_factory) -> Path:
     Returns:
         Path to an updated sample qc summary table (CSV).
     """
-    from cgr_gwas_qc.workflow.scripts.sample_qc_report import (
+    from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import (
         IDENTIFILER_FLAGS,
         QC_HEADER,
-        _case_control_encoder,
         _find_study_subject_representative,
         _find_study_subject_with_no_representative,
         _identifiler_reason,
@@ -210,23 +266,29 @@ def qc_summary(tmp_path_factory) -> Path:
     ss = (
         SampleSheet(data_cache / "original_data/manifest_full.csv")
         .add_group_by_column("PI_Subject_ID")
-        .data.assign(Internal_Control=lambda x: x.Sample_Group == "sVALD-001")
+        .data.assign(is_internal_control=lambda x: x.Sample_Group == "sVALD-001")
+        .assign(case_control=lambda x: x["Case/Control_Status"].str.lower())
         .reindex(
-            ["Sample_ID", "Group_By_Subject_ID", "Internal_Control", "Case/Control_Status"], axis=1
+            ["Sample_ID", "Group_By_Subject_ID", "is_internal_control", "case_control"], axis=1
         )
     )
 
-    legacy_qc_table = pd.read_csv(data_cache / "production_outputs/all_sample_qc.csv").merge(
-        ss, on="Sample_ID", how="left"
+    legacy_qc_table = (
+        pd.read_csv(data_cache / "production_outputs/all_sample_qc.csv")
+        .merge(ss, on="Sample_ID", how="left")
+        .rename(
+            {v: k for k, v in REPORT_NAME_MAPPER.items()}, axis=1
+        )  # rename legacy columns to new column names
     )
 
-    # Use functions from QC script to add other columns
-    legacy_qc_table["Case/Control_Status"] = legacy_qc_table["Case/Control_Status"].map(
-        _case_control_encoder
+    # Add new columns
+    legacy_qc_table["identifiler_reason"] = _identifiler_reason(
+        legacy_qc_table, list(IDENTIFILER_FLAGS)
     )
-    legacy_qc_table["Identifiler_Reason"] = _identifiler_reason(legacy_qc_table, IDENTIFILER_FLAGS)
-    legacy_qc_table["Subject_Representative"] = _find_study_subject_representative(legacy_qc_table)
-    legacy_qc_table["Subject_Dropped_From_Study"] = _find_study_subject_with_no_representative(
+    legacy_qc_table["is_subject_representative"] = _find_study_subject_representative(
+        legacy_qc_table
+    )
+    legacy_qc_table["subject_dropped_from_study"] = _find_study_subject_with_no_representative(
         legacy_qc_table
     )
 

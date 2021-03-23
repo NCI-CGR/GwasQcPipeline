@@ -62,45 +62,55 @@ def test_load_str_or_path(file_name):
     assert sorted(sample_sheet._sections.keys()) == sorted(["header", "manifests", "data"])
 
 
+@pytest.fixture(scope="module")
+def sample_sheet_obj(sample_sheet_file) -> SampleSheet:
+    """Returns a ``SampleSheet`` object.
+
+    The data section in the sample sheet can be accessed as a
+    ``pandas.DataFrame`` using ``sample_sheet.data``.
+    """
+    return SampleSheet(sample_sheet_file)
+
+
 ################################################################################
 # The parsed Header and Manifest should be dictionaries while the Data section
 # should be a pandas.DataFrame.
 ################################################################################
-def test_sample_sheet_properties_right_type(sample_sheet):
+def test_sample_sheet_properties_right_type(sample_sheet_obj: SampleSheet):
     # GIVEN: A parsed sample sheet object
     # THEN: that from each section is the correct type
     # header data is a dictionary of key-value pairs
-    assert isinstance(sample_sheet.header, dict)
+    assert isinstance(sample_sheet_obj.header, dict)
     # manifests data is a dictionary of key-value pairs
-    assert isinstance(sample_sheet.manifests, dict)
+    assert isinstance(sample_sheet_obj.manifests, dict)
     # data data is a dataframe
-    assert isinstance(sample_sheet.data, pd.DataFrame)
+    assert isinstance(sample_sheet_obj.data, pd.DataFrame)
 
 
 ################################################################################
 # Check Header and Manifest sections
 ################################################################################
-def test_header_contains_project_info(sample_sheet: SampleSheet):
-    assert "SR0001-001;SR0002-001" == sample_sheet.header["Project Name"]
+def test_header_contains_project_info(sample_sheet_obj: SampleSheet):
+    assert "SR0001-001;SR0002-001" == sample_sheet_obj.header["Project Name"]
 
 
-def test_manifests_contains_bpm_info(sample_sheet: SampleSheet):
-    assert "GSAMD-24v1-0" == sample_sheet.manifests["snp_array"]
-    assert "GSAMD-24v1-0_20011747_A1.bpm" == sample_sheet.manifests["bpm"]
+def test_manifests_contains_bpm_info(sample_sheet_obj: SampleSheet):
+    assert "GSAMD-24v1-0" == sample_sheet_obj.manifests["snp_array"]
+    assert "GSAMD-24v1-0_20011747_A1.bpm" == sample_sheet_obj.manifests["bpm"]
 
 
 ################################################################################
 # Sanity check that Data section gives expected results.
 ################################################################################
-def test_sample_sheet_data(sample_sheet):
+def test_sample_sheet_data(sample_sheet_obj: SampleSheet):
     """Test dataframe functionality."""
     # GIVEN: A parsed sample sheet object
     # THEN: the dataframe from the data section behaves as expected
     # has the same number of rows as the example sample sheet data section
-    assert sample_sheet.data.shape[0] == 4
+    assert sample_sheet_obj.data.shape[0] == 4
     # Allows querying by different fields and returns the right number of results
-    assert sample_sheet.data.query("Identifiler_Sex == 'M'").shape[0] == 2
-    assert sample_sheet.data.query("`Case/Control_Status` == 'Case'").shape[0] == 2
+    assert sample_sheet_obj.data.query("Identifiler_Sex == 'M'").shape[0] == 2
+    assert sample_sheet_obj.data.query("`Case/Control_Status` == 'Case'").shape[0] == 2
 
 
 ################################################################################

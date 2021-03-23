@@ -15,7 +15,7 @@ include: cfg.modules("common.smk")
 ################################################################################
 checkpoint subjects_per_population:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     params:
         threshold=cfg.config.workflow_params.minimum_pop_subjects,
     output:
@@ -24,7 +24,7 @@ checkpoint subjects_per_population:
         output_path = Path(output[0])
         output_path.mkdir(exist_ok=True, parents=True)
 
-        df = pd.read_csv(input[0]).query("Subject_Representative")
+        df = pd.read_csv(input[0]).query("is_subject_representative")
         for pop_, grp in df.groupby("Ancestry"):
             if grp.shape[0] < params.threshold:
                 # Too few subjects to analyze population
@@ -132,7 +132,7 @@ rule phony_population_results:
 ################################################################################
 checkpoint controls_per_population:
     input:
-        "sample_level/qc_summary.csv",
+        "sample_level/sample_qc.csv",
     params:
         threshold=cfg.config.workflow_params.control_hwp_threshold,
     output:
@@ -141,7 +141,7 @@ checkpoint controls_per_population:
         output_path = Path(output[0])
         output_path.mkdir(exist_ok=True, parents=True)
 
-        df = pd.read_csv(input[0]).query("Subject_Representative & `Case/Control_Status` == 0")
+        df = pd.read_csv(input[0]).query("is_subject_representative & case_control == 'control'")
         for pop_, grp in df.groupby("Ancestry"):
             if grp.shape[0] < params.threshold:
                 # Too few controls to analyze population
@@ -230,7 +230,7 @@ rule phony_population_controls:
 ################################################################################
 rule population_qc_table:
     input:
-        sample_qc="sample_level/qc_summary.csv",
+        sample_qc="sample_level/sample_qc.csv",
         populations=rules.phony_population_results.output[0],
         controls=rules.phony_population_controls.output[0],
     output:
