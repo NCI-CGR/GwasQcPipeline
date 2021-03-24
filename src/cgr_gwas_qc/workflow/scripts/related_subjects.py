@@ -1,4 +1,60 @@
 #!/usr/bin/env python
+"""
+related_subjects.py
+-------------------
+
+Uses IBS/IBD to identify putative relationships among subjects within a
+population. Any two subjects whose ``PI_HAT`` is greater than the user
+defined ``pi_hat_threshold`` [1] will be considered related.
+
+Output:
+
+    ``{prefix}/subjects_relatives_pi_hat_gt{pi}.csv``
+
+    This table contains information about which subjects appear to be related
+    according to IBS/IBD. An arbitrary family ID is assigned to help tracking.
+
+    1. Uses ``PI_HAT`` from IBS/IBD estimation to identify pairwise groups of
+    related subjects.
+    2. Builds a graph where subjects (nodes) are connected by edges if their
+    ``PI_HAT`` was above the ``pi_hat_threshold`` [1].
+    3. Each connected subgraph is then considered a "QC_Family".
+
+    .. csv-table::
+        :header: name, description
+
+        **QC_Family_ID** (*index*), An arbitrary ID assigned to each related set of subjects.
+        relatives, A list of related Subject_IDs concatenated together with a `|`.
+
+
+    ``{prefix}/subjects_to_remove_pi_hat_gt{pi}.txt``
+
+    Using a greeding algorithm, select subjects, with the most relationships,
+    to prune from the dataset to eliminate relatedness.
+
+    1. Uses ``PI_HAT`` from IBS/IBD estimation to identify pairwise groups of
+    related subjects.
+    2. Builds a graph where subjects (nodes) are connected by edges if their
+    ``PI_HAT`` was above the ``pi_hat_threshold`` [1].
+    3. Identifies subjects that have the most relatives (ie., nodes with max
+    degree).
+    4. Randomly selects and removes one of these highly connected subjects.
+    Adds this subject to the output pruning list.
+    5. Removes any subjects that no longer have a relative in the graph
+    (i.e., isolated nodes with no edges).
+    6. Repeats 3-5 until there are no subjects left in the graph.
+
+    Saves a list of subjects to prune in a format compatible with PLINK's
+    ``--remove`` option. In other words, a space seperated table in the form
+    of::
+
+        Subject_ID1  Subject_ID1
+        Subject_ID2  Subject_ID2
+        ...
+
+References:
+    - [1] :attr:`cgr_gwas_qc.models.config.software_params.SoftWareParams.pi_hat_threshold`
+"""
 from pathlib import Path
 from typing import Generator, Optional
 
@@ -21,27 +77,6 @@ def main(
     relatives: Path = typer.Argument(..., help="Path to save a list of subjects to remove."),
     to_remove: Path = typer.Argument(..., help="Path to save a list of subjects to remove."),
 ):
-    """Create a related subjects pruning list.
-
-    The goal of this script is to prune related subjects based on `PI_HAT`.
-    It uses a graph based algorithm to select which subjects should be
-    pruned. It does this by doing the following:
-
-    1. Uses `PI_HAT` from IBS/IBD estimation to identify pairwise groups of
-       related subjects.
-    2. Builds a graph where subjects (nodes) are connected by edges if their
-       `PI_HAT` was above the pi_hat_threshold.
-    3. Identifies subjects that have the most relatives (ie., nodes with max
-       degree).
-    4. Randomly selects and removes one of these highly connected subjects.
-       Adds this subject to the output pruning list.
-    5. Removes any subjects that no longer have a relative in the graph
-       (i.e., isolated nodes with no edges).
-    6. Repeats 3-5 until there are no subjects left in the graph.
-
-    Saves a list of subjects to prune in a format compatible with PLINK's
-    `--remove` option.
-    """
     pairwise_related_subjects = list(
         plink.read_genome(genome)
         .query("PI_HAT > @pi_hat_threshold")  # Ignore subjects under the pi_hat_threshold
@@ -80,13 +115,7 @@ def create_qc_families(G: nx.Graph) -> pd.Series:
 
     Returns:
         pd.Series:
-
-            .. csv-table::
-                :header: name, dtype, description
-
-                **QC_Family_ID** (*index*), string, An arbitrary ID assigned to each related subgraph.
-                relatives, string, A list of related IDs concatenated together with a `|`.
-
+            (QC_Family_ID, relatives)
     """
     return pd.Series(
         {
