@@ -76,6 +76,27 @@ rule plink_split_population:
         "--out {params.out_prefix}"
 
 
+rule population_qc_table:
+    input:
+        relatives=expand(
+            "population_level/{{population}}/subjects_relatives_pi_hat_gt{pi}.csv",
+            pi=cfg.config.software_params.pi_hat_threshold,
+        ),
+        pca=expand(
+            "population_level/{{population}}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec",
+            pi=cfg.config.software_params.pi_hat_threshold,
+            maf=cfg.config.software_params.maf_for_ibd,
+            ld=cfg.config.software_params.ld_prune_r2,
+        ),
+        autosomal_het="population_level/{population}/subjects.het",
+    params:
+        population="{population}",
+    output:
+        "population_level/{population}/qc.csv",
+    script:
+        "../scripts/population_qc_table.py"
+
+
 def required_population_results(wildcards):
     """Decide what populations to analyze.
 
@@ -88,40 +109,14 @@ def required_population_results(wildcards):
     if populations == ["no_populations"]:
         return []
 
-    pi = cfg.config.software_params.pi_hat_threshold
-    maf = cfg.config.software_params.maf_for_ibd
-    ld = cfg.config.software_params.ld_prune_r2
-
-    return flatten(
-        [
-            expand(  # PCA
-                "population_level/{population}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec",
-                population=populations,
-                pi=pi,
-                maf=maf,
-                ld=ld,
-            ),
-            expand(  # IBS/IBD
-                "population_level/{population}/subjects_maf{maf}_ld{ld}_pruned.genome",
-                population=populations,
-                maf=maf,
-                ld=ld,
-            ),
-            expand(  # Autosomal Heterozygosity
-                "population_level/{population}/subjects.het",
-                population=populations,
-                maf=maf,
-                ld=ld,
-            ),
-        ]
-    )
+    return expand("population_level/{population}/qc.csv", population=populations)
 
 
-rule phony_population_results:
+rule per_population_qc_done:
     input:
         required_population_results,
     output:
-        "population_level/results.done",
+        "population_level/per_population_qc.done",
     shell:
         "echo {input} | xargs printf '%s\n' > {output[0]}"
 
@@ -216,11 +211,11 @@ def required_population_controls(wildcards):
     )
 
 
-rule phony_population_controls:
+rule per_population_controls_qc_done:
     input:
         required_population_controls,
     output:
-        "population_level/controls.done",
+        "population_level/per_population_controls_qc.done",
     shell:
         "echo {input} | xargs printf '%s\n' > {output[0]}"
 
@@ -228,12 +223,12 @@ rule phony_population_controls:
 ################################################################################
 # Summary of Population and Controls
 ################################################################################
-rule population_qc_table:
+rule agg_population_qc_table:
     input:
         sample_qc="sample_level/sample_qc.csv",
-        populations=rules.phony_population_results.output[0],
-        controls=rules.phony_population_controls.output[0],
+        populations=rules.per_population_qc_done.output[0],
+        controls=rules.per_population_controls_qc_done.output[0],
     output:
         "population_level/population_qc.csv",
     script:
-        "../scripts/population_qc_table.py"
+        "../scripts/agg_population_qc_tables.py"
