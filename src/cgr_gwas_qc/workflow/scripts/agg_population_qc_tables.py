@@ -66,9 +66,9 @@ DTYPES = {
     "PC8": "float",
     "PC9": "float",
     "PC10": "float",
-    "O_HOM": "UInt8",
-    "E_HOM": "UInt8",
-    "N_NM": "UInt8",
+    "O_HOM": "UInt32",
+    "E_HOM": "UInt32",
+    "N_NM": "UInt32",
     "F": "float",
 }
 

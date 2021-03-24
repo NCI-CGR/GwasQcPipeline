@@ -67,9 +67,9 @@ DTYPES = {
     "PC8": "float",
     "PC9": "float",
     "PC10": "float",
-    "O_HOM": "UInt8",
-    "E_HOM": "UInt8",
-    "N_NM": "UInt8",
+    "O_HOM": "UInt32",
+    "E_HOM": "UInt32",
+    "N_NM": "UInt32",
     "F": "float",
 }
 
@@ -82,7 +82,7 @@ def main(relatives: Path, pca: Path, autosomal_het: Path, population: str, outfi
         .reset_index()
         .assign(population=population)
         .pipe(lambda x: annotate_relations(x, relatives, population))
-        .reindex(DTYPES.keys(), axis=1)
+        # .reindex(DTYPES.keys(), axis=1)
     )
 
     df.to_csv(outfile, index=False)
@@ -98,6 +98,8 @@ def _expand_related(relatives: os.PathLike, population: str) -> Generator[pd.Dat
                     "relatives": [rels],
                 }
             )
+    else:
+        yield pd.DataFrame(columns=["Subject_ID", "QC_Family_ID", "relatives"])
 
 
 def annotate_relations(df: pd.DataFrame, relatives: os.PathLike, population: str) -> pd.DataFrame:

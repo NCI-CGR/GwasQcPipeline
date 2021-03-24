@@ -78,12 +78,10 @@ rule plink_split_population:
 
 rule population_qc_table:
     input:
-        relatives=expand(
-            "population_level/{{population}}/subjects_relatives_pi_hat_gt{pi}.csv",
-            pi=cfg.config.software_params.pi_hat_threshold,
+        relatives="population_level/{{population}}/subjects_relatives_pi_hat_gt{pi}.csv".format(
+            pi=cfg.config.software_params.pi_hat_threshold
         ),
-        pca=expand(
-            "population_level/{{population}}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec",
+        pca="population_level/{{population}}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec".format(
             pi=cfg.config.software_params.pi_hat_threshold,
             maf=cfg.config.software_params.maf_for_ibd,
             ld=cfg.config.software_params.ld_prune_r2,

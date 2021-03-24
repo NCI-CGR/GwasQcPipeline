@@ -62,5 +62,5 @@ if cfg.ss.shape[0] < 1_000:
 
 rule all:
     input:
-        "population_level/results.done",
+        "population_level/population_qc.csv",
         "population_level/controls.done",
