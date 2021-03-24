@@ -17,6 +17,8 @@ Output:
 
         population, The population name
         Subject_ID, The Subject's ID
+        QC_Family_ID, An arbitrary ID assigned to each related set of subjects.
+        relatives, A list of related Subject_IDs concatenated together with a `|`.
         PC1, Principal component 1
         PC2, Principal component 2
         PC3, Principal component 3
@@ -53,6 +55,8 @@ app = typer.Typer(add_completion=False)
 DTYPES = {
     "population": "string",
     "Subject_ID": "string",
+    "QC_Family_ID": "string",
+    "relatives": "string",
     "PC1": "float",
     "PC2": "float",
     "PC3": "float",
