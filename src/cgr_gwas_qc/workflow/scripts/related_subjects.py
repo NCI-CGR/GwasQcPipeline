@@ -7,16 +7,19 @@ import pandas as pd
 import typer
 from numpy.random import RandomState
 
+from cgr_gwas_qc.parsers import plink
+
 app = typer.Typer(add_completion=False)
 
 
 @app.command()
 def main(
-    ibs: Path = typer.Argument(..., help="Path to the PLINK `.genome` file", exists=True),
+    genome: Path = typer.Argument(..., help="Path to the PLINK `.genome` file", exists=True),
     pi_hat_threshold: float = typer.Argument(  # noqa
         ..., help="The threshold to consider subjects related."
     ),
-    out_file: Path = typer.Argument(..., help="Path to save a list of subjects to remove."),
+    relatives: Path = typer.Argument(..., help="Path to save a list of subjects to remove."),
+    to_remove: Path = typer.Argument(..., help="Path to save a list of subjects to remove."),
 ):
     """Create a related subjects pruning list.
 
@@ -40,15 +43,16 @@ def main(
     `--remove` option.
     """
     pairwise_related_subjects = list(
-        pd.read_csv(ibs, delim_whitespace=True)
+        plink.read_genome(genome)
         .query("PI_HAT > @pi_hat_threshold")  # Ignore subjects under the pi_hat_threshold
-        .reindex(["IID1", "IID2"], axis=1)
+        .reindex(["ID1", "ID2"], axis=1)
         .itertuples(index=False)
     )
 
     if not pairwise_related_subjects:
-        # no related subjects so create empty pruning file
-        out_file.touch()
+        # no related subjects so create empty files
+        relatives.write_text("QC_Family_ID,relatives\n")
+        to_remove.touch()
         return None
 
     # Create a graph where subjects are nodes and edges are relatedness at a
@@ -56,9 +60,41 @@ def main(
     G = nx.Graph()
     G.add_edges_from(pairwise_related_subjects)
 
+    # Create a list of relatives at the current PI_HAT threshold
+    create_qc_families(pairwise_related_subjects).to_csv(relatives)
+
     # Create a pruning list by removing the most connected subjects first.
     prune_list = create_prune_list(G)
-    out_file.write_text("\n".join(prune_list))
+    to_remove.write_text("\n".join(prune_list))
+
+
+def create_qc_families(G: nx.Graph) -> pd.Series:
+    """Create a summary table of putative relatives.
+
+    For each subgraph of relatives, concatenates node IDs into a string and
+    assigns an arbitrary `QC_Family_ID`.
+
+    Args:
+        G: A graph where nodes are subjects and edges indicate two
+          subjects are related.
+
+    Returns:
+        pd.Series:
+
+            .. csv-table::
+                :header: name, dtype, description
+
+                **QC_Family_ID** (*index*), string, An arbitrary ID assigned to each related subgraph.
+                relatives, string, A list of related IDs concatenated together with a `|`.
+
+    """
+    return pd.Series(
+        {
+            f"fam{i}": "|".join(sorted(subgraph))
+            for i, subgraph in enumerate(sorted(nx.connected_components(G), key=len), start=1)
+        },
+        name="relatives",
+    ).rename_axis("QC_Family_ID")
 
 
 def create_prune_list(
@@ -99,8 +135,8 @@ def _prune(G: nx.Graph, seed: Optional[RandomState]) -> Generator[str, None, Non
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {}
-        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
-        defaults.update({"out_file": Path(snakemake.output[0])})  # type: ignore # noqa
+        defaults.update({"genome": Path(snakemake.input[0])})  # type: ignore # noqa
+        defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
         defaults.update(snakemake.params)  # type: ignore # noqa
         main(**defaults)
     else:

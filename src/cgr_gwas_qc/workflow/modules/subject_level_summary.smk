@@ -61,7 +61,10 @@ rule sample_to_subject_map:
             .query("is_subject_representative")
             .assign(Sample_ID2=lambda x: x.Sample_ID)
             .assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
-            .reindex(["Sample_ID", "Sample_ID2", "Group_By_Subject_ID", "Subject_ID2"], axis=1)
+            .reindex(
+                ["Sample_ID", "Sample_ID2", "Group_By_Subject_ID", "Subject_ID2"],
+                axis=1,
+            )
             .to_csv(output[0], sep=" ", index=False, header=False)
         )
 
@@ -102,13 +105,15 @@ rule renamed_subjects:
 
 rule related_subjects:
     input:
-        ibs="{{prefix}}/subjects_maf{maf}_ld{ld}_pruned.genome".format(
-            maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
+        "{{prefix}}/subjects_maf{maf}_ld{ld}_pruned.genome".format(
+            maf=cfg.config.software_params.maf_for_ibd,
+            ld=cfg.config.software_params.ld_prune_r2,
         ),
     params:
         pi_hat_threshold=lambda wc: float(wc.pi),
     output:
-        "{prefix}/subjects_to_remove_pi_hat_gt{pi}.txt",
+        relatives="{prefix}/subjects_relatives_pi_hat_gt{pi}.csv",
+        to_remove="{prefix}/subjects_to_remove_pi_hat_gt{pi}.txt",
     wildcard_constraints:
         pi="[01].\d+",
     script:
@@ -120,7 +125,7 @@ rule remove_related_subjects:
         bed="{prefix}/subjects.bed",
         bim="{prefix}/subjects.bim",
         fam="{prefix}/subjects.fam",
-        to_remove=rules.related_subjects.output[0],
+        to_remove=rules.related_subjects.output.to_remove,
     params:
         out_prefix="{prefix}/subjects_unrelated{pi}",
     output:
