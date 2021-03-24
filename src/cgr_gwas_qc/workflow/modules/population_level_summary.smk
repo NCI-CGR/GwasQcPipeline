@@ -225,9 +225,8 @@ rule per_population_controls_qc_done:
 ################################################################################
 rule agg_population_qc_table:
     input:
-        sample_qc="sample_level/sample_qc.csv",
-        populations=rules.per_population_qc_done.output[0],
-        controls=rules.per_population_controls_qc_done.output[0],
+        sample_qc_table="sample_level/sample_qc.csv",
+        population_qc_tables=rules.per_population_qc_done.output[0],
     output:
         "population_level/population_qc.csv",
     script:
