@@ -14,9 +14,9 @@ def read_het(filename: Path) -> pd.DataFrame:
                 :header: name, dtype, description
 
                 **ID** (*index*), object, Sample or Subject ID
-                O(HOM), int, Observed number of homozygotes
-                E(HOM), int, Expected number of homozygotes
-                N(NM), int, Number of non-missing autosomal genotypes
+                O_HOM, int, Observed number of homozygotes
+                E_HOM, int, Expected number of homozygotes
+                N_NM, int, Number of non-missing autosomal genotypes
                 F, float, Method-of-moments F coefficient estimate
 
     References:
@@ -26,7 +26,7 @@ def read_het(filename: Path) -> pd.DataFrame:
     return (
         pd.read_csv(filename, delim_whitespace=True)
         .drop("FID", axis=1)
-        .rename({"IID": "ID"}, axis=1)
+        .rename({"IID": "ID", "O(HOM)": "O_HOM", "E(HOM)": "E_HOM", "N(NM)": "N_NM"}, axis=1)
         .set_index("ID")
     )
 
@@ -137,9 +137,9 @@ def read_sexcheck(filename: Path) -> pd.DataFrame:
 
                 **ID** (*index*), object, Sample or Subject ID
                 PEDSEX, int, Sex code in input file
-                SNPSEX, int, Imputed sex code (1 = male, 2 = female, 0 = unknown)
-                STATUS, str, "OK" if PEDSEX and SNPSEX match and are nonzero, "PROBLEM" otherwise
-                F, int, Inbreeding coefficient, considering only X chromosome.
+                SNPSEX, int, Imputed sex code (1 = male; 2 = female; 0 = unknown)
+                STATUS, str, "OK" if PEDSEX and SNPSEX match and are nonzero "PROBLEM" otherwise
+                F, int, Inbreeding coefficient considering only X chromosome.
 
     References:
         - https://www.cog-genomics.org/plink/1.9/basic_stats#check_sex
