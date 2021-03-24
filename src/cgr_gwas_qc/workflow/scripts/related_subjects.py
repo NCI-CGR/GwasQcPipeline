@@ -45,7 +45,7 @@ Output:
     6. Repeats 3-5 until there are no subjects left in the graph.
 
     Saves a list of subjects to prune in a format compatible with PLINK's
-    ``--remove`` option. In other words, a space seperated table in the form
+    ``--remove`` option. In other words, a space separated table in the form
     of::
 
         Subject_ID1  Subject_ID1
@@ -96,7 +96,7 @@ def main(
     G.add_edges_from(pairwise_related_subjects)
 
     # Create a list of relatives at the current PI_HAT threshold
-    create_qc_families(pairwise_related_subjects).to_csv(relatives)
+    create_qc_families(G).to_csv(relatives)
 
     # Create a pruning list by removing the most connected subjects first.
     prune_list = create_prune_list(G)
