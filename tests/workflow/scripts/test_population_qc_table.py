@@ -2,6 +2,7 @@ from io import StringIO
 from textwrap import dedent
 
 import pandas as pd
+import pytest
 
 from cgr_gwas_qc.testing.data import RealData
 from cgr_gwas_qc.workflow.scripts.population_qc_table import _expand_related, main
@@ -22,6 +23,7 @@ def test_expand_related():
     assert {"S001|S002"} == set(df.relatives)
 
 
+@pytest.mark.real_data
 def test_main(tmp_path):
     pca = RealData() / "production_outputs/pca/EUR_subjects.eigenvec"
     het = RealData() / "production_outputs/autosomal_heterozygosity/EUR_subjects_qc.het"

@@ -121,7 +121,7 @@ def test_plink_split_population(tmp_path, conda_envs):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_phony_population_results(tmp_path, conda_envs, sample_qc):
+def test_per_population_qc_done(tmp_path, conda_envs, sample_qc):
     # GIVEN: real data config, sample_qc table, all of the inputs to generate
     # the summary table, and subject level plink data sets.
     # NOTE: I had to include the sample_qc inputs to get snakemake to run the
@@ -149,7 +149,7 @@ def test_phony_population_results(tmp_path, conda_envs, sample_qc):
 
             rule all:
                 input:
-                    "population_level/results.done",
+                    "population_level/per_population_qc.done",
 
             """
         )
@@ -193,7 +193,7 @@ def test_phony_population_results(tmp_path, conda_envs, sample_qc):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_phony_no_population_results(tmp_path, conda_envs, sample_qc):
+def test_per_population_qc_done_no_populations(tmp_path, conda_envs, sample_qc):
     # GIVEN: real data config, sample_qc table, but requiring 500 samples per populations
     conda_envs.copy_env("plink2", tmp_path)
     conda_envs.copy_env("eigensoft", tmp_path)
@@ -217,7 +217,7 @@ def test_phony_no_population_results(tmp_path, conda_envs, sample_qc):
 
             rule all:
                 input:
-                    "population_level/results.done",
+                    "population_level/per_population_qc.done",
 
             """
         )
@@ -229,7 +229,7 @@ def test_phony_no_population_results(tmp_path, conda_envs, sample_qc):
     run_snakemake(tmp_path)
 
     # THEN: There are not populations saved
-    assert "" == (tmp_path / "population_level/results.done").read_text().strip()
+    assert "" == (tmp_path / "population_level/per_population_qc.done").read_text().strip()
 
 
 @pytest.mark.regression
@@ -364,7 +364,7 @@ def test_plink_split_controls(tmp_path, conda_envs):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_phony_population_controls(tmp_path, conda_envs, sample_qc):
+def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc):
     # GIVEN: real data config, sample_qc table, all of the inputs to generate
     # the summary table, the European control list, and subject level plink data sets.
     # NOTE: I had to include the sample_qc inputs to get snakemake to run the
@@ -400,7 +400,7 @@ def test_phony_population_controls(tmp_path, conda_envs, sample_qc):
 
             rule all:
                 input:
-                    "population_level/controls.done",
+                    "population_level/per_population_controls_qc.done",
 
             """
         )
@@ -432,7 +432,7 @@ def test_phony_population_controls(tmp_path, conda_envs, sample_qc):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_phony_population_missing_controls(tmp_path, conda_envs, sample_qc):
+def test_per_population_controls_qc_done_no_controls(tmp_path, conda_envs, sample_qc):
     # GIVEN: real data config, sample_qc table
     conda_envs.copy_env("plink2", tmp_path)
     conda_envs.copy_env("eigensoft", tmp_path)
@@ -455,7 +455,7 @@ def test_phony_population_missing_controls(tmp_path, conda_envs, sample_qc):
 
             rule all:
                 input:
-                    "population_level/controls.done",
+                    "population_level/per_population_controls_qc.done",
 
             """
         )
@@ -473,4 +473,4 @@ def test_phony_population_missing_controls(tmp_path, conda_envs, sample_qc):
     run_snakemake(tmp_path)
 
     # THEN: There are no controls created
-    assert "" == (tmp_path / "population_level/controls.done").read_text().strip()
+    assert "" == (tmp_path / "population_level/per_population_controls_qc.done").read_text().strip()
