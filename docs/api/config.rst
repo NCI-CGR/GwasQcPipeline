@@ -6,6 +6,7 @@ Data Models
 
 .. pydantic:: cgr_gwas_qc.models.config.Config
 
+.. pydantic:: cgr_gwas_qc.models.config.software_params.SoftwareParams
 
 Configuration Manager
 ---------------------

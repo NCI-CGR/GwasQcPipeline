@@ -9,4 +9,4 @@ def test_read_het():
     filename = RealData() / "production_outputs/plink_start/samples_start.het"
     df = plink.read_het(filename)
     assert "ID" == df.index.name
-    assert all(["O(HOM)", "E(HOM)", "N(NM)", "F"] == df.columns.values)
+    assert all(["O_HOM", "E_HOM", "N_NM", "F"] == df.columns.values)
