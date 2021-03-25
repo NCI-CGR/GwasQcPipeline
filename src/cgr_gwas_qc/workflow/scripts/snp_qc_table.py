@@ -14,7 +14,21 @@ from pathlib import Path
 import pandas as pd
 import typer
 
+from cgr_gwas_qc.parsers import plink
+
 app = typer.Typer(add_completion=False)
+
+DTYPES = {
+    "array_snp_id": "string",
+    "thousand_genomes_snp_id": "string",
+    "chromosome": "string",
+    "Call_Rate_Initial": "float",
+    "is_cr1_filtered": "boolean",
+    "Call_Rate_1": "float",
+    "is_cr2_filtered": "boolean",
+    "Call_Rate_2": "float",
+    "is_call_rate_filtered": "boolean",
+}
 
 
 @app.command()
@@ -26,43 +40,59 @@ def main(
     outfile: Path = typer.Option(..., help="Output CSV."),
 ):
 
-    build_table(initial, cr1, cr2, thousand_genomes).to_csv(outfile)
+    snp_qc = aggregate_snp_data(initial, cr1, cr2, thousand_genomes)
+    add_call_rate_flags(snp_qc)
+    snp_qc.reindex(DTYPES.keys(), axis=1).to_csv(outfile)
 
 
-def build_table(initial, cr1, cr2, thousand_genomes):
+def aggregate_snp_data(initial, cr1, cr2, thousand_genomes) -> pd.DataFrame:
     return (
-        _read_lmiss(initial, "call_rate_initial")
-        .merge(_read_lmiss(cr1, "cr1"), how="outer")
-        .merge(_read_lmiss(cr2, "cr2"), how="outer")
+        _read_lmiss(initial, "Call_Rate_Initial")
+        .merge(_read_lmiss(cr1, "Call_Rate_1"), how="outer")
+        .merge(_read_lmiss(cr2, "Call_Rate_2"), how="outer")
         .merge(_read_thousand_genomes(thousand_genomes), how="outer")
-        .fillna({"snp_cr1_removed": True, "snp_cr2_removed": True})
-        .reindex(
-            [
-                "array_snp_id",
-                "thousand_genomes_snp_id",
-                "chromosome",
-                "snp_cr1",
-                "snp_cr1_removed",
-                "snp_cr2",
-                "snp_cr2_removed",
-            ],
-            axis=1,
-        )
     )
 
 
-def _read_lmiss(filename: Path, prefix: str) -> pd.DataFrame:
-    df = (
-        pd.read_csv(filename, delim_whitespace=True)
-        .assign(**{f"snp_{prefix}": lambda x: 1 - x.F_MISS})
+def add_call_rate_flags(df: pd.DataFrame):
+    """Add summary flags for call rate.
+
+    Each call rate step will drop snps/samples, so missing snps/samples were
+    filtered in the current or previous step(s). For example, a missing
+    snp `Call_Rate_1` indicates the snp did not pass Call Rate 1 filter
+    or was missing from before. If the sample was missing from before than I
+    am setting it as missing (pd.NA). This will help with data provenance and
+    hopefully make it clearer why a sample was removed.
+    """
+    cri = df.Call_Rate_Initial.isna()
+    cr1 = df.Call_Rate_1.isna()
+    cr2 = df.Call_Rate_2.isna()
+
+    df["is_cr1_filtered"] = cr1
+    df.loc[cri, "is_cr1_filtered"] = pd.NA
+
+    df["is_cr2_filtered"] = cr2
+    df.loc[cri | cr1, "is_cr2_filtered"] = pd.NA
+
+    # Add Call Rate Summary Flag
+    # `True` if filtered in cr1 or cr2
+    # `False` if not filtered in cr1 or cr2
+    # `pd.NA` if missing in the initial data set (cri)
+    df["is_call_rate_filtered"] = cr2
+    df.loc[cri, "is_call_rate_filtered"] = pd.NA
+
+
+def read_snp_qc(filename: Path) -> pd.DataFrame:
+    return pd.read_csv(filename, dtype=DTYPES)
+
+
+def _read_lmiss(filename: Path, name: str) -> pd.DataFrame:
+    return (
+        plink.read_lmiss(filename)
+        .assign(**{name: lambda x: 1 - x.F_MISS})
         .rename({"SNP": "array_snp_id", "CHR": "chromosome"}, axis=1)
-        .reindex(["array_snp_id", "chromosome", f"snp_{prefix}"], axis=1)
+        .reindex(["array_snp_id", "chromosome", name], axis=1)
     )
-
-    if prefix != "call_rate_initial":
-        df[f"snp_{prefix}_removed"] = False
-
-    return df
 
 
 def _read_thousand_genomes(filename: Path):
