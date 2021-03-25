@@ -26,6 +26,7 @@ from cgr_gwas_qc.models.config.user_files import Idat
 from cgr_gwas_qc.parsers import plink
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.validators import check_file
+from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
 
 app = typer.Typer(add_completion=False)
 
@@ -153,28 +154,7 @@ def main(
     ################################################################################
     # Add Summary Columns
     ################################################################################
-    # Add Call Rate Flags
-    # NOTE: Each call rate step will drop samples, so missing samples were
-    # filtered in the current or previous step(s). For example, a missing sample
-    # `Call_Rate_1` indicates the sample did not pass Call Rate 1 filter or
-    # was missing from before. If the sample was missing from before than I am
-    # setting it as missing (pd.NA). This will help with data provenance and
-    # hopefully make it clearer why a sample was removed.
-    cri = sample_qc.Call_Rate_Initial.isna()
-    cr1 = sample_qc.Call_Rate_1.isna()
-    cr2 = sample_qc.Call_Rate_2.isna()
-
-    sample_qc["is_cr1_filtered"] = cr1
-    sample_qc.loc[cri, "is_cr1_filtered"] = pd.NA
-
-    sample_qc["is_cr2_filtered"] = cr2
-    sample_qc.loc[cri | cr1, "is_cr2_filtered"] = pd.NA
-
-    # Add Call Rate Summary Flag
-    # NOTE: This is `True` if filtered in CR1 or CR2. It is `pd.NA` if missing
-    # in the initial data set (cri) and otherwise `False`.
-    sample_qc["is_call_rate_filtered"] = cr2
-    sample_qc.loc[cri, "is_call_rate_filtered"] = pd.NA
+    add_call_rate_flags(sample_qc)
 
     # Count the number of QC issues
     sample_qc["Count_of_QC_Issue"] = sample_qc[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
@@ -238,7 +218,7 @@ def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str
     df["case_control"] = (
         df["Case/Control_Status"]
         .str.lower()
-        .map(lambda status: case_control_mapper.get(status, pd.NA))
+        .map(lambda status: case_control_mapper.get(status, "Unknown"))
         .astype(CASE_CONTROL_DTYPE)
     )
 
