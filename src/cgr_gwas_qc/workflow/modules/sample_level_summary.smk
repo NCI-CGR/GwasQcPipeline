@@ -53,6 +53,21 @@ rule sample_qc_summary_stats:
         "../scripts/sample_qc_summary_stats.py"
 
 
+rule plot_call_rate:
+    input:
+        sample_qc=rules.sample_qc_table.output[0],
+        snp_qc=rules.snp_qc_table.output[0],
+    params:
+        sample_cr1=cfg.config.software_params.sample_call_rate_1,
+        snp_cr1=cfg.config.software_params.snp_call_rate_1,
+        sample_cr2=cfg.config.software_params.sample_call_rate_2,
+        snp_cr2=cfg.config.software_params.snp_call_rate_2,
+    output:
+        "sample_level/call_rate.png",
+    script:
+        "../scripts/plot_call_rate.py"
+
+
 rule sample_lists_from_qc_flags:
     input:
         all_samples=rules.sample_qc_table.output[0],

@@ -9,6 +9,8 @@ env = Environment(
 )
 
 CASE_CONTROL_DTYPE = pd.CategoricalDtype(categories=["Case", "Control", "QC", "Unknown"])
+CASE_CONTROL_COLORS = ["#f7022a", "#3e82fc", "gray", "#1bfc06"]  # red  # blue  # gray  # green
+
 SEX_DTYPE = pd.CategoricalDtype(categories=["M", "F", "U"])
 
 # Mapping current column names to names from the legacy workflow to maintain
