@@ -8,7 +8,7 @@ env = Environment(
     keep_trailing_newline=True,
 )
 
-CASE_CONTROL_DTYPE = pd.CategoricalDtype(categories=["Case", "Control", "QC"])
+CASE_CONTROL_DTYPE = pd.CategoricalDtype(categories=["Case", "Control", "QC", "Unknown"])
 SEX_DTYPE = pd.CategoricalDtype(categories=["M", "F", "U"])
 
 # Mapping current column names to names from the legacy workflow to maintain
