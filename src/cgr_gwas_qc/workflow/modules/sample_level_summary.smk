@@ -68,6 +68,15 @@ rule plot_call_rate:
         "../scripts/plot_call_rate.py"
 
 
+rule plot_chrx_inbreeding:
+    input:
+        rules.sample_qc_table.output[0],
+    output:
+        "sample_level/chrx_inbreeding.png",
+    script:
+        "../scripts/plot_chrx_inbreeding.py"
+
+
 rule sample_lists_from_qc_flags:
     input:
         all_samples=rules.sample_qc_table.output[0],
