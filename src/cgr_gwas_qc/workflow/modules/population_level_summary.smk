@@ -247,3 +247,12 @@ rule plot_pca:
         directory("population_level/pca_plots"),
     script:
         "../scripts/plot_pca.py"
+
+
+rule plot_hwe:
+    input:
+        rules.per_population_controls_qc_done.output[0],
+    output:
+        directory("population_level/hwe_plots"),
+    script:
+        "../scripts/plot_hwe.py"
