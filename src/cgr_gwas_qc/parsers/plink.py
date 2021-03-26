@@ -31,6 +31,48 @@ def read_het(filename: Path) -> pd.DataFrame:
     )
 
 
+def read_hwe(filename: Path) -> pd.DataFrame:
+    """Parse PLINK's hwe file format.
+
+    Returns:
+        pd.DataFrame:
+            A (# SNP x 9) table with the following columns
+
+            .. csv-table::
+                :header: name, dtype, description
+
+                **SNP** (*index*), string, SNP ID
+                CHR, string, Chromosome code
+                TEST, string, Type of test; one of {ALL', 'AFF', 'UNAFF', 'ALL(QT)', 'ALL(NP)'}
+                A1, string, Allele 1 (usually minor)
+                A2, string, Allele 2 (usually major)
+                GENO, string, '/'- separated genotype counts (A1 hom, het, A2 hom)
+                O_HET, float, Observed heterozygote frequency
+                E_HET, float, Expected heterozygote frequency
+                P, float, Hardy-Weinberg equilibrium exact test p-value
+
+    References:
+        - https://www.cog-genomics.org/plink/1.9/basic_stats#hardy
+        - https://www.cog-genomics.org/plink/1.9/formats#hwe
+    """
+    dtypes = {
+        "CHR": "string",
+        "SNP": "string",
+        "TEST": "string",
+        "A1": "string",
+        "A2": "string",
+        "GENO": "string",
+        "O(HET)": "float",
+        "E(HET)": "float",
+        "P": "float",
+    }
+    return (
+        pd.read_csv(filename, delim_whitespace=True, dtype=dtypes)
+        .rename({"O(HET)": "O_HET", "E(HET)": "E_HET"}, axis=1)
+        .set_index("SNP")
+    )
+
+
 def read_genome(filename: Path) -> pd.DataFrame:
     """Parse PLINK's genome file format.
 
