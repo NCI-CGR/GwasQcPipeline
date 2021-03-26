@@ -238,3 +238,12 @@ rule plot_autosomal_heterozygosity:
         directory("population_level/autosomal_heterozygosity_plots"),
     script:
         "../scripts/plot_autosomal_heterozygosity.py"
+
+
+rule plot_pca:
+    input:
+        rules.agg_population_qc_table.output[0],
+    output:
+        directory("population_level/pca_plots"),
+    script:
+        "../scripts/plot_pca.py"
