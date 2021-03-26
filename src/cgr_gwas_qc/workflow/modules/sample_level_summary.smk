@@ -77,6 +77,15 @@ rule plot_chrx_inbreeding:
         "../scripts/plot_chrx_inbreeding.py"
 
 
+rule plot_ancestry:
+    input:
+        rules.sample_qc_table.output[0],
+    output:
+        "sample_level/ancestry.png",
+    script:
+        "../scripts/plot_ancestry.py"
+
+
 rule sample_lists_from_qc_flags:
     input:
         all_samples=rules.sample_qc_table.output[0],
