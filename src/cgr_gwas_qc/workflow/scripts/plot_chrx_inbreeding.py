@@ -9,7 +9,9 @@ Output:
     ``sample_level/chrx_inbreeding.png``
 
 """
+import os
 from pathlib import Path
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -25,15 +27,13 @@ app = typer.Typer(add_completion=False)
 @app.command()
 def main(sample_qc: Path, outfile: Path):
     sample = load_sample_data(sample_qc)
-    fig = plot(sample)
-    fig.savefig(outfile)
+    plot(sample, outfile)
 
 
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     return (
         read_sample_qc(sample_qc)
-        .query("case_control != 'QC'")
-        .query("expected_sex != 'U'")
+        .query("expected_sex != 'U'")  # Don't plot unknown sex
         .transform(_update_categories)
     )
 
@@ -41,7 +41,7 @@ def load_sample_data(sample_qc: Path) -> pd.DataFrame:
 def _update_categories(sr: pd.DataFrame):
     """Update categorical data types for nicer plots"""
     if sr.name == "case_control":
-        # Drop the 'QC' category.
+        # Drop unused categories
         return sr.cat.remove_unused_categories()
 
     if sr.name == "expected_sex":
@@ -51,11 +51,11 @@ def _update_categories(sr: pd.DataFrame):
     return sr
 
 
-def plot(sample: pd.DataFrame):
+def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
 
     # Create plots
-    style_defaults = dict(linewidth=0, alpha=0.8, s=4)
+    style_defaults = dict(linewidth=0, alpha=0.8, s=2)
     defaults = dict(x="expected_sex", y="X_inbreeding_coefficient", data=sample)
     fig, ax = plt.subplots(figsize=(6, 6))
     sns.boxplot(ax=ax, showfliers=False, **defaults)
@@ -78,7 +78,9 @@ def plot(sample: pd.DataFrame):
     # Remove lines around inner plots
     sns.despine(ax=ax)
 
-    return fig
+    # Save if given an outfile
+    if outfile:
+        fig.savefig(outfile)
 
 
 if __name__ == "__main__":
