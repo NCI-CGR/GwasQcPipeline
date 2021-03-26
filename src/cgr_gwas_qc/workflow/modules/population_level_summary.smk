@@ -229,3 +229,12 @@ rule agg_population_qc_table:
         "population_level/population_qc.csv",
     script:
         "../scripts/agg_population_qc_tables.py"
+
+
+rule plot_autosomal_heterozygosity:
+    input:
+        rules.agg_population_qc_table.output[0],
+    output:
+        directory("population_level/autosomal_heterozygosity_plots"),
+    script:
+        "../scripts/plot_autosomal_heterozygosity.py"
