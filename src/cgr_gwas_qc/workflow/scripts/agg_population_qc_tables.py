@@ -45,6 +45,7 @@ from pathlib import Path
 import pandas as pd
 import typer
 
+from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE
 from cgr_gwas_qc.workflow.scripts.population_qc_table import read_population_qc
 
 app = typer.Typer(add_completion=False)
@@ -53,7 +54,7 @@ DTYPES = {
     "population": "string",
     "Subject_ID": "string",
     "Sample_ID": "string",
-    "case_control": "string",
+    "case_control": CASE_CONTROL_DTYPE,
     "QC_Family_ID": "string",
     "relatives": "string",
     "PC1": "float",
