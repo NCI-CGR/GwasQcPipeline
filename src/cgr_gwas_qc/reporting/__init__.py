@@ -1,29 +1,15 @@
-import pandas as pd
-from jinja2 import Environment, PackageLoader
+"""Tools used for reporting.
 
-env = Environment(
-    loader=PackageLoader("cgr_gwas_qc", "reporting.templates"),
-    trim_blocks=True,
-    lstrip_blocks=True,
-    keep_trailing_newline=True,
-)
+These tools include report templates and various constants used during
+reporting.
+"""
+from .constants import CASE_CONTROL_COLORS, CASE_CONTROL_DTYPE, REPORT_NAME_MAPPER, SEX_DTYPE
+from .templating import env
 
-CASE_CONTROL_DTYPE = pd.CategoricalDtype(categories=["Case", "Control", "QC", "Unknown"])
-CASE_CONTROL_COLORS = ["#f7022a", "#3e82fc", "gray", "#1bfc06"]  # red  # blue  # gray  # green
-
-SEX_DTYPE = pd.CategoricalDtype(categories=["M", "F", "U"])
-
-# Mapping current column names to names from the legacy workflow to maintain
-# consistency in deliverables.
-REPORT_NAME_MAPPER = {
-    "X_inbreeding_coefficient": "ChrX_Inbreed_estimate",
-    "expected_sex": "Expected_Sex",
-    "predicted_sex": "Predicted_Sex",
-    "idats_exist": "IdatsInProjectDir",
-    "identifiler_needed": "Identifiler_Needed",
-    "is_call_rate_filtered": "Low Call Rate",
-    "is_contaminated": "Contaminated",
-    "is_replicate_discordant": "Expected Replicate Discordance",
-    "is_sex_discordant": "Sex Discordant",
-    "is_unexpected_replicate": "Unexpected Replicate",
-}
+__all__ = [
+    "CASE_CONTROL_COLORS",
+    "CASE_CONTROL_DTYPE",
+    "env",
+    "REPORT_NAME_MAPPER",
+    "SEX_DTYPE",
+]
