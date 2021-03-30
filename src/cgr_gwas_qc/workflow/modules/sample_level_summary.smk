@@ -29,6 +29,7 @@ def _intensity(wildcards):
 
 rule sample_qc_table:
     input:
+        sample_sheet=cfg.sample_sheet_file,
         imiss_start="sample_level/samples.imiss",
         imiss_cr1="sample_level/call_rate_1/samples.imiss",
         imiss_cr2="sample_level/call_rate_2/samples.imiss",
@@ -38,6 +39,13 @@ rule sample_qc_table:
         unknown_replicates="sample_level/concordance/UnknownReplicates.csv",
         contam=_contam,
         intensity=_intensity,
+    params:
+        expected_sex_col_name=cfg.config.workflow_params.expected_sex_col_name,
+        idat_pattern=cfg.config.user_files.idat_pattern,
+        dup_concordance_cutoff=cfg.config.software_params.dup_concordance_cutoff,
+        contam_threshold=cfg.config.software_params.contam_threshold,
+        Sample_IDs_to_remove=cfg.config.Sample_IDs_to_remove,
+        subject_id_to_use=cfg.config.workflow_params.subject_id_to_use,
     output:
         "sample_level/sample_qc.csv",
     script:
