@@ -1,3 +1,4 @@
+import numpy as np
 from jinja2 import Environment, PackageLoader
 
 env = Environment(
@@ -12,7 +13,7 @@ def number_formater(value, decimals: int = 2) -> str:
     if isinstance(value, float):
         return f"{value:,.{decimals}f}"
 
-    if isinstance(value, int):
+    if isinstance(value, (int, np.integer)):
         return f"{value:,}"
 
     return str(value)
