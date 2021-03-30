@@ -91,6 +91,7 @@ rule population_qc_table:
         autosomal_het="population_level/{population}/subjects.het",
     params:
         population="{population}",
+        threshold=cfg.config.software_params.autosomal_het_threshold,
     output:
         "population_level/{population}/qc.csv",
     script:
