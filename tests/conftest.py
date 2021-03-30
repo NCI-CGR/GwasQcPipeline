@@ -273,6 +273,14 @@ def snp_qc(tmp_path_factory) -> Path:
 
 
 @pytest.mark.real_data
+@pytest.fixture
+def snp_qc_df(snp_qc) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts.snp_qc_table import read_snp_qc
+
+    return read_snp_qc(snp_qc)
+
+
+@pytest.mark.real_data
 @pytest.fixture(scope="session")
 def sample_qc(tmp_path_factory) -> Path:
     """The Sample QC table.
@@ -321,8 +329,16 @@ def sample_qc(tmp_path_factory) -> Path:
 
 
 @pytest.mark.real_data
+@pytest.fixture
+def sample_qc_df(sample_qc) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import read_sample_qc
+
+    return read_sample_qc(sample_qc)
+
+
+@pytest.mark.real_data
 @pytest.fixture(scope="session")
-def population_qc(tmp_path_factory) -> Path:
+def population_qc(real_config, tmp_path_factory) -> Path:
     """The Population QC table.
 
     Return:
@@ -344,7 +360,27 @@ def population_qc(tmp_path_factory) -> Path:
         autosomal_het=data_cache
         / "production_outputs/autosomal_heterozygosity/EUR_subjects_qc.het",
         population="EUR",
+        threshold=real_config.software_params.autosomal_het_threshold,
         outfile=outfile,
     )
+
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def population_qc_df(population_qc) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts.population_qc_table import read_population_qc
+
+    return read_population_qc(population_qc)
+
+
+@pytest.fixture
+def fake_image(tmp_path):
+    from PIL import Image
+
+    outfile = tmp_path / "fake.png"
+    img = Image.new("RGB", (1024, 1024), color="gray")
+    img.save(outfile)
 
     return outfile
