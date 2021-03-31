@@ -2,3 +2,4 @@ channels:
   - conda-forge
 dependencies:
   - pandoc=2.12
+  - texlive-core=20180414

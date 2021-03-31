@@ -15,6 +15,7 @@ include: cfg.modules("sample_level_qc.smk")
 include: cfg.modules("sample_level_summary.smk")
 include: cfg.modules("subject_level_summary.smk")
 include: cfg.modules("population_level_summary.smk")
+include: cfg.modules("delivery.smk")
 
 
 localrules: # Always run these rules locally b/c they are quick
@@ -27,7 +28,7 @@ localrules: # Always run these rules locally b/c they are quick
     subject_representative,
     sample_to_subject_map,
     subjects_per_population,
-    per_population_controls_qc_done,
+    per_population_qc_done,
     per_population_controls_qc_done,
 
 
@@ -62,5 +63,32 @@ if cfg.ss.shape[0] < 1_000:
 
 rule all:
     input:
-        "population_level/population_qc.csv",
-        "population_level/per_population_controls_qc.done",
+        "deliver/samples.bed",
+        "deliver/samples.bim",
+        "deliver/samples.fam",
+        "deliver/SampleUsedforSubject.csv",
+        "deliver/subjects.bed",
+        "deliver/subjects.bim",
+        "deliver/subjects.fam",
+        "deliver/HWP.zip",
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="all_sample_qc", ext="csv"
+        ),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="LimsUpload", ext="csv"
+        ),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="Identifiler", ext="csv"
+        ),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="KnownReplicates", ext="csv"
+        ),
+        cfg.config.user_files.output_pattern.format(
+            prefix="files_for_lab", file_type="UnknownReplicates", ext="csv"
+        ),
+        cfg.config.user_files.output_pattern.format(
+            prefix="deliver", file_type="AnalysisManifest", ext="csv"
+        ),
+        cfg.config.user_files.output_pattern.format(
+            prefix="deliver", file_type="QC_Report", ext="docx"
+        ),

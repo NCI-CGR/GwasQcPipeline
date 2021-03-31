@@ -10,6 +10,8 @@ wildcard_constraints:
     cr="1|2",
     maf="0\.\d+",
     ld="0\.\d+",
+    deliver_prefix=".*",
+    deliver_suffix=".*",
 
 
 def rule_group(wildcards):

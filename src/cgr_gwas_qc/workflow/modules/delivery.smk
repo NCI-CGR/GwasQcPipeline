@@ -10,9 +10,7 @@ rule lab_sample_level_qc_report:
     input:
         "sample_level/sample_qc.csv",
     output:
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="all_sample_qc", ext="csv"
-        ),
+        "files_for_lab/{deliver_prefix}all_sample_qc{deliver_suffix}.csv",
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -21,9 +19,7 @@ rule lab_lims_upload:
     input:
         "sample_level/sample_qc.csv",
     output:
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="LimsUpload", ext="csv"
-        ),
+        "files_for_lab/{deliver_prefix}LimsUpload{deliver_suffix}.csv",
     run:
         (
             pd.read_csv(input[0])
@@ -52,9 +48,7 @@ rule lab_identifiler_needed:
     input:
         "sample_level/sample_qc.csv",
     output:
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="Identifiler", ext="csv"
-        ),
+        "files_for_lab/{deliver_prefix}Identifiler{deliver_suffix}.csv",
     run:
         (
             pd.read_csv(input[0])
@@ -80,9 +74,7 @@ rule lab_known_replicates:
     input:
         "sample_level/concordance/KnownReplicates.csv",
     output:
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="KnownReplicates", ext="csv"
-        ),
+        "files_for_lab/{deliver_prefix}KnownReplicates{deliver_suffix}.csv",
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -91,9 +83,7 @@ rule lab_unknown_replicates:
     input:
         "sample_level/concordance/UnknownReplicates.csv",
     output:
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="UnknownReplicates", ext="csv"
-        ),
+        "files_for_lab/{deliver_prefix}UnknownReplicates{deliver_suffix}.csv",
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -105,9 +95,7 @@ rule deliver_manifest:
     input:
         cfg.sample_sheet_file.as_posix(),
     output:
-        cfg.config.user_files.output_pattern.format(
-            prefix="deliver", file_type="AnalysisManifest", ext="csv"
-        ),
+        "deliver/{deliver_prefix}AnalysisManifest{deliver_suffix}.csv",
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -174,3 +162,42 @@ rule deliver_subject_list:
             .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
             .to_csv(output[0], index=False)
         )
+
+
+################################################################################
+# QC Report
+################################################################################
+rule qc_report:
+    input:
+        sample_sheet_csv=cfg.sample_sheet_file,
+        snp_qc_csv="sample_level/snp_qc.csv",
+        sample_qc_csv="sample_level/sample_qc.csv",
+        population_qc_csv="population_level/population_qc.csv",
+        control_replicates_csv="sample_level/concordance/InternalQcKnown.csv",
+        study_replicates_csv="sample_level/concordance/StudySampleKnown.csv",
+        unexpected_replicates_csv="sample_level/concordance/UnknownReplicates.csv",
+        call_rate_png="sample_level/call_rate.png",
+        chrx_inbreeding_png="sample_level/chrx_inbreeding.png",
+        ancestry_png="sample_level/ancestry.png",
+        autosomal_heterozygosity_png_dir="population_level/autosomal_heterozygosity_plots",
+        pca_png_dir="population_level/pca_plots",
+        hwe_png_dir="population_level/hwe_plots",
+    params:
+        config=cfg.config,
+    output:
+        "deliver/qc_report.md",
+    script:
+        "../scripts/qc_report.py"
+
+
+rule export_qc_report:
+    input:
+        rules.qc_report.output[0],
+    output:
+        "deliver/{deliver_prefix}QC_Report{deliver_suffix}.{ext}",
+    wildcard_constraints:
+        ext="docx|pdf|html",
+    conda:
+        cfg.conda("pandoc.yml")
+    shell:
+        "pandoc --toc -s {input} -o {output[0]}"
