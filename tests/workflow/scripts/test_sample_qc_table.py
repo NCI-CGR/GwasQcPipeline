@@ -344,16 +344,16 @@ def test_find_study_subject_representative():
         StringIO(
             dedent(
                 """
-        Group_By_Subject_ID,Sample_ID,Call_Rate_2,is_call_rate_filtered,is_contaminated,is_replicate_discordant,is_internal_control
-        SB001,S001,.98,False,False,False,False
-        SB002,S002,.98,False,False,False,False
-        SB002,S003,.99,False,False,False,False
-        IB001,I001,.99,False,False,False,True
-        SB003,S004,.90,False,True,False,False
-        SB003,S005,.91,False,False,False,False
-        SB003,S006,.89,False,False,False,False
-        SB004,S007,.89,False,False,False,True
-        SB004,S008,.9,False,False,False,True
+        Group_By_Subject_ID,Sample_ID,Call_Rate_2,is_pass_sample_qc
+        SB001,S001,.98,True
+        SB002,S002,.98,True
+        SB002,S003,.99,True
+        IB001,I001,.99,False
+        SB003,S004,.90,False
+        SB003,S005,.91,True
+        SB003,S006,.89,True
+        SB004,S007,.89,False
+        SB004,S008,.9,False
         """
             )
         ),

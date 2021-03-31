@@ -108,6 +108,7 @@ def test_sample_qc_table(sample_qc_table):
         "is_subject_representative",  # New column
         "subject_dropped_from_study",  # New column
         "case_control",  # New column
+        "is_pass_sample_qc",  # New column
     ]
 
     obs_ = (

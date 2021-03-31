@@ -70,6 +70,7 @@ QC_HEADER = {  # Header for main QC table
     "Count_of_QC_Issue": "UInt8",
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
+    "is_pass_sample_qc": "boolean",
     "is_subject_representative": "boolean",
     "subject_dropped_from_study": "boolean",
 }
@@ -174,6 +175,7 @@ def main(
     sample_qc["identifiler_reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
 
     # Add flag for which samples to keep as subject
+    sample_qc["is_pass_sample_qc"] = _check_pass_qc(sample_qc)
     sample_qc["is_subject_representative"] = _find_study_subject_representative(sample_qc)
     sample_qc["subject_dropped_from_study"] = _find_study_subject_with_no_representative(sample_qc)
     ################################################################################
@@ -558,13 +560,30 @@ def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
     return sample_qc.apply(reason_string, axis=1)
 
 
+def _check_pass_qc(sample_qc: pd.DataFrame) -> pd.Series:
+    """True if a sample passed on sample level QC checks.
+
+    We remove all internal controls (``is_internal_control``) and poor
+    quality samples (``is_call_rate_filtered``, ``is_contaminated``,
+    ``is_replicate_discordant``).
+    """
+    df = sample_qc.copy()
+    df.fillna({k: False for k in QC_SUMMARY_FLAGS}, inplace=True)  # query breaks if there are NaNs
+    return (
+        ~df.is_internal_control
+        & ~df.is_contaminated
+        & ~df.is_call_rate_filtered
+        & ~df.is_replicate_discordant
+    )
+
+
 def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     """Flag indicating which sample to use as subject representative.
 
     We use a single representative sample for subject level analysis. First
-    we remove all internal controls and poor quality samples (is_call_rate_filtered,
-    is_contaminated, Replicate Discordance). For subject IDs with multiple
-    remaining samples, we select the sample that has the highest Call Rate 2.
+    we keep all samples (``is_pass_sample_qc``). For subject IDs with
+    multiple remaining samples, we select the sample that has the highest
+    Call Rate 2.
 
     Returns:
         pd.Series:
@@ -573,11 +592,8 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
               subject representative.
     """
     return (
-        sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
-        .query(
-            "not is_internal_control & not is_contaminated & not is_call_rate_filtered & not `is_replicate_discordant`"
-        )
-        .groupby("Group_By_Subject_ID")  # Group sample by subject id
+        sample_qc.query("is_pass_sample_qc")
+        .groupby("Group_By_Subject_ID")
         .apply(
             lambda x: x.Call_Rate_2 == x.Call_Rate_2.max()
         )  # Select the sample with highest call rate as representative
