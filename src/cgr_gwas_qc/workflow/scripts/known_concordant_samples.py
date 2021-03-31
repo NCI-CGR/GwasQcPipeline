@@ -110,7 +110,7 @@ def _read_sample_metadata(
     return (
         SampleSheet(sample_sheet)
         .add_group_by_column(subject_id_override)
-        .data.merge(_read_imiss_file(call_rate), how="left")
+        .data.merge(_read_imiss_file(call_rate), how="left", left_on="Sample_ID", right_index=True)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
         .loc[:, ("Sample_ID", "Subject_ID", "Sample_Group", "call_rate")]
     )
@@ -124,10 +124,9 @@ def _read_imiss_file(file_name: Path) -> pd.Series:
     """
     return (
         read_imiss(file_name)
-        .rename({"ID": "Sample_ID"}, axis=1)
+        .rename_axis("Sample_ID")
         .assign(call_rate=lambda df: 1.0 - df.F_MISS)
-        .reindex(["Sample_ID", "call_rate"], axis=1)
-        .squeeze()
+        .call_rate
     )
 
 

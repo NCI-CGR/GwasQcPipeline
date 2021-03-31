@@ -375,10 +375,11 @@ def population_qc_df(population_qc) -> pd.DataFrame:
     return read_population_qc(population_qc)
 
 
-@pytest.fixture
-def fake_image(tmp_path):
+@pytest.fixture(scope="session")
+def fake_image(tmp_path_factory):
     from PIL import Image
 
+    tmp_path = tmp_path_factory.mktemp("images")
     outfile = tmp_path / "fake.png"
     img = Image.new("RGB", (1024, 1024), color="gray")
     img.save(outfile)
