@@ -46,7 +46,7 @@ def _update_categories(sr: pd.DataFrame):
 
     if sr.name == "expected_sex":
         # Drop the 'U' category and re-order to put females first.
-        return sr.cat.remove_unused_categories().cat.reorder_categories(["F", "M"])
+        return sr.cat.remove_unused_categories()
 
     return sr
 
