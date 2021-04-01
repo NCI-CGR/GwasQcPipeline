@@ -59,7 +59,7 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
     defaults = dict(x="expected_sex", y="X_inbreeding_coefficient", data=sample)
     fig, ax = plt.subplots(figsize=(6, 6))
     sns.boxplot(ax=ax, showfliers=False, **defaults)
-    sns.swarmplot(
+    sns.stripplot(
         ax=ax, hue="case_control", palette=CASE_CONTROL_COLORS, **defaults, **style_defaults
     )
 
