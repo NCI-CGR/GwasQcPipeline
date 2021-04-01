@@ -107,7 +107,7 @@ def _annotate_relations(df: pd.DataFrame, relatives: os.PathLike, population: st
 
 def _read_het(filename: Path, threshold: float):
     return plink.read_het(filename).assign(
-        is_extreme_autosomal_heterozygosity=lambda x: x.F.abs() >= threshold
+        is_extreme_autosomal_heterozygosity=lambda x: x.F.abs() > threshold
     )
 
 
