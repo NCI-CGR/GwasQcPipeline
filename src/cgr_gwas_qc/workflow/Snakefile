@@ -27,8 +27,8 @@ localrules: # Always run these rules locally b/c they are quick
     subject_representative,
     sample_to_subject_map,
     subjects_per_population,
-    phony_population_results,
-    phony_population_controls,
+    per_population_controls_qc_done,
+    per_population_controls_qc_done,
 
 
 if cfg.ss.shape[0] < 1_000:
@@ -63,4 +63,4 @@ if cfg.ss.shape[0] < 1_000:
 rule all:
     input:
         "population_level/population_qc.csv",
-        "population_level/controls.done",
+        "population_level/per_population_controls_qc.done",

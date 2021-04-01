@@ -27,17 +27,24 @@ def main():
 def check_queue(job_id: int) -> Optional[str]:
     try:
         qstat_res = sp.check_output(shlex.split("qstat -s pr")).decode().strip()
+        queue_status = {int(x.split()[0]): x.split()[4] for x in qstat_res.splitlines()[2:]}
+        job_status = queue_status[job_id]
     except sp.CalledProcessError as err:
         logger.error("qstat process error")
         logger.error(err)
-
-    try:
-        queue_status = {int(x.split()[0]): x.split()[4] for x in qstat_res.splitlines()[2:]}
-        return "failed" if "E" in queue_status[job_id] else "running"
+        return None
     except KeyError:
         logger.info(f"{job_id} no in queue")
+        return None
 
-    return None
+    if job_status == "Eqw":  # Delete jobs in Eqw b/c they just sit there
+        qdel(job_id)
+        return "failed"
+
+    if job_status == "E":
+        return "failed"
+
+    return "running"
 
 
 def check_job_history(job_id: int) -> Optional[str]:
@@ -50,6 +57,15 @@ def check_job_history(job_id: int) -> Optional[str]:
         return "success" if log.endswith("(100%) done") else None
     except StopIteration:
         return None
+
+
+def qdel(job_id: int):
+    try:
+        sp.check_output(["qdel", str(job_id)]).decode().strip()
+        time.sleep(5)
+    except sp.CalledProcessError as err:
+        logger.error("qdel process error")
+        logger.error(err)
 
 
 if __name__ == "__main__":
