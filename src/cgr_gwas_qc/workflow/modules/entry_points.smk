@@ -78,9 +78,9 @@ if cfg.config.user_files.gtc_pattern:
             cfg.envmodules("plink2"),
         conda:
             cfg.conda("plink2.yml")
-        threads: 20
+        threads: 8
         resources:
-            mem=24000,
+            mem=16000,
         shell:
             "plink "
             "--merge-list {input.merge_list} "
