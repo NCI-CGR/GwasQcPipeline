@@ -243,6 +243,8 @@ rule agg_population_qc_table:
 rule plot_autosomal_heterozygosity:
     input:
         rules.agg_population_qc_table.output[0],
+    params:
+        threshold=cfg.config.software_params.autosomal_het_threshold,
     output:
         directory("population_level/autosomal_heterozygosity_plots"),
     script:

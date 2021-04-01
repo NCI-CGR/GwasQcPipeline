@@ -10,7 +10,7 @@ Output:
 """
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Sequence
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -30,14 +30,16 @@ COLORS = [
 
 
 @app.command()
-def main(population_qc: Path, outdir: Path):
+def main(population_qc: Path, threshold: float, outdir: Path):
     outdir.mkdir(exist_ok=True, parents=True)
 
     df = load_population_data(population_qc)
+
+    ylim = df.F.agg(["min", "max"]).tolist()
     for population, dd in df.groupby("population"):
         outfile = outdir / f"{population}.png"
         dd = add_x_label(dd)
-        plot(dd, population, outfile)
+        plot(dd, population, threshold, ylim, outfile)
 
 
 def load_population_data(filename: Path) -> pd.DataFrame:
@@ -58,7 +60,13 @@ def add_x_label(df: pd.DataFrame) -> pd.DataFrame:
     return df.sort_values("F").assign(x_label=lambda x: range(1, x.shape[0] + 1))
 
 
-def plot(df: pd.DataFrame, population: str, outfile: Optional[os.PathLike] = None):
+def plot(
+    df: pd.DataFrame,
+    population: str,
+    threshold: float,
+    ylim: Sequence[float],
+    outfile: Optional[os.PathLike] = None,
+):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
 
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -77,7 +85,13 @@ def plot(df: pd.DataFrame, population: str, outfile: Optional[os.PathLike] = Non
     # Add labels
     ax.set_xlabel("Subjects sorted by F")
     ax.set_ylabel("F")
+    ax.set_ylim(ylim)
     ax.set_title(f"{population} Homozygosity F Coefficient")
+
+    # Add threshold lines
+    line_defaults = dict(color="k", ls="--")
+    ax.axhline(threshold, **line_defaults)
+    ax.axhline(-threshold, **line_defaults)
 
     # Remove outside edges for a cleaner plot
     sns.despine(ax=ax)
@@ -97,6 +111,7 @@ if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {}
         defaults.update({"population_qc": Path(snakemake.input[0])})  # type: ignore # noqa
+        defaults.update({k: v for k, v in snakemake.params.items()})  # type: ignore # noqa
         defaults.update({"outdir": Path(snakemake.output[0])})  # type: ignore # noqa
         main(**defaults)
     else:
