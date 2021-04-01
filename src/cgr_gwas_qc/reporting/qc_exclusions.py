@@ -64,11 +64,11 @@ class ExclusionTables:
         }
 
         col_names = {
-            "Control": "CONTROLS",
-            "Case": "CASES",
+            "Control": "Controls",
+            "Case": "Cases",
             "QC": "QC",
-            "Unknown": "OTHER",
-            "total": "ALL SAMPLES",
+            "Unknown": "Other",
+            "total": "All Samples",
         }
 
         agg_df = (
@@ -86,7 +86,7 @@ class ExclusionTables:
             .rename(row_names)
             .reindex(col_names.keys(), axis=1)
             .rename(col_names, axis=1)
-            .rename_axis("Filter Reason/Description".upper())
+            .rename_axis("Filter Reason/Description")
             .applymap(number_formater)
             .to_markdown()
         )
@@ -100,11 +100,11 @@ class ExclusionTables:
         }
 
         col_names = {
-            "Control": "CONTROLS",
-            "Case": "CASES",
+            "Control": "Controls",
+            "Case": "Cases",
             "QC": "QC",
-            "Unknown": "OTHER",
-            "total": "ALL SUBJECTS",
+            "Unknown": "Other",
+            "total": "All Subjects",
         }
 
         agg_df = (
@@ -121,7 +121,7 @@ class ExclusionTables:
             .rename(row_names)
             .reindex(col_names.keys(), axis=1)
             .rename(col_names, axis=1)
-            .rename_axis("Filter Reason".upper())
+            .rename_axis("Filter Reason")
             .applymap(number_formater)
             .to_markdown()
         )

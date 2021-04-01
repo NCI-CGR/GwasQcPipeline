@@ -15,7 +15,7 @@ NOTE: This is an interim QC report for {{ config.project_name }}. Samples/subjec
 
 **Table 1**. Sample manifest information prior to processing
 
-| STUDY NAME         | ARRAY           | CASE:CONTROL          | MALE:FEMALE           | TOTAL COUNT       |
+| Study Name         | Array           | Case:Control          | Male:Female           | Total Count       |
 |:-------------------|:----------------|----------------------:|----------------------:|------------------:|
 | {{ config.project_name }} | {{ config.snp_array }} | {{ sample_qc.summary.case_control }} | {{ sample_qc.summary.male_female }} | {{ config.num_samples | numFormat }} |
 
@@ -40,7 +40,7 @@ NOTE: Samples that fail due to completion rate may be eligible for recovery effo
 
 **Table 2a** Sample Quality Control Exclusion
 
-| THRESHOLD                       | SAMPLE EXCLUSION   | REMAINING                |
+| Threshold                       | Sample Exclusion   | Remaining                |
 |---------------------------------|--------------------|--------------------------|
 | {{ config.software_params.sample_call_rate_1 | toPct | numFormat }}% | {{ sample_qc.completion_rate.num_sample_cr1_filtered | numFormat }} | {{ sample_qc.completion_rate.num_sample_pass_cr1 | numFormat }} |
 | {{ config.software_params.sample_call_rate_2 | toPct | numFormat }}% | {{ sample_qc.completion_rate.num_sample_cr2_filtered | numFormat}} | {{ sample_qc.completion_rate.num_sample_pass_cr2 | numFormat }} |
@@ -48,7 +48,7 @@ NOTE: Samples that fail due to completion rate may be eligible for recovery effo
 
 **Table 2b** Loci Quality Control Exclusion
 
-| THRESHOLD                    | LOCI EXCLUSION    | REMAINING               |
+| Threshold                    | Loci Exclusion    | Remaining               |
 |------------------------------|-------------------|-------------------------|
 | {{ config.software_params.snp_call_rate_1 | toPct | numFormat }}% | {{ sample_qc.completion_rate.num_snp_cr1_filtered | numFormat }} | {{ sample_qc.completion_rate.num_snp_pass_cr1 | numFormat }} |
 | {{ config.software_params.snp_call_rate_2 | toPct | numFormat }}% | {{ sample_qc.completion_rate.num_snp_cr2_filtered | numFormat }} | {{ sample_qc.completion_rate.num_snp_pass_cr2 | numFormat }} |
