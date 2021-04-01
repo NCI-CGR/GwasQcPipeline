@@ -193,7 +193,7 @@ def files_for_deliver(tmp_path_factory, sample_qc):
         "production_outputs/HWP/EUR_subjects_qc.hwe",
         f"population_level/EUR/controls_maf{maf}_snps_autosome_cleaned.hwe",
     )
-    (tmp_path / "population_level/controls.done").write_text(
+    (tmp_path / "population_level/per_population_controls_qc.done").write_text(
         f"population_level/EUR/controls_maf{maf}_snps_autosome_cleaned.hwe"
     )
 

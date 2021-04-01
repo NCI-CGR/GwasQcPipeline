@@ -33,7 +33,7 @@ def exclusion_df(real_config, sample_sheet_full, sample_qc_df, population_qc_df)
 @pytest.mark.real_data
 def test_sample_exclusion_table(exclusion_df):
     expected = (
-        "| FILTER REASON/DESCRIPTION      |   CONTROLS |   CASES |   QC |   OTHER |   ALL SAMPLES |\n"
+        "| Filter Reason/Description      |   Controls |   Cases |   QC |   Other |   All Samples |\n"
         "|:-------------------------------|-----------:|--------:|-----:|--------:|--------------:|\n"
         "| Array Processing Failure       |          0 |       0 |    0 |       0 |             0 |\n"
         "| Completion Rate 1st Filter     |          2 |       2 |    0 |       0 |             4 |\n"
@@ -53,7 +53,7 @@ def test_sample_exclusion_table(exclusion_df):
 @pytest.mark.real_data
 def test_subject_exclusion_table(exclusion_df):
     expected = (
-        "| FILTER REASON         |   CONTROLS |   CASES |   QC |   OTHER |   ALL SUBJECTS |\n"
+        "| Filter Reason         |   Controls |   Cases |   QC |   Other |   All Subjects |\n"
         "|:----------------------|-----------:|--------:|-----:|--------:|---------------:|\n"
         "| Sex Discordant        |          3 |       0 |    0 |       0 |              3 |\n"
         "| Unexpected Replicates |          0 |       0 |    0 |       0 |              0 |\n"
