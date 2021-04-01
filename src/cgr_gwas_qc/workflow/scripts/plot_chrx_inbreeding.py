@@ -33,7 +33,7 @@ def main(sample_qc: Path, outfile: Path):
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     return (
         read_sample_qc(sample_qc)
-        .query("expected_sex != 'U'")  # Don't plot unknown sex
+        .query("expected_sex != 'U' and is_subject_representative")  # Don't plot unknown sex
         .transform(_update_categories)
     )
 
