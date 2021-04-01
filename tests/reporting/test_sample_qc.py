@@ -114,7 +114,7 @@ def test_UnExpectedReplicates(sample_qc_df, unexpected_replicates_df):
 
     unexpected = UnExpectedReplicates.construct(sample_qc_df, unexpected_replicates_df)
 
-    assert 0 == unexpected.num_unexpected_replicate
+    assert 0 == unexpected.num_unexpected_replicates
 
 
 @pytest.mark.real_data

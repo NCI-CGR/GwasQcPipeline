@@ -159,7 +159,7 @@ class ExpectedReplicates:
 
 @dataclass
 class UnExpectedReplicates:
-    num_unexpected_replicate: int
+    num_unexpected_replicates: int
     min_concordance: float
     mean_concordance: float
 
