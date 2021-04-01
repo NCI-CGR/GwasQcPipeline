@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 import pandas as pd
 from more_itertools import flatten
@@ -25,20 +26,22 @@ checkpoint subjects_per_population:
     run:
         output_path = Path(output[0])
         output_path.mkdir(exist_ok=True, parents=True)
+        df = read_sample_qc(input[0]).query("is_subject_representative")
 
-        df = pd.read_csv(input[0]).query("is_subject_representative")
+        flag_no_populations = True
         for pop_, grp in df.groupby("Ancestry"):
             if grp.shape[0] < params.threshold:
-                # Too few subjects to analyze population
-                continue
+                continue  # Too few subjects to analyze population
 
+            flag_no_populations = False
             (  # Save a list of subjects for each population
                 grp.assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
                 .reindex(["Group_By_Subject_ID", "Subject_ID2"], axis=1)
                 .to_csv(output_path / f"{pop_}.txt", sep=" ", index=False, header=False)
             )
+            time.sleep(5)  # in case of latency
 
-        if len(list(output_path.glob("*.txt"))) == 0:
+        if flag_no_populations:
             (output_path / "no_populations.txt").touch()
 
 
@@ -136,20 +139,23 @@ checkpoint controls_per_population:
     run:
         output_path = Path(output[0])
         output_path.mkdir(exist_ok=True, parents=True)
-
         df = read_sample_qc(input[0]).query("is_subject_representative & case_control == 'Control'")
+
+        flag_no_controls = True
         for pop_, grp in df.groupby("Ancestry"):
             if grp.shape[0] < params.threshold:
                 # Too few controls to analyze population
                 continue
 
+            flag_no_controls = False
             (  # Save a list of subjects for each population
                 grp.assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
                 .reindex(["Group_By_Subject_ID", "Subject_ID2"], axis=1)
                 .to_csv(output_path / f"{pop_}.txt", sep=" ", index=False, header=False)
             )
+            time.sleep(5)  # in case of latency
 
-        if len(list(output_path.glob("*.txt"))) == 0:
+        if flag_no_controls:
             (output_path / "no_controls.txt").touch()
 
 
