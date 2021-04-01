@@ -102,7 +102,7 @@ rule deliver_manifest:
 
 rule deliver_hwp:
     input:
-        "population_level/controls.done",
+        "population_level/per_population_controls_qc.done",
     output:
         "deliver/HWP.zip",
     shell:
