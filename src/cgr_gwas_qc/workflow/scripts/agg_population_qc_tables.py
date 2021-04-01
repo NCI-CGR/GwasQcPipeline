@@ -71,6 +71,7 @@ DTYPES = {
     "E_HOM": "UInt32",
     "N_NM": "UInt32",
     "F": "float",
+    "is_extreme_autosomal_heterozygosity": "boolean",
 }
 
 

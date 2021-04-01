@@ -6,7 +6,7 @@ import pysam
 import pytest
 
 from cgr_gwas_qc import load_config
-from cgr_gwas_qc.models.config import Config
+from cgr_gwas_qc.models.config import Config, Idat, SoftwareParams, WorkflowParams
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 from cgr_gwas_qc.testing import chdir
@@ -241,56 +241,147 @@ def real_config(tmp_path_factory, pytestconfig) -> Config:
 ##################################################################################
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc(tmp_path_factory) -> Path:
-    """Add new QC columns to legacy QC summary table.
+def snp_qc(tmp_path_factory) -> Path:
+    """The SNP QC table.
 
-    The legacy QC summary table is missing several columns that are not
-    needed by downstream rules. This fixture adds the necessary columns.
-
-    Returns:
-        Path to an updated sample qc summary table (CSV).
+    Return:
+        Path to a generated SNP QC table generated from real data. Note: 1Kg
+        rsID mapping was faked so all values will be missing.
     """
-    from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import (
-        IDENTIFILER_FLAGS,
-        QC_HEADER,
-        _find_study_subject_representative,
-        _find_study_subject_with_no_representative,
-        _identifiler_reason,
-    )
+    from cgr_gwas_qc.workflow.scripts import snp_qc_table
 
-    tmp_path = tmp_path_factory.mktemp("qc_table")
+    # GIVEN: Real lmiss files, a fake mapping of array IDs to 1kg rsIDs, and an
+    # outfile.
+    tmp_path = tmp_path_factory.mktemp("snp_qc")
     data_cache = RealData()
 
-    # Add Group By and Internal Control columns
-    ss = (
-        SampleSheet(data_cache / "original_data/manifest_full.csv")
-        .add_group_by_column("PI_Subject_ID")
-        .data.assign(is_internal_control=lambda x: x.Sample_Group == "sVALD-001")
-        .assign(case_control=lambda x: x["Case/Control_Status"].str.lower())
-        .reindex(
-            ["Sample_ID", "Group_By_Subject_ID", "is_internal_control", "case_control"], axis=1
-        )
+    fake_1kg = tmp_path / "1kg.csv"
+    fake_1kg.write_text("array_id,thousand_genome_id\n")
+
+    outfile = tmp_path / "snp_qc.csv"
+
+    # WHEN: I run the main function of the snp qc script.
+    snp_qc_table.main(
+        data_cache / "production_outputs/plink_start/samples_start.lmiss",
+        data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.lmiss",
+        data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.lmiss",
+        fake_1kg,
+        outfile,
     )
 
-    legacy_qc_table = (
-        pd.read_csv(data_cache / "production_outputs/all_sample_qc.csv")
-        .merge(ss, on="Sample_ID", how="left")
-        .rename(
-            {v: k for k, v in REPORT_NAME_MAPPER.items()}, axis=1
-        )  # rename legacy columns to new column names
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def snp_qc_df(snp_qc) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts.snp_qc_table import read_snp_qc
+
+    return read_snp_qc(snp_qc)
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def sample_qc(tmp_path_factory) -> Path:
+    """The Sample QC table.
+
+    Return:
+        Path to a generated Sample QC table generated from real data. Note:
+        we do not have GRAF output from the legacy workflow. Instead, we are
+        using the SNPweights output which is automatically handled but will
+        give a warning.
+    """
+    from cgr_gwas_qc.workflow.scripts import sample_qc_table
+
+    tmp_path = tmp_path_factory.mktemp("sample_qc")
+    outfile = tmp_path / "sample_qc.csv"
+
+    data_cache = RealData(tmp_path)
+    workflow_params = WorkflowParams()
+    software_params = SoftwareParams()
+
+    sample_qc_table.main(
+        data_cache / "original_data/manifest_full.csv",
+        data_cache / "production_outputs/plink_start/samples_start.imiss",
+        data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss",
+        data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
+        data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
+        data_cache / "production_outputs/snpweights/samples.snpweights.csv",
+        data_cache / "production_outputs/concordance/KnownReplicates.csv",
+        data_cache / "production_outputs/concordance/UnknownReplicates.csv",
+        data_cache / "production_outputs/all_contam/contam.csv",
+        data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
+        workflow_params.expected_sex_col_name,
+        Idat(
+            red=data_cache._data_path.as_posix()
+            + "/original_data/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
+            green=data_cache._data_path.as_posix()
+            + "/original_data/{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat",
+        ),
+        software_params.dup_concordance_cutoff,
+        0.2,
+        "PI_Subject_ID",
+        list(),
+        outfile,
     )
 
-    # Add new columns
-    legacy_qc_table["identifiler_reason"] = _identifiler_reason(
-        legacy_qc_table, list(IDENTIFILER_FLAGS)
-    )
-    legacy_qc_table["is_subject_representative"] = _find_study_subject_representative(
-        legacy_qc_table
-    )
-    legacy_qc_table["subject_dropped_from_study"] = _find_study_subject_with_no_representative(
-        legacy_qc_table
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def sample_qc_df(sample_qc) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import read_sample_qc
+
+    return read_sample_qc(sample_qc)
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def population_qc(real_config, tmp_path_factory) -> Path:
+    """The Population QC table.
+
+    Return:
+        Path to a generated Population QC table generated from real data.
+    """
+    from cgr_gwas_qc.workflow.scripts import population_qc_table
+
+    tmp_path = tmp_path_factory.mktemp("population_qc")
+    relatives = tmp_path / "relatives.csv"
+    relatives.write_text("QC_Family_ID,relatives\n")
+
+    outfile = tmp_path / "population_qc.csv"
+
+    data_cache = RealData(tmp_path)
+
+    population_qc_table.main(
+        relatives=relatives,
+        pca=data_cache / "production_outputs/pca/EUR_subjects.eigenvec",
+        autosomal_het=data_cache
+        / "production_outputs/autosomal_heterozygosity/EUR_subjects_qc.het",
+        population="EUR",
+        threshold=real_config.software_params.autosomal_het_threshold,
+        outfile=outfile,
     )
 
-    legacy_qc_table.reindex(QC_HEADER, axis=1).to_csv(tmp_path / "qc.csv", index=False)
-    return tmp_path / "qc.csv"
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def population_qc_df(population_qc) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts.population_qc_table import read_population_qc
+
+    return read_population_qc(population_qc)
+
+
+@pytest.fixture(scope="session")
+def fake_image(tmp_path_factory):
+    from PIL import Image
+
+    tmp_path = tmp_path_factory.mktemp("images")
+    outfile = tmp_path / "fake.png"
+    img = Image.new("RGB", (1024, 1024), color="gray")
+    img.save(outfile)
+
+    return outfile

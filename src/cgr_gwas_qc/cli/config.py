@@ -107,11 +107,9 @@ def general_config(
     )
 
 
-def get_output_pattern(sample_sheet_name):
-    if "AnalysisManifest" in sample_sheet_name:
-        return "{prefix}/" + sample_sheet_name.replace("AnalysisManifest", "{file_type}").replace(
-            ".csv", ".{ext}"
-        )
+def get_output_pattern(sample_sheet_stem: str):
+    if "AnalysisManifest" in sample_sheet_stem:
+        return "{prefix}/" + sample_sheet_stem.replace("AnalysisManifest", "{file_type}") + ".{ext}"
 
     return "{prefix}/{file_type}.{ext}"
 

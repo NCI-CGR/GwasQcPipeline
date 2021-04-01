@@ -33,7 +33,7 @@ def main(sample_qc: Path, outfile: Path):
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     return (
         read_sample_qc(sample_qc)
-        .query("expected_sex != 'U'")  # Don't plot unknown sex
+        .query("expected_sex != 'U' and is_subject_representative")  # Don't plot unknown sex
         .transform(_update_categories)
     )
 
@@ -46,7 +46,7 @@ def _update_categories(sr: pd.DataFrame):
 
     if sr.name == "expected_sex":
         # Drop the 'U' category and re-order to put females first.
-        return sr.cat.remove_unused_categories().cat.reorder_categories(["F", "M"])
+        return sr.cat.remove_unused_categories()
 
     return sr
 
@@ -59,7 +59,7 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
     defaults = dict(x="expected_sex", y="X_inbreeding_coefficient", data=sample)
     fig, ax = plt.subplots(figsize=(6, 6))
     sns.boxplot(ax=ax, showfliers=False, **defaults)
-    sns.swarmplot(
+    sns.stripplot(
         ax=ax, hue="case_control", palette=CASE_CONTROL_COLORS, **defaults, **style_defaults
     )
 

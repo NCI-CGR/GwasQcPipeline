@@ -44,6 +44,7 @@ class ConfigMgr:
 
     SRC_DIR = Path(__file__).parent.absolute()
     WORKFLOW_DIR = SRC_DIR / "workflow"
+    TEMPLATE_DIR = SRC_DIR / "reporting/templates"
 
     CONDA_DIR = WORKFLOW_DIR / "conda"
     RULE_DIR = WORKFLOW_DIR / "rules"
@@ -166,6 +167,10 @@ class ConfigMgr:
         Given a script file_name, prepends the full path to that script.
         """
         return (self.SCRIPTS_DIR / file_name).as_posix()
+
+    @property
+    def docx_template(self) -> str:
+        return (self.TEMPLATE_DIR / "cgr_reference.docx").as_posix()
 
 
 ################################################################################

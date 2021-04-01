@@ -19,7 +19,7 @@ def files_for_upload(tmp_path_factory, sample_qc):
     tmp_path = tmp_path_factory.mktemp("files_for_upload")
     data_cache = (
         RealData(tmp_path)
-        .copy("original_data/manifest_full.csv", "SR001-001_00_AnalysisManifest_0000000.csv",)
+        .copy("original_data/manifest_full.csv", "SR001-001_00_AnalysisManifest_0000000.csv")
         .copy(
             "production_outputs/concordance/KnownReplicates.csv",
             "sample_level/concordance/KnownReplicates.csv",
@@ -69,13 +69,19 @@ def test_lab_lims_upload(files_for_upload):
     # NOTE: The legacy workflow uses `Sample ID` instead of `Sample_ID`. The
     # dev workflow uses `Sample_ID` so I need to rename production outputs
     # prior to comparisons.
-    obs_ = pd.read_csv(tmp_path / "files_for_lab/SR001-001_00_LimsUpload_0000000.csv")
-    exp_ = pd.read_csv(
-        data_cache
-        / "production_outputs/files_for_lab/SR0446-001_12_LimsUpload_1011201995419_casecontrol_20191011.csv"
-    ).rename({"Sample ID": "Sample_ID"}, axis=1)
+    obs_ = pd.read_csv(tmp_path / "files_for_lab/SR001-001_00_LimsUpload_0000000.csv").set_index(
+        "Sample_ID"
+    )
+    exp_ = (
+        pd.read_csv(
+            data_cache
+            / "production_outputs/files_for_lab/SR0446-001_12_LimsUpload_1011201995419_casecontrol_20191011.csv"
+        )
+        .rename({"Sample ID": "Sample_ID"}, axis=1)
+        .set_index("Sample_ID")
+    )
 
-    assert_frame_equal(obs_, exp_, check_dtype=False)
+    assert_frame_equal(obs_, exp_, check_dtype=False, check_like=True)
 
 
 @pytest.mark.regression
@@ -187,7 +193,7 @@ def files_for_deliver(tmp_path_factory, sample_qc):
         "production_outputs/HWP/EUR_subjects_qc.hwe",
         f"population_level/EUR/controls_maf{maf}_snps_autosome_cleaned.hwe",
     )
-    (tmp_path / "population_level/controls.done").write_text(
+    (tmp_path / "population_level/per_population_controls_qc.done").write_text(
         f"population_level/EUR/controls_maf{maf}_snps_autosome_cleaned.hwe"
     )
 

@@ -50,4 +50,4 @@ def test_add_metadata(sample_qc, per_population_qc_done):
     assert all(df.population.value_counts() == 3)
     assert df.Subject_ID.unique().shape[0] == 9
     assert 1 == df.case_control.isnull().sum()  # One subject was dropped from study so should be NA
-    assert df.query("case_control == 'control'").shape[0] == 6
+    assert df.query("case_control == 'Control'").shape[0] == 6

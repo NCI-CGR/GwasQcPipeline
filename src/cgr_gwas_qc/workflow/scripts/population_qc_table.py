@@ -71,21 +71,44 @@ DTYPES = {
     "E_HOM": "UInt32",
     "N_NM": "UInt32",
     "F": "float",
+    "is_extreme_autosomal_heterozygosity": "boolean",
 }
 
 
 @app.command()
-def main(relatives: Path, pca: Path, autosomal_het: Path, population: str, outfile: Path):
+def main(
+    relatives: Path,
+    pca: Path,
+    autosomal_het: Path,
+    population: str,
+    threshold: float,
+    outfile: Path,
+):
     df = (
-        pd.concat([eigensoft.Eigenvec(pca).components, plink.read_het(autosomal_het)], axis=1)
+        pd.concat([eigensoft.Eigenvec(pca).components, _read_het(autosomal_het, threshold)], axis=1)
         .rename_axis("Subject_ID")
         .reset_index()
         .assign(population=population)
-        .pipe(lambda x: annotate_relations(x, relatives, population))
-        # .reindex(DTYPES.keys(), axis=1)
+        .pipe(lambda x: _annotate_relations(x, relatives, population))
+        .reindex(DTYPES.keys(), axis=1)
     )
 
     df.to_csv(outfile, index=False)
+
+
+def read_population_qc(filename: os.PathLike) -> pd.DataFrame:
+    return pd.read_csv(filename, dtype=DTYPES)
+
+
+def _annotate_relations(df: pd.DataFrame, relatives: os.PathLike, population: str) -> pd.DataFrame:
+    related_df = pd.concat(_expand_related(relatives, population), ignore_index=True)
+    return df.merge(related_df, on="Subject_ID", how="left")
+
+
+def _read_het(filename: Path, threshold: float):
+    return plink.read_het(filename).assign(
+        is_extreme_autosomal_heterozygosity=lambda x: x.F.abs() > threshold
+    )
 
 
 def _expand_related(relatives: os.PathLike, population: str) -> Generator[pd.DataFrame, None, None]:
@@ -100,15 +123,6 @@ def _expand_related(relatives: os.PathLike, population: str) -> Generator[pd.Dat
             )
     else:
         yield pd.DataFrame(columns=["Subject_ID", "QC_Family_ID", "relatives"])
-
-
-def annotate_relations(df: pd.DataFrame, relatives: os.PathLike, population: str) -> pd.DataFrame:
-    related_df = pd.concat(_expand_related(relatives, population), ignore_index=True)
-    return df.merge(related_df, on="Subject_ID", how="left")
-
-
-def read_population_qc(filename: os.PathLike) -> pd.DataFrame:
-    return pd.read_csv(filename, dtype=DTYPES)
 
 
 if __name__ == "__main__":

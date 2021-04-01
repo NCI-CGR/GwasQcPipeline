@@ -21,9 +21,9 @@ from warnings import warn
 import pandas as pd
 import typer
 
-from cgr_gwas_qc import load_config
 from cgr_gwas_qc.models.config.user_files import Idat
 from cgr_gwas_qc.parsers import plink
+from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.validators import check_file
 from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
@@ -70,6 +70,7 @@ QC_HEADER = {  # Header for main QC table
     "Count_of_QC_Issue": "UInt8",
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
+    "is_pass_sample_qc": "boolean",
     "is_subject_representative": "boolean",
     "subject_dropped_from_study": "boolean",
 }
@@ -97,6 +98,7 @@ IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run
 
 @app.command()
 def main(
+    sample_sheet: Path = typer.Argument(..., help="Path to the sample sheet"),
     imiss_start: Path = typer.Argument(..., help="Path to plink_start/samples.imiss"),
     imiss_cr1: Path = typer.Argument(..., help="Path to plink_filter_call_rate_1/samples.imiss"),
     imiss_cr2: Path = typer.Argument(..., help="Path to plink_filter_call_rate_2/samples.imiss"),
@@ -106,8 +108,6 @@ def main(
     ancestry: Path = typer.Argument(..., help="Path to ancestry/graf_ancestry_calls.txt"),
     known_replicates: Path = typer.Argument(..., help=""),
     unknown_replicates: Path = typer.Argument(..., help=""),
-    # TO-ADD: new file to include in QC report. You also need to add this file
-    # to the rule in `reporting.smk`
     # Optional inputs
     contam: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_contamination_test.csv"
@@ -115,12 +115,25 @@ def main(
     intensity: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
+    # Params
+    expected_sex_col_name: str = typer.Option(
+        ..., help="Name of the column in the sample sheet that contains sex information."
+    ),
+    idat_pattern: Idat = typer.Option(..., help="Idat file name patterns."),
+    dup_concordance_cutoff: float = typer.Option(..., help="Threshold for duplicate concordance."),
+    contam_threshold: float = typer.Option(..., help="Threshold for contamination."),
+    subject_id_to_use: Optional[str] = typer.Option(
+        None, help="Select a specific column to use for Subject_ID"
+    ),
+    Sample_IDs_to_remove: Optional[Sequence[str]] = typer.Option(
+        None, help="List of Sample IDs that failed array processing."
+    ),
     # Outputs
     outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
 
-    cfg = load_config()
-    ss = _wrangle_sample_sheet(cfg.ss, cfg.config.workflow_params.expected_sex_col_name)
+    sample_sheet_df = SampleSheet(sample_sheet).add_group_by_column(subject_id_to_use).data
+    ss = _wrangle_sample_sheet(sample_sheet_df, expected_sex_col_name)
     Sample_IDs = ss.index
 
     ################################################################################
@@ -130,18 +143,16 @@ def main(
         pd.concat(
             [
                 ss,
-                _check_preflight(cfg.config.Sample_IDs_to_remove, Sample_IDs),
-                _check_idats_files(ss, cfg.config.user_files.idat_pattern),
+                _check_preflight(Sample_IDs_to_remove, Sample_IDs),
+                _check_idats_files(ss, idat_pattern),
                 _read_imiss(imiss_start, Sample_IDs, "Call_Rate_Initial"),
                 _read_imiss(imiss_cr1, Sample_IDs, "Call_Rate_1"),
                 _read_imiss(imiss_cr2, Sample_IDs, "Call_Rate_2"),
                 _read_sexcheck_cr1(sexcheck_cr1, ss.expected_sex),
                 _read_ancestry(ancestry, Sample_IDs),
-                _read_known_replicates(
-                    known_replicates, cfg.config.software_params.dup_concordance_cutoff, Sample_IDs
-                ),
+                _read_known_replicates(known_replicates, dup_concordance_cutoff, Sample_IDs),
                 _read_unknown_replicates(unknown_replicates, Sample_IDs),
-                _read_contam(contam, cfg.config.software_params.contam_threshold, Sample_IDs),
+                _read_contam(contam, contam_threshold, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
                 # TO-ADD: call function you created to parse/summarize new file
             ],
@@ -164,6 +175,7 @@ def main(
     sample_qc["identifiler_reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
 
     # Add flag for which samples to keep as subject
+    sample_qc["is_pass_sample_qc"] = _check_pass_qc(sample_qc)
     sample_qc["is_subject_representative"] = _find_study_subject_representative(sample_qc)
     sample_qc["subject_dropped_from_study"] = _find_study_subject_with_no_representative(sample_qc)
     ################################################################################
@@ -548,13 +560,30 @@ def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
     return sample_qc.apply(reason_string, axis=1)
 
 
+def _check_pass_qc(sample_qc: pd.DataFrame) -> pd.Series:
+    """True if a sample passed on sample level QC checks.
+
+    We remove all internal controls (``is_internal_control``) and poor
+    quality samples (``is_call_rate_filtered``, ``is_contaminated``,
+    ``is_replicate_discordant``).
+    """
+    df = sample_qc.copy()
+    df.fillna({k: False for k in QC_SUMMARY_FLAGS}, inplace=True)  # query breaks if there are NaNs
+    return (
+        ~df.is_internal_control
+        & ~df.is_contaminated
+        & ~df.is_call_rate_filtered
+        & ~df.is_replicate_discordant
+    )
+
+
 def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
     """Flag indicating which sample to use as subject representative.
 
     We use a single representative sample for subject level analysis. First
-    we remove all internal controls and poor quality samples (is_call_rate_filtered,
-    is_contaminated, Replicate Discordance). For subject IDs with multiple
-    remaining samples, we select the sample that has the highest Call Rate 2.
+    we keep all samples (``is_pass_sample_qc``). For subject IDs with
+    multiple remaining samples, we select the sample that has the highest
+    Call Rate 2.
 
     Returns:
         pd.Series:
@@ -563,11 +592,8 @@ def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
               subject representative.
     """
     return (
-        sample_qc.fillna({k: False for k in QC_SUMMARY_FLAGS})  # query breaks if there are NaNs
-        .query(
-            "not is_internal_control & not is_contaminated & not is_call_rate_filtered & not `is_replicate_discordant`"
-        )
-        .groupby("Group_By_Subject_ID")  # Group sample by subject id
+        sample_qc.query("is_pass_sample_qc")
+        .groupby("Group_By_Subject_ID")
         .apply(
             lambda x: x.Call_Rate_2 == x.Call_Rate_2.max()
         )  # Select the sample with highest call rate as representative
@@ -609,6 +635,7 @@ if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {"contam": None, "intensity": None}
         defaults.update({k: (Path(v) if v else None) for k, v in snakemake.input.items()})  # type: ignore # noqa
+        defaults.update({k: v for k, v in snakemake.params.items()})  # type: ignore # noqa
         defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
         main(**defaults)
     else:

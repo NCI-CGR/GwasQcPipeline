@@ -10,12 +10,14 @@ from different subjects should not be related. This script outputs 4 tables:
 - Known concordant samples (Study Samples Only)
 - Unknown concordant samples (Full Table)
 """
+import os
 from pathlib import Path
 from typing import Optional
 
 import pandas as pd
 import typer
 
+from cgr_gwas_qc.parsers.plink import read_imiss
 from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 
 app = typer.Typer(add_completion=False)
@@ -44,7 +46,7 @@ def main(
     sample_concordance = pd.read_csv(concordance).rename(
         {"IID1": "Sample_ID1", "IID2": "Sample_ID2"}, axis=1
     )
-    sample_metadata = read_sample_metadata(sample_sheet, imiss, subject_id_override)
+    sample_metadata = _read_sample_metadata(sample_sheet, imiss, subject_id_override)
 
     # Add metadata for Sample 1 and Sample 2 in pairwise table
     df = sample_concordance.merge(
@@ -56,7 +58,7 @@ def main(
     # (i.e., samples from the same subject)
     ################################################################################
     # Full Table
-    known_df = create_known_concordant_table(df)
+    known_df = _create_known_concordant_table(df)
     known_df.to_csv(known, index=False)  # Full table
 
     # QC samples only
@@ -70,11 +72,34 @@ def main(
     # Save Unknown Concordant Samples
     # (i.e., highly concordant samples from different subjects)
     ################################################################################
-    unknown_df = create_unknown_concordant_table(df, concordance_threshold)
+    unknown_df = _create_unknown_concordant_table(df, concordance_threshold)
     unknown_df.to_csv(unknown, index=False)
 
 
-def read_sample_metadata(
+def read_known_concordance_table(filename: os.PathLike) -> pd.DataFrame:
+    dtypes = {
+        "Subject_ID": "string",
+        "Sample_ID1": "string",
+        "Sample_ID2": "string",
+        "concordance": "float",
+        "PI_HAT": "float",
+    }
+    return pd.read_csv(filename, dtype=dtypes)
+
+
+def read_unknown_concordance_table(filename: os.PathLike) -> pd.DataFrame:
+    dtypes = {
+        "Subject_ID1": "string",
+        "Subject_ID2": "string",
+        "Sample_ID1": "string",
+        "Sample_ID2": "string",
+        "concordance": "float",
+        "PI_HAT": "float",
+    }
+    return pd.read_csv(filename, dtype=dtypes)
+
+
+def _read_sample_metadata(
     sample_sheet: Path, call_rate: Path, subject_id_override: Optional[str] = None
 ) -> pd.DataFrame:
     """Read in sample metadata from sample sheet and call rates.
@@ -85,28 +110,27 @@ def read_sample_metadata(
     return (
         SampleSheet(sample_sheet)
         .add_group_by_column(subject_id_override)
-        .data.merge(read_imiss_file(call_rate), how="left")
+        .data.merge(_read_imiss_file(call_rate), how="left", left_on="Sample_ID", right_index=True)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
         .loc[:, ("Sample_ID", "Subject_ID", "Sample_Group", "call_rate")]
     )
 
 
-def read_imiss_file(file_name: Path) -> pd.Series:
+def _read_imiss_file(file_name: Path) -> pd.Series:
     """Read imiss file and calculate call rate.
 
     Returns:
         Series (Sample_ID, call_rate) where call_rate is 1 - F_MISS.
     """
     return (
-        pd.read_csv(file_name, delim_whitespace=True)
+        read_imiss(file_name)
+        .rename_axis("Sample_ID")
         .assign(call_rate=lambda df: 1.0 - df.F_MISS)
-        .rename({"IID": "Sample_ID"}, axis=1)
-        .loc[:, ("Sample_ID", "call_rate")]
-        .squeeze()
+        .call_rate
     )
 
 
-def create_known_concordant_table(df: pd.DataFrame) -> pd.DataFrame:
+def _create_known_concordant_table(df: pd.DataFrame) -> pd.DataFrame:
     """Save samples known to be from the same subject.
 
     - If missing PI_HAT estimates set defaults (PI_HAT = 0.05, concordance =
@@ -135,7 +159,7 @@ def create_known_concordant_table(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def create_unknown_concordant_table(
+def _create_unknown_concordant_table(
     df: pd.DataFrame, dup_concordance_cutoff: float
 ) -> pd.DataFrame:  # noqa
     """Identify concordant samples from different subjects.

@@ -14,7 +14,7 @@ from cgr_gwas_qc.validators import check_file
 
 app = typer.Typer(add_completion=False)
 
-template = env.get_template("summary_stats.txt.jinja2")
+template = env.get_template("summary_stats.txt.j2")
 
 
 @app.command()
@@ -37,7 +37,7 @@ def main(file_name: Path, file_out: Path):
         "contamination_rate": _table_summary_w_na(df.Contamination_Rate),
         "intensity": _table_summary_str(df.IdatIntensity),
         "contaminated": _value_counts_w_na(df.is_contaminated),
-        "call_rate_filterd": _value_counts_w_na(df["is_call_rate_filtered"]),
+        "call_rate_filtered": _value_counts_w_na(df["is_call_rate_filtered"]),
         "sex_discord": _value_counts_w_na(df["is_sex_discordant"]),
         "rep_discord": _value_counts_w_na(df["is_replicate_discordant"]),
         "unexpected_rep": _value_counts_w_na(df["is_unexpected_replicate"]),

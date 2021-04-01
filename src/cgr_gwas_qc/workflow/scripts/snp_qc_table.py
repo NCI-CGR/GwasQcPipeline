@@ -42,7 +42,7 @@ def main(
 
     snp_qc = aggregate_snp_data(initial, cr1, cr2, thousand_genomes)
     add_call_rate_flags(snp_qc)
-    snp_qc.reindex(DTYPES.keys(), axis=1).to_csv(outfile)
+    snp_qc.reindex(DTYPES.keys(), axis=1).to_csv(outfile, index=False)
 
 
 def aggregate_snp_data(initial, cr1, cr2, thousand_genomes) -> pd.DataFrame:
