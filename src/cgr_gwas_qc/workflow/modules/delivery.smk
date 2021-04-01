@@ -190,14 +190,16 @@ rule qc_report:
         "../scripts/qc_report.py"
 
 
-rule export_qc_report:
+rule qc_report_docx:
     input:
         rules.qc_report.output[0],
+    params:
+        template=cfg.docx_template,
     output:
-        "deliver/{deliver_prefix}QC_Report{deliver_suffix}.{ext}",
+        "deliver/{deliver_prefix}QC_Report{deliver_suffix}.docx",
     wildcard_constraints:
         ext="docx|pdf|html",
     conda:
         cfg.conda("pandoc.yml")
     shell:
-        "pandoc --toc -s {input} -o {output[0]}"
+        "pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}"
