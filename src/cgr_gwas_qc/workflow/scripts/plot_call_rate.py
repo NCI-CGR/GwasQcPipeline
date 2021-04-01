@@ -89,7 +89,7 @@ def plot_panel(
     )
 
     # Set basic defaults so I don't have to repeat myself
-    style_defaults = dict(linewidth=0, alpha=0.8, s=10)
+    style_defaults = dict(linewidth=0, alpha=0.8, s=5)
     sample_defaults = {
         **dict(hue="case_control", palette=CASE_CONTROL_COLORS, data=sample),
         **style_defaults,
