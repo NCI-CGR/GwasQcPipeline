@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import numpy as np
 import pytest
 from numpy import isclose
@@ -17,22 +15,11 @@ def test_gtc2adpc(gtc_file, bpm_file, tmp_path):
     # GIVEN: A fake GTC and BPM file
     # WHEN: I run the script and get adpc.bin and snp_counts as outputs.
     results = runner.invoke(
-        app,
-        [
-            gtc_file.as_posix(),
-            bpm_file.as_posix(),
-            (tmp_path / "adpc.bin").as_posix(),
-            (tmp_path / "snp_counts.txt").as_posix(),
-        ],
+        app, [gtc_file.as_posix(), bpm_file.as_posix(), (tmp_path / "adpc.bin").as_posix()],
     )
     assert results.exit_code == 0
 
-    # THEN: The expected SNP counts are the same between observed and expected
-    obs_snp_count = tmp_path / "snp_counts.txt"
-    expected_snp_count = Path("tests/data/small.adpc.bin.numSnps.txt")
-    assert obs_snp_count.read_text() == expected_snp_count.read_text()
-
-    # The adpc.bin file is almost identical are about equal. The output
+    # THEN: The adpc.bin file is almost identical are about equal. The output
     # contains floats so we need to do fuzzy matching.
     obs_adpc = tmp_path / "adpc.bin"
     expected_adpc = "tests/data/small.adpc.bin"
@@ -70,15 +57,7 @@ def test_gtc2adpc_issue_31(tmp_path):
     bpm_file = (data_repo / "reference_data/GSAMD-24v1-0_20011747_A1.bpm").as_posix()
 
     # WHEN: run the script
-    results = runner.invoke(
-        app,
-        [
-            gtc_file,
-            bpm_file,
-            (tmp_path / "test.adpc.bin").as_posix(),
-            (tmp_path / "test.snp_counts").as_posix(),
-        ],
-    )
+    results = runner.invoke(app, [gtc_file, bpm_file, (tmp_path / "test.adpc.bin").as_posix()])
     assert results.exit_code == 0
 
     # THEN:

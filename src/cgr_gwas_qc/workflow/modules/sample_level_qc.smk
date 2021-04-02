@@ -108,13 +108,12 @@ if (
             This is a submission hot spot creating 1 job per sample.
         """
         input:
-            gtc=lambda wc: cfg.expand(
+            gtc_file=lambda wc: cfg.expand(
                 cfg.config.user_files.gtc_pattern, query=f"Sample_ID == '{wc.Sample_ID}'",
             )[0],
-            bpm=cfg.config.reference_files.illumina_manifest_file,
+            bpm_file=cfg.config.reference_files.illumina_manifest_file,
         output:
-            adpc=temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
-            snp_count=temp("sample_level/per_sample_num_snps/{Sample_ID}.txt"),
+            temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
         resources:
             mem_gb=1,
         group:
@@ -161,7 +160,7 @@ if (
             multi-sample mode is that it only works when you have a "large" number of samples.
         """
         input:
-            adpc=rules.per_sample_gtc_to_adpc.output.adpc,
+            adpc=rules.per_sample_gtc_to_adpc.output[0],
             abf=rules.pull_1KG_allele_b_freq.output.abf_file,
         params:
             snps=cfg.config.num_snps,
