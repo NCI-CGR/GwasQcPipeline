@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.cli.config &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  <title>cgr_gwas_qc.cli.config &mdash; GwasQcPipeline v1.0.0a3 documentation</title>
   
 
   
@@ -283,11 +283,9 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_output_pattern</span><span class="p">(</span><span class="n">sample_sheet_name</span><span class="p">):</span>
-    <span class="k">if</span> <span class="s2">&quot;AnalysisManifest&quot;</span> <span class="ow">in</span> <span class="n">sample_sheet_name</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">/&quot;</span> <span class="o">+</span> <span class="n">sample_sheet_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;AnalysisManifest&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{file_type}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-            <span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.</span><span class="si">{ext}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_output_pattern</span><span class="p">(</span><span class="n">sample_sheet_stem</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;AnalysisManifest&quot;</span> <span class="ow">in</span> <span class="n">sample_sheet_stem</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">/&quot;</span> <span class="o">+</span> <span class="n">sample_sheet_stem</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;AnalysisManifest&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{file_type}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.</span><span class="si">{ext}</span><span class="s2">&quot;</span>
 
     <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{prefix}</span><span class="s2">/</span><span class="si">{file_type}</span><span class="s2">.</span><span class="si">{ext}</span><span class="s2">&quot;</span>
 

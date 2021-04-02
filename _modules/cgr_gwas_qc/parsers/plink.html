@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.parsers.plink &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  <title>cgr_gwas_qc.parsers.plink &mdash; GwasQcPipeline v1.0.0a3 documentation</title>
   
 
   
@@ -190,16 +190,178 @@
 <span class="sd">                :header: name, dtype, description</span>
 
 <span class="sd">                **ID** (*index*), object, Sample or Subject ID</span>
-<span class="sd">                O(HOM), int, Observed number of homozygotes</span>
-<span class="sd">                E(HOM), int, Expected number of homozygotes</span>
-<span class="sd">                N(NM), int, Number of non-missing autosomal genotypes</span>
+<span class="sd">                O_HOM, int, Observed number of homozygotes</span>
+<span class="sd">                E_HOM, int, Expected number of homozygotes</span>
+<span class="sd">                N_NM, int, Number of non-missing autosomal genotypes</span>
 <span class="sd">                F, float, Method-of-moments F coefficient estimate</span>
 
 <span class="sd">    References:</span>
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/basic_stats#ibc</span>
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#het</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;FID&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;IID&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;O(HOM)&quot;</span><span class="p">:</span> <span class="s2">&quot;O_HOM&quot;</span><span class="p">,</span> <span class="s2">&quot;E(HOM)&quot;</span><span class="p">:</span> <span class="s2">&quot;E_HOM&quot;</span><span class="p">,</span> <span class="s2">&quot;N(NM)&quot;</span><span class="p">:</span> <span class="s2">&quot;N_NM&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
+    <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="read_hwe"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_hwe">[docs]</a><span class="k">def</span> <span class="nf">read_hwe</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s hwe file format.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame:</span>
+<span class="sd">            A (# SNP x 9) table with the following columns</span>
+
+<span class="sd">            .. csv-table::</span>
+<span class="sd">                :header: name, dtype, description</span>
+
+<span class="sd">                **SNP** (*index*), string, SNP ID</span>
+<span class="sd">                CHR, string, Chromosome code</span>
+<span class="sd">                TEST, string, Type of test; one of {ALL, AFF, UNAFF, ALL(QT), ALL(NP)}</span>
+<span class="sd">                A1, string, Allele 1 (usually minor)</span>
+<span class="sd">                A2, string, Allele 2 (usually major)</span>
+<span class="sd">                GENO, string, &#39;/&#39;- separated genotype counts (A1 hom, het, A2 hom)</span>
+<span class="sd">                O_HET, float, Observed heterozygote frequency</span>
+<span class="sd">                E_HET, float, Expected heterozygote frequency</span>
+<span class="sd">                P, float, Hardy-Weinberg equilibrium exact test p-value</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/basic_stats#hardy</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#hwe</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;CHR&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SNP&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TEST&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;A1&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;A2&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GENO&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;O(HET)&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;E(HET)&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;O(HET)&quot;</span><span class="p">:</span> <span class="s2">&quot;O_HET&quot;</span><span class="p">,</span> <span class="s2">&quot;E(HET)&quot;</span><span class="p">:</span> <span class="s2">&quot;E_HET&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;SNP&quot;</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_genome"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_genome">[docs]</a><span class="k">def</span> <span class="nf">read_genome</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s genome file format.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame:</span>
+<span class="sd">            A (n x 5) table with the following columns</span>
+
+<span class="sd">            .. csv-table::</span>
+<span class="sd">                :header: name, dtype, description</span>
+
+<span class="sd">                ID1, object, First Sample or Subject ID</span>
+<span class="sd">                ID2, object, Second Sample or Subject ID</span>
+<span class="sd">                RT, object, Relationship type inferred from .fam/.ped file {FS: Full Sib, HS, Half Sib, PO: Parent-Offspring, OT; Other}</span>
+<span class="sd">                EZ, object, IBD sharing expected value, based on just .fam/.ped relationship</span>
+<span class="sd">                Z0, float, P(IBD=0)</span>
+<span class="sd">                Z1, float, P(IBD=1)</span>
+<span class="sd">                Z2, float, P(IBD=2)</span>
+<span class="sd">                PI_HAT, float, Proportion IBD, i.e. P(IBD=2) + 0.5*P(IBD=1)</span>
+<span class="sd">                PHE, int, Pairwise phenotypic code (1, 0, -1 = case-case, case-ctrl, and ctrl-ctrl pairs, respectively)</span>
+<span class="sd">                DST, float, IBS distance, i.e. (IBS2 + 0.5*IBS1) / (IBS0 + IBS1 + IBS2)</span>
+<span class="sd">                PPC, float, IBS binomial test</span>
+<span class="sd">                RATIO, float, HETHET: IBS0 SNP ratio (expected value 2)</span>
+<span class="sd">                IBS0, int, Number of IBS 0 nonmissing variants</span>
+<span class="sd">                IBS1, int, Number of IBS 1 nonmissing variants</span>
+<span class="sd">                IBS2, int, Number of IBS 2 nonmissing variants</span>
+<span class="sd">                HOMHOM, float, Number of IBS 0 SNP pairs used in PPC test</span>
+<span class="sd">                HETHET, float, Number of IBS 2 het/het SNP pairs used in PPC test</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/ibd</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#genome</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;FID1&quot;</span><span class="p">,</span> <span class="s2">&quot;FID2&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;IID1&quot;</span><span class="p">:</span> <span class="s2">&quot;ID1&quot;</span><span class="p">,</span> <span class="s2">&quot;IID2&quot;</span><span class="p">:</span> <span class="s2">&quot;ID2&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_imiss"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_imiss">[docs]</a><span class="k">def</span> <span class="nf">read_imiss</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s imiss file format.</span>
+
+<span class="sd">    This reports sample level missing data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame:</span>
+<span class="sd">            A (n x 5) table with the following columns</span>
+
+<span class="sd">            .. csv-table::</span>
+<span class="sd">                :header: name, dtype, description</span>
+
+<span class="sd">                **ID** (*index*), object, Sample or Subject ID</span>
+<span class="sd">                MISS_PHENO, str, [Y/N] if the phenotype is missing</span>
+<span class="sd">                N_MISS, int, The number of missing genotype calls not including obligatory missing or heterozygous haploids.</span>
+<span class="sd">                N_GENO, int, Number of potentially valid calls</span>
+<span class="sd">                F_MISS, float, Missing call rate</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/basic_stats#missing</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#imiss</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;FID&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;IID&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_lmiss"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_lmiss">[docs]</a><span class="k">def</span> <span class="nf">read_lmiss</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s lmiss file format.</span>
+
+<span class="sd">    This reports snp level missing data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame:</span>
+<span class="sd">            A (n x 5) table with the following columns</span>
+
+<span class="sd">            .. csv-table::</span>
+<span class="sd">                :header: name, dtype, description</span>
+
+<span class="sd">                CHR, str, Chromosome code</span>
+<span class="sd">                SNP, str, Variant identifier</span>
+<span class="sd">                N_MISS, int, The number of missing genotype calls not including obligatory missing or heterozygous haploids.</span>
+<span class="sd">                N_GENO, int, Number of potentially valid calls</span>
+<span class="sd">                F_MISS, float, Missing call rate</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/basic_stats#missing</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#lmiss</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_sexcheck"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_sexcheck">[docs]</a><span class="k">def</span> <span class="nf">read_sexcheck</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s sexcheck file format.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame:</span>
+<span class="sd">            A (n x 5) table with the following columns</span>
+
+<span class="sd">            .. csv-table::</span>
+<span class="sd">                :header: name, dtype, description</span>
+
+<span class="sd">                **ID** (*index*), object, Sample or Subject ID</span>
+<span class="sd">                PEDSEX, int, Sex code in input file</span>
+<span class="sd">                SNPSEX, int, Imputed sex code (1 = male; 2 = female; 0 = unknown)</span>
+<span class="sd">                STATUS, str, OK if PEDSEX and SNPSEX match and are nonzero PROBLEM otherwise</span>
+<span class="sd">                F, int, Inbreeding coefficient considering only X chromosome.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/basic_stats#check_sex</span>
+<span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#sexcheck</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

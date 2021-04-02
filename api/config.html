@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  <title>Configuration &mdash; GwasQcPipeline v1.0.0a3 documentation</title>
   
 
   
@@ -115,12 +115,14 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#data-models">Data Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#config">Config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#softwareparams">SoftwareParams</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#configuration-manager">Configuration Manager</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="parsers.html">Parsers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow Scripts</a></li>
 </ul>
 </li>
 </ul>
@@ -227,7 +229,7 @@ schema and implementing data validation.</p>
 <td colspan="2"><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>v0.1.0</p></td>
+<td colspan="2"><p>v1.0.0-alpha.3</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
 <li><p>project_name</p></li>
@@ -1093,6 +1095,328 @@ schema and implementing data validation.</p>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="softwareparams">
+<h3>SoftwareParams<a class="headerlink" href="#softwareparams" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>sample_call_rate_1</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Sample Call Rate 1</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Sample call rate filter 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.8</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>snp_call_rate_1</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Snp Call Rate 1</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>SNP call rate filter 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.8</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>sample_call_rate_2</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Sample Call Rate 2</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Sample call rate filter 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.95</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>snp_call_rate_2</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Snp Call Rate 2</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>SNP call rate filter 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.95</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>ld_prune_r2</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Ld Prune R2</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>r-squared threshold for LD pruning of SNPS for use with IBD and concordance.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.1</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>maf_for_ibd</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Maf For Ibd</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Minor allele frequency threshold of SNPS for use with IBD and concordance.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.2</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>maf_for_hwe</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Maf For Hwe</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Minor allele frequency threshold of SNPs for use with HWE.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.05</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>ibd_pi_hat_min</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Ibd Pi Hat Min</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Minimum IBD pi hat threshold.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMaximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>minimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.05</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>ibd_pi_hat_max</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Ibd Pi Hat Max</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Maximum IBD pi hat threshold.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>1.0</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>dup_concordance_cutoff</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Dup Concordance Cutoff</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>SNP concordance threshold to call samples as replicates.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.95</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="5"><ul class="simple">
+<li><p>intensity_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Intensity Threshold</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>IDAT intensity threshold used for estimating contamination.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>6000</p></td>
+</tr>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>contam_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Contam Threshold</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Threshold to call a sample contaminated.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>0.1</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>contam_population</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Contam Population</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Population from 1KG to use for B allele frequencies during contamination testing {AF, EAS_AF, AMR_AF, AFR_AF, EUR_AF, SAS_AF}.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>AF</p></td>
+</tr>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>pi_hat_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Pi Hat Threshold</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>PI hat threshold used for calling related subjects. The default of 0.2 removes 2nd degree or higher relatives.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>0.2</p></td>
+</tr>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>autosomal_het_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Autosomal Het Threshold</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Autosomal heterozygosity F coefficient threshold to remove subjects.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>0.1</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>strand</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Strand</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Which strand to use for genotypes when converting GTC to plink {TOP, FWD, PLUS}.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>top</p></td>
 </tr>
 </tbody>
 </table>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Parsers &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  <title>Parsers &mdash; GwasQcPipeline v1.0.0a3 documentation</title>
   
 
   
@@ -37,6 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Workflow Scripts" href="workflow.html" />
     <link rel="prev" title="Configuration" href="config.html" /> 
 </head>
 
@@ -117,6 +118,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.eigensoft">Eigensoft</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow Scripts</a></li>
 </ul>
 </li>
 </ul>
@@ -191,6 +193,204 @@
 <div class="section" id="module-cgr_gwas_qc.parsers.plink">
 <span id="plink"></span><h2>Plink<a class="headerlink" href="#module-cgr_gwas_qc.parsers.plink" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
+<dt id="cgr_gwas_qc.parsers.plink.read_genome">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_genome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse PLINK’s genome file format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A (n x 5) table with the following columns</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ID1</p></td>
+<td><p>object</p></td>
+<td><p>First Sample or Subject ID</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ID2</p></td>
+<td><p>object</p></td>
+<td><p>Second Sample or Subject ID</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>RT</p></td>
+<td><p>object</p></td>
+<td><p>Relationship type inferred from .fam/.ped file {FS: Full Sib</p></td>
+<td><p>HS</p></td>
+<td><p>Half Sib</p></td>
+<td><p>PO: Parent-Offspring</p></td>
+<td><p>OT; Other}</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>EZ</p></td>
+<td><p>object</p></td>
+<td><p>IBD sharing expected value</p></td>
+<td><p>based on just .fam/.ped relationship</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Z0</p></td>
+<td><p>float</p></td>
+<td><p>P(IBD=0)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Z1</p></td>
+<td><p>float</p></td>
+<td><p>P(IBD=1)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Z2</p></td>
+<td><p>float</p></td>
+<td><p>P(IBD=2)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>PI_HAT</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBD</p></td>
+<td><p>i.e. P(IBD=2) + 0.5*P(IBD=1)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>PHE</p></td>
+<td><p>int</p></td>
+<td><p>Pairwise phenotypic code (1</p></td>
+<td><p>0</p></td>
+<td><p>-1 = case-case</p></td>
+<td><p>case-ctrl</p></td>
+<td><p>and ctrl-ctrl pairs</p></td>
+<td><p>respectively)</p></td>
+</tr>
+<tr class="row-odd"><td><p>DST</p></td>
+<td><p>float</p></td>
+<td><p>IBS distance</p></td>
+<td><p>i.e. (IBS2 + 0.5*IBS1) / (IBS0 + IBS1 + IBS2)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>PPC</p></td>
+<td><p>float</p></td>
+<td><p>IBS binomial test</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>RATIO</p></td>
+<td><p>float</p></td>
+<td><p>HETHET: IBS0 SNP ratio (expected value 2)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>IBS0</p></td>
+<td><p>int</p></td>
+<td><p>Number of IBS 0 nonmissing variants</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>IBS1</p></td>
+<td><p>int</p></td>
+<td><p>Number of IBS 1 nonmissing variants</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>IBS2</p></td>
+<td><p>int</p></td>
+<td><p>Number of IBS 2 nonmissing variants</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>HOMHOM</p></td>
+<td><p>float</p></td>
+<td><p>Number of IBS 0 SNP pairs used in PPC test</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>HETHET</p></td>
+<td><p>float</p></td>
+<td><p>Number of IBS 2 het/het SNP pairs used in PPC test</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/ibd">https://www.cog-genomics.org/plink/1.9/ibd</a></p></li>
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#genome">https://www.cog-genomics.org/plink/1.9/formats#genome</a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_het">
 <code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_het</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_het"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_het" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse PLINK’s het file format.</p>
@@ -214,15 +414,15 @@
 <td><p>object</p></td>
 <td><p>Sample or Subject ID</p></td>
 </tr>
-<tr class="row-odd"><td><p>O(HOM)</p></td>
+<tr class="row-odd"><td><p>O_HOM</p></td>
 <td><p>int</p></td>
 <td><p>Observed number of homozygotes</p></td>
 </tr>
-<tr class="row-even"><td><p>E(HOM)</p></td>
+<tr class="row-even"><td><p>E_HOM</p></td>
 <td><p>int</p></td>
 <td><p>Expected number of homozygotes</p></td>
 </tr>
-<tr class="row-odd"><td><p>N(NM)</p></td>
+<tr class="row-odd"><td><p>N_NM</p></td>
 <td><p>int</p></td>
 <td><p>Number of non-missing autosomal genotypes</p></td>
 </tr>
@@ -242,6 +442,288 @@
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/basic_stats#ibc">https://www.cog-genomics.org/plink/1.9/basic_stats#ibc</a></p></li>
 <li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#het">https://www.cog-genomics.org/plink/1.9/formats#het</a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.plink.read_hwe">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_hwe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_hwe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_hwe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse PLINK’s hwe file format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A (# SNP x 9) table with the following columns</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>SNP</strong> (<em>index</em>)</p></td>
+<td><p>string</p></td>
+<td><p>SNP ID</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>CHR</p></td>
+<td><p>string</p></td>
+<td><p>Chromosome code</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>TEST</p></td>
+<td><p>string</p></td>
+<td><p>Type of test; one of {ALL</p></td>
+<td><p>AFF</p></td>
+<td><p>UNAFF</p></td>
+<td><p>ALL(QT)</p></td>
+<td><p>ALL(NP)}</p></td>
+</tr>
+<tr class="row-odd"><td><p>A1</p></td>
+<td><p>string</p></td>
+<td><p>Allele 1 (usually minor)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>A2</p></td>
+<td><p>string</p></td>
+<td><p>Allele 2 (usually major)</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>GENO</p></td>
+<td><p>string</p></td>
+<td><p>’/’- separated genotype counts (A1 hom</p></td>
+<td><p>het</p></td>
+<td><p>A2 hom)</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>O_HET</p></td>
+<td><p>float</p></td>
+<td><p>Observed heterozygote frequency</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>E_HET</p></td>
+<td><p>float</p></td>
+<td><p>Expected heterozygote frequency</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>P</p></td>
+<td><p>float</p></td>
+<td><p>Hardy-Weinberg equilibrium exact test p-value</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/basic_stats#hardy">https://www.cog-genomics.org/plink/1.9/basic_stats#hardy</a></p></li>
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#hwe">https://www.cog-genomics.org/plink/1.9/formats#hwe</a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.plink.read_imiss">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_imiss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_imiss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_imiss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse PLINK’s imiss file format.</p>
+<p>This reports sample level missing data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A (n x 5) table with the following columns</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>ID</strong> (<em>index</em>)</p></td>
+<td><p>object</p></td>
+<td><p>Sample or Subject ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>MISS_PHENO</p></td>
+<td><p>str</p></td>
+<td><p>[Y/N] if the phenotype is missing</p></td>
+</tr>
+<tr class="row-even"><td><p>N_MISS</p></td>
+<td><p>int</p></td>
+<td><p>The number of missing genotype calls not including obligatory missing or heterozygous haploids.</p></td>
+</tr>
+<tr class="row-odd"><td><p>N_GENO</p></td>
+<td><p>int</p></td>
+<td><p>Number of potentially valid calls</p></td>
+</tr>
+<tr class="row-even"><td><p>F_MISS</p></td>
+<td><p>float</p></td>
+<td><p>Missing call rate</p></td>
+</tr>
+</tbody>
+</table>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/basic_stats#missing">https://www.cog-genomics.org/plink/1.9/basic_stats#missing</a></p></li>
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#imiss">https://www.cog-genomics.org/plink/1.9/formats#imiss</a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.plink.read_lmiss">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_lmiss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_lmiss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_lmiss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse PLINK’s lmiss file format.</p>
+<p>This reports snp level missing data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A (n x 5) table with the following columns</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CHR</p></td>
+<td><p>str</p></td>
+<td><p>Chromosome code</p></td>
+</tr>
+<tr class="row-odd"><td><p>SNP</p></td>
+<td><p>str</p></td>
+<td><p>Variant identifier</p></td>
+</tr>
+<tr class="row-even"><td><p>N_MISS</p></td>
+<td><p>int</p></td>
+<td><p>The number of missing genotype calls not including obligatory missing or heterozygous haploids.</p></td>
+</tr>
+<tr class="row-odd"><td><p>N_GENO</p></td>
+<td><p>int</p></td>
+<td><p>Number of potentially valid calls</p></td>
+</tr>
+<tr class="row-even"><td><p>F_MISS</p></td>
+<td><p>float</p></td>
+<td><p>Missing call rate</p></td>
+</tr>
+</tbody>
+</table>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/basic_stats#missing">https://www.cog-genomics.org/plink/1.9/basic_stats#missing</a></p></li>
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#lmiss">https://www.cog-genomics.org/plink/1.9/formats#lmiss</a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.plink.read_sexcheck">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_sexcheck</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_sexcheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_sexcheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse PLINK’s sexcheck file format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A (n x 5) table with the following columns</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>ID</strong> (<em>index</em>)</p></td>
+<td><p>object</p></td>
+<td><p>Sample or Subject ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>PEDSEX</p></td>
+<td><p>int</p></td>
+<td><p>Sex code in input file</p></td>
+</tr>
+<tr class="row-even"><td><p>SNPSEX</p></td>
+<td><p>int</p></td>
+<td><p>Imputed sex code (1 = male; 2 = female; 0 = unknown)</p></td>
+</tr>
+<tr class="row-odd"><td><p>STATUS</p></td>
+<td><p>str</p></td>
+<td><p>OK if PEDSEX and SNPSEX match and are nonzero PROBLEM otherwise</p></td>
+</tr>
+<tr class="row-even"><td><p>F</p></td>
+<td><p>int</p></td>
+<td><p>Inbreeding coefficient considering only X chromosome.</p></td>
+</tr>
+</tbody>
+</table>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pd.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/basic_stats#check_sex">https://www.cog-genomics.org/plink/1.9/basic_stats#check_sex</a></p></li>
+<li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#sexcheck">https://www.cog-genomics.org/plink/1.9/formats#sexcheck</a></p></li>
 </ul>
 </dd></dl>
 
@@ -337,6 +819,8 @@
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="workflow.html" class="btn btn-neutral float-right" title="Workflow Scripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="config.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

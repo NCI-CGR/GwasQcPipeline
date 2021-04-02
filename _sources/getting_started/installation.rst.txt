@@ -17,8 +17,9 @@ Create a ``conda`` environment (python=3.8):
 Install the current release of the ``GwasQcPipeline``:
 
 .. code-block:: bash
+    :substitutions:
 
-    $ pip install https://storage.googleapis.com/gwasqc/releases/cgr_gwas_qc-1.0.0a1-py3-none-any.whl
+    $ pip install |pkgurl|
     $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 
 After the initial installation, to use ``GwasQcPipeline``:
@@ -29,13 +30,14 @@ After the initial installation, to use ``GwasQcPipeline``:
     $ conda activate GwasQcPipeline
     $ cgr --help
 
-To update the ``GwasQcPipeline`` in the future:
+To update the latest version of ``GwasQcPipeline``:
 
 .. code-block:: bash
+    :substitutions:
 
     $ module load miniconda/4.8.3
     $ conda activate GwasQcPipeline
-    $ pip install --force-reinstall # <url to latest *.whl>
+    $ pip install --force-reinstall |pkgurl|
     # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 
 
@@ -47,10 +49,11 @@ The ``GwasQcPipeline`` requires ``conda`` to run. We suggest you follow these di
 .. _Miniconda: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
 
 .. code-block:: bash
+    :substitutions:
 
     $ conda create -n GwasQcPipeline -y python=3.8 pip
     $ conda activate GwasQcPipeline
-    $ pip install https://storage.googleapis.com/gwasqc/releases/cgr_gwas_qc-1.0.0a1-py3-none-any.whl
+    $ pip install |pkgurl|
     $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 
 
@@ -64,7 +67,8 @@ To use ``GwasQcPipeline`` first activate your ``conda`` environment:
 And to update:
 
 .. code-block:: bash
+    :substitutions:
 
     $ conda activate GwasQcPipeline
-    $ pip install --force-reinstall # <url to latest *.whl>
+    $ pip install --force-reinstall |pkgurl|
     # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases

@@ -7,3 +7,4 @@ API Reference
     cli.rst
     config.rst
     parsers.rst
+    workflow.rst

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>QC Report &mdash; GwasQcPipeline 0.1.0a documentation</title>
+  <title>QC Report &mdash; GwasQcPipeline v1.0.0a3 documentation</title>
   
 
   
@@ -98,7 +98,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#summary-table">Summary Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#supplemental-tables-and-parts">Supplemental Tables and Parts</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#sample-qc-summary">Sample QC Summary</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#population-qc-summary">Population QC Summary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#population-qc-summary">Population QC Summary</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#population-qc-table-py">population_qc_table.py</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -244,7 +247,7 @@
 <ul class="simple">
 <li><dl class="simple">
 <dt><strong>Inputs</strong>:</dt><dd><ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/qc_summary.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/sample_qc.csv</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">population_level/{population}/subjects.het</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">population_level/{population}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec</span></code></p></li>
 </ul>
@@ -254,99 +257,92 @@
 <li><p><strong>Output</strong>: <code class="docutils literal notranslate"><span class="pre">population_level/population_qc.csv</span></code></p></li>
 <li><p><strong>Script</strong>: <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc/workflow/scripts/population_qc_table.py</span></code></p></li>
 </ul>
-<span class="target" id="module-cgr_gwas_qc.workflow.scripts.population_qc_table"></span><p>Population level summary table with the following columns:</p>
+<span class="target" id="module-cgr_gwas_qc.workflow.scripts.population_qc_table"></span><div class="section" id="population-qc-table-py">
+<h4>population_qc_table.py<a class="headerlink" href="#population-qc-table-py" title="Permalink to this headline">¶</a></h4>
+<p>Creates a QC summary table for each population. This is done by aggregating major population-level results including:</p>
+<ul class="simple">
+<li><p>Within population subject reslationships (IBS/IBD)</p></li>
+<li><p>Principal components analysis</p></li>
+<li><p>Autosomal heterozygosity</p></li>
+</ul>
+<dl>
+<dt>Output:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">population_level/{population}/qc.csv</span></code></p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 50%" />
+<col style="width: 50%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>name</p></th>
-<th class="head"><p>dtype</p></th>
 <th class="head"><p>description</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Subject_ID</p></td>
-<td><p>str</p></td>
-<td><p>Subject ID</p></td>
+<tr class="row-even"><td><p>population</p></td>
+<td><p>The population name</p></td>
 </tr>
-<tr class="row-odd"><td><p>Sample_ID</p></td>
-<td><p>str</p></td>
-<td><p>Sample ID</p></td>
+<tr class="row-odd"><td><p>Subject_ID</p></td>
+<td><p>The Subject’s ID</p></td>
 </tr>
-<tr class="row-even"><td><p>Case/Control_Status</p></td>
-<td><p>str</p></td>
-<td><p>Case/Control Status</p></td>
+<tr class="row-even"><td><p>QC_Family_ID</p></td>
+<td><p>An arbitrary ID assigned to each related set of subjects.</p></td>
 </tr>
-<tr class="row-odd"><td><p>population</p></td>
-<td><p>str</p></td>
-<td><p>Population name</p></td>
+<tr class="row-odd"><td><p>relatives</p></td>
+<td><p>A list of related Subject_IDs concatenated together with a <cite>|</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p>PC1</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 1</p></td>
 </tr>
 <tr class="row-odd"><td><p>PC2</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 2</p></td>
 </tr>
 <tr class="row-even"><td><p>PC3</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 3</p></td>
 </tr>
 <tr class="row-odd"><td><p>PC4</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 4</p></td>
 </tr>
 <tr class="row-even"><td><p>PC5</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 5</p></td>
 </tr>
 <tr class="row-odd"><td><p>PC6</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 6</p></td>
 </tr>
 <tr class="row-even"><td><p>PC7</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 7</p></td>
 </tr>
 <tr class="row-odd"><td><p>PC8</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 8</p></td>
 </tr>
 <tr class="row-even"><td><p>PC9</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 9</p></td>
 </tr>
 <tr class="row-odd"><td><p>PC10</p></td>
-<td><p>float</p></td>
 <td><p>Principal component 10</p></td>
 </tr>
-<tr class="row-even"><td><p>O(HOM)</p></td>
-<td><p>int</p></td>
+<tr class="row-even"><td><p>O_HOM</p></td>
 <td><p>Observed number of homozygotes</p></td>
 </tr>
-<tr class="row-odd"><td><p>E(HOM)</p></td>
-<td><p>int</p></td>
+<tr class="row-odd"><td><p>E_HOM</p></td>
 <td><p>Expected number of homozygotes</p></td>
 </tr>
-<tr class="row-even"><td><p>N(NM)</p></td>
-<td><p>int</p></td>
+<tr class="row-even"><td><p>N_NM</p></td>
 <td><p>Number of non-missing autosomal genotypes</p></td>
 </tr>
 <tr class="row-odd"><td><p>F</p></td>
-<td><p>float</p></td>
 <td><p>Method-of-moments F coefficient estimate</p></td>
 </tr>
 </tbody>
 </table>
+</dd>
+</dl>
 <p class="rubric">References</p>
 <ul class="simple">
+<li><p><a class="reference internal" href="../api/workflow.html#module-cgr_gwas_qc.workflow.scripts.related_subjects" title="cgr_gwas_qc.workflow.scripts.related_subjects"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgr_gwas_qc.workflow.scripts.related_subjects</span></code></a></p></li>
 <li><p><a class="reference internal" href="../api/parsers.html#cgr_gwas_qc.parsers.plink.read_het" title="cgr_gwas_qc.parsers.plink.read_het"><code class="xref py py-func docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.plink.read_het()</span></code></a></p></li>
 <li><p><a class="reference internal" href="../api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec" title="cgr_gwas_qc.parsers.eigensoft.Eigenvec"><code class="xref py py-class docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.eigensoft.Eigenvec</span></code></a></p></li>
 </ul>
+</div>
 </div>
 </div>
 </div>
