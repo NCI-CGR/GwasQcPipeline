@@ -22,7 +22,7 @@ copyright = "2020, Leidos Biomedical Research, Inc."
 authors = ["Justin Fear", "Eric Karlins", "Jiahui Wang", "Cameron Palmer", "Bari Ballew", "Bin Zhu"]
 
 # The full version, including alpha/beta/rc tags
-release = __version__.replace("-alpha.", "a").replace("-beta.", "b")
+release = __version__.lstrip("v").replace("-alpha.", "a").replace("-beta.", "b")
 pkg = f"cgr_gwas_qc-{release}-py3-none-any.whl"
 
 
