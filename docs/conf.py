@@ -13,7 +13,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import subprocess as sp
+from cgr_gwas_qc.version import __version__
 
 # -- Project information -----------------------------------------------------
 
@@ -22,12 +22,7 @@ copyright = "2020, Leidos Biomedical Research, Inc."
 authors = ["Justin Fear", "Eric Karlins", "Jiahui Wang", "Cameron Palmer", "Bari Ballew", "Bin Zhu"]
 
 # The full version, including alpha/beta/rc tags
-release = (
-    sp.check_output(["git", "describe", "--tags", "--abbrev=0"])
-    .decode()
-    .strip()
-    .replace("-alpha.", "a")
-)
+release = __version__.replace("-alpha.", "a").replace("-beta.", "b")
 pkg = f"cgr_gwas_qc-{release}-py3-none-any.whl"
 
 
