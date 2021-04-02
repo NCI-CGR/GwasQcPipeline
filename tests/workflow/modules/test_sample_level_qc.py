@@ -217,10 +217,6 @@ def test_per_sample_gtc_to_adpc(tmp_path):
                     assert pytest.approx(exp_row.y_norm, abs=1e-6) == obs_row.y_norm
                     assert pytest.approx(exp_row.genotype_score, abs=1e-6) == obs_row.genotype_score
 
-        obs_counts = tmp_path / f"sample_level/per_sample_num_snps/{r.Sample_ID}.txt"
-        exp_counts = data_cache / f"production_outputs/contam/{r.Sample_ID}.adpc.bin.numSnps.txt"
-        assert file_hashes_equal(obs_counts, exp_counts)
-
 
 @pytest.mark.real_data
 @pytest.mark.regression
