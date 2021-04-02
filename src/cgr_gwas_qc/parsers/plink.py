@@ -43,7 +43,7 @@ def read_hwe(filename: Path) -> pd.DataFrame:
 
                 **SNP** (*index*), string, SNP ID
                 CHR, string, Chromosome code
-                TEST, string, Type of test; one of {ALL', 'AFF', 'UNAFF', 'ALL(QT)', 'ALL(NP)'}
+                TEST, string, Type of test; one of {ALL, AFF, UNAFF, ALL(QT), ALL(NP)}
                 A1, string, Allele 1 (usually minor)
                 A2, string, Allele 2 (usually major)
                 GENO, string, '/'- separated genotype counts (A1 hom, het, A2 hom)
@@ -180,7 +180,7 @@ def read_sexcheck(filename: Path) -> pd.DataFrame:
                 **ID** (*index*), object, Sample or Subject ID
                 PEDSEX, int, Sex code in input file
                 SNPSEX, int, Imputed sex code (1 = male; 2 = female; 0 = unknown)
-                STATUS, str, "OK" if PEDSEX and SNPSEX match and are nonzero "PROBLEM" otherwise
+                STATUS, str, OK if PEDSEX and SNPSEX match and are nonzero PROBLEM otherwise
                 F, int, Inbreeding coefficient considering only X chromosome.
 
     References:

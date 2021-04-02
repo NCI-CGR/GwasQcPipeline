@@ -13,7 +13,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
+import subprocess as sp
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +22,13 @@ copyright = "2020, Leidos Biomedical Research, Inc."
 authors = ["Justin Fear", "Eric Karlins", "Jiahui Wang", "Cameron Palmer", "Bari Ballew", "Bin Zhu"]
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.0a"
+release = (
+    sp.check_output(["git", "describe", "--tags", "--abbrev=0"])
+    .decode()
+    .strip()
+    .replace("-alpha.", "a")
+)
+pkg = f"cgr_gwas_qc-{release}-py3-none-any.whl"
 
 
 # -- General configuration ---------------------------------------------------
@@ -34,6 +40,9 @@ templates_path = ["templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "api/cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.rst"]
 
+rst_prolog = f"""
+.. |pkgurl| replace:: https://storage.googleapis.com/gwasqc/releases/{pkg}
+"""
 
 # -- Extension Settings -------------------------------------------------
 # Add any Sphinx extension module names here, as strings. They can be
@@ -46,6 +55,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx-pydantic",
     "sphinxcontrib.mermaid",
+    "sphinx-prompt",
+    "sphinx_substitution_extensions",
 ]
 
 todo_include_todos = True

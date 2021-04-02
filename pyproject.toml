@@ -54,6 +54,7 @@ pytest-mock = "^3.5.1"
 sphinx-pydantic = "^0.1.1"
 sphinx-jsonschema = "1.15"
 Pillow = "^8.1.2"
+Sphinx-Substitution-Extensions = "^2020.9.30"
 
 [tool.poetry.scripts]
 cgr = "cgr_gwas_qc.cli:app"

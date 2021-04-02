@@ -1226,6 +1226,18 @@ requests = "*"
 
 [[package]]
 category = "dev"
+description = "Sphinx directive to add unselectable prompt"
+name = "sphinx-prompt"
+optional = false
+python-versions = "*"
+version = "1.4.0"
+
+[package.dependencies]
+pygments = "*"
+Sphinx = "*"
+
+[[package]]
+category = "dev"
 description = "Generate Sphinx documentation from PyDantic objects."
 name = "sphinx-pydantic"
 optional = false
@@ -1249,6 +1261,22 @@ sphinx = "*"
 
 [package.extras]
 dev = ["transifex-client", "sphinxcontrib-httpdomain", "bump2version"]
+
+[[package]]
+category = "dev"
+description = "Extensions for Sphinx which allow for substitutions."
+name = "sphinx-substitution-extensions"
+optional = false
+python-versions = "*"
+version = "2020.9.30.0"
+
+[package.dependencies]
+docutils = ">=0.15"
+sphinx = ">=2.0.0"
+sphinx-prompt = ">=0.1"
+
+[package.extras]
+dev = ["autoflake (==1.4)", "black (==20.8b1)", "check-manifest (==0.43)", "doc8 (==0.8.1)", "flake8-commas (==2.0.0)", "flake8-quotes (==3.2.0)", "flake8 (==3.8.3)", "isort (==5.5.4)", "mypy (==0.782)", "pip-check-reqs (==2.1.1)", "pydocstyle (==5.1.1)", "pyenchant (==3.1.1)", "pygithub (==1.53)", "pylint (==2.6.0)", "pyroma (==2.6)", "pytest-cov (==2.10.1)", "pytest (==6.1.0)", "twine (==3.2.0)", "vulture (==2.1)"]
 
 [[package]]
 category = "dev"
@@ -1487,7 +1515,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "33d77bfdffc91e65a3187202415d4607030c3b408ee044a2bdfbc54557dc0de7"
+content-hash = "9356eca0a1845e6a576f63b355ef4cf90d324cfee09bd2d05d1077ee02299427"
 lock-version = "1.1"
 python-versions = "^3.8"
 
@@ -2258,6 +2286,10 @@ sphinx = [
 sphinx-jsonschema = [
     {file = "sphinx-jsonschema-1.15.tar.gz", hash = "sha256:7fcc7bbec1d4f9cc9d8c564a59a3f6dad8878b30933fd644e20ede29b1ce3e3f"},
 ]
+sphinx-prompt = [
+    {file = "sphinx-prompt-1.4.0.tar.gz", hash = "sha256:70c8e66d1f36def1e295ed961c7562bbf8fc697eea5191b92b41e4784c264ef5"},
+    {file = "sphinx_prompt-1.4.0-py3-none-any.whl", hash = "sha256:ac54b204c3e0ff75851d92060672b65407ff67f8942bde2eb6ba318b8e7ca595"},
+]
 sphinx-pydantic = [
     {file = "sphinx-pydantic-0.1.1.tar.gz", hash = "sha256:a830e4f07fe88fbdfe3edecc2f52ef133cde2def7cb882a3f22780f34963b0fb"},
     {file = "sphinx_pydantic-0.1.1-py3-none-any.whl", hash = "sha256:371487ad81250d8bc5b944a2936b33c10ff88af7188d5be0ee6c4b46bb70254a"},
@@ -2265,6 +2297,10 @@ sphinx-pydantic = [
 sphinx-rtd-theme = [
     {file = "sphinx_rtd_theme-0.5.0-py2.py3-none-any.whl", hash = "sha256:373413d0f82425aaa28fb288009bf0d0964711d347763af2f1b65cafcb028c82"},
     {file = "sphinx_rtd_theme-0.5.0.tar.gz", hash = "sha256:22c795ba2832a169ca301cd0a083f7a434e09c538c70beb42782c073651b707d"},
+]
+sphinx-substitution-extensions = [
+    {file = "Sphinx Substitution Extensions-2020.9.30.0.tar.gz", hash = "sha256:578afc04eb4f701d9a922f8b75f678d3a1a897fa7a172a9226b92f17553f177a"},
+    {file = "Sphinx_Substitution_Extensions-2020.9.30.0-py3-none-any.whl", hash = "sha256:02e543fb64c82a168031d6f64af5d11bdf91d3f06480ffe399c11be87453729f"},
 ]
 sphinxcontrib-applehelp = [
     {file = "sphinxcontrib-applehelp-1.0.2.tar.gz", hash = "sha256:a072735ec80e7675e3f432fcae8610ecf509c5f1869d17e2eecff44389cdbc58"},
