@@ -121,7 +121,7 @@ PLINK software was used to interrogate autosomal heterozygosity and calculate th
 
 ## PCA Plot
 
-To resolve more detailed population substructure, principal components analysis (PCA) was conducted using LD-pruned markers after splitting by ancestry group, excluding duplicates, and related subjects. PCA results for each ancestry group can be found as separate tabs in "{{ excel_file_name }}". PCA was performed with "smarpca" from [Eigensoft](https://www.hsph.harvard.edu/alkes-price/software/), and plots were generated using [R](https://www.r-project.org/) software.
+To resolve more detailed population substructure, principal components analysis (PCA) was conducted using LD-pruned markers after splitting by ancestry group, excluding duplicates, and related subjects. PCA results for each ancestry group can be found as separate tabs in "{{ excel_file_name }}". PCA was performed with "smartpca" from [Eigensoft](https://www.hsph.harvard.edu/alkes-price/software/), and plots were generated using [R](https://www.r-project.org/) software.
 PCA plots for each ancestry group are shown in **Figure 5**.
 
 {% for panel in subject_qc.pca.panels %}
