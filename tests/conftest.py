@@ -375,6 +375,33 @@ def population_qc_df(population_qc) -> pd.DataFrame:
     return read_population_qc(population_qc)
 
 
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def agg_population_qc(sample_qc, population_qc, tmp_path_factory) -> Path:
+    """Create the aggregated population qc table"""
+    from cgr_gwas_qc.workflow.scripts import agg_population_qc_tables
+
+    tmp_path = tmp_path_factory.mktemp("agg_population_qc")
+    tables = tmp_path / "population_qc_tables.txt"
+    tables.write_text(population_qc.resolve().as_posix())
+
+    outfile = tmp_path / "agg_population_qc.csv"
+
+    agg_population_qc_tables.main(
+        sample_qc_table=sample_qc, population_qc_tables=tables, outfile=outfile,
+    )
+
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def agg_population_qc_df(agg_population_qc) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts.agg_population_qc_tables import read_agg_population_qc_tables
+
+    return read_agg_population_qc_tables(agg_population_qc)
+
+
 @pytest.fixture(scope="session")
 def fake_image(tmp_path_factory):
     from PIL import Image

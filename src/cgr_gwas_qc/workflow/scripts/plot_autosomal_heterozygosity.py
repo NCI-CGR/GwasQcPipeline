@@ -88,6 +88,9 @@ def plot(
     ax.set_ylim(ylim)
     ax.set_title(f"{population} Homozygosity F Coefficient")
 
+    # Move legend
+    plt.legend(loc="upper left")
+
     # Add threshold lines
     line_defaults = dict(color="k", ls="--")
     ax.axhline(threshold, **line_defaults)
