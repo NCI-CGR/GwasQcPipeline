@@ -53,20 +53,18 @@ rule concordance_table:
     """Parse IBD file and calculate sample concordance.
 
     Returns:
-        DataFrame with ["IID1", "IID2", "PI_HAT", "concordance"].
+        DataFrame with ["ID1", "ID2", "PI_HAT", "concordance"].
           Sample concordance is `IBS2 / (IBS0 + IBS1 + IBS2)`.
     """
     input:
         "{prefix}.genome",
+    params:
+        concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
+        pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
     output:
-        temp("{prefix}.concordance.csv"),
-    run:
-        (
-            pd.read_csv(input[0], delim_whitespace=True)
-            .assign(concordance=lambda x: x.IBS2 / (x.IBS0 + x.IBS1 + x.IBS2))
-            .reindex(["IID1", "IID2", "PI_HAT", "concordance"], axis=1)
-            .to_csv(output[0])
-        )
+        "{prefix}.concordance.csv",
+    script:
+        "../scripts/concordance_table.py"
 
 
 def eigensoft_config_inputs(wildcards):
