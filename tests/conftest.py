@@ -8,7 +8,7 @@ import pytest
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.models.config import Config, Idat, SoftwareParams, WorkflowParams
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.conda import CondaEnv
 from cgr_gwas_qc.testing.data import FakeData, RealData
@@ -150,7 +150,7 @@ def sample_sheet_file() -> Path:
 @pytest.fixture
 def sample_sheet(sample_sheet_file) -> pd.DataFrame:
     """FAke Data sample sheet (4 samples)."""
-    return SampleSheet(sample_sheet_file).add_group_by_column().data
+    return SampleManifest(sample_sheet_file).add_group_by_column().data
 
 
 @pytest.fixture(scope="session")
@@ -202,7 +202,9 @@ def sample_sheet_short(pytestconfig) -> pd.DataFrame:
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
-    return SampleSheet(RealData() / "original_data/manifest_short.csv").add_group_by_column().data
+    return (
+        SampleManifest(RealData() / "original_data/manifest_short.csv").add_group_by_column().data
+    )
 
 
 @pytest.mark.real_data
@@ -212,7 +214,7 @@ def sample_sheet_full(pytestconfig) -> pd.DataFrame:
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
-    return SampleSheet(RealData() / "original_data/manifest_full.csv").add_group_by_column().data
+    return SampleManifest(RealData() / "original_data/manifest_full.csv").add_group_by_column().data
 
 
 @pytest.mark.real_data

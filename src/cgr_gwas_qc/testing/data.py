@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import MutableMapping, Optional, TypeVar, Union
 from warnings import warn
 
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.testing import make_snakefile, make_test_config
 
 DEFAULT_TEST_DATA_SERVER = "cgemsiii.nci.nih.gov"
@@ -73,7 +73,7 @@ class DataRepo(ABC):
 
     def __init__(self, working_dir: Optional[Path] = None):
         self.working_dir = working_dir
-        self.ss = SampleSheet(self / self._sample_sheet)
+        self.ss = SampleManifest(self / self._sample_sheet)
         self._config: MutableMapping = defaultdict(dict)
 
         self._config["project_name"] = self.ss.header["Project Name"].split(";")[0]

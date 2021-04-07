@@ -7,7 +7,7 @@ from snakemake.rules import expand
 
 import cgr_gwas_qc.yaml as yaml
 from cgr_gwas_qc.models.config import Config
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 
 
 class CgrGwasQcConfigError(Exception):
@@ -64,11 +64,11 @@ class ConfigMgr:
         data = yaml.load(self.user_config)
         self._config = Config.parse_obj(data)
         self.sample_sheet_file: Path = self.config.sample_sheet
-        self._sample_sheet: Optional[SampleSheet] = None
+        self._sample_sheet: Optional[SampleManifest] = None
 
         try:
             self._sample_sheet = (
-                SampleSheet(self.sample_sheet_file)
+                SampleManifest(self.sample_sheet_file)
                 .add_group_by_column(self.config.workflow_params.subject_id_to_use)
                 .remove_Sample_IDs(self.config.Sample_IDs_to_remove)
             )

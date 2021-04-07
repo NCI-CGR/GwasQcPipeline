@@ -23,7 +23,7 @@ import typer
 
 from cgr_gwas_qc.models.config.user_files import Idat
 from cgr_gwas_qc.parsers import plink
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.validators import check_file
 from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
@@ -132,7 +132,7 @@ def main(
     outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
 
-    sample_sheet_df = SampleSheet(sample_sheet).add_group_by_column(subject_id_to_use).data
+    sample_sheet_df = SampleManifest(sample_sheet).add_group_by_column(subject_id_to_use).data
     ss = _wrangle_sample_sheet(sample_sheet_df, expected_sex_col_name)
     Sample_IDs = ss.index
 

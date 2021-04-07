@@ -18,7 +18,7 @@ import pandas as pd
 import typer
 
 from cgr_gwas_qc.parsers.plink import read_imiss
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 
 app = typer.Typer(add_completion=False)
 
@@ -108,7 +108,7 @@ def _read_sample_metadata(
         DataFrame with ["Sample_ID", "Subject_ID", "Sample_Group", "call_rate"]
     """
     return (
-        SampleSheet(sample_sheet)
+        SampleManifest(sample_sheet)
         .add_group_by_column(subject_id_override)
         .data.merge(_read_imiss_file(call_rate), how="left", left_on="Sample_ID", right_index=True)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)

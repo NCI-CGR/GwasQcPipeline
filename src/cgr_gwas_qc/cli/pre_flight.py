@@ -13,7 +13,7 @@ from cgr_gwas_qc.config import config_to_yaml
 from cgr_gwas_qc.exceptions import GwasQcValidationError
 from cgr_gwas_qc.models.config import Config, ReferenceFiles, UserFiles
 from cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles import BeadPoolManifest
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.validators import bgzip, bpm, gtc, idat, sample_sheet
 
 app = typer.Typer(add_completion=False)
@@ -74,7 +74,7 @@ def check_config(config_file: Path) -> Config:
         raise SystemExit
 
 
-def check_sample_sheet(filename) -> SampleSheet:
+def check_sample_sheet(filename) -> SampleManifest:
     try:
         sample_sheet.validate(filename)
         typer.secho(f"Sample Sheet OK ({filename.as_posix()})", fg=typer.colors.GREEN)
@@ -94,7 +94,7 @@ def check_sample_sheet(filename) -> SampleSheet:
         )
         raise SystemExit
 
-    return SampleSheet(filename)
+    return SampleManifest(filename)
 
 
 def check_reference_files(reference_files: ReferenceFiles):
@@ -123,7 +123,7 @@ def check_reference_files(reference_files: ReferenceFiles):
         typer.secho(f"VCF.TBI ERROR: {msg} ({tbi_})", fg=typer.colors.RED)
 
 
-def check_user_files(user_files: UserFiles, sample_sheet: SampleSheet, threads: int) -> Set[str]:
+def check_user_files(user_files: UserFiles, sample_sheet: SampleManifest, threads: int) -> Set[str]:
     # Here I use multiple processors speed up processing of user files
     pool = mp.Pool(threads)
     args = list(
@@ -143,7 +143,7 @@ def check_user_files(user_files: UserFiles, sample_sheet: SampleSheet, threads: 
 
 
 def update_config_file(
-    config: Config, sample_sheet: SampleSheet, problem_samples: Optional[Set[str]]
+    config: Config, sample_sheet: SampleManifest, problem_samples: Optional[Set[str]]
 ):
     if config.num_snps == 0:
         config.num_snps = BeadPoolManifest(config.reference_files.illumina_manifest_file).num_loci

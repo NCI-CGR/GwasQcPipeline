@@ -1,6 +1,6 @@
 import pytest
 
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.validators.sample_sheet import (
     SampleSheetMissingRequiredColumnsError,
     SampleSheetMissingSectionHeaderError,
@@ -209,7 +209,7 @@ def test_check_required_columns(missing_data_req_column):
     # GIVEN: a sample sheet with a missing required column
     # WHEN-THEN: we validate it and it raises a missing column error
     with pytest.raises(SampleSheetMissingRequiredColumnsError):
-        check_required_columns(SampleSheet(missing_data_req_column))
+        check_required_columns(SampleManifest(missing_data_req_column))
 
 
 ################################################################################
@@ -253,4 +253,4 @@ def test_null_columns(missing_data_values):
     # GIVEN: a sample sheet with a missing data in a required column
     # WHEN-THEN: we validate it and it raises a missing value error
     with pytest.raises(SampleSheetMissingValueRequiredColumnsError):
-        check_missing_values_required_columns(SampleSheet(missing_data_values))
+        check_missing_values_required_columns(SampleManifest(missing_data_values))

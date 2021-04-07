@@ -9,7 +9,7 @@ import pandas as pd
 from cgr_gwas_qc.typing import PathLike
 
 
-class SampleSheet:
+class SampleManifest:
     """An object representation of the Illumina sample sheet.
 
     The Illumina sample sheet is an INI like file with different sections.
@@ -117,7 +117,7 @@ class SampleSheet:
         data_no_extra_breaks = re.sub("\n+", "\n", data_no_empty_rows)
         return data_no_extra_breaks.lstrip()
 
-    def add_group_by_column(self, col_name: Optional[str] = None) -> "SampleSheet":
+    def add_group_by_column(self, col_name: Optional[str] = None) -> "SampleManifest":
         """Select which column in the sample sheet to use for subject grouping.
 
         This function adds the column `Group_By_Subject_ID` to the sample
@@ -150,7 +150,7 @@ class SampleSheet:
 
         return self
 
-    def remove_Sample_IDs(self, sample_ids: Optional[Sequence[str]] = None) -> "SampleSheet":
+    def remove_Sample_IDs(self, sample_ids: Optional[Sequence[str]] = None) -> "SampleManifest":
         if sample_ids:
             self.data = self.data.query("Sample_ID not in @sample_ids")
         return self

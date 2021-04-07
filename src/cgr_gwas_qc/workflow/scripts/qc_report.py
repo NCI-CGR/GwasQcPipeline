@@ -5,7 +5,7 @@ from typing import Dict, Text
 import typer
 
 from cgr_gwas_qc.config import Config
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.reporting import ExclusionTables, SampleQC, SubjectQC, env
 from cgr_gwas_qc.workflow.scripts.known_concordant_samples import (
     read_known_concordance_table,
@@ -37,7 +37,7 @@ def main(
     outfile: Path,
 ):
     sample_sheet = (
-        SampleSheet(sample_sheet_csv)
+        SampleManifest(sample_sheet_csv)
         .add_group_by_column(config.workflow_params.subject_id_to_use)
         .data
     )

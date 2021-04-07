@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 from cgr_gwas_qc.parsers.sample_sheet import (
-    SampleSheet,
+    SampleManifest,
     _convert_to_key_value_pair,
     _strip_terminal_commas,
 )
@@ -56,27 +56,27 @@ example_sample_sheet = "tests/data/example_sample_sheet.csv"
 def test_load_str_or_path(file_name):
     """Make sure SampleSheet works with strings or paths."""
     # GIVEN-WHEN: we load an example sample sheet
-    sample_sheet = SampleSheet(file_name)
+    sample_sheet = SampleManifest(file_name)
 
     # THEN: we apture the three section headers.
     assert sorted(sample_sheet._sections.keys()) == sorted(["header", "manifests", "data"])
 
 
 @pytest.fixture(scope="module")
-def sample_sheet_obj(sample_sheet_file) -> SampleSheet:
+def sample_sheet_obj(sample_sheet_file) -> SampleManifest:
     """Returns a ``SampleSheet`` object.
 
     The data section in the sample sheet can be accessed as a
     ``pandas.DataFrame`` using ``sample_sheet.data``.
     """
-    return SampleSheet(sample_sheet_file)
+    return SampleManifest(sample_sheet_file)
 
 
 ################################################################################
 # The parsed Header and Manifest should be dictionaries while the Data section
 # should be a pandas.DataFrame.
 ################################################################################
-def test_sample_sheet_properties_right_type(sample_sheet_obj: SampleSheet):
+def test_sample_sheet_properties_right_type(sample_sheet_obj: SampleManifest):
     # GIVEN: A parsed sample sheet object
     # THEN: that from each section is the correct type
     # header data is a dictionary of key-value pairs
@@ -90,11 +90,11 @@ def test_sample_sheet_properties_right_type(sample_sheet_obj: SampleSheet):
 ################################################################################
 # Check Header and Manifest sections
 ################################################################################
-def test_header_contains_project_info(sample_sheet_obj: SampleSheet):
+def test_header_contains_project_info(sample_sheet_obj: SampleManifest):
     assert "SR0001-001;SR0002-001" == sample_sheet_obj.header["Project Name"]
 
 
-def test_manifests_contains_bpm_info(sample_sheet_obj: SampleSheet):
+def test_manifests_contains_bpm_info(sample_sheet_obj: SampleManifest):
     assert "GSAMD-24v1-0" == sample_sheet_obj.manifests["snp_array"]
     assert "GSAMD-24v1-0_20011747_A1.bpm" == sample_sheet_obj.manifests["bpm"]
 
@@ -102,7 +102,7 @@ def test_manifests_contains_bpm_info(sample_sheet_obj: SampleSheet):
 ################################################################################
 # Sanity check that Data section gives expected results.
 ################################################################################
-def test_sample_sheet_data(sample_sheet_obj: SampleSheet):
+def test_sample_sheet_data(sample_sheet_obj: SampleManifest):
     """Test dataframe functionality."""
     # GIVEN: A parsed sample sheet object
     # THEN: the dataframe from the data section behaves as expected
@@ -132,7 +132,7 @@ def test_empty_row_in_sample_sheet_data(tmp_path):
     )
 
     # WHEN: we parse that sample sheet
-    ss = SampleSheet(sample_sheet)
+    ss = SampleManifest(sample_sheet)
 
     # THEN: we automatically drop that empty row
     assert ss.data.shape[0] == 2
@@ -155,7 +155,7 @@ def test_add_group_by_column(tmp_path):
         )
     )
     # WHEN: I parse the sample sheet and add the grouping column
-    sample_sheet = SampleSheet(tmp_path / "sample_sheet.csv").add_group_by_column()
+    sample_sheet = SampleManifest(tmp_path / "sample_sheet.csv").add_group_by_column()
 
     # THEN: A new column `Group_By_Subject_ID` will have the values from the
     # columns specified in the `Group_By` column.
@@ -179,7 +179,7 @@ def test_add_user_provided_group_by_column(tmp_path):
         )
     )
     # WHEN: I parse the sample sheet and add the grouping column with a user selected column.
-    sample_sheet = SampleSheet(tmp_path / "sample_sheet.csv").add_group_by_column("Sample_ID")
+    sample_sheet = SampleManifest(tmp_path / "sample_sheet.csv").add_group_by_column("Sample_ID")
 
     # THEN: A new column `Group_By_Subject_ID` will have the values from the
     # columns specified by the user.

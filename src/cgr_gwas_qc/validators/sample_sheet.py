@@ -8,7 +8,7 @@ from cgr_gwas_qc.exceptions import (
     SampleSheetNullRowError,
     SampleSheetTruncatedFileError,
 )
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 
 REQUIRED_COLUMNS = ["Sample_ID", "LIMS_Individual_ID"]
 
@@ -18,7 +18,7 @@ def validate(file_name: Path):
     check_section_headers(data)
     check_file_truncation(data)
 
-    ss = SampleSheet(file_name)
+    ss = SampleManifest(file_name)
     check_required_columns(ss)
     check_missing_values_required_columns(ss)
 
@@ -67,7 +67,7 @@ def check_null_rows(data: str):
         raise SampleSheetNullRowError
 
 
-def check_required_columns(ss: SampleSheet):
+def check_required_columns(ss: SampleManifest):
     """Checks if essential columns have missing values."""
 
     missing_required_columns = [
@@ -78,7 +78,7 @@ def check_required_columns(ss: SampleSheet):
         raise SampleSheetMissingRequiredColumnsError(missing_required_columns)
 
 
-def check_missing_values_required_columns(ss: SampleSheet):
+def check_missing_values_required_columns(ss: SampleManifest):
     """Checks if essential columns have missing values."""
     essential_columns = ["Sample_ID", "LIMS_Individual_ID"]
 
