@@ -6,6 +6,8 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import pandas as pd
 
+from cgr_gwas_qc.typing import PathLike
+
 
 class SampleSheet:
     """An object representation of the Illumina sample sheet.
@@ -27,13 +29,13 @@ class SampleSheet:
 
     section_regex = re.compile(r"(?:\[(\w+)\].*?\n([^\[]*))")
 
-    def __init__(self, file_name: Union[str, Path]) -> None:
+    def __init__(self, filename: PathLike) -> None:
         """Load a sample sheet.
 
         Args:
             file_name: Path the an Illumina sample sheet file.
         """
-        self.file_name = Path(file_name)
+        self.file_name = Path(filename)
         self._sections = {}
 
         for section in self._split_sections():
