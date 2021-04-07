@@ -44,7 +44,7 @@ def main(
     # Pairwise sample concordance + sample metadata
     ################################################################################
     sample_concordance = pd.read_csv(concordance).rename(
-        {"IID1": "Sample_ID1", "IID2": "Sample_ID2"}, axis=1
+        {"ID1": "Sample_ID1", "ID2": "Sample_ID2"}, axis=1
     )
     sample_metadata = _read_sample_metadata(sample_sheet_csv, imiss, subject_id_override)
 
