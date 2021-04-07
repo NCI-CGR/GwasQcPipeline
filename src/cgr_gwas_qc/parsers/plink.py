@@ -1,9 +1,9 @@
-from pathlib import Path
-
 import pandas as pd
 
+from cgr_gwas_qc.typing import PathLike
 
-def read_het(filename: Path) -> pd.DataFrame:
+
+def read_het(filename: PathLike) -> pd.DataFrame:
     """Parse PLINK's het file format.
 
     Returns:
@@ -31,7 +31,7 @@ def read_het(filename: Path) -> pd.DataFrame:
     )
 
 
-def read_hwe(filename: Path) -> pd.DataFrame:
+def read_hwe(filename: PathLike) -> pd.DataFrame:
     """Parse PLINK's hwe file format.
 
     Returns:
@@ -73,7 +73,7 @@ def read_hwe(filename: Path) -> pd.DataFrame:
     )
 
 
-def read_genome(filename: Path) -> pd.DataFrame:
+def read_genome(filename: PathLike) -> pd.DataFrame:
     """Parse PLINK's genome file format.
 
     Returns:
@@ -112,7 +112,7 @@ def read_genome(filename: Path) -> pd.DataFrame:
     )
 
 
-def read_imiss(filename: Path) -> pd.DataFrame:
+def read_imiss(filename: PathLike) -> pd.DataFrame:
     """Parse PLINK's imiss file format.
 
     This reports sample level missing data.
@@ -142,7 +142,7 @@ def read_imiss(filename: Path) -> pd.DataFrame:
     )
 
 
-def read_lmiss(filename: Path) -> pd.DataFrame:
+def read_lmiss(filename: PathLike) -> pd.DataFrame:
     """Parse PLINK's lmiss file format.
 
     This reports snp level missing data.
@@ -167,7 +167,7 @@ def read_lmiss(filename: Path) -> pd.DataFrame:
     return pd.read_csv(filename, delim_whitespace=True)
 
 
-def read_sexcheck(filename: Path) -> pd.DataFrame:
+def read_sexcheck(filename: PathLike) -> pd.DataFrame:
     """Parse PLINK's sexcheck file format.
 
     Returns:
