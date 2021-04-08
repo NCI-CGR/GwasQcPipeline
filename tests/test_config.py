@@ -1,5 +1,4 @@
 from pathlib import Path
-from textwrap import dedent
 
 import pandas as pd
 import pytest
@@ -19,7 +18,7 @@ def example_working_dir(tmp_path):
         - Sample Sheet
         - Config File
     """
-    FakeData(tmp_path).copy_sample_sheet().make_config()
+    FakeData(tmp_path).make_cgr_sample_sheet().make_config()
     return tmp_path
 
 
@@ -105,15 +104,16 @@ def test_group_by_column_default(tmp_path):
     The default value should be the same as LIMS_Individual_ID.
     """
     # GIVEN: Fake sample sheet and config
-    FakeData(tmp_path).copy_sample_sheet().make_config()
+    FakeData(tmp_path).make_cgr_sample_sheet().make_config()
 
     # WHEN: I load the config and sample sheet
     with chdir(tmp_path):
         cfg = load_config()
+        ss = pd.read_csv("cgr_sample_sheet.csv")
 
     # THEN: The `Group_By_Subject_ID` column is populated by the
     # `LIMS_Individual_ID` by default.
-    assert all(cfg.ss.Group_By_Subject_ID == cfg.ss.LIMS_Individual_ID)
+    assert all(cfg.ss.Group_By_Subject_ID == ss.LIMS_Individual_ID)
 
 
 def test_group_by_column_config_option(tmp_path):
@@ -123,42 +123,29 @@ def test_group_by_column_config_option(tmp_path):
     `workflow_params.subject_id_column`.
     """
     # GIVEN: Fake sample sheet and a config where I set the `subject_id_column`
-    FakeData(tmp_path).copy_sample_sheet().make_config(
+    FakeData(tmp_path).make_config(
         workflow_params=dict(subject_id_column="Sample_ID")
-    )
+    ).make_cgr_sample_sheet()
 
     # WHEN: I load the config and sample sheet
     with chdir(tmp_path):
         cfg = load_config()
+        ss = pd.read_csv("cgr_sample_sheet.csv")
 
     # THEN: The `Group_By_Subject_ID` column is populated by the
     # which ever column is specified here.
-    assert all(cfg.ss.Group_By_Subject_ID == cfg.ss.Sample_ID)
+    assert all(cfg.ss.Group_By_Subject_ID == ss.Sample_ID)
 
 
 def test_group_by_column(tmp_path):
     """Populate Group_By_Subject_ID column with config option.
 
-    The value should be the same as the column specified in
-    `workflow_params.subject_id_column`.
     """
     # GIVEN: Fake sample sheet and config
-    FakeData(tmp_path).copy_sample_sheet().make_config()
+    FakeData(tmp_path).make_config(
+        workflow_params=dict(subject_id_column="Group_By")
+    ).make_cgr_sample_sheet()
     # and the sample sheet has the `Group_By` column set
-    (tmp_path / "sample_sheet.csv").write_text(
-        dedent(
-            """\
-            [Header],,
-            test,data,
-            [Manifests],,
-            test,data,
-            [Data]
-            Sample_ID,LIMS_Individual_ID,Group_By
-            T0001,L0001,Sample_ID
-            T0002,L0002,LIMS_Individual_ID
-            """
-        )
-    )
 
     # WHEN: I load the config and sample sheet
     with chdir(tmp_path):
@@ -166,4 +153,8 @@ def test_group_by_column(tmp_path):
 
     # THEN: The `Group_By_Subject_ID` column is populated by the
     # which ever column is specified for each sample separately.
-    assert all(cfg.ss.Group_By_Subject_ID == ["T0001", "L0002"])
+    sr = cfg.ss.set_index("Sample_ID").Group_By_Subject_ID
+
+    assert sr["SB00001_PB0001_A01"] == "I-0000000001"
+    assert sr["SB00004_PB0001_D01"] == "R-000000-4"
+    assert sr["SB00005_PB0001_G01"] == "NCP666"
