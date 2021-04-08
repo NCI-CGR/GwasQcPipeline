@@ -9,8 +9,8 @@ from cgr_gwas_qc.validators.sample_sheet import (
     SampleSheetNullRowError,
     SampleSheetTruncatedFileError,
     _check_file_truncation,
+    _check_manifest_null_rows,
     _check_missing_values_required_columns,
-    _check_null_rows,
     _check_required_columns,
     _check_section_headers,
     validate_manifest,
@@ -21,7 +21,12 @@ def test_sample_sheet_good_sample_sheet():
     """Make sure a good sample sheet passes validation."""
     # GIVEN: a good sample sheet
     # WHEN-THEN: we validate it raises no errors
-    validate_manifest(FakeData._data_path / FakeData._sample_sheet)
+    validate_manifest(
+        FakeData._data_path / FakeData._sample_sheet,
+        FakeData._subject_id_column,
+        FakeData._expected_sex_column,
+        FakeData._case_control_column,
+    )
 
 
 ################################################################################
@@ -75,16 +80,6 @@ truncated_files = [
         "Sample_ID,col2,col3,col4\n"
         "SB001,001,002"
     ),
-    # Missing line terminator on last row
-    (
-        "[Header],,,\n"
-        ",,,\n"
-        "[Manifests],,,\n"
-        ",,,\n"
-        "[Data],,,\n"
-        "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002,"
-    ),
 ]
 
 
@@ -131,7 +126,7 @@ def test_null_row_in_data_section(data):
     # GIVEN: a sample sheet with an empty row
     # WHEN-THEN: we validate_manifest it raises a null row error
     with pytest.raises(SampleSheetNullRowError):
-        _check_null_rows(data)
+        _check_manifest_null_rows(data)
 
 
 ################################################################################
@@ -167,7 +162,7 @@ def test_null_row_in_another_section(data):
     """Empty rows in the other sections should do nothing."""
     # GIVEN: a sample sheet with an empty row in the header of manifests section
     # WHEN-THEN: we validate_manifest it and it raises no errors
-    _check_null_rows(data)
+    _check_manifest_null_rows(data)
 
 
 ################################################################################
@@ -203,14 +198,14 @@ def missing_data_req_column(tmp_path, request):
     """
     sample_sheet = tmp_path / "sample_sheet.csv"
     sample_sheet.write_text(request.param)
-    return sample_sheet
+    return SampleManifest(sample_sheet).data
 
 
 def test_check_required_columns(missing_data_req_column):
     # GIVEN: a sample sheet with a missing required column
     # WHEN-THEN: we validate_manifest it and it raises a missing column error
     with pytest.raises(SampleSheetMissingRequiredColumnsError):
-        _check_required_columns(SampleManifest(missing_data_req_column))
+        _check_required_columns(missing_data_req_column, "LIMS_Individual_ID")
 
 
 ################################################################################
@@ -247,11 +242,11 @@ def missing_data_values(tmp_path, request):
     """
     sample_sheet = tmp_path / "sample_sheet.csv"
     sample_sheet.write_text(request.param)
-    return sample_sheet
+    return SampleManifest(sample_sheet).data
 
 
 def test_null_columns(missing_data_values):
     # GIVEN: a sample sheet with a missing data in a required column
     # WHEN-THEN: we validate_manifest it and it raises a missing value error
     with pytest.raises(SampleSheetMissingValueRequiredColumnsError):
-        _check_missing_values_required_columns(SampleManifest(missing_data_values))
+        _check_missing_values_required_columns(missing_data_values, "LIMS_Individual_ID")
