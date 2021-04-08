@@ -66,13 +66,17 @@ class ConfigMgr:
         self._sample_sheet: pd.DataFrame = sample_sheet.read(self.sample_sheet_file)
 
     @classmethod
-    def instance(cls):
+    def instance(cls, pytest=False):
         """Returns the active ConfigMgr instance.
 
         This ensures that only 1 ConfigMgr is created per python session.
         """
+        if pytest:
+            return cls(*find_cgr_files())
+
         if cls.__instance is None:
             cls.__instance = cls(*find_cgr_files())
+
         return cls.__instance
 
     ################################################################################

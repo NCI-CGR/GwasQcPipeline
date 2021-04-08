@@ -17,7 +17,7 @@ def test_fake_data(tmp_path):
 
     # WHEN: we load the config in the working dir
     with chdir(tmp_path):
-        cfg = load_config()  # Config working
+        cfg = load_config(pytest=True)  # Config working
 
         # THEN:
         assert Path("cgr_sample_sheet.csv").exists()
@@ -49,7 +49,7 @@ def test_fake_data_tweak_config(tmp_path):
 
     # THEN: that setting is written to the config
     with chdir(tmp_path):
-        cfg = load_config()  # Config working
+        cfg = load_config(pytest=True)  # Config working
         assert cfg.config.software_params.strand == "fwd"
 
 
