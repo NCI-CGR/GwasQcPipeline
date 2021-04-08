@@ -186,7 +186,7 @@ def _add_group_by_column(df: pd.DataFrame, subject_id_column: str = "Group_By"):
 
         default_id = sr.get("LIMS_Individual_ID", pd.NA)
         if "Group_By" == subject_id_column:
-            return sr[sr[subject_id_column]] if pd.notna(sr[subject_id_column]) else default_id
+            return sr[sr[subject_id_column]] if pd.notna(sr[sr[subject_id_column]]) else default_id
         return sr[subject_id_column] if pd.notna(sr[subject_id_column]) else default_id
 
     df["Group_By_Subject_ID"] = df.apply(_get_subject_id, axis=1)
