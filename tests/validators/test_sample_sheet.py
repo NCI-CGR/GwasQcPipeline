@@ -1,26 +1,27 @@
 import pytest
 
 from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
+from cgr_gwas_qc.testing.data import FakeData
 from cgr_gwas_qc.validators.sample_sheet import (
     SampleSheetMissingRequiredColumnsError,
     SampleSheetMissingSectionHeaderError,
     SampleSheetMissingValueRequiredColumnsError,
     SampleSheetNullRowError,
     SampleSheetTruncatedFileError,
-    check_file_truncation,
-    check_missing_values_required_columns,
-    check_null_rows,
-    check_required_columns,
-    check_section_headers,
-    validate,
+    _check_file_truncation,
+    _check_missing_values_required_columns,
+    _check_null_rows,
+    _check_required_columns,
+    _check_section_headers,
+    validate_manifest,
 )
 
 
-def test_sample_sheet_good_sample_sheet(sample_sheet_file):
+def test_sample_sheet_good_sample_sheet():
     """Make sure a good sample sheet passes validation."""
     # GIVEN: a good sample sheet
     # WHEN-THEN: we validate it raises no errors
-    validate(sample_sheet_file)
+    validate_manifest(FakeData._data_path / FakeData._sample_sheet)
 
 
 ################################################################################
@@ -54,9 +55,9 @@ missing_sections = [
 @pytest.mark.parametrize("data", missing_sections)
 def test_missing_sections(data: str):
     # GIVEN: a sample sheet with different sections missing
-    # WHEN-THEN: we validate it raises a missing section error
+    # WHEN-THEN: we validate_manifest it raises a missing section error
     with pytest.raises(SampleSheetMissingSectionHeaderError):
-        check_section_headers(data)
+        _check_section_headers(data)
 
 
 ################################################################################
@@ -90,10 +91,10 @@ truncated_files = [
 @pytest.mark.parametrize("data", truncated_files)
 def test_truncated_file(data):
     # GIVEN: a sample sheet with a partial last row (missing \n)
-    # WHEN-THEN: we validate it raises a truncation error
+    # WHEN-THEN: we validate_manifest it raises a truncation error
     """If file appears truncated should raise an error."""
     with pytest.raises(SampleSheetTruncatedFileError):
-        check_file_truncation(data)
+        _check_file_truncation(data)
 
 
 ################################################################################
@@ -128,9 +129,9 @@ null_data_rows = [
 def test_null_row_in_data_section(data):
     """If empty row in the Data section, then raise an error."""
     # GIVEN: a sample sheet with an empty row
-    # WHEN-THEN: we validate it raises a null row error
+    # WHEN-THEN: we validate_manifest it raises a null row error
     with pytest.raises(SampleSheetNullRowError):
-        check_null_rows(data)
+        _check_null_rows(data)
 
 
 ################################################################################
@@ -165,8 +166,8 @@ null_other_rows = [
 def test_null_row_in_another_section(data):
     """Empty rows in the other sections should do nothing."""
     # GIVEN: a sample sheet with an empty row in the header of manifests section
-    # WHEN-THEN: we validate it and it raises no errors
-    check_null_rows(data)
+    # WHEN-THEN: we validate_manifest it and it raises no errors
+    _check_null_rows(data)
 
 
 ################################################################################
@@ -207,9 +208,9 @@ def missing_data_req_column(tmp_path, request):
 
 def test_check_required_columns(missing_data_req_column):
     # GIVEN: a sample sheet with a missing required column
-    # WHEN-THEN: we validate it and it raises a missing column error
+    # WHEN-THEN: we validate_manifest it and it raises a missing column error
     with pytest.raises(SampleSheetMissingRequiredColumnsError):
-        check_required_columns(SampleManifest(missing_data_req_column))
+        _check_required_columns(SampleManifest(missing_data_req_column))
 
 
 ################################################################################
@@ -251,6 +252,6 @@ def missing_data_values(tmp_path, request):
 
 def test_null_columns(missing_data_values):
     # GIVEN: a sample sheet with a missing data in a required column
-    # WHEN-THEN: we validate it and it raises a missing value error
+    # WHEN-THEN: we validate_manifest it and it raises a missing value error
     with pytest.raises(SampleSheetMissingValueRequiredColumnsError):
-        check_missing_values_required_columns(SampleManifest(missing_data_values))
+        _check_missing_values_required_columns(SampleManifest(missing_data_values))

@@ -1,6 +1,15 @@
 """Test parsing of Illumina BPM files."""
 import pytest
 
+from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
+from cgr_gwas_qc.testing.data import FakeData
+
+
+@pytest.fixture(scope="module")
+def bpm():
+    return BeadPoolManifest(FakeData._data_path / FakeData._illumina_manifest_file)
+
+
 ################################################################################
 # Most BPM attrributes have an entry for each loci. Check that these entries
 # are equal to the number of loci.

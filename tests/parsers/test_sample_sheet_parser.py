@@ -12,6 +12,18 @@ from cgr_gwas_qc.parsers.sample_sheet import (
     _strip_terminal_commas,
     update_sample_sheet,
 )
+from cgr_gwas_qc.testing.data import FakeData
+
+
+@pytest.fixture(scope="module")
+def sample_manifest() -> SampleManifest:
+    """Returns a ``SampleSheet`` object.
+
+    The data section in the sample sheet can be accessed as a
+    ``pandas.DataFrame`` using ``sample_sheet.data``.
+    """
+    return SampleManifest(FakeData._data_path / FakeData._sample_sheet)
+
 
 ################################################################################
 # The sample sheet is a mix of a CSV and INI file. Remove trailing commas for
@@ -64,55 +76,45 @@ def test_load_str_or_path(file_name):
     assert sorted(sample_sheet._sections.keys()) == sorted(["header", "manifests", "data"])
 
 
-@pytest.fixture(scope="module")
-def sample_sheet_obj(sample_sheet_file) -> SampleManifest:
-    """Returns a ``SampleSheet`` object.
-
-    The data section in the sample sheet can be accessed as a
-    ``pandas.DataFrame`` using ``sample_sheet.data``.
-    """
-    return SampleManifest(sample_sheet_file)
-
-
 ################################################################################
 # The parsed Header and Manifest should be dictionaries while the Data section
 # should be a pandas.DataFrame.
 ################################################################################
-def test_sample_sheet_properties_right_type(sample_sheet_obj: SampleManifest):
+def test_sample_sheet_properties_right_type(sample_manifest: SampleManifest):
     # GIVEN: A parsed sample sheet object
     # THEN: that from each section is the correct type
     # header data is a dictionary of key-value pairs
-    assert isinstance(sample_sheet_obj.header, dict)
+    assert isinstance(sample_manifest.header, dict)
     # manifests data is a dictionary of key-value pairs
-    assert isinstance(sample_sheet_obj.manifests, dict)
+    assert isinstance(sample_manifest.manifests, dict)
     # data data is a dataframe
-    assert isinstance(sample_sheet_obj.data, pd.DataFrame)
+    assert isinstance(sample_manifest.data, pd.DataFrame)
 
 
 ################################################################################
 # Check Header and Manifest sections
 ################################################################################
-def test_header_contains_project_info(sample_sheet_obj: SampleManifest):
-    assert "SR0001-001;SR0002-001" == sample_sheet_obj.header["Project Name"]
+def test_header_contains_project_info(sample_manifest: SampleManifest):
+    assert "SR0001-001;SR0002-001" == sample_manifest.header["Project Name"]
 
 
-def test_manifests_contains_bpm_info(sample_sheet_obj: SampleManifest):
-    assert "GSAMD-24v1-0" == sample_sheet_obj.manifests["snp_array"]
-    assert "GSAMD-24v1-0_20011747_A1.bpm" == sample_sheet_obj.manifests["bpm"]
+def test_manifests_contains_bpm_info(sample_manifest: SampleManifest):
+    assert "GSAMD-24v1-0" == sample_manifest.manifests["snp_array"]
+    assert "GSAMD-24v1-0_20011747_A1.bpm" == sample_manifest.manifests["bpm"]
 
 
 ################################################################################
 # Sanity check that Data section gives expected results.
 ################################################################################
-def test_sample_sheet_data(sample_sheet_obj: SampleManifest):
+def test_sample_sheet_data(sample_manifest: SampleManifest):
     """Test dataframe functionality."""
     # GIVEN: A parsed sample sheet object
     # THEN: the dataframe from the data section behaves as expected
     # has the same number of rows as the example sample sheet data section
-    assert sample_sheet_obj.data.shape[0] == 6
+    assert sample_manifest.data.shape[0] == 6
     # Allows querying by different fields and returns the right number of results
-    assert sample_sheet_obj.data.query("Identifiler_Sex == 'M'").shape[0] == 3
-    assert sample_sheet_obj.data.query("`Case/Control_Status` == 'Case'").shape[0] == 2
+    assert sample_manifest.data.query("Identifiler_Sex == 'M'").shape[0] == 3
+    assert sample_manifest.data.query("`Case/Control_Status` == 'Case'").shape[0] == 2
 
 
 ################################################################################
@@ -144,10 +146,10 @@ def test_empty_row_in_sample_sheet_data(tmp_path):
 # Adding of custom columns based on config options
 ################################################################################
 @pytest.fixture
-def updated_sample_sheet(sample_sheet_obj: SampleManifest) -> pd.DataFrame:
+def updated_sample_sheet(sample_manifest: SampleManifest) -> pd.DataFrame:
     params = WorkflowParams()
     return update_sample_sheet(
-        sample_sheet_obj.data,
+        sample_manifest.data,
         "LIMS_Individual_ID",
         params.expected_sex_column,
         params.case_control_column,
