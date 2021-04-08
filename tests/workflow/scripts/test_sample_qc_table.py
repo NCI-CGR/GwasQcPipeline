@@ -6,77 +6,26 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_series_equal
 
-from cgr_gwas_qc import load_config
 from cgr_gwas_qc.models.config.software_params import SoftwareParams
 from cgr_gwas_qc.testing import chdir
-from cgr_gwas_qc.testing.data import FakeData, RealData
-from cgr_gwas_qc.workflow.scripts.sample_qc_table import CASE_CONTROL_DTYPE, SEX_DTYPE
-
-
-@pytest.fixture
-def sample_ids_short(sample_sheet_short) -> pd.Index:
-    return pd.Index(sample_sheet_short.Sample_ID)
-
-
-@pytest.fixture
-def sample_ids_full(sample_sheet_full) -> pd.Index:
-    return pd.Index(sample_sheet_full.Sample_ID)
+from cgr_gwas_qc.testing.data import RealData
 
 
 @pytest.mark.real_data
-@pytest.mark.parametrize("expected_sex_col", ["Expected_Sex", "Identifiler_Sex"])
-def test_wrangle_sample_sheet(sample_sheet_full, expected_sex_col):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _wrangle_sample_sheet
-
-    # GIVEN: A sample sheet and a column to use as `expected_sex_col`
-    # WHEN: I wrangle the sample sheet
-    ss = _wrangle_sample_sheet(sample_sheet_full, expected_sex_col)
-
-    # THEN: Basic properties
-    assert ss.index.name == "Sample_ID"
-    assert isinstance(ss.is_internal_control.dtype, pd.BooleanDtype)
-    assert ss.expected_sex.dtype == SEX_DTYPE
-    assert ss.case_control.dtype == CASE_CONTROL_DTYPE
-
-    # The `expected_sex` column should be the same as the column passed as `expected_sex_col`
-    control_Sample_ID = ss.query("case_control == 'QC'").index
-    assert_series_equal(
-        ss.expected_sex.drop(control_Sample_ID).sort_index().astype("object"),
-        sample_sheet_full.set_index("Sample_ID")[expected_sex_col]
-        .drop(control_Sample_ID)
-        .sort_index(),
-        check_names=False,
-    )
+@pytest.fixture(scope="module")
+def ss_df(real_cfg):
+    return real_cfg.ss.set_index("Sample_ID")
 
 
 @pytest.mark.real_data
-def test_check_preflight_none(sample_ids_full):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_preflight
-
-    sr = _check_preflight(None, sample_ids_full)
-    assert not any(sr)
-
-
-@pytest.mark.real_data
-def test_check_preflight(sample_ids_full):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_preflight
-
-    sr = _check_preflight(sample_ids_full[:2], sample_ids_full)
-
-    assert "Sample_ID" == sr.index.name
-    assert "is_preflight_exclusion" == sr.name
-    assert 2 == sum(sr)
-
-
-@pytest.mark.real_data
-def test_read_imiss_start(sample_ids_full):
+def test_read_imiss_start(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
 
     # GIVEN: the call rates from the initial starting point and a list of Sample IDs
     filename = RealData() / "production_outputs/plink_start/samples_start.imiss"
 
     # WHEN: I parse the imiss table.
-    sr = _read_imiss(filename, sample_ids_full, "Call_Rate_Initial")
+    sr = _read_imiss(filename, ss_df.index, "Call_Rate_Initial")
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -85,14 +34,14 @@ def test_read_imiss_start(sample_ids_full):
 
 
 @pytest.mark.real_data
-def test_read_imiss_cr1(sample_ids_full):
+def test_read_imiss_cr1(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
 
     # GIVEN: the call rates after CR1 filters and a list of Sample IDs
     filename = RealData() / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss"
 
     # WHEN: I parse the imiss table.
-    sr = _read_imiss(filename, sample_ids_full, "Call_Rate_1")
+    sr = _read_imiss(filename, ss_df.index, "Call_Rate_1")
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -101,14 +50,14 @@ def test_read_imiss_cr1(sample_ids_full):
 
 
 @pytest.mark.real_data
-def test_read_imiss_cr2(sample_ids_full):
+def test_read_imiss_cr2(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
 
     # GIVEN: the call rates after CR2 filters and a list of Sample IDs
     filename = RealData() / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
 
     # WHEN: I parse the imiss table.
-    sr = _read_imiss(filename, sample_ids_full, "Call_Rate_2")
+    sr = _read_imiss(filename, ss_df.index, "Call_Rate_2")
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -117,16 +66,16 @@ def test_read_imiss_cr2(sample_ids_full):
 
 
 @pytest.mark.real_data
-def test_read_sexcheck_cr1(sample_sheet_full):
+def test_read_sexcheck_cr1(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_sexcheck_cr1
 
     # GIVEN: A test sample sheet, plink sexcheck file, and the expected sex
     # calls from the sample table
     filename = RealData() / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
-    expected_sex_calls = sample_sheet_full.set_index("Sample_ID")["Expected_Sex"]
-    expected_sex_calls[
-        "SB_missing_sample"
-    ] = "F"  # add an extra sample to check how missing values are handled
+    expected_sex_calls = ss_df["expected_sex"]
+
+    # add an extra sample to check how missing values are handled
+    expected_sex_calls["SB_missing_sample"] = "F"
 
     # WHEN: read the sexcheck table
     df = _read_sexcheck_cr1(filename, expected_sex_calls)
@@ -139,7 +88,7 @@ def test_read_sexcheck_cr1(sample_sheet_full):
 
 
 @pytest.mark.real_data
-def test_read_ancestry_GRAF(sample_ids_short, tmp_path):
+def test_read_ancestry_GRAF(tmp_path):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_ancestry
 
     # GIVEN: A test sample sheet, example outputs from GRAF -pop, and a list of Sample_IDs
@@ -153,9 +102,10 @@ def test_read_ancestry_GRAF(sample_ids_short, tmp_path):
             """
         )
     )
+    sample_ids = pd.Index(["SB034307_PC26469_B09", "SB034327_PC26469_C09"], name="Sample_ID")
 
     # WHEN: Parse the GRAF output
-    df = _read_ancestry(filename, sample_ids_short)
+    df = _read_ancestry(filename, sample_ids)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
@@ -174,7 +124,7 @@ def test_read_ancestry_GRAF(sample_ids_short, tmp_path):
 
 
 @pytest.mark.real_data
-def test_read_known_replicates(sample_ids_full):
+def test_read_known_replicates(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_known_replicates
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
@@ -182,7 +132,7 @@ def test_read_known_replicates(sample_ids_full):
     cutoff = SoftwareParams().dup_concordance_cutoff
 
     # WHEN: Check for discordant replicates
-    sr = _read_known_replicates(filename, cutoff, sample_ids_full)
+    sr = _read_known_replicates(filename, cutoff, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -192,14 +142,14 @@ def test_read_known_replicates(sample_ids_full):
 
 
 @pytest.mark.real_data
-def test_read_unknown_replicates(sample_ids_full):
+def test_read_unknown_replicates(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_unknown_replicates
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
     filename = RealData() / "production_outputs/concordance/UnknownReplicates.csv"
 
     # WHEN: I parse unknown concordant samples table.
-    sr = _read_unknown_replicates(filename, sample_ids_full)
+    sr = _read_unknown_replicates(filename, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -209,7 +159,7 @@ def test_read_unknown_replicates(sample_ids_full):
 
 
 @pytest.mark.real_data
-def test_read_contam(sample_ids_full):
+def test_read_contam(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_contam
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
@@ -217,7 +167,7 @@ def test_read_contam(sample_ids_full):
     cutoff = SoftwareParams().contam_threshold
 
     # WHEN: Parse the contamination table
-    df = _read_contam(filename, cutoff, sample_ids_full)
+    df = _read_contam(filename, cutoff, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
@@ -229,7 +179,7 @@ def test_read_contam(sample_ids_full):
 
 
 @pytest.mark.real_data
-def test_read_contam_file_name_none(sample_ids_full):
+def test_read_contam_file_name_none(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_contam
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
@@ -237,7 +187,7 @@ def test_read_contam_file_name_none(sample_ids_full):
     cutoff = SoftwareParams().contam_threshold
 
     # WHEN: Parse the contamination table.
-    df = _read_contam(filename, cutoff, sample_ids_full)
+    df = _read_contam(filename, cutoff, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
@@ -247,14 +197,14 @@ def test_read_contam_file_name_none(sample_ids_full):
 
 
 @pytest.mark.real_data
-def test_read_intensity(sample_ids_full):
+def test_read_intensity(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_intensity
 
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
     filename = RealData() / "production_outputs/all_sample_idat_intensity/idat_intensity.csv"
 
     # WHEN: Parse the read intensity table.
-    sr = _read_intensity(filename, sample_ids_full)
+    sr = _read_intensity(filename, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -264,14 +214,14 @@ def test_read_intensity(sample_ids_full):
 
 
 @pytest.mark.real_data
-def test_read_intensity_file_name_none(sample_ids_full):
+def test_read_intensity_file_name_none(ss_df):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_intensity
 
     # GIVEN: A test sample sheet, No production outputs, and a list of Sample_IDs
     filename = None
 
     # WHEN: Parse the read intensity table with file name of None
-    sr = _read_intensity(filename, sample_ids_full)
+    sr = _read_intensity(filename, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -279,16 +229,15 @@ def test_read_intensity_file_name_none(sample_ids_full):
     assert sr.name == "IdatIntensity"
 
 
-def test_check_idat_files(tmp_path):
+def test_check_idat_files(real_cfg_short):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_idats_files
 
     # GIVEN: Fake data using the gtc entrypoint to create the idat files
-    (FakeData(tmp_path).add_user_files("gtc").make_config())
-
     # WHEN: Scan the folder for Idat files.
-    with chdir(tmp_path):
-        cfg = load_config()
-        sr = _check_idats_files(cfg.ss.set_index("Sample_ID"), cfg.config.user_files.idat_pattern)
+    with chdir(real_cfg_short.root):
+        sr = _check_idats_files(
+            real_cfg_short.ss.set_index("Sample_ID"), real_cfg_short.config.user_files.idat_pattern
+        )
 
     # THEN: Basic properties
     assert sr.index.name == "Sample_ID"
@@ -299,23 +248,24 @@ def test_check_idat_files(tmp_path):
 
 
 @pytest.mark.real_data
-def test_check_idat_files_one_missing(tmp_path):
+def test_check_idat_files_one_missing(real_cfg_short):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_idats_files
 
     # GIVEN: Fake data using the gtc entrypoint to create the idat files
-    (FakeData(tmp_path).add_user_files("gtc").make_config())
+    ss = real_cfg_short.ss.copy()
+    fake_record = ss.iloc[0, :].copy()
+    fake_record["Sample_ID"] = "fake_Sample_ID"
+    fake_record["SentrixBarcode_A"] = "fake_barcode"
+    ss = ss.append(fake_record, ignore_index=True)
 
     # WHEN: I add an extra sample (without idat file) and scan the folder for Idat files.
-    with chdir(tmp_path):
-        cfg = load_config()
-        fake_record = cfg.ss.iloc[0, :].copy()
-        fake_record["Sample_ID"] = "fake_Sample_ID"
-        fake_record["SentrixBarcode_A"] = "fake_barcode"
-        cfg.ss = cfg.ss.append(fake_record, ignore_index=True)
-        sr = _check_idats_files(cfg.ss.set_index("Sample_ID"), cfg.config.user_files.idat_pattern)
+    with chdir(real_cfg_short.root):
+        sr = _check_idats_files(
+            ss.set_index("Sample_ID"), real_cfg_short.config.user_files.idat_pattern
+        )
 
     # I should have 4 samples with idat files found and 1 missing these files.
-    assert sum(sr) == 4
+    assert sum(sr) == 2
     assert sum(~sr) == 1
 
 

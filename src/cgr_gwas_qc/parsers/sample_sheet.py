@@ -22,7 +22,7 @@ DTYPES = {
 
 
 def read(
-    filename: PathLike, remove_exclusions: bool = True, all_user_column: bool = False
+    filename: PathLike, remove_exclusions: bool = True, all_user_column: bool = True
 ) -> pd.DataFrame:
     df = pd.read_csv(filename, dtype=DTYPES)
 

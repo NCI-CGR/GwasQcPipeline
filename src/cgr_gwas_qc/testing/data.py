@@ -149,8 +149,7 @@ class DataRepo(ABC):
                 params.expected_sex_column,
                 params.case_control_column,
                 problem_sample_ids,
-            )
-            sample_sheet.to_csv(self.working_dir / "cgr_sample_sheet.csv", index=False)
+            ).to_csv(self.working_dir / "cgr_sample_sheet.csv", index=False)
             return self
         else:
             raise ValueError("You need to have set ``self.working_dir``.")

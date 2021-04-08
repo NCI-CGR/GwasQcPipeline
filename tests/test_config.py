@@ -86,9 +86,9 @@ def test_manually_loading_config(example_working_dir: Path):
 def test_load_config(example_working_dir: Path):
     # GIVEN: A working dir with a config.yml and a sample sheet
 
-    # WHEN: We load the ``ConfigMgr`` using the ``load_config()`` helper function
+    # WHEN: We load the ``ConfigMgr`` using the ``load_config(pytest=True)`` helper function
     with chdir(example_working_dir):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
 
     # THEN: We have a working ``ConfigMgr``
     assert cfg.config.pipeline_version == __version__
@@ -108,7 +108,7 @@ def test_group_by_column_default(tmp_path):
 
     # WHEN: I load the config and sample sheet
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         ss = pd.read_csv("cgr_sample_sheet.csv")
 
     # THEN: The `Group_By_Subject_ID` column is populated by the
@@ -129,7 +129,7 @@ def test_group_by_column_config_option(tmp_path):
 
     # WHEN: I load the config and sample sheet
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         ss = pd.read_csv("cgr_sample_sheet.csv")
 
     # THEN: The `Group_By_Subject_ID` column is populated by the
@@ -149,7 +149,7 @@ def test_group_by_column(tmp_path):
 
     # WHEN: I load the config and sample sheet
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
 
     # THEN: The `Group_By_Subject_ID` column is populated by the
     # which ever column is specified for each sample separately.
