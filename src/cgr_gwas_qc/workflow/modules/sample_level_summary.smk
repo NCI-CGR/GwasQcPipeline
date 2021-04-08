@@ -40,7 +40,7 @@ rule sample_qc_table:
         contam=_contam,
         intensity=_intensity,
     params:
-        expected_sex_col_name=cfg.config.workflow_params.expected_sex_col_name,
+        expected_sex_column=cfg.config.workflow_params.expected_sex_column,
         idat_pattern=cfg.config.user_files.idat_pattern,
         dup_concordance_cutoff=cfg.config.software_params.dup_concordance_cutoff,
         contam_threshold=cfg.config.software_params.contam_threshold,

@@ -313,7 +313,7 @@ def sample_qc(tmp_path_factory) -> Path:
         data_cache / "production_outputs/concordance/UnknownReplicates.csv",
         data_cache / "production_outputs/all_contam/contam.csv",
         data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-        workflow_params.expected_sex_col_name,
+        workflow_params.expected_sex_column,
         Idat(
             red=data_cache._data_path.as_posix()
             + "/original_data/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",

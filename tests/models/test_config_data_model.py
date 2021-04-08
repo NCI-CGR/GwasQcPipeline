@@ -148,7 +148,7 @@ def test_workflow_params_defaults():
     workflow_params = WorkflowParams()
 
     # THEN: we get the defaults
-    assert workflow_params.expected_sex_col_name == "Expected_Sex"
+    assert workflow_params.expected_sex_column == "Expected_Sex"
     assert workflow_params.remove_contam is True
     assert workflow_params.remove_sex_discordant is True
     assert workflow_params.remove_rep_discordant is True

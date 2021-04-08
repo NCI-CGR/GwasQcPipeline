@@ -116,7 +116,7 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Params
-    expected_sex_col_name: str = typer.Option(
+    expected_sex_column: str = typer.Option(
         ..., help="Name of the column in the sample sheet that contains sex information."
     ),
     idat_pattern: Idat = typer.Option(..., help="Idat file name patterns."),
@@ -133,7 +133,7 @@ def main(
 ):
 
     sample_sheet_df = SampleManifest(sample_sheet).add_group_by_column(subject_id_column).data
-    ss = _wrangle_sample_sheet(sample_sheet_df, expected_sex_col_name)
+    ss = _wrangle_sample_sheet(sample_sheet_df, expected_sex_column)
     Sample_IDs = ss.index
 
     ################################################################################
@@ -194,12 +194,12 @@ def read_sample_qc(filename: os.PathLike) -> pd.DataFrame:
     return pd.read_csv(filename, dtype=QC_HEADER)
 
 
-def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
+def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_column: str) -> pd.DataFrame:
     """Identify expected sex column and count number samples per subject.
 
     Users can specify which column in the `sample_sheet` holds the expected
-    sex information (`config.workflow_params.expected_sex_col_name`). Here we
-    rename `expected_sex_col_name` to `expected_sex`.
+    sex information (`config.workflow_params.expected_sex_column`). Here we
+    rename `expected_sex_column` to `expected_sex`.
 
     We also add the summary column with the number of `Sample_ID`s per
     `Group_By_Subject_ID`.
@@ -220,7 +220,7 @@ def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str
 
     sex_mapper = {"m": "M", "male": "M", "f": "F", "female": "F"}
     df["expected_sex"] = (
-        df[expected_sex_col_name]
+        df[expected_sex_column]
         .str.lower()
         .map(lambda sex: sex_mapper.get(sex, "U"))
         .astype(SEX_DTYPE)

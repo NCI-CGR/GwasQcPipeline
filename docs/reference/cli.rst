@@ -19,7 +19,7 @@ Command Line Interface
                             [--contam_threshold CONTAM_THRESHOLD]
                             [-i ILLUMINA_MANIFEST_FILE] [-a ADPC_FILE]
                             [-g GTC_DIR]
-                            [--expected_sex_col_name EXPECTED_SEX_COL_NAME]
+                            [--expected_sex_column EXPECTED_SEX_COLUMN]
                             [-q QUEUE] [-u]
 
     optional arguments:
@@ -47,7 +47,7 @@ Command Line Interface
     --subject_id_column SUBJECT_ID_COLUMN
                             Name of column in sample sheet that corresponds to
                             subject ID to use.
-    --expected_sex_col_name EXPECTED_SEX_COL_NAME
+    --expected_sex_column EXPECTED_SEX_COLUMN
                             Name of column in sample sheet that corresponds to
                             expected sex of sample.
 

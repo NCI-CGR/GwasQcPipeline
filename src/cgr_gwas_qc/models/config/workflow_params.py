@@ -11,7 +11,7 @@ class WorkflowParams(BaseModel):
         None,
         description="[Deprecated] The name of the column in the sample sheet which identifies unique subjects.",
     )
-    expected_sex_col_name: str = Field(
+    expected_sex_column: str = Field(
         "Expected_Sex", description="Column in the sample sheet that describes the expected sex."
     )
 
