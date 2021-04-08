@@ -209,13 +209,12 @@ rule sample_concordance_plink:
     filtered and LD pruned SNPs.
     """
     input:
-        sample_sheet=cfg.sample_sheet_file,
+        sample_sheet_csv="cgr_sample_sheet.csv",
         imiss="sample_level/call_rate_2/samples.imiss",
         concordance="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.concordance.csv".format(
             maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
     params:
-        subject_id_override=cfg.config.workflow_params.subject_id_column,
         concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
     output:
         known="sample_level/concordance/KnownReplicates.csv",

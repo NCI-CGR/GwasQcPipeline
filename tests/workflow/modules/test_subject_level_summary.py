@@ -15,7 +15,6 @@ def test_create_subjects(tmp_path, conda_envs, sample_qc):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",
@@ -29,6 +28,7 @@ def test_create_subjects(tmp_path, conda_envs, sample_qc):
             "sample_level/call_rate_2/samples.fam",
         )
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -72,11 +72,11 @@ def test_remove_related_subjects(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
         .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
         .make_config(software_params={"pi_hat_threshold": 0.16})  # ensure some subjects are related
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -99,7 +99,7 @@ def test_remove_related_subjects(tmp_path, conda_envs):
     )
 
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         pi = cfg.config.software_params.pi_hat_threshold
 
     # WHEN: Prune related subjects.

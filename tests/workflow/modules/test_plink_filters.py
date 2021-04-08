@@ -30,11 +30,11 @@ def test_old_call_rate_filter_order(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .make_cgr_sample_sheet()
         .copy("production_outputs/plink_start/samples.bed", "sample_level/samples.bed")
         .copy("production_outputs/plink_start/samples.bim", "sample_level/samples.bim")
         .copy("production_outputs/plink_start/samples.fam", "sample_level/samples.fam")
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -136,11 +136,11 @@ def test_call_rate_filters(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .make_cgr_sample_sheet()
         .copy("production_outputs/plink_start/samples.bed", "sample_level/samples.bed")
         .copy("production_outputs/plink_start/samples.bim", "sample_level/samples.bim")
         .copy("production_outputs/plink_start/samples.fam", "sample_level/samples.fam")
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -187,7 +187,6 @@ def maf_and_ld_outputs(tmp_path_factory, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .make_cgr_sample_sheet()
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",
@@ -201,6 +200,7 @@ def maf_and_ld_outputs(tmp_path_factory, conda_envs):
             "sample_level/call_rate_2/samples.fam",
         )
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -242,7 +242,7 @@ def test_maf_filter(maf_and_ld_outputs):
         return int(m[0])
 
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf = cfg.config.software_params.maf_for_ibd
 
     obs_maf_count = parse_plink_log_for_maf_counts(
@@ -270,7 +270,7 @@ def test_approx_ld(maf_and_ld_outputs):
         return int(pruned), int(kept)
 
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf, ld = cfg.config.software_params.maf_for_ibd, cfg.config.software_params.ld_prune_r2
 
     obs_pruned, _ = parse_plink_log_for_ld_pruning(
@@ -291,7 +291,7 @@ def test_ld_prune(maf_and_ld_outputs):
 
     # THEN:
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf, ld = cfg.config.software_params.maf_for_ibd, cfg.config.software_params.ld_prune_r2
 
     obs_bed = tmp_path / f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.bed"

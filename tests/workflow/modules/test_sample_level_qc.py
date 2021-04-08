@@ -24,7 +24,6 @@ def graf_inputs(tmp_path_factory, conda_envs):
     conda_envs.copy_env("graf", tmp_path)
     (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",
@@ -37,7 +36,8 @@ def graf_inputs(tmp_path_factory, conda_envs):
             "production_outputs/plink_filter_call_rate_2/samples.fam",
             "sample_level/call_rate_2/samples.fam",
         )
-        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
+        .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -119,9 +119,9 @@ def median_idat_intensity(tmp_path_factory, conda_envs) -> Path:
     conda_envs.copy_env("illuminaio", tmp_path)
     (
         RealData(tmp_path, full_sample_sheet=False)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -169,9 +169,9 @@ def test_per_sample_gtc_to_adpc(tmp_path):
     # GIVEN: Real data using GTC entry point.
     data_cache = (
         RealData(tmp_path, full_sample_sheet=False)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -227,7 +227,6 @@ def test_per_sample_verifyIDintensity_contamination(tmp_path, conda_envs):
     conda_envs.copy_env("verifyidintensity", tmp_path)
     data_cache = (
         RealData(tmp_path, full_sample_sheet=False)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/contam", "sample_level/per_sample_adpc")
         .copy(
@@ -235,6 +234,7 @@ def test_per_sample_verifyIDintensity_contamination(tmp_path, conda_envs):
             "sample_level/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
         )
         .make_config(num_snps=700078)
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -281,10 +281,10 @@ def test_contamination_test_with_missing_abf_values(tmp_path, conda_envs):
     conda_envs.copy_env("verifyidintensity", tmp_path)
     data_cache = (
         RealData(tmp_path, full_sample_sheet=False)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/contam", "sample_level/per_sample_adpc")
         .make_config(num_snps=700078)
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -335,13 +335,13 @@ def test_contamination_test_with_missing_adpc_values(tmp_path, conda_envs):
     conda_envs.copy_env("verifyidintensity", tmp_path)
     data_store = (
         RealData(tmp_path, full_sample_sheet=False)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
             "sample_level/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
         )
         .make_config(num_snps=700078)
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -383,7 +383,6 @@ def test_agg_contamination_test(tmp_path, median_idat_intensity):
     # rates, and the Illuminaio conda env.
     data_cache = (
         RealData(tmp_path, full_sample_sheet=False)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/one_samp_b_1000g_contam",
@@ -394,6 +393,7 @@ def test_agg_contamination_test(tmp_path, median_idat_intensity):
             "sample_level/call_rate_2/samples.imiss",
         )
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -441,8 +441,8 @@ def test_sample_concordance_plink(tmp_path):
     # GIVEN: Real data
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
-        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
+        .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -463,7 +463,7 @@ def test_sample_concordance_plink(tmp_path):
     )
 
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf, ld = cfg.config.software_params.maf_for_ibd, cfg.config.software_params.ld_prune_r2
 
     (

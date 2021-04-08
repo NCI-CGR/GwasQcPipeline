@@ -235,7 +235,13 @@ class DataRepo(ABC):
             kwargs: Config options that you would like to set when creating
               the config.yml
         """
-        self._config.update(kwargs)
+        # Update config with passed items
+        for k, v in kwargs.items():
+            if isinstance(v, dict):
+                self._config[k].update(v)
+            else:
+                self._config[k] = v
+
         if self.working_dir:
             make_test_config(self.working_dir, **self._config)
         else:

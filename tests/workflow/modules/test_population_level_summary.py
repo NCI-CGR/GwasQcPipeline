@@ -16,8 +16,8 @@ def test_subjects_per_population(tmp_path, sample_qc):
     # GIVEN: real data config and qc summary table
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -72,7 +72,6 @@ def test_plink_split_population(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .copy(
             "production_outputs/split_by_pop/EUR.keep.txt",
             "population_level/subject_lists/EUR.txt",
@@ -81,6 +80,7 @@ def test_plink_split_population(tmp_path, conda_envs):
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
         .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -130,11 +130,11 @@ def test_per_population_qc_done(tmp_path, conda_envs, sample_qc):
     conda_envs.copy_env("eigensoft", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
         .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
         .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -162,7 +162,7 @@ def test_per_population_qc_done(tmp_path, conda_envs, sample_qc):
 
     # THEN:
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf = cfg.config.software_params.maf_for_ibd
         ld = cfg.config.software_params.ld_prune_r2
         pi = cfg.config.software_params.pi_hat_threshold
@@ -199,10 +199,8 @@ def test_per_population_qc_done_no_populations(tmp_path, conda_envs, sample_qc):
     conda_envs.copy_env("eigensoft", tmp_path)
     (
         RealData(tmp_path)
-        .copy_sample_sheet()
-        .make_config(
-            workflow_params={"subject_id_column": "PI_Subject_ID", "minimum_pop_subjects": 500}
-        )
+        .make_config(workflow_params={"minimum_pop_subjects": 500})
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -241,8 +239,8 @@ def test_controls_per_population(tmp_path, sample_qc):
     # in test data
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -301,7 +299,6 @@ def test_plink_split_controls(tmp_path, conda_envs):
 
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .copy("production_outputs/HWP/EUR_controls.txt", "population_level/controls_lists/EUR.txt",)
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed",
@@ -316,6 +313,7 @@ def test_plink_split_controls(tmp_path, conda_envs):
             f"population_level/EUR/subjects_unrelated{pi}.fam",
         )
         .make_config(software_params={"maf_for_hwe": maf, "pi_hat_threshold": pi})
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -374,7 +372,6 @@ def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc):
     conda_envs.copy_env("eigensoft", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed", "population_level/EUR/subjects.bed",
@@ -385,7 +382,8 @@ def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc):
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.fam", "population_level/EUR/subjects.fam",
         )
-        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
+        .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -409,7 +407,7 @@ def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc):
     shutil.copyfile(sample_qc, tmp_path / "sample_level/sample_qc.csv")
 
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf = cfg.config.software_params.maf_for_hwe
         pi = cfg.config.software_params.pi_hat_threshold
 
@@ -438,9 +436,9 @@ def test_per_population_controls_qc_done_no_controls(tmp_path, conda_envs, sampl
     conda_envs.copy_env("eigensoft", tmp_path)
     (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
-        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
+        .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
