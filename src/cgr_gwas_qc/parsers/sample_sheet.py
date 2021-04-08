@@ -175,13 +175,19 @@ def _add_group_by_column(df: pd.DataFrame, subject_id_column: str = "Group_By"):
     Recently, Q1 2021, we started adding a column named ``Group_By`` which
     contains the column name(s) to use for subject grouping. This allows
     values from multiple columns to be used.
+
+    Note::
+        We treat ``LIMS_Individual_ID`` as the default value if other values are missing.
     """
 
     def _get_subject_id(sr: pd.Series) -> str:
-        if "Group_By" == subject_id_column:
-            return sr[sr[subject_id_column]]
+        if "LIMS_Individual_ID" == subject_id_column:
+            return sr[subject_id_column]
 
-        return sr[subject_id_column]
+        default_id = sr.get("LIMS_Individual_ID", pd.NA)
+        if "Group_By" == subject_id_column:
+            return sr[sr[subject_id_column]] if pd.notna(sr[subject_id_column]) else default_id
+        return sr[subject_id_column] if pd.notna(sr[subject_id_column]) else default_id
 
     df["Group_By_Subject_ID"] = df.apply(_get_subject_id, axis=1)
 
