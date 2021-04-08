@@ -37,7 +37,7 @@ def graf_inputs(tmp_path_factory, conda_envs):
             "production_outputs/plink_filter_call_rate_2/samples.fam",
             "sample_level/call_rate_2/samples.fam",
         )
-        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -442,7 +442,7 @@ def test_sample_concordance_plink(tmp_path):
     data_cache = (
         RealData(tmp_path)
         .copy_sample_sheet()
-        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config

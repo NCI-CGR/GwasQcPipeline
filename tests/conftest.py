@@ -229,7 +229,7 @@ def real_config(tmp_path_factory, pytestconfig) -> Config:
     (
         RealData(tmp_path)
         .add_user_files("gtc")
-        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
     )
 
     with chdir(tmp_path):

@@ -45,7 +45,7 @@ rule sample_qc_table:
         dup_concordance_cutoff=cfg.config.software_params.dup_concordance_cutoff,
         contam_threshold=cfg.config.software_params.contam_threshold,
         Sample_IDs_to_remove=cfg.config.Sample_IDs_to_remove,
-        subject_id_to_use=cfg.config.workflow_params.subject_id_to_use,
+        subject_id_column=cfg.config.workflow_params.subject_id_column,
     output:
         "sample_level/sample_qc.csv",
     script:

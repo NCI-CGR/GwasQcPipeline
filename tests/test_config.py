@@ -120,11 +120,11 @@ def test_group_by_column_config_option(tmp_path):
     """Populate Group_By_Subject_ID column with config option.
 
     The value should be the same as the column specified in
-    `workflow_params.subject_id_to_use`.
+    `workflow_params.subject_id_column`.
     """
-    # GIVEN: Fake sample sheet and a config where I set the `subject_id_to_use`
+    # GIVEN: Fake sample sheet and a config where I set the `subject_id_column`
     FakeData(tmp_path).copy_sample_sheet().make_config(
-        workflow_params=dict(subject_id_to_use="Sample_ID")
+        workflow_params=dict(subject_id_column="Sample_ID")
     )
 
     # WHEN: I load the config and sample sheet
@@ -140,7 +140,7 @@ def test_group_by_column(tmp_path):
     """Populate Group_By_Subject_ID column with config option.
 
     The value should be the same as the column specified in
-    `workflow_params.subject_id_to_use`.
+    `workflow_params.subject_id_column`.
     """
     # GIVEN: Fake sample sheet and config
     FakeData(tmp_path).copy_sample_sheet().make_config()

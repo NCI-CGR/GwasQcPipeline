@@ -55,7 +55,7 @@ def sample_qc_table(tmp_path_factory) -> Path:
             "sample_level/median_idat_intensity.csv",
         )
         .make_config(
-            workflow_params={"subject_id_to_use": "PI_Subject_ID"},
+            workflow_params={"subject_id_column": "PI_Subject_ID"},
             software_params={"contam_threshold": 0.2},
         )
         .make_snakefile(

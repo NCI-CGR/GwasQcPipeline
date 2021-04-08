@@ -122,7 +122,7 @@ def main(
     idat_pattern: Idat = typer.Option(..., help="Idat file name patterns."),
     dup_concordance_cutoff: float = typer.Option(..., help="Threshold for duplicate concordance."),
     contam_threshold: float = typer.Option(..., help="Threshold for contamination."),
-    subject_id_to_use: Optional[str] = typer.Option(
+    subject_id_column: Optional[str] = typer.Option(
         None, help="Select a specific column to use for Subject_ID"
     ),
     Sample_IDs_to_remove: Optional[Sequence[str]] = typer.Option(
@@ -132,7 +132,7 @@ def main(
     outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
 
-    sample_sheet_df = SampleManifest(sample_sheet).add_group_by_column(subject_id_to_use).data
+    sample_sheet_df = SampleManifest(sample_sheet).add_group_by_column(subject_id_column).data
     ss = _wrangle_sample_sheet(sample_sheet_df, expected_sex_col_name)
     Sample_IDs = ss.index
 

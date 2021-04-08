@@ -215,7 +215,7 @@ rule sample_concordance_plink:
             maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
     params:
-        subject_id_override=cfg.config.workflow_params.subject_id_to_use,
+        subject_id_override=cfg.config.workflow_params.subject_id_column,
         concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
     output:
         known="sample_level/concordance/KnownReplicates.csv",

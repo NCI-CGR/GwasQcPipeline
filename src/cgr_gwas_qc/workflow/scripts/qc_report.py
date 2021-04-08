@@ -38,7 +38,7 @@ def main(
 ):
     sample_sheet = (
         SampleManifest(sample_sheet_csv)
-        .add_group_by_column(config.workflow_params.subject_id_to_use)
+        .add_group_by_column(config.workflow_params.subject_id_column)
         .data
     )
     snp_qc = read_snp_qc(snp_qc_csv)

@@ -69,7 +69,7 @@ class ConfigMgr:
         try:
             self._sample_sheet = (
                 SampleManifest(self.sample_sheet_file)
-                .add_group_by_column(self.config.workflow_params.subject_id_to_use)
+                .add_group_by_column(self.config.workflow_params.subject_id_column)
                 .remove_Sample_IDs(self.config.Sample_IDs_to_remove)
             )
         except Exception:

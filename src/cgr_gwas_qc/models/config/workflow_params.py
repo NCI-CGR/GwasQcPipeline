@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, validator
 class WorkflowParams(BaseModel):
     """This set of parameters control what parts and how the workflow is run."""
 
-    subject_id_to_use: Optional[str] = Field(
+    subject_id_column: Optional[str] = Field(
         None,
         description="[Deprecated] The name of the column in the sample sheet which identifies unique subjects.",
     )
@@ -41,13 +41,13 @@ class WorkflowParams(BaseModel):
         gt=0,
     )
 
-    @validator("subject_id_to_use")
-    def validate_subject_id_to_use(cls, v):
+    @validator("subject_id_column")
+    def validate_subject_id_column(cls, v):
         if v is None:
             return v
 
         warnings.warn(
-            "subject_id_to_use is deprecated, add this to the Group_By column in the sample sheet.",
+            "subject_id_column is deprecated, add this to the Group_By column in the sample sheet.",
             DeprecationWarning,
         )
 

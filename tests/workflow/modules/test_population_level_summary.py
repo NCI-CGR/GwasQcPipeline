@@ -134,7 +134,7 @@ def test_per_population_qc_done(tmp_path, conda_envs, sample_qc):
         .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
         .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
         .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
-        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -201,7 +201,7 @@ def test_per_population_qc_done_no_populations(tmp_path, conda_envs, sample_qc):
         RealData(tmp_path)
         .copy_sample_sheet()
         .make_config(
-            workflow_params={"subject_id_to_use": "PI_Subject_ID", "minimum_pop_subjects": 500}
+            workflow_params={"subject_id_column": "PI_Subject_ID", "minimum_pop_subjects": 500}
         )
         .make_snakefile(
             """
@@ -385,7 +385,7 @@ def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc):
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.fam", "population_level/EUR/subjects.fam",
         )
-        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -440,7 +440,7 @@ def test_per_population_controls_qc_done_no_controls(tmp_path, conda_envs, sampl
         RealData(tmp_path)
         .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
-        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
+        .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
