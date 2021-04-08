@@ -48,7 +48,7 @@ def unknown_replicates(tmp_path):
 
 @pytest.mark.real_data
 def test_qc_report(
-    real_config,
+    real_cfg,
     snp_qc,
     sample_qc,
     population_qc,
@@ -60,7 +60,6 @@ def test_qc_report(
 ):
     from cgr_gwas_qc.workflow.scripts import qc_report
 
-    data_cache = RealData()
     outfile = tmp_path / "qc_report.md"
 
     # Set up some place holder PNGs for PCA, AutoHet, and HWE
@@ -70,8 +69,8 @@ def test_qc_report(
     shutil.copyfile(fake_image, png_dir / "AFR.png")
 
     qc_report.main(
-        config=real_config,
-        sample_sheet_csv=data_cache / "original_data/manifest_full.csv",
+        config=real_cfg.config,
+        sample_sheet_csv=real_cfg.root / "cgr_sample_sheet.csv",
         snp_qc_csv=snp_qc,
         sample_qc_csv=sample_qc,
         population_qc_csv=population_qc,

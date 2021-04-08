@@ -4,11 +4,22 @@ import pytest
 from typer.testing import CliRunner
 
 from cgr_gwas_qc.testing import file_hashes_equal
+from cgr_gwas_qc.testing.data import FakeData
 from cgr_gwas_qc.workflow.scripts.gtc2plink import app
 
 runner = CliRunner()
 
 sample_id = "T0001"
+
+
+@pytest.fixture(scope="module")
+def gtc_file():
+    return FakeData._data_path / FakeData._test_gtc
+
+
+@pytest.fixture(scope="module")
+def bpm_file():
+    return FakeData._data_path / FakeData._illumina_manifest_file
 
 
 ################################################################################

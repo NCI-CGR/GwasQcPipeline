@@ -5,7 +5,7 @@ from typing import Dict, Text
 import typer
 
 from cgr_gwas_qc.config import Config
-from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
+from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.reporting import ExclusionTables, SampleQC, SubjectQC, env
 from cgr_gwas_qc.workflow.scripts.known_concordant_samples import (
     read_known_concordance_table,
@@ -36,11 +36,7 @@ def main(
     hwe_png_dir: Path,
     outfile: Path,
 ):
-    sample_sheet = (
-        SampleManifest(sample_sheet_csv)
-        .add_group_by_column(config.workflow_params.subject_id_column)
-        .data
-    )
+    ss = sample_sheet.read(sample_sheet_csv)
     snp_qc = read_snp_qc(snp_qc_csv)
     sample_qc = read_sample_qc(sample_qc_csv)
     population_qc = read_population_qc(population_qc_csv)
@@ -58,7 +54,7 @@ def main(
         "config": config,
         "sample_qc": SampleQC.construct(
             config,
-            sample_sheet,
+            ss,
             snp_qc,
             sample_qc,
             control_replicates,
@@ -71,9 +67,7 @@ def main(
         "subject_qc": SubjectQC.construct(
             population_qc, autosomal_heterozygosity_png_dir, pca_png_dir, hwe_png_dir
         ),
-        "exclusion_tables": ExclusionTables.construct(
-            config, sample_sheet, sample_qc, population_qc
-        ),
+        "exclusion_tables": ExclusionTables.construct(config, ss, sample_qc, population_qc),
     }
 
     report = create_report(payload)

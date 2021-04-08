@@ -4,10 +4,20 @@ from numpy import isclose
 from typer.testing import CliRunner
 
 from cgr_gwas_qc.parsers.illumina import AdpcReader
-from cgr_gwas_qc.testing.data import RealData
+from cgr_gwas_qc.testing.data import FakeData, RealData
 from cgr_gwas_qc.workflow.scripts.gtc2adpc import app
 
 runner = CliRunner()
+
+
+@pytest.fixture(scope="module")
+def gtc_file():
+    return FakeData._data_path / FakeData._test_gtc
+
+
+@pytest.fixture(scope="module")
+def bpm_file():
+    return FakeData._data_path / FakeData._illumina_manifest_file
 
 
 @pytest.mark.regression
