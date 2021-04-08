@@ -185,7 +185,7 @@ def test_run_submit_with_right_command(cluster, cmd, tmp_path, mocker: MockerFix
         )
 
     spy = mocker.patch("cgr_gwas_qc.cli.submit.sp.check_output")
-    FakeData(tmp_path).copy_sample_sheet().make_config()
+    FakeData(tmp_path).make_cgr_sample_sheet().make_config()
     with chdir(tmp_path):
         submit.main(
             cgems=cgems,

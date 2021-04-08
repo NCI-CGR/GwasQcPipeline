@@ -14,7 +14,7 @@ def call_rate_2_stats(tmp_path_factory, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
+        .make_cgr_sample_sheet()
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",
@@ -125,7 +125,7 @@ def test_plink_stats_ibd(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
+        .make_cgr_sample_sheet()
         .make_config()
         .make_snakefile(
             """
