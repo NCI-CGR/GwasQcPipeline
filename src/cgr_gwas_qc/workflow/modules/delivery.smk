@@ -17,57 +17,22 @@ rule lab_sample_level_qc_report:
 
 rule lab_lims_upload:
     input:
-        "sample_level/sample_qc.csv",
+        sample_sheet_csv="cgr_sample_sheet.csv",
+        sample_qc_csv="sample_level/sample_qc.csv",
     output:
         "files_for_lab/{deliver_prefix}LimsUpload{deliver_suffix}.csv",
-    run:
-        (
-            pd.read_csv(input[0])
-            .rename(REPORT_NAME_MAPPER, axis=1)
-            .rename({"Call_Rate_Initial": "Call Rate"}, axis=1)
-            .reindex(
-                [
-                    "SR_Subject_ID",
-                    "LIMS_Individual_ID",
-                    "Sample_ID",
-                    "Project-Sample ID",
-                    "Call Rate",
-                    "Low Call Rate",
-                    "Contaminated",
-                    "Sex Discordant",
-                    "Expected Replicate Discordance",
-                    "Unexpected Replicate",
-                ],
-                axis=1,
-            )
-            .to_csv(output[0], index=False)
-        )
+    script:
+        "../scripts/lab_lims_upload.py"
 
 
 rule lab_identifiler_needed:
     input:
-        "sample_level/sample_qc.csv",
+        sample_sheet_csv="cgr_sample_sheet.csv",
+        sample_qc_csv="sample_level/sample_qc.csv",
     output:
         "files_for_lab/{deliver_prefix}Identifiler{deliver_suffix}.csv",
-    run:
-        (
-            pd.read_csv(input[0])
-            .query("identifiler_needed")
-            .rename(REPORT_NAME_MAPPER, axis=1)
-            .reindex(
-                [
-                    "Sample_ID",
-                    "LIMSSample_ID",
-                    "Project",
-                    "Project-Sample ID",
-                    "SR_Subject_ID",
-                    "LIMS_Individual_ID",
-                    "identifiler_reason",
-                ],
-                axis=1,
-            )
-            .to_csv(output[0], index=False)
-        )
+    script:
+        "../scripts/lab_identifiler_needed.py"
 
 
 rule lab_known_replicates:

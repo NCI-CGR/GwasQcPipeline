@@ -28,6 +28,7 @@ def files_for_upload(tmp_path_factory, sample_qc):
             "production_outputs/concordance/UnknownReplicates.csv",
             "sample_level/concordance/UnknownReplicates.csv",
         )
+        .make_cgr_sample_sheet()
         .make_config(
             sample_sheet="SR001-001_00_AnalysisManifest_0000000.csv",
             user_files=dict(output_pattern="{prefix}/SR001-001_00_{file_type}_0000000.{ext}"),
@@ -92,13 +93,11 @@ def test_identifiler_needed(files_for_upload):
     data_cache, tmp_path = files_for_upload
 
     # THEN: The Identifiler table for upload should be identical with production outputs.
-    # NOTE: The legacy workflow uses `Identifiler Reason` where the dev workflow uses `identifiler_reason`.
-    # I need to rename production outputs prior to comparisons.
     obs_ = pd.read_csv(tmp_path / "files_for_lab/SR001-001_00_Identifiler_0000000.csv")
     exp_ = pd.read_csv(
         data_cache
         / "production_outputs/files_for_lab/SR0446-001_12_Identifiler_1011201995419_casecontrol_20191011.csv"
-    ).rename({"Identifiler Reason": "identifiler_reason"}, axis=1)
+    )
 
     assert_frame_equal(obs_, exp_, check_dtype=False)
 
@@ -155,6 +154,7 @@ def files_for_deliver(tmp_path_factory, sample_qc):
         .copy("production_outputs/subject_level/samples.fam", "subject_level/samples.fam")
         # Use CGR manifest naming scheme
         .copy("original_data/manifest_full.csv", "SR001-001_00_AnalysisManifest_0000000.csv",)
+        .make_cgr_sample_sheet()
         .make_config(
             sample_sheet="SR001-001_00_AnalysisManifest_0000000.csv",
             user_files=dict(output_pattern="{prefix}/SR001-001_00_{file_type}_0000000.{ext}"),
@@ -186,7 +186,7 @@ def files_for_deliver(tmp_path_factory, sample_qc):
 
     # HWE results for Europeans b/c they are the only non-empty files
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf = cfg.config.software_params.maf_for_hwe
 
     data_cache.copy(
@@ -228,7 +228,7 @@ def test_deliver_hwp(files_for_deliver, tmp_path):
 
     # WHEN: Unzip `deliver/HWP.zip`
     with chdir(deliver_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf = cfg.config.software_params.maf_for_hwe
 
     with ZipFile(deliver_path / "deliver/HWP.zip") as myzip:

@@ -13,9 +13,11 @@ REPORT_NAME_MAPPER = {
     "predicted_sex": "Predicted_Sex",
     "idats_exist": "IdatsInProjectDir",
     "identifiler_needed": "Identifiler_Needed",
+    "identifiler_reason": "Identifiler Reason",
     "is_call_rate_filtered": "Low Call Rate",
     "is_contaminated": "Contaminated",
     "is_replicate_discordant": "Expected Replicate Discordance",
     "is_sex_discordant": "Sex Discordant",
     "is_unexpected_replicate": "Unexpected Replicate",
+    "Call_Rate_Initial": "Call Rate",
 }

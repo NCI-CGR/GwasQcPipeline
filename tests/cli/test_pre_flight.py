@@ -38,7 +38,7 @@ def test_preflight_refs_and_gtc_only(test_data):
 
 def test_check_user_files_no_problems(test_data):
     with chdir(test_data.working_dir):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         user_files = cfg.config.user_files
         record = dict(cfg.ss.iloc[0, :])
         problems = [problem for problem in _check_user_files(user_files, record) if problem]
@@ -47,7 +47,7 @@ def test_check_user_files_no_problems(test_data):
 
 def test_check_user_files_missing_idat_red(test_data):
     with chdir(test_data.working_dir):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         user_files = cfg.config.user_files
         record = dict(cfg.ss.iloc[0, :])
         Path(user_files.idat_pattern.red.format(**record)).unlink()
@@ -59,7 +59,7 @@ def test_check_user_files_missing_idat_red(test_data):
 
 def test_check_user_files_missing_gtc(test_data):
     with chdir(test_data.working_dir):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         user_files = cfg.config.user_files
         record = dict(cfg.ss.iloc[0, :])
         Path(user_files.gtc_pattern.format(**record)).unlink()
@@ -71,7 +71,7 @@ def test_check_user_files_missing_gtc(test_data):
 
 def test_check_user_files_missing_both_idat(test_data):
     with chdir(test_data.working_dir):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         user_files = cfg.config.user_files
         record = dict(cfg.ss.iloc[0, :])
         Path(user_files.idat_pattern.red.format(**record)).unlink()
