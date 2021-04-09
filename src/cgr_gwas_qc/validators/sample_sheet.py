@@ -32,7 +32,7 @@ def _validate(
     df: pd.DataFrame, subject_id_column: str, expected_sex_column: str, case_control_column: str
 ):
     _check_required_columns(df, subject_id_column, expected_sex_column, case_control_column)
-    _check_missing_values_required_columns(df, subject_id_column)
+    _check_missing_values_required_columns(df)
 
 
 def _check_section_headers(data: str):
@@ -90,9 +90,9 @@ def _check_required_columns(df: pd.DataFrame, *args):
         raise SampleSheetMissingRequiredColumnsError(missing_required_columns)
 
 
-def _check_missing_values_required_columns(df: pd.DataFrame, subject_id_column: str):
+def _check_missing_values_required_columns(df: pd.DataFrame):
     """Checks if essential columns have missing values."""
-    essential_columns = ["Sample_ID", subject_id_column]
+    essential_columns = ["Sample_ID"]
 
     col_w_missing_values = [column for column in essential_columns if df[column].isnull().any()]
 

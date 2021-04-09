@@ -222,14 +222,6 @@ missing_values_in_req_column = [
         "SB002,001,002,003\n"
         ",001,002,003\n"
     ),
-    # Missing value in LIMS_Individual_ID
-    (
-        "[Data],,,\n"
-        "Sample_ID,LIMS_Individual_ID,col3,col4\n"
-        "SB001,001,002,004\n"
-        "SB002,,002,003\n"
-        "SB002,001,002,003\n"
-    ),
 ]
 
 
@@ -249,4 +241,4 @@ def test_null_columns(missing_data_values):
     # GIVEN: a sample sheet with a missing data in a required column
     # WHEN-THEN: we validate_manifest it and it raises a missing value error
     with pytest.raises(SampleSheetMissingValueRequiredColumnsError):
-        _check_missing_values_required_columns(missing_data_values, "LIMS_Individual_ID")
+        _check_missing_values_required_columns(missing_data_values)

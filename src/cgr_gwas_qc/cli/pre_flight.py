@@ -1,24 +1,32 @@
 import multiprocessing as mp
-from collections import defaultdict, namedtuple
+from collections import defaultdict
+from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
 from textwrap import indent
 from typing import Dict, List, Mapping, Optional, Sequence, Set
 
+import pandas as pd
 import typer
 from pydantic.error_wrappers import ValidationError
 
 from cgr_gwas_qc import yaml
 from cgr_gwas_qc.config import config_to_yaml
-from cgr_gwas_qc.exceptions import GwasQcValidationError
+from cgr_gwas_qc.exceptions import GwasQcValidationError, SampleSheetNullRowError
 from cgr_gwas_qc.models.config import Config, ReferenceFiles, UserFiles
 from cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles import BeadPoolManifest
-from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest, is_sample_manifest, update_sample_sheet
 from cgr_gwas_qc.validators import bgzip, bpm, gtc, idat, sample_sheet
 
 app = typer.Typer(add_completion=False)
 
-ProblemFile = namedtuple("ProblemFile", "Sample_ID,reason,file_type,filename")
+
+@dataclass
+class ProblemFile:
+    Sample_ID: str
+    reason: str
+    file_type: str
+    filename: str
 
 
 @app.command()
@@ -34,28 +42,50 @@ def main(
     Pre-flight checks include the Sample Sheet, reference files, Idat files,
     and GTC files. For Idat and GTC files, the user provided file name
     pattern is extended using the columns in the sample sheet.
+
+    Pre-flight also creates a parsed version of the sample sheet
+    ``cgr_sample_sheet.csv``. This file is used in the Gwas QC workflow.
     """
     config = check_config(config_file)
-    sample_sheet = check_sample_sheet(config.sample_sheet).remove_Sample_IDs(
-        config.Sample_IDs_to_remove
+    ss = check_sample_sheet(
+        config.sample_sheet,
+        config.workflow_params.subject_id_column,
+        config.workflow_params.expected_sex_column,
+        config.workflow_params.case_control_column,
     )
 
     if reference_check:
         check_reference_files(config.reference_files)
 
-    problem_samples = None
-    if user_files_check:
-        problem_samples = check_user_files(config.user_files, sample_sheet, threads)
+    problem_samples = (
+        check_user_files(config.user_files, ss, threads) if user_files_check else set()
+    )
 
+    if config.Sample_IDs_to_remove:
+        # Remove IDs flagged in the config
+        problem_samples |= set(config.Sample_IDs_to_remove)
+
+    # Create a parsed version of the sample sheet with some custom columns
+    typer.secho("Saving Updated Sample Sheet to (cgr_sample_sheet.csv)", fg=typer.colors.GREEN)
+    update_sample_sheet(
+        ss,
+        config.workflow_params.subject_id_column,
+        config.workflow_params.expected_sex_column,
+        config.workflow_params.case_control_column,
+        problem_samples,
+    ).to_csv("cgr_sample_sheet.csv", index=False)
+
+    # Update the config file with some dynamic settings
     if update_config:
         # Update the config file with problem samples and re-calculate values
-        update_config_file(config, sample_sheet, problem_samples)
+        typer.secho("Saving Updated Config to (cgr_config.yml)", fg=typer.colors.GREEN)
+        update_config_file(config, ss)
 
 
-def check_config(config_file: Path) -> Config:
+def check_config(filename: Path) -> Config:
     try:
-        data = yaml.load(config_file)
-        return Config.parse_obj(data)
+        data = yaml.load(filename)
+        config = Config.parse_obj(data)
     except Exception as err:
         if isinstance(err, OSError):
             msg = err.args[1]
@@ -63,112 +93,132 @@ def check_config(config_file: Path) -> Config:
             msg = str(err.args[0][0].exc).replace("\n", " ")
         else:
             msg = err.args[0]
-
-        typer.secho(
-            (
-                f"Config ERROR: ({config_file})\n\t{msg}\n"
-                "Exiting... Cannot continue without a valid config file."
-            ),
-            fg=typer.colors.RED,
-        )
+        typer.secho(f"Config ERROR: ({filename.as_posix()})\n\t{msg}\n", fg=typer.colors.RED)
+        typer.secho("Exiting... Cannot continue without a valid config file.", fg=typer.colors.RED)
         raise SystemExit
 
+    typer.secho(f"Config OK ({filename.as_posix()})", fg=typer.colors.GREEN)
+    return config
 
-def check_sample_sheet(filename) -> SampleManifest:
+
+def check_sample_sheet(
+    filename: Path, subject_id_column: str, expected_sex_column: str, case_control_column: str
+) -> pd.DataFrame:
     try:
-        sample_sheet.validate(filename)
-        typer.secho(f"Sample Sheet OK ({filename.as_posix()})", fg=typer.colors.GREEN)
-    except sample_sheet.SampleSheetNullRowError:
+        if is_sample_manifest(filename):
+            # User provided a CGR like manifest file
+            sample_sheet.validate_manifest(
+                filename, subject_id_column, expected_sex_column, case_control_column
+            )
+            df = SampleManifest(filename).data
+        else:
+            # User provided a plain CSV file
+            sample_sheet.validate_sample_sheet(
+                filename, subject_id_column, expected_sex_column, case_control_column
+            )
+            df = pd.read_csv(filename)
+    except SampleSheetNullRowError:
         typer.secho(
             f"Sample Sheet WARNING: Contains Empty Rows ({filename.as_posix()})",
             fg=typer.colors.YELLOW,
         )
     except Exception as err:
-        msg = err.args[0] if len(err.args) == 1 else err.args[1]
-        typer.secho(
-            (
-                f"Sample Sheet ERROR: ({filename.as_posix()})\n\t{msg}\n"
-                "Exiting... Cannot continue without a valid sample sheet."
-            ),
-            fg=typer.colors.RED,
-        )
+        if isinstance(err, FileNotFoundError):
+            msg = f"FileNotFound ({filename.as_posix()})"
+        else:
+            msg = err.args[1]
+        typer.secho(f"Sample Sheet ERROR: {msg}", fg=typer.colors.RED)
+        typer.secho("Exiting... Cannot continue without a valid sample sheet.", fg=typer.colors.RED)
         raise SystemExit
 
-    return SampleManifest(filename)
+    typer.secho(f"Sample Sheet OK ({filename.as_posix()})", fg=typer.colors.GREEN)
+    return df
 
 
 def check_reference_files(reference_files: ReferenceFiles):
-    bpm_ = reference_files.illumina_manifest_file
+    bpm_file = reference_files.illumina_manifest_file
     try:
-        bpm.validate(bpm_)  # type: ignore
-        typer.secho(f"BPM OK ({bpm_})", fg=typer.colors.GREEN)
+        bpm.validate(bpm_file)
+        typer.secho(f"BPM OK ({bpm_file})", fg=typer.colors.GREEN)
     except Exception as err:
         msg = err.args[0] if len(err.args) == 1 else err.args[1]
-        typer.secho(f"BPM ERROR: {msg} ({bpm_})", fg=typer.colors.RED)
+        typer.secho(f"BPM ERROR: {msg} ({bpm_file})", fg=typer.colors.RED)
 
-    vcf_ = reference_files.thousand_genome_vcf
+    vcf_file = reference_files.thousand_genome_vcf
     try:
-        bgzip.validate(vcf_)  # type: ignore
-        typer.secho(f"VCF OK ({vcf_})", fg=typer.colors.GREEN)
+        bgzip.validate(vcf_file)
+        typer.secho(f"VCF OK ({vcf_file})", fg=typer.colors.GREEN)
     except Exception as err:
         msg = err.args[0] if len(err.args) == 1 else err.args[1]
-        typer.secho(f"VCF ERROR: {msg} ({vcf_})", fg=typer.colors.RED)
+        typer.secho(f"VCF ERROR: {msg} ({vcf_file})", fg=typer.colors.RED)
 
-    tbi_ = reference_files.thousand_genome_tbi
+    tbi_file = reference_files.thousand_genome_tbi
     try:
-        bgzip.validate(tbi_)  # type: ignore
-        typer.secho(f"VCF.TBI OK ({tbi_})", fg=typer.colors.GREEN)
+        bgzip.validate(tbi_file)
+        typer.secho(f"VCF.TBI OK ({tbi_file})", fg=typer.colors.GREEN)
     except Exception as err:
         msg = err.args[0] if len(err.args) == 1 else err.args[1]
-        typer.secho(f"VCF.TBI ERROR: {msg} ({tbi_})", fg=typer.colors.RED)
+        typer.secho(f"VCF.TBI ERROR: {msg} ({tbi_file})", fg=typer.colors.RED)
 
 
-def check_user_files(user_files: UserFiles, sample_sheet: SampleManifest, threads: int) -> Set[str]:
-    # Here I use multiple processors speed up processing of user files
-    pool = mp.Pool(threads)
-    args = list(
-        product(
-            [user_files], [record._asdict() for record in sample_sheet.data.itertuples(index=False)]
-        )
+def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> Set[str]:
+    """Check user files (IDAT, GTC) using multiple threads.
+
+    There can be tens of thousands of user files to process here. To speed
+    things up a bit we use parallel processing. This function spins up
+    ``threads`` processes and runs user files checks for each sample.
+
+    Returns:
+        Sample_IDs that had a problem with either their IDAT or GTC files.
+    """
+    pool = mp.Pool(threads)  # Create a pool of workers
+    args = list(  # [(UserFiles, Dict[sample_sheet_column, sample_sheet_row1_value]), ...]
+        product([user_files], [record._asdict() for record in ss.itertuples(index=False)])
     )
     typer.secho("Checking user files for {:,} samples.".format(len(args)))
-    futures = pool.starmap(_check_user_files, args)
+    futures = pool.starmap(_check_user_files, args)  # Send work to pool of workers
     with typer.progressbar(futures, length=len(args)) as bar:
         problem_user_files = []
-        for results in bar:
+        for results in bar:  # collect results (i.e., problem samples)
             problem_user_files.extend([problem for problem in results if problem])
         _pretty_print_user_problems(problem_user_files)
 
     return {problem.Sample_ID for problem in problem_user_files}
 
 
-def update_config_file(
-    config: Config, sample_sheet: SampleManifest, problem_samples: Optional[Set[str]]
-):
-    if config.num_snps == 0:
-        config.num_snps = BeadPoolManifest(config.reference_files.illumina_manifest_file).num_loci
+def update_config_file(config: Config, ss: pd.DataFrame):
+    try:
+        if config.num_snps == 0:
+            config.num_snps = BeadPoolManifest(
+                config.reference_files.illumina_manifest_file
+            ).num_loci
+    except Exception:
+        typer.secho(
+            "  - Problem parsing the illumina manifest file, could not update 'config.num_snp'.",
+            fg=typer.colors.YELLOW,
+        )
 
     if config.num_samples == 0:
-        config.num_samples = sample_sheet.data.shape[0]
-
-    if problem_samples:
-        # Add problem samples and update num_samples
-        config.Sample_IDs_to_remove = list(problem_samples)
+        config.num_samples = ss.shape[0]
 
     config_to_yaml(config)
 
 
 def _check_user_files(user_files: UserFiles, record: Mapping) -> List[Optional[ProblemFile]]:
+    """Check IDAT and GTC files for a given sample."""
     sample_id = record["Sample_ID"]
     problems = []
 
     if user_files.idat_pattern:
-        problems.append(_check_idat(user_files.idat_pattern.red.format(**record), "red", sample_id))
-        problems.append(
-            _check_idat(user_files.idat_pattern.green.format(**record), "green", sample_id)
-        )
+        red_file = user_files.idat_pattern.red.format(**record)
+        problems.append(_check_idat(red_file, "red", sample_id))
+
+        green_file = user_files.idat_pattern.green.format(**record)
+        problems.append(_check_idat(green_file, "green", sample_id))
+
     if user_files.gtc_pattern:
-        problems.append(_check_gtc(user_files.gtc_pattern.format(**record), sample_id))
+        gtc_file = user_files.gtc_pattern.format(**record)
+        problems.append(_check_gtc(gtc_file, sample_id))
 
     return problems
 
@@ -182,7 +232,7 @@ def _check_idat(filename: str, color: str, sample_id: str) -> Optional[ProblemFi
         return ProblemFile(sample_id, "Permissions", f"idat_{color}", filename)
     except GwasQcValidationError as err:
         return ProblemFile(sample_id, err.args[0], f"idat_{color}", filename)
-    return None
+    return None  # No problems
 
 
 def _check_gtc(filename: str, sample_id: str) -> Optional[ProblemFile]:
@@ -194,7 +244,7 @@ def _check_gtc(filename: str, sample_id: str) -> Optional[ProblemFile]:
         return ProblemFile(sample_id, "Permissions", "gtc", filename)
     except GwasQcValidationError as err:
         return ProblemFile(sample_id, err.args[0], "gtc", filename)
-    return None
+    return None  # No problems
 
 
 def _pretty_print_user_problems(problems: Sequence[ProblemFile]):
