@@ -78,7 +78,7 @@ def test_lab_lims_upload(files_for_upload):
             data_cache
             / "production_outputs/files_for_lab/SR0446-001_12_LimsUpload_1011201995419_casecontrol_20191011.csv"
         )
-        .rename({"Sample ID": "Sample_ID"}, axis=1)
+        .rename({"Sample ID": "Sample_ID", "Call Rate": "Call_Rate_Initial"}, axis=1)
         .set_index("Sample_ID")
     )
 

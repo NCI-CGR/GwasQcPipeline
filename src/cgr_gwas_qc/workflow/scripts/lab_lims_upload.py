@@ -13,7 +13,7 @@ COLUMNS = (
     "LIMS_Individual_ID",
     "Sample_ID",
     "Project-Sample ID",
-    "Call Rate",
+    "Call_Rate_Initial",
     "Low Call Rate",
     "Contaminated",
     "Sex Discordant",

@@ -7,10 +7,10 @@ from cgr_gwas_qc.testing.data import RealData
 
 
 @pytest.mark.real_data
-def test_ArrayProcessing(real_config, sample_sheet_full):
+def test_ArrayProcessing(real_cfg):
     from cgr_gwas_qc.reporting.sample_qc import ArrayProcessing
 
-    ap = ArrayProcessing.construct(real_config, sample_sheet_full)
+    ap = ArrayProcessing.construct(real_cfg.config, real_cfg.ss)
 
     assert 220 == ap.num_samples_qc_processed
     assert 0 == ap.num_failed_array_processing

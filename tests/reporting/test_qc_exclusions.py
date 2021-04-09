@@ -5,27 +5,25 @@ from pytest_mock import MockerFixture
 from cgr_gwas_qc.reporting.qc_exclusions import ExclusionTables
 
 
-def test_pre_qc(sample_sheet: pd.DataFrame, mocker: MockerFixture):
+def test_pre_qc(fake_cfg, mocker: MockerFixture):
     config = mocker.MagicMock()
     config.Sample_IDs_to_remove = ["SB00001_PB0001_A01"]
-    pre_qc = ExclusionTables._pre_qc(config, sample_sheet)
+    pre_qc = ExclusionTables._pre_qc(config, fake_cfg.ss)
     assert 1 == pre_qc.is_array_processing_failure.sum()
 
 
-def test_pop_qc(sample_sheet: pd.DataFrame):
-    df = (
-        sample_sheet.copy()
-        .assign(Subject_ID=lambda x: x.LIMS_Individual_ID)
-        .assign(is_extreme_autosomal_heterozygosity=False)
+def test_pop_qc(fake_cfg):
+    df = fake_cfg.ss.assign(Subject_ID=lambda x: x.LIMS_Individual_ID).assign(
+        is_extreme_autosomal_heterozygosity=False
     )
     pop_qc = ExclusionTables._pop_qc(df)
-    assert (4, 2) == pop_qc.dropna().shape
+    assert (6, 2) == pop_qc.dropna().shape
 
 
 @pytest.mark.real_data
 @pytest.fixture
-def exclusion_df(real_config, sample_sheet_full, sample_qc_df, population_qc_df) -> pd.DataFrame:
-    pre_qc = ExclusionTables._pre_qc(real_config, sample_sheet_full)
+def exclusion_df(real_cfg, sample_qc_df, population_qc_df) -> pd.DataFrame:
+    pre_qc = ExclusionTables._pre_qc(real_cfg.config, real_cfg.ss)
     pop_qc = ExclusionTables._pop_qc(population_qc_df)
     return sample_qc_df.merge(pre_qc, how="outer").merge(pop_qc, how="left")
 
