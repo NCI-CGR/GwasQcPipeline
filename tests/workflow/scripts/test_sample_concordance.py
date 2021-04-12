@@ -1,46 +1,147 @@
 import pandas as pd
 import pytest
+from pandas.testing import assert_frame_equal
 
-from cgr_gwas_qc.config import ConfigMgr
+from cgr_gwas_qc.reporting.constants import REPORT_NAME_MAPPER
 from cgr_gwas_qc.testing.data import RealData
-from cgr_gwas_qc.workflow.scripts.known_concordant_samples import main
+from cgr_gwas_qc.workflow.scripts import sample_concordance
 
 
 @pytest.mark.real_data
-def test_unknown_concordant_samples(real_cfg: ConfigMgr, tmp_path):
-    """Make sure an unknown can be saved out.
+@pytest.fixture
+def sample_concordance_table_df(sample_concordance_table_csv) -> pd.DataFrame:
+    return sample_concordance._read_concordance_csv(sample_concordance_table_csv)
 
-    I am forcing 1 unknown pair of concordant samples. Here I am just testing
-    that they are indeed written out.
+
+@pytest.mark.real_data
+@pytest.fixture
+def known_replicates_df(real_cfg, sample_concordance_table_df):
+    return sample_concordance._known_replicates_df(
+        sample_concordance_table_df,
+        sample_concordance._get_known_replicates(real_cfg.ss),
+        real_cfg.ss.set_index("Sample_ID").Group_By_Subject_ID.rename("Subject_ID"),
+    )
+
+
+@pytest.mark.real_data
+@pytest.mark.regression
+def test_known_replicates_df(known_replicates_df):
+    # GIVEN: Expected output from legacy workflow
+    exp_df = pd.read_csv(RealData() / "production_outputs/concordance/KnownReplicates.csv")
+    exp_tweak = exp_df.set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"]).reindex(
+        ["Concordance", "PI_HAT"], axis=1
+    )
+
+    # Observed output from dev workflow
+    obs_df = known_replicates_df
+    obs_tweak = (
+        obs_df.set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
+        .rename(REPORT_NAME_MAPPER, axis=1)
+        .reindex(["Concordance", "PI_HAT"], axis=1)
+    )
+
+    # THEN: Frames should be the same.
+    assert_frame_equal(exp_tweak, obs_tweak, check_dtype=False, check_exact=False, check_like=True)
+
+
+@pytest.mark.real_data
+def test_known_replicates_df_force_no_replicates(real_cfg, sample_concordance_table_df):
+    """Test what happens when there are no known replicates."""
+    # GIVEN: That we have no known replicates
+    obs_df = sample_concordance._known_replicates_df(
+        sample_concordance_table_df,
+        [],  # force no known replicates
+        real_cfg.ss.set_index("Sample_ID").Group_By_Subject_ID.rename("Subject_ID"),
+    )
+
+    # THEN: The results table should be empty
+    assert 0 == obs_df.shape[0]
+
+
+@pytest.mark.real_data
+@pytest.mark.regression
+def test_unknown_replicates_df(real_cfg, sample_concordance_table_df):
+    """The test data set has no unknown replicates in it."""
+    # GIVEN: Expected output from legacy workflow
+    exp_df = pd.read_csv(RealData() / "production_outputs/concordance/UnknownReplicates.csv")
+    exp_tweak = exp_df.set_index(
+        ["Subject_ID1", "Subject_ID2", "Sample_ID1", "Sample_ID2"]
+    ).reindex(["Concordance", "PI_HAT"], axis=1)
+
+    # Observed output from dev workflow
+    obs_df = sample_concordance._unknown_replicates_df(
+        sample_concordance_table_df,
+        sample_concordance._get_known_replicates(real_cfg.ss),
+        real_cfg.ss.set_index("Sample_ID").Group_By_Subject_ID.rename("Subject_ID"),
+    )
+    obs_tweak = (
+        obs_df.set_index(["Subject_ID1", "Subject_ID2", "Sample_ID1", "Sample_ID2"])
+        .rename(REPORT_NAME_MAPPER, axis=1)
+        .reindex(["Concordance", "PI_HAT"], axis=1)
+    )
+
+    # THEN: Frames should be the same.
+    assert_frame_equal(exp_tweak, obs_tweak, check_dtype=False, check_exact=False, check_like=True)
+
+
+@pytest.mark.real_data
+def test_unknown_replicates_df_force_replicates(real_cfg, sample_concordance_table_df):
+    """Force unknown replicates.
+
+    Since the legacy workflow had no unknown replicates, I want to force the
+    table to be built. I am doing this by just saying there are no "known"
+    replicates.
     """
-    # GIVEN: Real test data and the concordance threshold
-    data_cache = RealData()
-
-    # Create a concordance table with 1 unknown concordant sample
-    (
-        pd.read_csv(data_cache / "production_outputs/ibd/samples.genome", delim_whitespace=True)
-        .assign(concordance=lambda x: x.IBS2 / (x.IBS0 + x.IBS1 + x.IBS2))
-        .assign(  # Replace the minimum concordance with .99 to cause an unexpected replicate
-            concordance=lambda x: x.concordance.map(
-                lambda y: 0.99 if y == x.concordance.min() else y
-            )
-        )
-        .reindex(["IID1", "IID2", "PI_HAT", "concordance"], axis=1)
-        .to_csv(tmp_path / "one_unknown_concordant.csv")
+    # GIVEN: That I say there are no known replicates
+    obs_df = sample_concordance._unknown_replicates_df(
+        sample_concordance_table_df,
+        [],  # Force no known replicates
+        real_cfg.ss.set_index("Sample_ID").Group_By_Subject_ID.rename("Subject_ID"),
     )
 
-    # WHEN: I run the script with legacy inputs
-    main(
-        real_cfg.root / "cgr_sample_sheet.csv",
-        data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
-        tmp_path / "one_unknown_concordant.csv",
-        tmp_path / "known.csv",
-        tmp_path / "known_qc.csv",
-        tmp_path / "known_study.csv",
-        tmp_path / "unknown.csv",
-        real_cfg.config.software_params.dup_concordance_cutoff,
+    # THEN: all concordant samples should be added to this table.
+    assert sample_concordance_table_df.is_ge_concordance.sum() == obs_df.shape[0]
+
+
+@pytest.mark.real_data
+def test_split_into_qc(real_cfg, known_replicates_df):
+    # GIVEN: Expected output from legacy workflow
+    exp_df = pd.read_csv(RealData() / "production_outputs/concordance/InternalQcKnown.csv")
+    exp_tweak = exp_df.set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"]).reindex(
+        ["Concordance", "PI_HAT"], axis=1
     )
 
-    # THEN: There should be 1 unknown concordant sample.
-    obs_unknown = pd.read_csv(tmp_path / "unknown.csv")
-    assert obs_unknown.shape[0] == 1
+    # WHEN: I split the known replicates into qc fraction
+    qc, _ = sample_concordance._split_into_qc_and_study_samples(real_cfg.ss, known_replicates_df)
+
+    qc_tweak = (
+        qc.set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
+        .rename(REPORT_NAME_MAPPER, axis=1)
+        .reindex(["Concordance", "PI_HAT"], axis=1)
+    )
+
+    # THEN: Frames should be the same.
+    assert_frame_equal(exp_tweak, qc_tweak, check_dtype=False, check_exact=False, check_like=True)
+
+
+@pytest.mark.real_data
+def test_split_into_study(real_cfg, known_replicates_df):
+    # GIVEN: Expected output from legacy workflow
+    exp_df = pd.read_csv(RealData() / "production_outputs/concordance/StudySampleKnown.csv")
+    exp_tweak = exp_df.set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"]).reindex(
+        ["Concordance", "PI_HAT"], axis=1
+    )
+
+    # WHEN: I split the known replicates into study fraction
+    _, study = sample_concordance._split_into_qc_and_study_samples(real_cfg.ss, known_replicates_df)
+
+    study_tweak = (
+        study.set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
+        .rename(REPORT_NAME_MAPPER, axis=1)
+        .reindex(["Concordance", "PI_HAT"], axis=1)
+    )
+
+    # THEN: Frames should be the same.
+    assert_frame_equal(
+        exp_tweak, study_tweak, check_dtype=False, check_exact=False, check_like=True
+    )

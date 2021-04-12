@@ -1,178 +1,269 @@
 #!/usr/bin/env python
-"""Create tables of sample concordance.
+"""
+Sample Concordance Tables
+-------------------------
 
 This script uses sample concordance based on pairwise IBD estimations. We
 expect samples from the same subject to show high concordance while samples
 from different subjects should not be related. This script outputs 4 tables:
 
-- Known concordant samples (Full Table)
-- Known concordant samples (QC Samples Only)
-- Known concordant samples (Study Samples Only)
-- Unknown concordant samples (Full Table)
+Known Replicates
+++++++++++++++++
+
+- ``sample_level/concordance/KnownReplicates.csv`` (Full Table)
+- ``sample_level/concordance/InternalQcKnown.csv`` (QC Samples Only)
+- ``sample_level/concordance/StudySampleKnown.csv`` (Study Samples Only)
+
+These tables have the following format:
+
+.. csv-table::
+    :header: name, dtype, description
+
+    Subject_ID, string, The Subject_ID for the replicate
+    Sample_ID1, string, Sample_ID1 for the pairwise comparison.
+    Sample_ID2, string, Sample_ID2 for the pairwise comparison.
+    PI_HAT, float, Proportion IBD i.e. ``P(IBD=2) + 0.5*P(IBD=1)``
+    concordance, float, Proportion IBS2 ``IBS2 / (IBS0 + IBS1 + IBS2)``
+    is_ge_pi_hat, boolean, True if PI_HAT was greater than ``software_params.pi_hat_cutoff``
+    is_ge_concordance, boolean, True if concordance was greater than ``software_params.dup_concordance_cutoff``
+
+Unknown Replicates
+++++++++++++++++++
+
+- ``sample_level/concordance/UnknownReplicates.csv`` (Full Table)
+
+This table has the following format:
+
+.. csv-table::
+    :header: name, dtype, description
+
+    Subject_ID1, string, The Subject_ID for ``Sample_ID1``
+    Subject_ID2, string, The Subject_ID for ``Sample_ID2``
+    Sample_ID1, string, Sample_ID1 for the pairwise comparison.
+    Sample_ID2, string, Sample_ID2 for the pairwise comparison.
+    PI_HAT, float, Proportion IBD i.e. ``P(IBD=2) + 0.5*P(IBD=1)``
+    concordance, float, Proportion IBS2 ``IBS2 / (IBS0 + IBS1 + IBS2)``
+    is_ge_pi_hat, boolean, True if PI_HAT was greater than ``software_params.pi_hat_cutoff``
+    is_ge_concordance, boolean, True if concordance was greater than ``software_params.dup_concordance_cutoff``
+
 """
 import os
+from itertools import combinations
 from pathlib import Path
-from typing import Optional
+from typing import List, Tuple
 
 import pandas as pd
 import typer
 
 from cgr_gwas_qc.parsers import sample_sheet
-from cgr_gwas_qc.parsers.plink import read_imiss
+from cgr_gwas_qc.typing import PathLike
+from cgr_gwas_qc.workflow.scripts import concordance_table
 
 app = typer.Typer(add_completion=False)
+
+KNOWN_DTYPES = {
+    "Subject_ID": "string",
+    "Sample_ID1": "string",
+    "Sample_ID2": "string",
+    "PI_HAT": "float",
+    "concordance": "float",
+    "is_ge_pi_hat": "boolean",
+    "is_ge_concordance": "boolean",
+}
+
+UNKNOWN_DTYPES = {
+    "Subject_ID1": "string",
+    "Subject_ID2": "string",
+    "Sample_ID1": "string",
+    "Sample_ID2": "string",
+    "PI_HAT": "float",
+    "concordance": "float",
+    "is_ge_pi_hat": "boolean",
+    "is_ge_concordance": "boolean",
+}
+
+
+def read_known_sample_concordance(filename: os.PathLike) -> pd.DataFrame:
+    """Read the known replicate concordance table.
+
+    Returns:
+        A table with:
+
+        - ``Subject_ID``
+        - ``Sample_ID1``
+        - ``Sample_ID2``
+        - ``PI_HAT``
+        - ``concordance``
+        - ``is_ge_pi_hat``
+        - ``is_ge_concordance``
+    """
+    return pd.read_csv(filename, dtype=KNOWN_DTYPES)
+
+
+def read_unknown_sample_concordance(filename: os.PathLike) -> pd.DataFrame:
+    """Read the unknown replicate concordance table.
+
+    Returns:
+        A table with:
+
+        - ``Subject_ID1``
+        - ``Subject_ID1``
+        - ``Sample_ID1``
+        - ``Sample_ID2``
+        - ``PI_HAT``
+        - ``concordance``
+        - ``is_ge_pi_hat``
+        - ``is_ge_concordance``
+    """
+    return pd.read_csv(filename, dtype=UNKNOWN_DTYPES)
 
 
 @app.command()
 def main(
-    sample_sheet_csv: Path = typer.Argument(..., help="Path to the sample sheet CSV."),
-    imiss: Path = typer.Argument(..., help="Path to the `plink_filter_call_rate_2/samples.imiss`"),
-    concordance: Path = typer.Argument(..., help="Path to the `ibd/samples.genome` file."),
-    known: Path = typer.Argument(..., help="Path to save known concordant samples."),
-    known_qc: Path = typer.Argument(..., help="Path to save known concordant internal QC samples."),
-    known_study: Path = typer.Argument(..., help="Path to save known concordant study samples."),
-    unknown: Path = typer.Argument(..., help="Path to save unknown condorant samples."),
-    concordance_threshold: float = typer.Argument(
-        ..., help="The concordance threshold for samples from different subjects."
-    ),
-    subject_id_override: Optional[str] = typer.Argument(
-        None,
-        help="Specify which column corresponds to subjects. [Deprecated: Use the `Group_By` column sample sheet]",
-    ),
+    sample_sheet_csv: Path,
+    concordance_csv: Path,
+    known_csv: Path,
+    known_qc_csv: Path,
+    known_study_csv: Path,
+    unknown_csv: Path,
 ):
-    ################################################################################
-    # Pairwise sample concordance + sample metadata
-    ################################################################################
-    sample_concordance = pd.read_csv(concordance).rename(
-        {"ID1": "Sample_ID1", "ID2": "Sample_ID2"}, axis=1
+    # Load sample metadata
+    ss = sample_sheet.read(sample_sheet_csv)
+    known_replicates = _get_known_replicates(ss)
+    sample_to_subject_id = ss.set_index("Sample_ID").Group_By_Subject_ID.rename("Subject_ID")
+
+    # Load sample level concordance information
+    concordance = _read_concordance_csv(concordance_csv)
+
+    # Get sample concordance for known and unknown replicates
+    known_df = _known_replicates_df(concordance, known_replicates, sample_to_subject_id)
+    unknown_df = _unknown_replicates_df(concordance, known_replicates, sample_to_subject_id)
+
+    # Save full tables
+    known_df.to_csv(known_csv, index=False)
+    unknown_df.to_csv(unknown_csv, index=False)
+
+    # Split known replicates into internal controls and study samples
+    known_qc, known_study = _split_into_qc_and_study_samples(ss, known_df)
+    known_qc.to_csv(known_qc_csv, index=False)
+    known_study.to_csv(known_study_csv, index=False)
+
+
+def _read_concordance_csv(concordance_csv: PathLike) -> pd.DataFrame:
+    """Read the concordance table and wrangle for easy query.
+
+    Here is where I sort IDs alphabetically so that ``Sample_ID1`` is before
+    ``Sample_ID2``.
+    """
+
+    def _assign_sample_id(x: pd.Series):
+        """Sort IDs alphabetically."""
+        x["Sample_ID1"], x["Sample_ID2"] = sorted([x.ID1, x.ID2])
+        return x
+
+    return (
+        concordance_table.read(concordance_csv)
+        .apply(_assign_sample_id, axis=1)
+        .drop(["ID1", "ID2"], axis=1)
     )
-    sample_metadata = _read_sample_metadata(sample_sheet_csv, imiss, subject_id_override)
-
-    # Add metadata for Sample 1 and Sample 2 in pairwise table
-    df = sample_concordance.merge(
-        sample_metadata.add_suffix("1"), on="Sample_ID1", how="left"
-    ).merge(sample_metadata.add_suffix("2"), on="Sample_ID2", how="left")
-
-    ################################################################################
-    # Save Known Concordant Samples
-    # (i.e., samples from the same subject)
-    ################################################################################
-    # Full Table
-    known_df = _create_known_concordant_table(df)
-    known_df.to_csv(known, index=False)  # Full table
-
-    # QC samples only
-    qc_subjects = sample_metadata.query("Sample_Group == 'sVALD-001'").Subject_ID.values  # noqa
-    known_df.query("Subject_ID in @qc_subjects").to_csv(known_qc, index=False)
-
-    # Study samples only
-    known_df.query("Subject_ID not in @qc_subjects").to_csv(known_study, index=False)
-
-    ################################################################################
-    # Save Unknown Concordant Samples
-    # (i.e., highly concordant samples from different subjects)
-    ################################################################################
-    unknown_df = _create_unknown_concordant_table(df, concordance_threshold)
-    unknown_df.to_csv(unknown, index=False)
 
 
-def read_known_concordance_table(filename: os.PathLike) -> pd.DataFrame:
-    dtypes = {
-        "Subject_ID": "string",
-        "Sample_ID1": "string",
-        "Sample_ID2": "string",
-        "concordance": "float",
-        "PI_HAT": "float",
-    }
-    return pd.read_csv(filename, dtype=dtypes)
+def _get_known_replicates(ss: pd.DataFrame) -> List[Tuple[str, str]]:
+    """Create list of pairwise combinations of know replicates.
+
+    This function creates a list of all pairwise combinations of replicate
+    IDs. It does this using the following logic::
+
+    - Subset each set of replicates
+    - Add all pairwise combinations of replicate IDs to a list
+
+    The ``cgr_sample_sheet.csv`` has a column ``replicate_ids`` which
+    contains, for each subject, all of the replicate IDs concatenated together (i.e.,
+    "ID1|ID2|ID3"). If there are no replicates than it is ``NA``. When I
+    group by ``replicate_ids``, I am essentially subseting subjects that have
+    a replicate. I then create all pairwise combinations and add them to a
+    list.
+
+    I also make sure to sort ID pairs alphabetically to match the concordance
+    table ID order.
+    """
+    known_replicates = []  # type: ignore
+    for _, dd in ss.groupby("replicate_ids"):
+        known_replicates.extend(combinations(dd.Sample_ID.sort_values(), 2))
+    return known_replicates
 
 
-def read_unknown_concordance_table(filename: os.PathLike) -> pd.DataFrame:
-    dtypes = {
-        "Subject_ID1": "string",
-        "Subject_ID2": "string",
-        "Sample_ID1": "string",
-        "Sample_ID2": "string",
-        "concordance": "float",
-        "PI_HAT": "float",
-    }
-    return pd.read_csv(filename, dtype=dtypes)
-
-
-def _read_sample_metadata(
-    sample_sheet_csv: Path, call_rate: Path, subject_id_override: Optional[str] = None
+def _known_replicates_df(
+    concordance: pd.DataFrame, known_replicates: List, sample_to_subject_id: pd.Series
 ) -> pd.DataFrame:
-    """Read in sample metadata from sample sheet and call rates.
+    """Filter concordance table for known replicates.
 
-    Returns:
-        DataFrame with ["Sample_ID", "Subject_ID", "Sample_Group", "call_rate"]
+    Pulls known replicate samples from the concordance table. If a replicate
+    pair is missing they are filled in as NA.
     """
+    if len(known_replicates) == 0:
+        # No known replicates
+        return pd.DataFrame([], columns=KNOWN_DTYPES.keys())
+
+    res = []
+    for s1, s2 in known_replicates:
+        query = concordance.query("Sample_ID1 == @s1 & Sample_ID2 == @s2")
+        if query.shape[0] > 0:
+            res.append(query)
+        else:
+            # The known replicate pair is missing. This could be due to:
+            #   - a sample being removed during call rate filtering
+            #   - a pair being pre-filtered because of low concordance (i.e.,
+            #     `software_params.ibd_pi_hat_min` [default <= 0.05])
+            #   - a pair being pre-filtered because of high concordance (i.e.,
+            #     `software_params.ibd_pi_hat_max` [default >= 1.0]). This is less
+            #     likely b/c the default is at the upper bound of `PI_HAT`.
+            res.append(pd.DataFrame({"Sample_ID1": [s1], "Sample_ID2": [s2]}))
+
     return (
-        sample_sheet.read(sample_sheet_csv)
-        .merge(_read_imiss_file(call_rate), how="left", left_on="Sample_ID", right_index=True)
-        .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
-        .reindex(["Sample_ID", "Subject_ID", "Sample_Group", "call_rate"], axis=1)
+        pd.concat(res, ignore_index=True)
+        .merge(sample_to_subject_id, left_on="Sample_ID1", right_index=True)
+        .reset_index()
+        .reindex(KNOWN_DTYPES.keys(), axis=1)
     )
 
 
-def _read_imiss_file(file_name: Path) -> pd.Series:
-    """Read imiss file and calculate call rate.
+def _unknown_replicates_df(
+    concordance: pd.DataFrame, known_replicates: List, sample_to_subject_id: pd.Series
+) -> pd.DataFrame:
+    """Filter concordance table for unknown replicates.
 
-    Returns:
-        Series (Sample_ID, call_rate) where call_rate is 1 - F_MISS.
+    Pulls unknown replicate samples from the concordance table. These are
+    samples that show high levels of concordance but have different
+    Subject_IDs.
     """
+
+    def _check(x: pd.Series) -> bool:
+        """Test sample pairs.
+
+        Identify sample pairs that are greater than concordance threshold and
+        not a known replicate.
+        """
+        s1, s2 = x.Sample_ID1, x.Sample_ID2
+        return x.is_ge_concordance & ((s1, s2) not in known_replicates)
+
+    mask = concordance.apply(_check, axis=1)
+    unknown_replicates = concordance[mask]
+
     return (
-        read_imiss(file_name)
-        .rename_axis("Sample_ID")
-        .assign(call_rate=lambda df: 1.0 - df.F_MISS)
-        .call_rate
+        unknown_replicates.merge(
+            sample_to_subject_id.rename("Subject_ID1"), left_on="Sample_ID1", right_index=True
+        )
+        .merge(sample_to_subject_id.rename("Subject_ID2"), left_on="Sample_ID2", right_index=True)
+        .reindex(UNKNOWN_DTYPES.keys(), axis=1)
     )
 
 
-def _create_known_concordant_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Save samples known to be from the same subject.
-
-    - If missing PI_HAT estimates set defaults (PI_HAT = 0.05, concordance =
-      min concordance)
-    - If either sample missing call rate then set (PI_HAT and concordance to
-      Nan)
-
-    Returns:
-        DataFrame with ["Subject_ID", "Sample_ID1", "Sample_ID2",
-          "concordance", "PI_HAT"]
-    """
-    _df = df.copy()
-
-    missing_pi_hat = _df.PI_HAT.isna()
-    _df.loc[missing_pi_hat, "PI_HAT"] = 0.05
-    _df.loc[missing_pi_hat, "concordance"] = min(1.0, _df.concordance.min())
-
-    missing_call_rate = _df.call_rate1.isna() | _df.call_rate2.isna()
-    _df.loc[missing_call_rate, "PI_HAT"] = "NA"
-    _df.loc[missing_call_rate, "concordance"] = "NA"
-
-    return (
-        _df.query("Subject_ID1 == Subject_ID2")
-        .rename({"Subject_ID1": "Subject_ID"}, axis=1)
-        .loc[:, ("Subject_ID", "Sample_ID1", "Sample_ID2", "concordance", "PI_HAT")]
-    )
-
-
-def _create_unknown_concordant_table(
-    df: pd.DataFrame, dup_concordance_cutoff: float
-) -> pd.DataFrame:  # noqa
-    """Identify concordant samples from different subjects.
-
-    1. Samples have different subject IDs
-    2. Sample concordance is > `dup_concordance_cutoff`
-
-    Returns:
-        DataFrame with ["Subject_ID1", "Subject_ID2", "Sample_ID1",
-        "Sample_ID2", "concordance", "PI_HAT"]
-    """
-    return df.query("Subject_ID1 != Subject_ID2 & concordance > @dup_concordance_cutoff").loc[
-        :, ("Subject_ID1", "Subject_ID2", "Sample_ID1", "Sample_ID2", "concordance", "PI_HAT")
-    ]
+def _split_into_qc_and_study_samples(
+    ss: pd.DataFrame, df: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    qc_samples = ss.Sample_ID[ss.is_internal_control].tolist()  # type: ignore # noqa
+    return df.query("Sample_ID1 in @qc_samples"), df.query("Sample_ID1 not in @qc_samples")
 
 
 if __name__ == "__main__":
@@ -180,7 +271,6 @@ if __name__ == "__main__":
         defaults = {"subject_id_override": None}
         defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
         defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
-        defaults.update(snakemake.params)  # type: ignore # noqa
         main(**defaults)
     else:
         app()

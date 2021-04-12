@@ -110,6 +110,12 @@ def fake_cfg(tmp_path_factory) -> ConfigMgr:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
+def fake_sample_sheet_csv(fake_cfg: ConfigMgr) -> Path:
+    return fake_cfg.root / "cgr_sample_sheet.csv"
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
 def real_cfg(tmp_path_factory, pytestconfig) -> ConfigMgr:
     """Real Data config manager object."""
     if not pytestconfig.getoption("--real-data"):
@@ -122,6 +128,12 @@ def real_cfg(tmp_path_factory, pytestconfig) -> ConfigMgr:
         cfg = load_config(pytest=True)
 
     return cfg
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def real_sample_sheet_csv(real_cfg: ConfigMgr) -> Path:
+    return real_cfg.root / "cgr_sample_sheet.csv"
 
 
 @pytest.mark.real_data
@@ -142,9 +154,37 @@ def real_cfg_short(tmp_path_factory, pytestconfig) -> ConfigMgr:
     return cfg
 
 
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def real_short_sample_sheet_csv(real_cfg_short: ConfigMgr) -> Path:
+    return real_cfg_short.root / "cgr_sample_sheet.csv"
+
+
 ##################################################################################
 # New Workflow Outputs
 ##################################################################################
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def sample_concordance_table_csv(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
+    """Creates the sample level concordance table."""
+    from cgr_gwas_qc.workflow.scripts import concordance_table
+
+    # GIVEN: Real lmiss files, a fake mapping of array IDs to 1kg rsIDs, and an
+    # outfile.
+    tmp_path = tmp_path_factory.mktemp("sample_concordance")
+    outfile = tmp_path / "sample_concordance_table.csv"
+
+    data_cache = RealData()
+    concordance_table.main(
+        data_cache / "production_outputs/ibd/samples.genome",
+        real_cfg.config.software_params.dup_concordance_cutoff,
+        real_cfg.config.software_params.pi_hat_threshold,
+        outfile,
+    )
+
+    return outfile
+
+
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
 def snp_qc(tmp_path_factory) -> Path:

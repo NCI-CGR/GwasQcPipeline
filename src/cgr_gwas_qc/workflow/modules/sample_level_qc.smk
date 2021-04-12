@@ -198,29 +198,20 @@ if (
 # Sample/Replicate Concordance
 ################################################################################
 rule sample_concordance_plink:
-    """Summarize sample concordance using IBS/IBD.
+    """Summarize sample concordance.
 
-    Calculates the proportion of shared homozygous markers (IBS2 / (IBS0 + IBS1 + IBS2)) as a
-    measure of sample concordance. Then outputs concordance measures for samples that are known
-    to be replicates and samples that are thought to be unrelated/independent with a concordance
-    > dup_concordance_cutoff (currently 0.95).
-
-    PLINK's IBD approximation does not account for LD, so you must use MAF
-    filtered and LD pruned SNPs.
+    Splits the concordance table into known and unknown replicates.
     """
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
-        imiss="sample_level/call_rate_2/samples.imiss",
-        concordance="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.concordance.csv".format(
+        concordance_csv="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.concordance.csv".format(
             maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
-    params:
-        concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
     output:
-        known="sample_level/concordance/KnownReplicates.csv",
-        known_qc="sample_level/concordance/InternalQcKnown.csv",
-        known_study="sample_level/concordance/StudySampleKnown.csv",
-        unknown="sample_level/concordance/UnknownReplicates.csv",
+        known_csv="sample_level/concordance/KnownReplicates.csv",
+        known_qc_csv="sample_level/concordance/InternalQcKnown.csv",
+        known_study_csv="sample_level/concordance/StudySampleKnown.csv",
+        unknown_csv="sample_level/concordance/UnknownReplicates.csv",
     script:
         "../scripts/sample_concordance.py"
 
