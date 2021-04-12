@@ -19,7 +19,6 @@ def sample_qc_table(tmp_path_factory) -> Path:
     tmp_path = tmp_path_factory.mktemp("sample_level_summary")
     (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .copy("production_outputs/plink_start/samples_start.imiss", "sample_level/samples.imiss")
         .copy(
@@ -54,10 +53,8 @@ def sample_qc_table(tmp_path_factory) -> Path:
             "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
             "sample_level/median_idat_intensity.csv",
         )
-        .make_config(
-            workflow_params={"subject_id_to_use": "PI_Subject_ID"},
-            software_params={"contam_threshold": 0.2},
-        )
+        .make_config(software_params={"contam_threshold": 0.2})
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -109,6 +106,8 @@ def test_sample_qc_table(sample_qc_table):
         "subject_dropped_from_study",  # New column
         "case_control",  # New column
         "is_pass_sample_qc",  # New column
+        "is_sample_exclusion",  # New column
+        "replicate_ids",  # New column
     ]
 
     obs_ = (
@@ -150,7 +149,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_table):
     # GIVEN: real data sample sheet, config, and sample_qc_summary table.
     (
         RealData(tmp_path)
-        .copy_sample_sheet()
+        .make_cgr_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -184,7 +183,7 @@ def test_qc_failures(tmp_path, sample_qc_table):
     # GIVEN: real data sample sheet, config, and sample_qc_summary table.
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
+        .make_cgr_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .make_snakefile(
@@ -241,7 +240,7 @@ def test_remove_contaminated(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
+        .make_cgr_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .copy(
@@ -305,7 +304,7 @@ def test_remove_contaminated_add_contam_samples(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
+        .make_cgr_sample_sheet()
         .add_user_files(entry_point="gtc", copy=False)
         .make_config()
         .copy(

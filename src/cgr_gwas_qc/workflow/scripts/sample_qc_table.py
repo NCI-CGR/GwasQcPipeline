@@ -22,8 +22,7 @@ import pandas as pd
 import typer
 
 from cgr_gwas_qc.models.config.user_files import Idat
-from cgr_gwas_qc.parsers import plink
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers import plink, sample_sheet
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.validators import check_file
 from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
@@ -31,48 +30,40 @@ from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
 app = typer.Typer(add_completion=False)
 
 
-QC_HEADER = {  # Header for main QC table
-    # From Sample Sheet
+DTYPES = {  # Header for main QC table
     "Sample_ID": "string",
     "Group_By_Subject_ID": "string",
-    "LIMSSample_ID": "string",
-    "LIMS_Individual_ID": "string",
-    "SR_Subject_ID": "string",
-    "PI_Subject_ID": "string",
-    "PI_Study_ID": "string",
-    "Project": "string",
-    "Project-Sample ID": "string",
-    # Generated here
     "num_samples_per_subject": "UInt8",
-    "is_internal_control": "boolean",
+    "is_subject_representative": "boolean",
+    "subject_dropped_from_study": "boolean",
     "case_control": CASE_CONTROL_DTYPE,
-    "is_preflight_exclusion": "boolean",
+    "is_internal_control": "boolean",
+    "is_sample_exclusion": "boolean",
     "idats_exist": "boolean",
+    "Call_Rate_Initial": "float",
+    "Call_Rate_1": "float",
+    "Call_Rate_2": "float",
+    "is_cr1_filtered": "boolean",
+    "is_cr2_filtered": "boolean",
+    "is_call_rate_filtered": "boolean",
+    "IdatIntensity": "float",
+    "Contamination_Rate": "float",
+    "is_contaminated": "boolean",
+    "replicate_ids": "string",
+    "is_replicate_discordant": "boolean",
+    "is_unexpected_replicate": "boolean",
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
     "X_inbreeding_coefficient": "float",
-    "IdatIntensity": "float",
+    "is_sex_discordant": "boolean",
     "AFR": "float",
     "EUR": "float",
     "ASN": "float",
     "Ancestry": "category",
-    "Contamination_Rate": "float",
-    "Call_Rate_Initial": "float",
-    "is_cr1_filtered": "boolean",
-    "Call_Rate_1": "float",
-    "is_cr2_filtered": "boolean",
-    "Call_Rate_2": "float",
-    "is_call_rate_filtered": "boolean",
-    "is_contaminated": "boolean",
-    "is_sex_discordant": "boolean",
-    "is_replicate_discordant": "boolean",
-    "is_unexpected_replicate": "boolean",
     "Count_of_QC_Issue": "UInt8",
+    "is_pass_sample_qc": "boolean",
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
-    "is_pass_sample_qc": "boolean",
-    "is_subject_representative": "boolean",
-    "subject_dropped_from_study": "boolean",
 }
 
 
@@ -98,7 +89,7 @@ IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run
 
 @app.command()
 def main(
-    sample_sheet: Path = typer.Argument(..., help="Path to the sample sheet"),
+    sample_sheet_csv: Path = typer.Argument(..., help="Path to the sample sheet"),
     imiss_start: Path = typer.Argument(..., help="Path to plink_start/samples.imiss"),
     imiss_cr1: Path = typer.Argument(..., help="Path to plink_filter_call_rate_1/samples.imiss"),
     imiss_cr2: Path = typer.Argument(..., help="Path to plink_filter_call_rate_2/samples.imiss"),
@@ -116,24 +107,14 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Params
-    expected_sex_col_name: str = typer.Option(
-        ..., help="Name of the column in the sample sheet that contains sex information."
-    ),
     idat_pattern: Idat = typer.Option(..., help="Idat file name patterns."),
     dup_concordance_cutoff: float = typer.Option(..., help="Threshold for duplicate concordance."),
     contam_threshold: float = typer.Option(..., help="Threshold for contamination."),
-    subject_id_to_use: Optional[str] = typer.Option(
-        None, help="Select a specific column to use for Subject_ID"
-    ),
-    Sample_IDs_to_remove: Optional[Sequence[str]] = typer.Option(
-        None, help="List of Sample IDs that failed array processing."
-    ),
     # Outputs
     outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
 
-    sample_sheet_df = SampleSheet(sample_sheet).add_group_by_column(subject_id_to_use).data
-    ss = _wrangle_sample_sheet(sample_sheet_df, expected_sex_col_name)
+    ss = sample_sheet.read(sample_sheet_csv, remove_exclusions=False).set_index("Sample_ID")
     Sample_IDs = ss.index
 
     ################################################################################
@@ -143,7 +124,6 @@ def main(
         pd.concat(
             [
                 ss,
-                _check_preflight(Sample_IDs_to_remove, Sample_IDs),
                 _check_idats_files(ss, idat_pattern),
                 _read_imiss(imiss_start, Sample_IDs, "Call_Rate_Initial"),
                 _read_imiss(imiss_cr1, Sample_IDs, "Call_Rate_1"),
@@ -191,80 +171,7 @@ def read_sample_qc(filename: os.PathLike) -> pd.DataFrame:
         pd.DataFrame:
             Assigning specific data types for optimal parsing.
     """
-    return pd.read_csv(filename, dtype=QC_HEADER)
-
-
-def _wrangle_sample_sheet(sample_sheet: pd.DataFrame, expected_sex_col_name: str) -> pd.DataFrame:
-    """Identify expected sex column and count number samples per subject.
-
-    Users can specify which column in the `sample_sheet` holds the expected
-    sex information (`config.workflow_params.expected_sex_col_name`). Here we
-    rename `expected_sex_col_name` to `expected_sex`.
-
-    We also add the summary column with the number of `Sample_ID`s per
-    `Group_By_Subject_ID`.
-
-    Returns:
-        pd.DataFrame: The full sample sheet with the following adjustments.
-            - Sample_ID (pd.Index)
-            - num_samples_per_subject (int): Number of samples per
-              `Group_By_Subject_ID`.
-            - expected_sex (category): M/F/U based on the expected set column
-              set in the config.
-            - case_control (category): case/control/qc based on the
-              Case/Control_Status in the sample sheet.
-    """
-    df = sample_sheet.copy()
-
-    df["is_internal_control"] = (df.Sample_Group == "sVALD-001").astype("boolean")
-
-    sex_mapper = {"m": "M", "male": "M", "f": "F", "female": "F"}
-    df["expected_sex"] = (
-        df[expected_sex_col_name]
-        .str.lower()
-        .map(lambda sex: sex_mapper.get(sex, "U"))
-        .astype(SEX_DTYPE)
-    )
-
-    case_control_mapper = {cat.lower(): cat for cat in CASE_CONTROL_DTYPE.categories}
-    df["case_control"] = (
-        df["Case/Control_Status"]
-        .str.lower()
-        .map(lambda status: case_control_mapper.get(status, "Unknown"))
-        .astype(CASE_CONTROL_DTYPE)
-    )
-
-    # For internal controls use the `Indentifiler_Sex` column as `expected_sex`
-    df.loc[df.is_internal_control, "expected_sex"] = df.loc[
-        df.is_internal_control, "Identifiler_Sex"
-    ]
-
-    # For internal controls set case_control to qc
-    df.loc[df.is_internal_control, "case_control"] = case_control_mapper["qc"]
-
-    # Count the number of samples per subject ID and set Sample_ID as index
-    return df.merge(
-        df.groupby("Group_By_Subject_ID", dropna=False).size().rename("num_samples_per_subject"),
-        on="Group_By_Subject_ID",
-    ).set_index("Sample_ID")
-
-
-def _check_preflight(samples_to_remove: Optional[Sequence[str]], Sample_IDs: pd.Index) -> pd.Series:
-    """Checks if any samples were flagged during pre-flight checks.
-
-    Pre-flight checks save samples with missing GTC or IDAT files to the
-    config file. This adds a column to the sample_qc table to indicate if a
-    sample was excluded due to pre-flight checks.
-    """
-    if samples_to_remove is None:
-        return pd.Series(False, index=Sample_IDs, name="is_preflight_exclusion", dtype="boolean")
-
-    return pd.Series(
-        Sample_IDs.isin(samples_to_remove),
-        index=Sample_IDs,
-        name="is_preflight_exclusion",
-        dtype="boolean",
-    )
+    return pd.read_csv(filename, dtype=DTYPES)
 
 
 def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Series:
@@ -628,7 +535,7 @@ def _find_study_subject_with_no_representative(sample_qc: pd.DataFrame) -> pd.Se
 
 def _save_qc_table(sample_qc: pd.DataFrame, file_name: Path) -> None:
     """Save main QC table."""
-    sample_qc.reindex(QC_HEADER, axis=1).to_csv(file_name, index=False)
+    sample_qc.reindex(DTYPES, axis=1).to_csv(file_name, index=False)
 
 
 if __name__ == "__main__":

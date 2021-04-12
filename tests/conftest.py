@@ -2,13 +2,11 @@ import os
 from pathlib import Path
 
 import pandas as pd
-import pysam
 import pytest
 
 from cgr_gwas_qc import load_config
-from cgr_gwas_qc.models.config import Config, Idat, SoftwareParams, WorkflowParams
-from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.config import ConfigMgr
+from cgr_gwas_qc.models.config import Idat, SoftwareParams
 from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.conda import CondaEnv
 from cgr_gwas_qc.testing.data import FakeData, RealData
@@ -74,110 +72,6 @@ def conda_envs() -> CondaEnv:
     return CondaEnv()
 
 
-@pytest.fixture(autouse=True)
-def change_default_behavior_of_ConfigMgr(monkeypatch):
-    """Monkeypatch the ``ConfigMgr.instance()`` method.
-
-    The ``ConfigMgr`` is designed to create only a single instance. If a
-    ``ConfigMgr`` object already exists in the python session it should just
-    return that object. This is important to make sure we only have one
-    ``ConfigMgr`` object when running the workflow. However, when testing we
-    want to create a new object for each test because they all have different
-    working directories and configs. Here I monkeypatch the
-    ``ConfigMgr.instance()`` method to change it so it always returns a new
-    ``ConfigMgr`` object.
-    """
-    from cgr_gwas_qc.config import ConfigMgr, find_configs
-
-    def mock_instance(*args, **kwargs):
-        return ConfigMgr(*find_configs(), **kwargs)
-
-    monkeypatch.setattr(ConfigMgr, "instance", mock_instance)
-
-
-@pytest.fixture
-def qsub(monkeypatch):
-    """Adds the mock version of qsub/qstat/qacct to the path."""
-    qsub_dir = Path("tests/data/scripts").resolve().as_posix()
-    monkeypatch.setenv("PATH", qsub_dir, prepend=os.pathsep)
-
-
-##################################################################################
-# Small Test Data (Fake)
-##################################################################################
-@pytest.fixture(scope="session")
-def idat_file() -> Path:
-    """Returns the path to a test idat file."""
-    return Path("tests/data/illumina/idat/small_intensity.idat").absolute()
-
-
-@pytest.fixture(scope="session")
-def gtc_file() -> Path:
-    """Returns the path to a test gtc file."""
-    return Path("tests/data/illumina/gtc/small_genotype.gtc").absolute()
-
-
-@pytest.fixture(scope="session")
-def gtc(gtc_file) -> GenotypeCalls:
-    """Returns an ``Illumina.GenotypeCalls`` object."""
-    return GenotypeCalls(gtc_file)
-
-
-@pytest.fixture(scope="session")
-def vcf_file() -> Path:
-    """Returns the path to a test vcf file."""
-    return Path("tests/data/1KG/small_1KG.vcf.gz").absolute()
-
-
-@pytest.fixture(scope="session")
-def bpm_file():
-    """Returns the path to a test bpm file."""
-    return Path("tests/data/illumina/bpm/small_manifest.bpm").absolute()
-
-
-@pytest.fixture(scope="session")
-def bpm(bpm_file) -> BeadPoolManifest:
-    """Returns an ``Illumina.BeadPoolManifest`` object."""
-    return BeadPoolManifest(bpm_file)
-
-
-@pytest.fixture(scope="session")
-def sample_sheet_file() -> Path:
-    """Returns the path to a test sample sheet."""
-    return Path("tests/data/example_sample_sheet.csv").absolute()
-
-
-@pytest.fixture
-def sample_sheet(sample_sheet_file) -> pd.DataFrame:
-    """FAke Data sample sheet (4 samples)."""
-    return SampleSheet(sample_sheet_file).add_group_by_column().data
-
-
-@pytest.fixture(scope="session")
-def fake_config(tmp_path_factory) -> Config:
-    """Fake Data config assuming GTC entrypoint."""
-    tmp_path = tmp_path_factory.mktemp("fake_config")
-
-    (FakeData(tmp_path).add_user_files("gtc").make_config())
-
-    with chdir(tmp_path):
-        cfg = load_config()
-
-    return cfg.config
-
-
-@pytest.fixture(scope="session")
-def bim_file() -> Path:
-    """Returns the path to a test bpm file."""
-    return Path("tests/data/plink/samples.bim").absolute()
-
-
-@pytest.fixture(scope="session")
-def vcf(vcf_file) -> pysam.VariantFile:
-    """Returns a ``pysam.VariantFile``."""
-    return pysam.VariantFile(vcf_file, "r")
-
-
 @pytest.fixture(scope="session")
 def vcf_mock():
     from cgr_gwas_qc.parsers.vcf import VcfFile
@@ -192,52 +86,64 @@ def vcf_mock():
     return VcfFileMock
 
 
-##################################################################################
-# Test Data (Real)
-##################################################################################
-@pytest.mark.real_data
 @pytest.fixture
-def sample_sheet_short(pytestconfig) -> pd.DataFrame:
-    """Real Data short sample sheet (2 samples)."""
-    if not pytestconfig.getoption("--real-data"):
-        pytest.skip("No real data")
-
-    return SampleSheet(RealData() / "original_data/manifest_short.csv").add_group_by_column().data
+def qsub(monkeypatch):
+    """Adds the mock version of qsub/qstat/qacct to the path."""
+    qsub_dir = Path("tests/data/scripts").resolve().as_posix()
+    monkeypatch.setenv("PATH", qsub_dir, prepend=os.pathsep)
 
 
-@pytest.mark.real_data
-@pytest.fixture
-def sample_sheet_full(pytestconfig) -> pd.DataFrame:
-    """Real Data full sample sheet (203 samples)."""
-    if not pytestconfig.getoption("--real-data"):
-        pytest.skip("No real data")
+##################################################################################
+# Configuration
+##################################################################################
+@pytest.fixture(scope="session")
+def fake_cfg(tmp_path_factory) -> ConfigMgr:
+    """Fake Data config manager object."""
+    tmp_path = tmp_path_factory.mktemp("fake_config")
+    FakeData(tmp_path).add_user_files(entry_point="gtc").make_config().make_cgr_sample_sheet()
 
-    return SampleSheet(RealData() / "original_data/manifest_full.csv").add_group_by_column().data
+    with chdir(tmp_path):
+        cfg = load_config(pytest=True)
+
+    return cfg
 
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def real_config(tmp_path_factory, pytestconfig) -> Config:
-    """Real Data config assuming GTC entrypoint."""
+def real_cfg(tmp_path_factory, pytestconfig) -> ConfigMgr:
+    """Real Data config manager object."""
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
     tmp_path = tmp_path_factory.mktemp("real_config")
-
-    (
-        RealData(tmp_path)
-        .add_user_files("gtc")
-        .make_config(workflow_params={"subject_id_to_use": "PI_Subject_ID"})
-    )
+    RealData(tmp_path).make_config().make_cgr_sample_sheet()
 
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
 
-    return cfg.config
+    return cfg
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def real_cfg_short(tmp_path_factory, pytestconfig) -> ConfigMgr:
+    """Real Data config manager object with IDAT/GTC files."""
+    if not pytestconfig.getoption("--real-data"):
+        pytest.skip("No real data")
+
+    tmp_path = tmp_path_factory.mktemp("real_config_short")
+    RealData(tmp_path, full_sample_sheet=False).add_user_files(
+        entry_point="gtc"
+    ).make_config().make_cgr_sample_sheet()
+
+    with chdir(tmp_path):
+        cfg = load_config(pytest=True)
+
+    return cfg
 
 
 ##################################################################################
-# Update QC Summary Table
+# New Workflow Outputs
 ##################################################################################
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
@@ -282,7 +188,7 @@ def snp_qc_df(snp_qc) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc(tmp_path_factory) -> Path:
+def sample_qc(real_cfg, tmp_path_factory) -> Path:
     """The Sample QC table.
 
     Return:
@@ -297,11 +203,10 @@ def sample_qc(tmp_path_factory) -> Path:
     outfile = tmp_path / "sample_qc.csv"
 
     data_cache = RealData(tmp_path)
-    workflow_params = WorkflowParams()
     software_params = SoftwareParams()
 
     sample_qc_table.main(
-        data_cache / "original_data/manifest_full.csv",
+        real_cfg.root / "cgr_sample_sheet.csv",
         data_cache / "production_outputs/plink_start/samples_start.imiss",
         data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss",
         data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
@@ -311,7 +216,6 @@ def sample_qc(tmp_path_factory) -> Path:
         data_cache / "production_outputs/concordance/UnknownReplicates.csv",
         data_cache / "production_outputs/all_contam/contam.csv",
         data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-        workflow_params.expected_sex_col_name,
         Idat(
             red=data_cache._data_path.as_posix()
             + "/original_data/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
@@ -320,8 +224,6 @@ def sample_qc(tmp_path_factory) -> Path:
         ),
         software_params.dup_concordance_cutoff,
         0.2,
-        "PI_Subject_ID",
-        list(),
         outfile,
     )
 
@@ -338,7 +240,7 @@ def sample_qc_df(sample_qc) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def population_qc(real_config, tmp_path_factory) -> Path:
+def population_qc(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
     """The Population QC table.
 
     Return:
@@ -360,7 +262,7 @@ def population_qc(real_config, tmp_path_factory) -> Path:
         autosomal_het=data_cache
         / "production_outputs/autosomal_heterozygosity/EUR_subjects_qc.het",
         population="EUR",
-        threshold=real_config.software_params.autosomal_het_threshold,
+        threshold=real_cfg.config.software_params.autosomal_het_threshold,
         outfile=outfile,
     )
 

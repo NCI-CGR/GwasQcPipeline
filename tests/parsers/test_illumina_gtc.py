@@ -1,4 +1,18 @@
 import numpy as np
+import pytest
+
+from cgr_gwas_qc.parsers.illumina import BeadPoolManifest, GenotypeCalls
+from cgr_gwas_qc.testing.data import FakeData
+
+
+@pytest.fixture(scope="module")
+def bpm():
+    return BeadPoolManifest(FakeData._data_path / FakeData._illumina_manifest_file)
+
+
+@pytest.fixture(scope="module")
+def gtc():
+    return GenotypeCalls(FakeData._data_path / FakeData._test_gtc)
 
 
 ################################################################################

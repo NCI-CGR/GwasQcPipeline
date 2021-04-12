@@ -2,14 +2,40 @@
 import re
 from io import StringIO
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import pandas as pd
 
+from cgr_gwas_qc.reporting.constants import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.typing import PathLike
 
+DTYPES = {
+    "Sample_ID": "string",
+    "Group_By_Subject_ID": "string",
+    "num_samples_per_subject": "UInt8",
+    "replicate_ids": "string",
+    "expected_sex": SEX_DTYPE,
+    "case_control": CASE_CONTROL_DTYPE,
+    "is_internal_control": "boolean",
+    "is_sample_exclusion": "boolean",
+}
 
-class SampleSheet:
+
+def read(
+    filename: PathLike, remove_exclusions: bool = True, all_user_column: bool = True
+) -> pd.DataFrame:
+    df = pd.read_csv(filename, dtype=DTYPES)
+
+    if not all_user_column:
+        df = df.reindex(DTYPES.keys(), axis=1)
+
+    if remove_exclusions:
+        df = df.query("not is_sample_exclusion")
+
+    return df
+
+
+class SampleManifest:
     """An object representation of the Illumina sample sheet.
 
     The Illumina sample sheet is an INI like file with different sections.
@@ -117,43 +143,142 @@ class SampleSheet:
         data_no_extra_breaks = re.sub("\n+", "\n", data_no_empty_rows)
         return data_no_extra_breaks.lstrip()
 
-    def add_group_by_column(self, col_name: Optional[str] = None) -> "SampleSheet":
-        """Select which column in the sample sheet to use for subject grouping.
 
-        This function adds the column `Group_By_Subject_ID` to the sample
-        sheet object. The sample sheet contains multiple columns with subject
-        level information. This selects which column to use for subject
-        grouping. If `col_name` is provided and has a value then this will be
-        used. If the sample sheet has the new `Group_By` column, then this
-        column will be used if it has a value. Finally, the
-        `LIMS_Individual-ID` is used as the default if neither `col_name` or
-        `Group_By` are provided, or if their values are missing. Missing
-        values are common for internal controls. Ideally, the `Group_By`
-        column should be used in the sample sheet.
+def is_sample_manifest(filename: Path) -> bool:
+    text = filename.read_text()
+    return all(["[Header]" in text, "[Manifests]" in text, "[Data]" in text])
 
-        Args:
-            col_name: Typically, this is from the user config.yml
-            (`workflow_params.subject_id_to-use`).
 
-        """
+def update_sample_sheet(
+    df: pd.DataFrame,
+    subject_id_column: str,
+    expected_sex_column: str,
+    case_control_column: str,
+    problem_sample_ids: Optional[Iterable[str]] = None,
+) -> pd.DataFrame:
+    _add_group_by_column(df, subject_id_column)
+    _add_is_internal_control(df)
+    _add_sample_exclusion(df, problem_sample_ids)
+    _update_expected_sex(df, expected_sex_column)
+    _update_case_control(df, case_control_column)
+    return _add_replicate_info(df)
 
-        def _get_subject_id(sr: pd.Series) -> str:
-            if col_name and (col_name in sr.dropna().index):
-                return sr[col_name]
 
-            if "Group_By" in sr.dropna().index:
-                return sr[sr.Group_By]
+def _add_group_by_column(df: pd.DataFrame, subject_id_column: str = "Group_By"):
+    """Select which column in the sample sheet to use for subject grouping.
 
-            return sr["LIMS_Individual_ID"]
+    This function adds the column `Group_By_Subject_ID` to the sample
+    sheet object. The sample sheet contains multiple columns with subject
+    level information. The user defines which column to use in the config
+    ``config.workflow_settings.subject_id_column``.
 
-        self.data["Group_By_Subject_ID"] = self.data.apply(_get_subject_id, axis=1)
+    Recently, Q1 2021, we started adding a column named ``Group_By`` which
+    contains the column name(s) to use for subject grouping. This allows
+    values from multiple columns to be used.
 
-        return self
+    Note::
+        We treat ``LIMS_Individual_ID`` as the default value if other values are missing.
+    """
 
-    def remove_Sample_IDs(self, sample_ids: Optional[Sequence[str]] = None) -> "SampleSheet":
-        if sample_ids:
-            self.data = self.data.query("Sample_ID not in @sample_ids")
-        return self
+    def _get_subject_id(sr: pd.Series) -> str:
+        if "LIMS_Individual_ID" == subject_id_column:
+            return sr[subject_id_column]
+
+        default_id = sr.get("LIMS_Individual_ID", pd.NA)
+        if "Group_By" == subject_id_column:
+            return sr[sr[subject_id_column]] if pd.notna(sr[sr[subject_id_column]]) else default_id
+        return sr[subject_id_column] if pd.notna(sr[subject_id_column]) else default_id
+
+    df["Group_By_Subject_ID"] = df.apply(_get_subject_id, axis=1)
+
+
+def _add_replicate_info(df: pd.DataFrame) -> pd.DataFrame:
+    """Adds information about the number of samples per subject.
+
+    This function adds two columns:
+        - ``num_samples_per_subject`` count of the number of samples per subject
+        - ``replicate_ids`` Concatenated Sample_IDs for samples from the same subject
+    """
+
+    def _replicate_info(x):
+        num_reps = x.shape[0]
+        x["num_samples_per_subject"] = num_reps
+        x["replicate_ids"] = pd.NA
+
+        if num_reps > 1:
+            x["replicate_ids"] = x.Sample_ID.sort_values().str.cat(sep="|")
+
+        return x
+
+    return df.groupby("Group_By_Subject_ID", dropna=False).apply(_replicate_info)
+
+
+def _add_sample_exclusion(df, problem_sample_ids: Optional[Iterable[str]]):
+    df["is_sample_exclusion"] = False
+    if problem_sample_ids:
+        mask = df.Sample_ID.isin(problem_sample_ids)
+        df.loc[mask, "is_sample_exclusion"] = True
+
+
+def _add_is_internal_control(df: pd.DataFrame):
+    """Add a flag if a sample is really an internal control.
+
+    This function adds the column ``is_internal_control`` if it does not
+    already exist. This column is generated based on assumptions about CGRs
+    LIMS sheet. Third party users should create this column separately if
+    they have their own internal controls.
+    """
+    if "is_internal_control" in df.columns:
+        # Column already exists, this would allow people to add their own if they want
+        return
+
+    if "Sample_Group" in df.columns:
+        df["is_internal_control"] = (df.Sample_Group == "sVALD-001").astype("boolean")
+        return
+
+    df["is_internal_control"] = False
+
+
+def _update_expected_sex(df: pd.DataFrame, expected_sex_column: str = "Expected_Sex"):
+    """Normalize sex calls.
+
+    This function creates a new column ``expected_sex`` based on the column
+    provided by the user ``config.workflow_settings.expected_sex_column``.
+    Here we normalize sex values and update sex for internal controls.
+    """
+    sex_mapper = {"m": "M", "male": "M", "f": "F", "female": "F"}
+    df["expected_sex"] = (
+        df[expected_sex_column]
+        .str.lower()
+        .map(lambda sex: sex_mapper.get(sex, "U"))
+        .astype(SEX_DTYPE)
+    )
+
+    if "Identifiler_Sex" in df.columns:
+        # For internal controls use the `Indentifiler_Sex` column as `expected_sex`
+        df.loc[df.is_internal_control, "expected_sex"] = df.loc[
+            df.is_internal_control, "Identifiler_Sex"
+        ]
+
+
+def _update_case_control(df: pd.DataFrame, case_control_column: str = "Case/Control_Status"):
+    """Normalize Case/Control annotations.
+
+    This function creates a new column ``case_control`` based on the column
+    provided by the user ``config.workflow_settings.case_control_column``.
+    Here we normalize labels values and update labels to ``QC`` for internal
+    controls.
+    """
+    case_control_mapper = {cat.lower(): cat for cat in CASE_CONTROL_DTYPE.categories}
+    df["case_control"] = (
+        df[case_control_column]
+        .str.lower()
+        .map(lambda status: case_control_mapper.get(status, "Unknown"))
+        .astype(CASE_CONTROL_DTYPE)
+    )
+
+    # For internal controls set case_control to qc
+    df.loc[df.is_internal_control, "case_control"] = case_control_mapper["qc"]
 
 
 def _strip_terminal_commas(data: str) -> str:

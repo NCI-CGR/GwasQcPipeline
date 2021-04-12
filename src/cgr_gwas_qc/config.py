@@ -1,13 +1,12 @@
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
-from warnings import warn
 
 import pandas as pd
 from snakemake.rules import expand
 
 import cgr_gwas_qc.yaml as yaml
 from cgr_gwas_qc.models.config import Config
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers import sample_sheet
 
 
 class CgrGwasQcConfigError(Exception):
@@ -57,32 +56,27 @@ class ConfigMgr:
     ################################################################################
     # Set-up
     ################################################################################
-    def __init__(self, root: Path, user_config: Path):
+    def __init__(self, root: Path, user_config: Path, sample_sheet_file: Path):
         self.root: Path = root
         self.user_config: Path = user_config
+        self.sample_sheet_file: Path = sample_sheet_file
 
         data = yaml.load(self.user_config)
         self._config = Config.parse_obj(data)
-        self.sample_sheet_file: Path = self.config.sample_sheet
-        self._sample_sheet: Optional[SampleSheet] = None
-
-        try:
-            self._sample_sheet = (
-                SampleSheet(self.sample_sheet_file)
-                .add_group_by_column(self.config.workflow_params.subject_id_to_use)
-                .remove_Sample_IDs(self.config.Sample_IDs_to_remove)
-            )
-        except Exception:
-            warn(f"Sample Sheet: {self.sample_sheet_file} could not be loaded.", RuntimeWarning)
+        self._sample_sheet: pd.DataFrame = sample_sheet.read(self.sample_sheet_file)
 
     @classmethod
-    def instance(cls):
+    def instance(cls, pytest=False):
         """Returns the active ConfigMgr instance.
 
         This ensures that only 1 ConfigMgr is created per python session.
         """
+        if pytest:
+            return cls(*find_cgr_files())
+
         if cls.__instance is None:
-            cls.__instance = cls(*find_configs())
+            cls.__instance = cls(*find_cgr_files())
+
         return cls.__instance
 
     ################################################################################
@@ -95,20 +89,7 @@ class ConfigMgr:
     @property
     def ss(self) -> pd.DataFrame:
         """Access the sample sheet DataFrame."""
-        if self._sample_sheet is None:
-            warn(f"Sample Sheet: {self.sample_sheet_file} was not loaded.", RuntimeWarning)
-            return None
-
-        return self._sample_sheet.data
-
-    @ss.setter
-    def ss(self, value: pd.DataFrame) -> None:
-        """Replace the sample sheet DataFrame."""
-        if self._sample_sheet is None:
-            warn(f"Sample Sheet: {self.sample_sheet_file} was not loaded.", RuntimeWarning)
-            return None
-
-        self._sample_sheet.data = value
+        return self._sample_sheet
 
     ################################################################################
     # Helper functions for snakemake
@@ -195,14 +176,22 @@ def scan_for_yaml(base_dir: Path, name: str) -> Optional[Path]:
     return None
 
 
-def find_configs() -> Tuple[Path, Path]:
+def find_cgr_files() -> Tuple[Path, Path, Path]:
     root = Path.cwd().absolute()
     user_config = scan_for_yaml(root, "config")
+    sample_sheet_file = root / "cgr_sample_sheet.csv"
 
     if user_config is None:
         raise FileNotFoundError("Please run with a `config.yml` in your working directory.")
 
-    return root, user_config
+    if not sample_sheet_file.exists():
+        raise FileNotFoundError(
+            "Missing `cgr_sample_sheet.csv`. "
+            "This file is created during `cgr preflight`, "
+            "please run preflight prior to trying to run the workflow."
+        )
+
+    return root, user_config, sample_sheet_file
 
 
 def config_to_yaml(cfg: Config, yaml_file: str = "config.yml", exclude_none=True, **kwargs) -> None:

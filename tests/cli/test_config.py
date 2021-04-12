@@ -1,9 +1,11 @@
 import pytest
 
 from cgr_gwas_qc.cli.config import get_number_snps, get_output_pattern
+from cgr_gwas_qc.testing.data import FakeData
 
 
-def test_get_number_snps(bpm_file):
+def test_get_number_snps():
+    bpm_file = FakeData._data_path / FakeData._illumina_manifest_file
     assert 2000 == get_number_snps(bpm_file)
 
 

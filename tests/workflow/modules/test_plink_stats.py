@@ -14,7 +14,6 @@ def call_rate_2_stats(tmp_path_factory, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .copy(
             "production_outputs/plink_filter_call_rate_2/samples.bed",
             "sample_level/call_rate_2/samples.bed",
@@ -28,6 +27,7 @@ def call_rate_2_stats(tmp_path_factory, conda_envs):
             "sample_level/call_rate_2/samples.fam",
         )
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -125,8 +125,8 @@ def test_plink_stats_ibd(tmp_path, conda_envs):
     conda_envs.copy_env("plink2", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy_sample_sheet()
         .make_config()
+        .make_cgr_sample_sheet()
         .make_snakefile(
             """
             from cgr_gwas_qc import load_config
@@ -146,7 +146,7 @@ def test_plink_stats_ibd(tmp_path, conda_envs):
         )
     )
     with chdir(tmp_path):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
         maf, ld = cfg.config.software_params.maf_for_ibd, cfg.config.software_params.ld_prune_r2
 
     # And outputs from LD pruning

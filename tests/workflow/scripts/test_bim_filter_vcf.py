@@ -10,8 +10,19 @@ from typer.testing import CliRunner
 from cgr_gwas_qc.parsers import vcf
 from cgr_gwas_qc.parsers.bim import BimRecord
 from cgr_gwas_qc.testing import file_hashes_equal
+from cgr_gwas_qc.testing.data import FakeData
 
 runner = CliRunner()
+
+
+@pytest.fixture(scope="module")
+def vcf_file():
+    return FakeData._data_path / FakeData._thousand_genome_vcf
+
+
+@pytest.fixture(scope="module")
+def bim_file():
+    return FakeData._data_path / FakeData._bim
 
 
 ################################################################################

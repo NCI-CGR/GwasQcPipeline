@@ -8,7 +8,7 @@ import typer
 from cgr_gwas_qc.config import config_to_yaml
 from cgr_gwas_qc.models.config import Config
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
@@ -25,7 +25,7 @@ def main(
 ):
     """Creates a Gwas Qc Pipeline config file in the current working directory."""
 
-    ss = SampleSheet(sample_sheet)
+    ss = SampleManifest(sample_sheet)
     project_name = project_name or ss.header.get("Project Name", "No Project Name").split(";")[0]
     num_samples = ss.data.shape[0]
     snp_array = ss.manifests.get("snp_array", None)

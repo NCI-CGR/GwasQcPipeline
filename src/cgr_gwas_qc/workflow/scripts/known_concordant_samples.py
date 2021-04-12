@@ -17,15 +17,15 @@ from typing import Optional
 import pandas as pd
 import typer
 
+from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.parsers.plink import read_imiss
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
 
 app = typer.Typer(add_completion=False)
 
 
 @app.command()
 def main(
-    sample_sheet: Path = typer.Argument(..., help="Path to the sample sheet CSV."),
+    sample_sheet_csv: Path = typer.Argument(..., help="Path to the sample sheet CSV."),
     imiss: Path = typer.Argument(..., help="Path to the `plink_filter_call_rate_2/samples.imiss`"),
     concordance: Path = typer.Argument(..., help="Path to the `ibd/samples.genome` file."),
     known: Path = typer.Argument(..., help="Path to save known concordant samples."),
@@ -46,7 +46,7 @@ def main(
     sample_concordance = pd.read_csv(concordance).rename(
         {"IID1": "Sample_ID1", "IID2": "Sample_ID2"}, axis=1
     )
-    sample_metadata = _read_sample_metadata(sample_sheet, imiss, subject_id_override)
+    sample_metadata = _read_sample_metadata(sample_sheet_csv, imiss, subject_id_override)
 
     # Add metadata for Sample 1 and Sample 2 in pairwise table
     df = sample_concordance.merge(
@@ -100,7 +100,7 @@ def read_unknown_concordance_table(filename: os.PathLike) -> pd.DataFrame:
 
 
 def _read_sample_metadata(
-    sample_sheet: Path, call_rate: Path, subject_id_override: Optional[str] = None
+    sample_sheet_csv: Path, call_rate: Path, subject_id_override: Optional[str] = None
 ) -> pd.DataFrame:
     """Read in sample metadata from sample sheet and call rates.
 
@@ -108,11 +108,10 @@ def _read_sample_metadata(
         DataFrame with ["Sample_ID", "Subject_ID", "Sample_Group", "call_rate"]
     """
     return (
-        SampleSheet(sample_sheet)
-        .add_group_by_column(subject_id_override)
-        .data.merge(_read_imiss_file(call_rate), how="left", left_on="Sample_ID", right_index=True)
+        sample_sheet.read(sample_sheet_csv)
+        .merge(_read_imiss_file(call_rate), how="left", left_on="Sample_ID", right_index=True)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
-        .loc[:, ("Sample_ID", "Subject_ID", "Sample_Group", "call_rate")]
+        .reindex(["Sample_ID", "Subject_ID", "Sample_Group", "call_rate"], axis=1)
     )
 
 

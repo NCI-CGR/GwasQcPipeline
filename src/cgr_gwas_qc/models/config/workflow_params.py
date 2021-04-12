@@ -1,18 +1,22 @@
-import warnings
-from typing import Optional
-
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 
 class WorkflowParams(BaseModel):
     """This set of parameters control what parts and how the workflow is run."""
 
-    subject_id_to_use: Optional[str] = Field(
-        None,
-        description="[Deprecated] The name of the column in the sample sheet which identifies unique subjects.",
+    subject_id_column: str = Field(
+        "Group_By",
+        description="The name of the column in the sample sheet which identifies unique subjects.",
     )
-    expected_sex_col_name: str = Field(
-        "Expected_Sex", description="Column in the sample sheet that describes the expected sex."
+
+    expected_sex_column: str = Field(
+        "Expected_Sex",
+        description="The name of the column in the sample sheet which identifies expected sex of samples.",
+    )
+
+    case_control_column: str = Field(
+        "Case/Control_Status",
+        description="The name of the column in the sample sheet which identifies Case/Control status.",
     )
 
     remove_contam: bool = Field(
@@ -40,15 +44,3 @@ class WorkflowParams(BaseModel):
         description="Minimum number of controls (in a population) required for HWE estimation",
         gt=0,
     )
-
-    @validator("subject_id_to_use")
-    def validate_subject_id_to_use(cls, v):
-        if v is None:
-            return v
-
-        warnings.warn(
-            "subject_id_to_use is deprecated, add this to the Group_By column in the sample sheet.",
-            DeprecationWarning,
-        )
-
-        return v

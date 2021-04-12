@@ -25,10 +25,11 @@ import subprocess
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from pathlib import Path
-from typing import MutableMapping, Optional, TypeVar, Union
+from typing import Iterable, MutableMapping, Optional, TypeVar, Union
 from warnings import warn
 
-from cgr_gwas_qc.parsers.sample_sheet import SampleSheet
+from cgr_gwas_qc.models.config.workflow_params import WorkflowParams
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest, update_sample_sheet
 from cgr_gwas_qc.testing import make_snakefile, make_test_config
 
 DEFAULT_TEST_DATA_SERVER = "cgemsiii.nci.nih.gov"
@@ -70,10 +71,13 @@ class DataRepo(ABC):
     _bim: str  # Name of the aggregate samples BIM
     _fam: str  # Name of the aggregate samples FAM
     _num_snps: int  # Number of SNPs in the array
+    _subject_id_column: str  # The column containing subject information
+    _expected_sex_column: str  # The column containing sex information
+    _case_control_column: str  # The column containing Case/Control information
 
     def __init__(self, working_dir: Optional[Path] = None):
         self.working_dir = working_dir
-        self.ss = SampleSheet(self / self._sample_sheet)
+        self.ss = SampleManifest(self / self._sample_sheet)
         self._config: MutableMapping = defaultdict(dict)
 
         self._config["project_name"] = self.ss.header["Project Name"].split(";")[0]
@@ -93,6 +97,10 @@ class DataRepo(ABC):
             self / self._thousand_genome_tbi
         ).absolute()
 
+        self._config["workflow_params"]["subject_id_column"] = self._subject_id_column
+        self._config["workflow_params"]["expected_sex_column"] = self._expected_sex_column
+        self._config["workflow_params"]["case_control_column"] = self._case_control_column
+
     @abstractmethod
     def _add_gtcs(self):
         """Each subclass must define this method.
@@ -111,21 +119,40 @@ class DataRepo(ABC):
         """
         raise NotImplementedError
 
-    def copy_sample_sheet(self) -> U:
-        """Add sample sheet.
+    def make_cgr_sample_sheet(
+        self, problem_sample_ids: Optional[Iterable[str]] = None, **kwargs
+    ) -> U:
+        """Parse the manifest file and create the cgr sample sheet.
 
-        The sample sheet can either be copied into the working directory or
-        have its full path referenced in the config. If a working directory
-        is given (``self.working_dir``) then it will be copied otherwise it
-        will be referenced in the config.
+        Parses the sample manifest and creates a sample sheet saved to
+        ``working_dir/cgr_sample_sheet.csv``. Similar steps are performed
+        during ``cgr preflight``.
+
+        Args:
+            problem_sample_ids: A list of Sample IDs to mark for exclusion. Defaults to None.
+            kwargs: Any valid ``cgr_gwas_qc.models.config.workflow_params.WorkflowPrams``.
+
+        Raises:
+            ValueError: You must have provided a working directory when
+              instantiating the object.
+
+        Returns:
+            Creates a file ``working_dir/cgr_sample_sheet.csv`` and returns
+            the ``DataRepo`` object.
         """
-        if self.working_dir is None:
-            # No working directory provided to just ignore
+        if self.working_dir:
+            params = WorkflowParams(**{**self._config["workflow_params"], **kwargs})
+            sample_sheet = SampleManifest(self._config["sample_sheet"]).data
+            update_sample_sheet(
+                sample_sheet,
+                params.subject_id_column,
+                params.expected_sex_column,
+                params.case_control_column,
+                problem_sample_ids,
+            ).to_csv(self.working_dir / "cgr_sample_sheet.csv", index=False)
             return self
-
-        self._config["sample_sheet"] = "sample_sheet.csv"
-        self.copy(self._sample_sheet, self._config["sample_sheet"])
-        return self
+        else:
+            raise ValueError("You need to have set ``self.working_dir``.")
 
     def add_user_files(self, entry_point: str = "bed", copy: bool = True) -> U:
         """Add user provided files.
@@ -208,7 +235,13 @@ class DataRepo(ABC):
             kwargs: Config options that you would like to set when creating
               the config.yml
         """
-        self._config.update(kwargs)
+        # Update config with passed items
+        for k, v in kwargs.items():
+            if isinstance(v, dict):
+                self._config[k].update(v)
+            else:
+                self._config[k] = v
+
         if self.working_dir:
             make_test_config(self.working_dir, **self._config)
         else:
@@ -271,7 +304,7 @@ class FakeData(DataRepo):
         >>> cache / non_existing_file.txt  # If file does not exist then raises exception
         FileNotFoundError: ".../non_existing_file.txt"
 
-        >>> cache.copy_sample_sheet()  # copy sample sheet to working dir
+        >>> cache.make_cgr_sample_sheet()  # copy sample sheet to working dir
         >>> cache.add_user_files()  # add BED/BIM/FAM to working dir
         >>> cache.make_config()  # make the config for files added using cache
     """
@@ -301,6 +334,10 @@ class FakeData(DataRepo):
 
     _snp_array = "Fake-GSA"
     _num_snps = 2_000
+
+    _subject_id_column = "LIMS_Individual_ID"
+    _expected_sex_column = "Expected_Sex"
+    _case_control_column = "Case/Control_Status"
 
     def add_user_files(self, entry_point: str = "bed", copy: bool = True) -> U:
         if (self.working_dir is None or not copy) and entry_point == "gtc":
@@ -346,7 +383,7 @@ class RealData(DataRepo):
         >>> cache / non_existing_file.txt  # If file does not exist then raises exception
         FileNotFoundError: "../../../.cache/cgr_gwas_qc/test_data/non_existing_file.txt"
 
-        >>> cache.copy_sample_sheet()  # copy sample sheet to working dir
+        >>> cache.make_cgr_sample_sheet()  # copy sample sheet to working dir
         >>> cache.add_user_files(copy=False)  # add full path of user files to config
         >>> cache.make_config()  # make the config for files added using cache
     """
@@ -377,6 +414,10 @@ class RealData(DataRepo):
 
     _snp_array = "GSAMD-24v1-0"
     _num_snps = 700078
+
+    _subject_id_column = "PI_Subject_ID"
+    _expected_sex_column = "Expected_Sex"
+    _case_control_column = "Case/Control_Status"
 
     def __init__(
         self,

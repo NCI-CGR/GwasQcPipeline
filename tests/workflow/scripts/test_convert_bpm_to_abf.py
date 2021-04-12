@@ -11,9 +11,20 @@ import pytest
 from typer.testing import CliRunner
 
 from cgr_gwas_qc.parsers import bpm, vcf
+from cgr_gwas_qc.testing.data import FakeData
 from cgr_gwas_qc.workflow.scripts.bpm2abf import app
 
 runner = CliRunner()
+
+
+@pytest.fixture(scope="module")
+def vcf_file():
+    return FakeData._data_path / FakeData._thousand_genome_vcf
+
+
+@pytest.fixture(scope="module")
+def bpm_file():
+    return FakeData._data_path / FakeData._illumina_manifest_file
 
 
 ################################################################################

@@ -1,11 +1,12 @@
 import pytest
 
 from cgr_gwas_qc.parsers import vcf
+from cgr_gwas_qc.testing.data import FakeData
 
 
 @pytest.fixture(scope="module")
-def vcf_fh(vcf_file):
-    return vcf.VcfFile(vcf_file)
+def vcf_fh():
+    return vcf.VcfFile(FakeData._data_path / FakeData._thousand_genome_vcf)
 
 
 @pytest.mark.parametrize("chrom", [1, "1", "chr1", "X", "chrX"])
