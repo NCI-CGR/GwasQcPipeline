@@ -222,7 +222,7 @@ rule sample_concordance_plink:
         known_study="sample_level/concordance/StudySampleKnown.csv",
         unknown="sample_level/concordance/UnknownReplicates.csv",
     script:
-        "../scripts/known_concordant_samples.py"
+        "../scripts/sample_concordance.py"
 
 
 rule sample_concordance_graf:
