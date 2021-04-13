@@ -197,7 +197,7 @@ def sample_concordance_table_csv(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def snp_qc(tmp_path_factory) -> Path:
+def snp_qc_csv(tmp_path_factory) -> Path:
     """The SNP QC table.
 
     Return:
@@ -230,15 +230,15 @@ def snp_qc(tmp_path_factory) -> Path:
 
 @pytest.mark.real_data
 @pytest.fixture
-def snp_qc_df(snp_qc) -> pd.DataFrame:
+def snp_qc_df(snp_qc_csv) -> pd.DataFrame:
     from cgr_gwas_qc.workflow.scripts import snp_qc_table
 
-    return snp_qc_table.read(snp_qc)
+    return snp_qc_table.read(snp_qc_csv)
 
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc(real_cfg, tmp_path_factory) -> Path:
+def sample_qc_csv(real_cfg, tmp_path_factory) -> Path:
     """The Sample QC table.
 
     Return:
@@ -282,15 +282,15 @@ def sample_qc(real_cfg, tmp_path_factory) -> Path:
 
 @pytest.mark.real_data
 @pytest.fixture
-def sample_qc_df(sample_qc) -> pd.DataFrame:
+def sample_qc_df(sample_qc_csv) -> pd.DataFrame:
     from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
-    return sample_qc_table.read(sample_qc)
+    return sample_qc_table.read(sample_qc_csv)
 
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def population_qc(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
+def population_qc_csv(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
     """The Population QC table.
 
     Return:
@@ -321,26 +321,26 @@ def population_qc(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
 
 @pytest.mark.real_data
 @pytest.fixture
-def population_qc_df(population_qc) -> pd.DataFrame:
+def population_qc_df(population_qc_csv) -> pd.DataFrame:
     from cgr_gwas_qc.workflow.scripts import population_qc_table
 
-    return population_qc_table.read(population_qc)
+    return population_qc_table.read(population_qc_csv)
 
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def agg_population_qc(sample_qc, population_qc, tmp_path_factory) -> Path:
+def agg_population_qc_csv(sample_qc_csv, population_qc_csv, tmp_path_factory) -> Path:
     """Create the aggregated population qc table"""
     from cgr_gwas_qc.workflow.scripts import agg_population_qc_tables
 
     tmp_path = tmp_path_factory.mktemp("agg_population_qc")
     tables = tmp_path / "population_qc_tables.txt"
-    tables.write_text(population_qc.resolve().as_posix())
+    tables.write_text(population_qc_csv.resolve().as_posix())
 
     outfile = tmp_path / "agg_population_qc.csv"
 
     agg_population_qc_tables.main(
-        sample_qc_table=sample_qc, population_qc_tables=tables, outfile=outfile,
+        sample_qc_table=sample_qc_csv, population_qc_tables=tables, outfile=outfile,
     )
 
     return outfile
@@ -348,10 +348,10 @@ def agg_population_qc(sample_qc, population_qc, tmp_path_factory) -> Path:
 
 @pytest.mark.real_data
 @pytest.fixture
-def agg_population_qc_df(agg_population_qc) -> pd.DataFrame:
+def agg_population_qc_df(agg_population_qc_csv) -> pd.DataFrame:
     from cgr_gwas_qc.workflow.scripts.agg_population_qc_tables import read_agg_population_qc_tables
 
-    return read_agg_population_qc_tables(agg_population_qc)
+    return read_agg_population_qc_tables(agg_population_qc_csv)
 
 
 @pytest.fixture(scope="session")

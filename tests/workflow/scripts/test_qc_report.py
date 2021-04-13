@@ -49,9 +49,9 @@ def unknown_replicates(tmp_path):
 @pytest.mark.real_data
 def test_qc_report(
     real_cfg,
-    snp_qc,
-    sample_qc,
-    population_qc,
+    snp_qc_csv,
+    sample_qc_csv,
+    population_qc_csv,
     control_replicates,
     study_replicates,
     unknown_replicates,
@@ -71,9 +71,9 @@ def test_qc_report(
     qc_report.main(
         config=real_cfg.config,
         sample_sheet_csv=real_cfg.root / "cgr_sample_sheet.csv",
-        snp_qc_csv=snp_qc,
-        sample_qc_csv=sample_qc,
-        population_qc_csv=population_qc,
+        snp_qc_csv=snp_qc_csv,
+        sample_qc_csv=sample_qc_csv,
+        population_qc_csv=population_qc_csv,
         control_replicates_csv=control_replicates,
         study_replicates_csv=study_replicates,
         unexpected_replicates_csv=unknown_replicates,
