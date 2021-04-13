@@ -4,8 +4,7 @@ import shutil
 import pandas as pd
 import pytest
 
-from cgr_gwas_qc import load_config
-from cgr_gwas_qc.testing import chdir, file_hashes_equal, run_snakemake, sorted_file_equal
+from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake, sorted_file_equal
 from cgr_gwas_qc.testing.data import RealData
 
 
@@ -121,7 +120,7 @@ def test_plink_split_population(tmp_path, conda_envs):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_per_population_qc_done(tmp_path, conda_envs, sample_qc_csv):
+def test_per_population_qc_done(tmp_path, conda_envs, sample_qc_csv, software_params):
     # GIVEN: real data config, sample_qc table, all of the inputs to generate
     # the summary table, and subject level plink data sets.
     # NOTE: I had to include the sample_qc inputs to get snakemake to run the
@@ -161,12 +160,6 @@ def test_per_population_qc_done(tmp_path, conda_envs, sample_qc_csv):
     run_snakemake(tmp_path)
 
     # THEN:
-    with chdir(tmp_path):
-        cfg = load_config(pytest=True)
-        maf = cfg.config.software_params.maf_for_ibd
-        ld = cfg.config.software_params.ld_prune_r2
-        pi = cfg.config.software_params.pi_hat_threshold
-
     assert not (tmp_path / "population_level/AFR").exists()  # Should not run b/c too few subjects
     assert not (tmp_path / "population_level/ASN").exists()  # Should not run b/c too few subjects
 
@@ -180,8 +173,11 @@ def test_per_population_qc_done(tmp_path, conda_envs, sample_qc_csv):
     def clean_eigenvec(pth):
         return re.sub("-", "", re.sub(r"\s+", " ", pth.read_text()))
 
+    maf = software_params.maf_for_ibd
+    ld = software_params.ld_prune_r2
+
     assert clean_eigenvec(
-        tmp_path / f"population_level/EUR/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec"
+        tmp_path / f"population_level/EUR/subjects_unrelated_maf{maf}_ld{ld}_pruned.eigenvec"
     ) == clean_eigenvec(data_cache / "production_outputs/pca/EUR_subjects.eigenvec")
 
     assert file_hashes_equal(
@@ -294,23 +290,23 @@ def test_plink_split_controls(tmp_path, conda_envs):
     # in test data
     conda_envs.copy_env("plink2", tmp_path)
 
-    pi = 0.2
     maf = 0.05
+    pi = 0.2
 
     data_cache = (
         RealData(tmp_path)
         .copy("production_outputs/HWP/EUR_controls.txt", "population_level/controls_lists/EUR.txt",)
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed",
-            f"population_level/EUR/subjects_unrelated{pi}.bed",
+            "population_level/EUR/subjects_unrelated.bed",
         )
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bim",
-            f"population_level/EUR/subjects_unrelated{pi}.bim",
+            "population_level/EUR/subjects_unrelated.bim",
         )
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.fam",
-            f"population_level/EUR/subjects_unrelated{pi}.fam",
+            "population_level/EUR/subjects_unrelated.fam",
         )
         .make_config(software_params={"maf_for_hwe": maf, "pi_hat_threshold": pi})
         .make_cgr_sample_sheet()
@@ -326,7 +322,7 @@ def test_plink_split_controls(tmp_path, conda_envs):
             rule all:
                 input:
                     expand(
-                        "population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.{ext}",
+                        "population_level/EUR/controls_unrelated_maf{maf}_snps_autosome_cleaned.{ext}",
                         maf=cfg.config.software_params.maf_for_hwe,
                         pi=cfg.config.software_params.pi_hat_threshold,
                         ext=["bed", "bim", "fam"]
@@ -340,20 +336,17 @@ def test_plink_split_controls(tmp_path, conda_envs):
 
     # THEN: The European control data sets should match legacy
     assert file_hashes_equal(
-        tmp_path
-        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.bed",
+        tmp_path / f"population_level/EUR/controls_unrelated_maf{maf}_snps_autosome_cleaned.bed",
         data_cache / "production_outputs/HWP/EUR_subjects.bed",
     )
 
     assert file_hashes_equal(
-        tmp_path
-        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.bim",
+        tmp_path / f"population_level/EUR/controls_unrelated_maf{maf}_snps_autosome_cleaned.bim",
         data_cache / "production_outputs/HWP/EUR_subjects.bim",
     )
 
     assert file_hashes_equal(
-        tmp_path
-        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.fam",
+        tmp_path / f"population_level/EUR/controls_unrelated_maf{maf}_snps_autosome_cleaned.fam",
         data_cache / "production_outputs/HWP/EUR_subjects.fam",
     )
 
@@ -362,7 +355,7 @@ def test_plink_split_controls(tmp_path, conda_envs):
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.mark.slow
-def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc_csv):
+def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc_csv, software_params):
     # GIVEN: real data config, sample_qc table, all of the inputs to generate
     # the summary table, the European control list, and subject level plink data sets.
     # NOTE: I had to include the sample_qc inputs to get snakemake to run the
@@ -406,23 +399,17 @@ def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc_csv):
     (tmp_path / "sample_level").mkdir()
     shutil.copyfile(sample_qc_csv, tmp_path / "sample_level/sample_qc.csv")
 
-    with chdir(tmp_path):
-        cfg = load_config(pytest=True)
-        maf = cfg.config.software_params.maf_for_hwe
-        pi = cfg.config.software_params.pi_hat_threshold
-
     # WHEN: run snakemake to get all population level and all population-control level results
     run_snakemake(tmp_path)
 
     # THEN:
+    maf = software_params.maf_for_hwe
     assert file_hashes_equal(
-        tmp_path
-        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.bed",
+        tmp_path / f"population_level/EUR/controls_unrelated_maf{maf}_snps_autosome_cleaned.bed",
         data_cache / "production_outputs/HWP/EUR_subjects.bed",
     )
     assert file_hashes_equal(
-        tmp_path
-        / f"population_level/EUR/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.hwe",
+        tmp_path / f"population_level/EUR/controls_unrelated_maf{maf}_snps_autosome_cleaned.hwe",
         data_cache / "production_outputs/HWP/EUR_subjects_qc.hwe",
     )
 

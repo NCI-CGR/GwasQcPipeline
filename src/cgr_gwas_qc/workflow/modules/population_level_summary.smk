@@ -83,13 +83,9 @@ rule plink_split_population:
 
 rule population_qc_table:
     input:
-        relatives="population_level/{{population}}/subjects_relatives_pi_hat_gt{pi}.csv".format(
-            pi=cfg.config.software_params.pi_hat_threshold
-        ),
-        pca="population_level/{{population}}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec".format(
-            pi=cfg.config.software_params.pi_hat_threshold,
-            maf=cfg.config.software_params.maf_for_ibd,
-            ld=cfg.config.software_params.ld_prune_r2,
+        relatives="population_level/{population}/relatives.csv",
+        pca="population_level/{{population}}/subjects_unrelated_maf{maf}_ld{ld}_pruned.eigenvec".format(
+            maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
         autosomal_het="population_level/{population}/subjects.het",
     params:
@@ -193,21 +189,19 @@ checkpoint controls_per_population:
 
 rule plink_split_controls:
     input:
-        bed="population_level/{population}/subjects_unrelated{pi}.bed",
-        bim="population_level/{population}/subjects_unrelated{pi}.bim",
-        fam="population_level/{population}/subjects_unrelated{pi}.fam",
+        bed="population_level/{population}/subjects_unrelated.bed",
+        bim="population_level/{population}/subjects_unrelated.bim",
+        fam="population_level/{population}/subjects_unrelated.fam",
         to_keep="population_level/controls_lists/{population}.txt",
     params:
-        out_prefix="population_level/{population}/controls_unrelated{pi}",
+        out_prefix="population_level/{population}/controls_unrelated",
     output:
-        bed="population_level/{population}/controls_unrelated{pi}.bed",
-        bim="population_level/{population}/controls_unrelated{pi}.bim",
-        fam="population_level/{population}/controls_unrelated{pi}.fam",
-        nosex="population_level/{population}/controls_unrelated{pi}.nosex",
+        bed="population_level/{population}/controls_unrelated.bed",
+        bim="population_level/{population}/controls_unrelated.bim",
+        fam="population_level/{population}/controls_unrelated.fam",
+        nosex="population_level/{population}/controls_unrelated.nosex",
     log:
-        "population_level/{population}/controls_unrelated{pi}.log",
-    wildcard_constraints:
-        pi="[01].\d+",
+        "population_level/{population}/controls_unrelated.log",
     envmodules:
         cfg.envmodules("plink2"),
     conda:
@@ -240,13 +234,11 @@ def required_population_controls(wildcards):
         return []
 
     maf = cfg.config.software_params.maf_for_hwe
-    pi = cfg.config.software_params.pi_hat_threshold
 
     return expand(  # HWE
-        "population_level/{population}/controls_unrelated{pi}_maf{maf}_snps_autosome_cleaned.hwe",
+        "population_level/{population}/controls_unrelated_maf{maf}_snps_autosome_cleaned.hwe",
         population=populations,
         maf=maf,
-        pi=pi,
     )
 
 

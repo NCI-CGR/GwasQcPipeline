@@ -61,10 +61,7 @@ rule sample_to_subject_map:
             .query("is_subject_representative")
             .assign(Sample_ID2=lambda x: x.Sample_ID)
             .assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
-            .reindex(
-                ["Sample_ID", "Sample_ID2", "Group_By_Subject_ID", "Subject_ID2"],
-                axis=1,
-            )
+            .reindex(["Sample_ID", "Sample_ID2", "Group_By_Subject_ID", "Subject_ID2"], axis=1,)
             .to_csv(output[0], sep=" ", index=False, header=False)
         )
 
@@ -105,17 +102,12 @@ rule renamed_subjects:
 
 rule related_subjects:
     input:
-        "{{prefix}}/subjects_maf{maf}_ld{ld}_pruned.genome".format(
-            maf=cfg.config.software_params.maf_for_ibd,
-            ld=cfg.config.software_params.ld_prune_r2,
+        "{{prefix}}/subjects_maf{maf}_ld{ld}_pruned.concordance.csv".format(
+            maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
         ),
-    params:
-        pi_hat_threshold=lambda wc: float(wc.pi),
     output:
-        relatives="{prefix}/subjects_relatives_pi_hat_gt{pi}.csv",
-        to_remove="{prefix}/subjects_to_remove_pi_hat_gt{pi}.txt",
-    wildcard_constraints:
-        pi="[01].\d+",
+        relatives="{prefix}/relatives.csv",
+        to_remove="{prefix}/related_subjects_to_remove.txt",
     script:
         "../scripts/related_subjects.py"
 
@@ -127,14 +119,14 @@ rule remove_related_subjects:
         fam="{prefix}/subjects.fam",
         to_remove=rules.related_subjects.output.to_remove,
     params:
-        out_prefix="{prefix}/subjects_unrelated{pi}",
+        out_prefix="{prefix}/subjects_unrelated",
     output:
-        bed="{prefix}/subjects_unrelated{pi}.bed",
-        bim="{prefix}/subjects_unrelated{pi}.bim",
-        fam="{prefix}/subjects_unrelated{pi}.fam",
-        nosex="{prefix}/subjects_unrelated{pi}.nosex",
+        bed="{prefix}/subjects_unrelated.bed",
+        bim="{prefix}/subjects_unrelated.bim",
+        fam="{prefix}/subjects_unrelated.fam",
+        nosex="{prefix}/subjects_unrelated.nosex",
     log:
-        "{prefix}/subjects_unrelated{pi}.log",
+        "{prefix}/subjects_unrelated.log",
     envmodules:
         cfg.envmodules("plink2"),
     conda:

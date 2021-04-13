@@ -9,7 +9,7 @@ defined ``pi_hat_threshold`` [1] will be considered related.
 
 Output:
 
-    ``{prefix}/subjects_relatives_pi_hat_gt{pi}.csv``
+    ``{prefix}/relatives.csv``
 
     This table contains information about which subjects appear to be related
     according to IBS/IBD. An arbitrary family ID is assigned to help tracking.
@@ -27,7 +27,7 @@ Output:
         relatives, A list of related Subject_IDs concatenated together with a `|`.
 
 
-    ``{prefix}/subjects_to_remove_pi_hat_gt{pi}.txt``
+    ``{prefix}/related_subjects_to_remove.txt``
 
     Using a greeding algorithm, select subjects, with the most relationships,
     to prune from the dataset to eliminate relatedness.
@@ -63,23 +63,16 @@ import pandas as pd
 import typer
 from numpy.random import RandomState
 
-from cgr_gwas_qc.parsers import plink
+from cgr_gwas_qc.workflow.scripts import concordance_table
 
 app = typer.Typer(add_completion=False)
 
 
 @app.command()
-def main(
-    genome: Path = typer.Argument(..., help="Path to the PLINK `.genome` file", exists=True),
-    pi_hat_threshold: float = typer.Argument(  # noqa
-        ..., help="The threshold to consider subjects related."
-    ),
-    relatives: Path = typer.Argument(..., help="Path to save a list of subjects to remove."),
-    to_remove: Path = typer.Argument(..., help="Path to save a list of subjects to remove."),
-):
+def main(concordance_csv: Path, relatives: Path, to_remove: Path):
     pairwise_related_subjects = list(
-        plink.read_genome(genome)
-        .query("PI_HAT > @pi_hat_threshold")  # Ignore subjects under the pi_hat_threshold
+        concordance_table.read(concordance_csv)
+        .query("is_ge_pi_hat")  # Ignore subjects under the pi_hat_threshold
         .reindex(["ID1", "ID2"], axis=1)
         .itertuples(index=False)
     )
@@ -119,7 +112,7 @@ def create_qc_families(G: nx.Graph) -> pd.Series:
     """
     return pd.Series(
         {
-            f"fam{i}": "|".join(sorted(subgraph))
+            f"F{i:06}": "|".join(sorted(subgraph))
             for i, subgraph in enumerate(sorted(nx.connected_components(G), key=len), start=1)
         },
         name="relatives",
@@ -163,10 +156,10 @@ def _prune(G: nx.Graph, seed: Optional[RandomState]) -> Generator[str, None, Non
 
 if __name__ == "__main__":
     if "snakemake" in locals():
-        defaults = {}
-        defaults.update({"genome": Path(snakemake.input[0])})  # type: ignore # noqa
-        defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
-        defaults.update(snakemake.params)  # type: ignore # noqa
+        defaults = {
+            **{"concordance_csv": Path(snakemake.input[0])},  # type: ignore # noqa
+            **{k: Path(v) for k, v in snakemake.output.items()},  # type: ignore # noqa
+        }
         main(**defaults)
     else:
         app()
