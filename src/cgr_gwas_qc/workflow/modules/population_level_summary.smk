@@ -125,6 +125,36 @@ rule per_population_qc_done:
         "echo {input} | xargs printf '%s\n' > {output[0]}"
 
 
+rule agg_population_qc_table:
+    input:
+        sample_qc_table="sample_level/sample_qc.csv",
+        population_qc_tables=rules.per_population_qc_done.output[0],
+    output:
+        "population_level/population_qc.csv",
+    script:
+        "../scripts/agg_population_qc_tables.py"
+
+
+rule plot_autosomal_heterozygosity:
+    input:
+        rules.agg_population_qc_table.output[0],
+    params:
+        threshold=cfg.config.software_params.autosomal_het_threshold,
+    output:
+        directory("population_level/autosomal_heterozygosity_plots"),
+    script:
+        "../scripts/plot_autosomal_heterozygosity.py"
+
+
+rule plot_pca:
+    input:
+        rules.agg_population_qc_table.output[0],
+    output:
+        directory("population_level/pca_plots"),
+    script:
+        "../scripts/plot_pca.py"
+
+
 ################################################################################
 # Population Level Analysis (Controls Only)
 #   - HWE
@@ -227,39 +257,6 @@ rule per_population_controls_qc_done:
         "population_level/per_population_controls_qc.done",
     shell:
         "echo {input} | xargs printf '%s\n' > {output[0]}"
-
-
-################################################################################
-# Summary of Population and Controls
-################################################################################
-rule agg_population_qc_table:
-    input:
-        sample_qc_table="sample_level/sample_qc.csv",
-        population_qc_tables=rules.per_population_qc_done.output[0],
-    output:
-        "population_level/population_qc.csv",
-    script:
-        "../scripts/agg_population_qc_tables.py"
-
-
-rule plot_autosomal_heterozygosity:
-    input:
-        rules.agg_population_qc_table.output[0],
-    params:
-        threshold=cfg.config.software_params.autosomal_het_threshold,
-    output:
-        directory("population_level/autosomal_heterozygosity_plots"),
-    script:
-        "../scripts/plot_autosomal_heterozygosity.py"
-
-
-rule plot_pca:
-    input:
-        rules.agg_population_qc_table.output[0],
-    output:
-        directory("population_level/pca_plots"),
-    script:
-        "../scripts/plot_pca.py"
 
 
 rule plot_hwe:
