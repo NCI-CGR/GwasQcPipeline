@@ -76,6 +76,13 @@ def read_hwe(filename: PathLike) -> pd.DataFrame:
 def read_genome(filename: PathLike) -> pd.DataFrame:
     """Parse PLINK's genome file format.
 
+    Each row of the genome file is a pairwise combinations of
+    samples/subjects. I am unsure of how plink assigns IID order. Here I sort
+    IDs alphanumerically which will make searching for pairs easier because
+    you can assume the order.
+
+    >>> ID1, ID2 = sort([IID1, IID2])
+
     Returns:
         pd.DataFrame:
             A (n x 5) table with the following columns
@@ -83,8 +90,8 @@ def read_genome(filename: PathLike) -> pd.DataFrame:
             .. csv-table::
                 :header: name, dtype, description
 
-                ID1, object, First Sample or Subject ID
-                ID2, object, Second Sample or Subject ID
+                ID1, object, First Sample or Subject ID (alphanumerically)
+                ID2, object, Second Sample or Subject ID (alphanumerically)
                 RT, object, Relationship type inferred from .fam/.ped file {FS: Full Sib, HS, Half Sib, PO: Parent-Offspring, OT; Other}
                 EZ, object, IBD sharing expected value, based on just .fam/.ped relationship
                 Z0, float, P(IBD=0)
@@ -105,10 +112,16 @@ def read_genome(filename: PathLike) -> pd.DataFrame:
         - https://www.cog-genomics.org/plink/1.9/ibd
         - https://www.cog-genomics.org/plink/1.9/formats#genome
     """
+
+    def _sort_ids(x: pd.Series):
+        """Sort IDs alphanumerically."""
+        x["ID1"], x["ID2"] = sorted([x.IID1, x.IID2])
+        return x
+
     return (
         pd.read_csv(filename, delim_whitespace=True)
-        .drop(["FID1", "FID2"], axis=1)
-        .rename({"IID1": "ID1", "IID2": "ID2"}, axis=1)
+        .apply(_sort_ids, axis=1)
+        .drop(["IID1", "IID2", "FID1", "FID2"], axis=1)
     )
 
 

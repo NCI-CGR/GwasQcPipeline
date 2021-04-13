@@ -47,7 +47,6 @@ This table has the following format:
     is_ge_concordance, boolean, True if concordance was greater than ``software_params.dup_concordance_cutoff``
 
 """
-import os
 from itertools import combinations
 from pathlib import Path
 from typing import List, Tuple
@@ -83,7 +82,7 @@ UNKNOWN_DTYPES = {
 }
 
 
-def read_known_sample_concordance(filename: os.PathLike) -> pd.DataFrame:
+def read_known_sample_concordance(filename: PathLike) -> pd.DataFrame:
     """Read the known replicate concordance table.
 
     Returns:
@@ -100,7 +99,7 @@ def read_known_sample_concordance(filename: os.PathLike) -> pd.DataFrame:
     return pd.read_csv(filename, dtype=KNOWN_DTYPES)
 
 
-def read_unknown_sample_concordance(filename: os.PathLike) -> pd.DataFrame:
+def read_unknown_sample_concordance(filename: PathLike) -> pd.DataFrame:
     """Read the unknown replicate concordance table.
 
     Returns:
@@ -133,7 +132,9 @@ def main(
     sample_to_subject_id = ss.set_index("Sample_ID").Group_By_Subject_ID.rename("Subject_ID")
 
     # Load sample level concordance information
-    concordance = _read_concordance_csv(concordance_csv)
+    concordance = concordance_table.read(concordance_csv).rename(
+        {"ID1": "Sample_ID1", "ID2": "Sample_ID2"}, axis=1
+    )
 
     # Get sample concordance for known and unknown replicates
     known_df = _known_replicates_df(concordance, known_replicates, sample_to_subject_id)
@@ -147,25 +148,6 @@ def main(
     known_qc, known_study = _split_into_qc_and_study_samples(ss, known_df)
     known_qc.to_csv(known_qc_csv, index=False)
     known_study.to_csv(known_study_csv, index=False)
-
-
-def _read_concordance_csv(concordance_csv: PathLike) -> pd.DataFrame:
-    """Read the concordance table and wrangle for easy query.
-
-    Here is where I sort IDs alphabetically so that ``Sample_ID1`` is before
-    ``Sample_ID2``.
-    """
-
-    def _assign_sample_id(x: pd.Series):
-        """Sort IDs alphabetically."""
-        x["Sample_ID1"], x["Sample_ID2"] = sorted([x.ID1, x.ID2])
-        return x
-
-    return (
-        concordance_table.read(concordance_csv)
-        .apply(_assign_sample_id, axis=1)
-        .drop(["ID1", "ID2"], axis=1)
-    )
 
 
 def _get_known_replicates(ss: pd.DataFrame) -> List[Tuple[str, str]]:

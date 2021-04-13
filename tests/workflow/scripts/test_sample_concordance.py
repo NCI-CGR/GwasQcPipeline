@@ -4,13 +4,15 @@ from pandas.testing import assert_frame_equal
 
 from cgr_gwas_qc.reporting.constants import REPORT_NAME_MAPPER
 from cgr_gwas_qc.testing.data import RealData
-from cgr_gwas_qc.workflow.scripts import sample_concordance
+from cgr_gwas_qc.workflow.scripts import concordance_table, sample_concordance
 
 
 @pytest.mark.real_data
 @pytest.fixture
 def sample_concordance_table_df(sample_concordance_table_csv) -> pd.DataFrame:
-    return sample_concordance._read_concordance_csv(sample_concordance_table_csv)
+    return concordance_table.read(sample_concordance_table_csv).rename(
+        {"ID1": "Sample_ID1", "ID2": "Sample_ID2"}, axis=1
+    )
 
 
 @pytest.mark.real_data
