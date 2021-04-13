@@ -25,7 +25,7 @@ COLUMNS = (
 @app.command()
 def main(sample_sheet_csv: Path, sample_qc_csv: Path, outfile: Path):
     ss = sample_sheet.read(sample_sheet_csv, all_user_column=True, remove_exclusions=False)
-    qc = sample_qc_table.read_sample_qc(sample_qc_csv).rename(REPORT_NAME_MAPPER, axis=1)
+    qc = sample_qc_table.read(sample_qc_csv).rename(REPORT_NAME_MAPPER, axis=1)
 
     # Merge and drop duplicate rows from ss
     df = qc.merge(ss, on="Sample_ID", how="outer", suffixes=["", "_DROP"]).filter(

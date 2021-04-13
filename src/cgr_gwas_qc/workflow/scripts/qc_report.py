@@ -7,13 +7,12 @@ import typer
 from cgr_gwas_qc.config import Config
 from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.reporting import ExclusionTables, SampleQC, SubjectQC, env
-from cgr_gwas_qc.workflow.scripts.known_concordant_samples import (
-    read_known_concordance_table,
-    read_unknown_concordance_table,
+from cgr_gwas_qc.workflow.scripts import (
+    population_qc_table,
+    sample_concordance,
+    sample_qc_table,
+    snp_qc_table,
 )
-from cgr_gwas_qc.workflow.scripts.population_qc_table import read_population_qc
-from cgr_gwas_qc.workflow.scripts.sample_qc_table import read_sample_qc
-from cgr_gwas_qc.workflow.scripts.snp_qc_table import read_snp_qc
 
 app = typer.Typer(add_completion=False)
 
@@ -37,12 +36,14 @@ def main(
     outfile: Path,
 ):
     ss = sample_sheet.read(sample_sheet_csv)
-    snp_qc = read_snp_qc(snp_qc_csv)
-    sample_qc = read_sample_qc(sample_qc_csv)
-    population_qc = read_population_qc(population_qc_csv)
-    control_replicates = read_known_concordance_table(control_replicates_csv)
-    study_replicates = read_known_concordance_table(study_replicates_csv)
-    unexpected_replicates = read_unknown_concordance_table(unexpected_replicates_csv)
+    snp_qc = snp_qc_table.read(snp_qc_csv)
+    sample_qc = sample_qc_table.read(sample_qc_csv)
+    population_qc = population_qc_table.read(population_qc_csv)
+    control_replicates = sample_concordance.read_known_sample_concordance(control_replicates_csv)
+    study_replicates = sample_concordance.read_known_sample_concordance(study_replicates_csv)
+    unexpected_replicates = sample_concordance.read_unknown_sample_concordance(
+        unexpected_replicates_csv
+    )
 
     payload = {
         "excel_file_name": Path(

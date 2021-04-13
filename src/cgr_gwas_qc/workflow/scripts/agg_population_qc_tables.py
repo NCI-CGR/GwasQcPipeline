@@ -46,7 +46,7 @@ import pandas as pd
 import typer
 
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE
-from cgr_gwas_qc.workflow.scripts.population_qc_table import read_population_qc
+from cgr_gwas_qc.workflow.scripts import population_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -94,7 +94,7 @@ def main(sample_qc_table: Path, population_qc_tables: Path, outfile: Path):
 def aggregate_qc_tables(population_files: Path) -> pd.DataFrame:
     filenames = population_files.read_text().strip().splitlines()
     return pd.concat(
-        [read_population_qc(Path(filename)) for filename in filenames], ignore_index=True
+        [population_qc_table.read(Path(filename)) for filename in filenames], ignore_index=True
     )
 
 

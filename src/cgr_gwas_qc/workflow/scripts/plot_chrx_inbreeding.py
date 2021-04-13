@@ -19,7 +19,7 @@ import seaborn as sns
 import typer
 
 from cgr_gwas_qc.reporting import CASE_CONTROL_COLORS
-from cgr_gwas_qc.workflow.scripts.sample_qc_table import read_sample_qc
+from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -32,7 +32,7 @@ def main(sample_qc: Path, outfile: Path):
 
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     return (
-        read_sample_qc(sample_qc)
+        sample_qc_table.read(sample_qc)
         .query("expected_sex != 'U' and is_subject_representative")  # Don't plot unknown sex
         .transform(_update_categories)
     )

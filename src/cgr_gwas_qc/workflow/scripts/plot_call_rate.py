@@ -17,8 +17,7 @@ import seaborn as sns
 import typer
 
 from cgr_gwas_qc.reporting import CASE_CONTROL_COLORS
-from cgr_gwas_qc.workflow.scripts.sample_qc_table import read_sample_qc
-from cgr_gwas_qc.workflow.scripts.snp_qc_table import read_snp_qc
+from cgr_gwas_qc.workflow.scripts import sample_qc_table, snp_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -41,7 +40,7 @@ def main(
 
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     return (
-        read_sample_qc(sample_qc)
+        sample_qc_table.read(sample_qc)
         .reindex(["Call_Rate_Initial", "Call_Rate_2", "case_control"], axis=1)
         .dropna(subset=["Call_Rate_Initial"])
         .transform(_scale_call_rate)
@@ -56,7 +55,7 @@ def load_sample_data(sample_qc: Path) -> pd.DataFrame:
 
 def load_snp_data(snp_qc: Path) -> pd.DataFrame:
     return (
-        read_snp_qc(snp_qc)
+        snp_qc_table.read(snp_qc)
         .reindex(["Call_Rate_Initial", "Call_Rate_2"], axis=1)
         .dropna(subset=["Call_Rate_Initial"])
         .transform(_scale_call_rate)

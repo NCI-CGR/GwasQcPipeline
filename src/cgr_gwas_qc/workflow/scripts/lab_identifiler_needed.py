@@ -23,7 +23,7 @@ COLUMNS = (
 def main(sample_sheet_csv: Path, sample_qc_csv: Path, outfile: Path):
     ss = sample_sheet.read(sample_sheet_csv, all_user_column=True, remove_exclusions=False)
     qc = (
-        sample_qc_table.read_sample_qc(sample_qc_csv)
+        sample_qc_table.read(sample_qc_csv)
         .query("identifiler_needed")
         .rename(REPORT_NAME_MAPPER, axis=1)
     )

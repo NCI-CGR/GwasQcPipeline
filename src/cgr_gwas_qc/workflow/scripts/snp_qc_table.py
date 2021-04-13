@@ -82,7 +82,7 @@ def add_call_rate_flags(df: pd.DataFrame):
     df.loc[cri, "is_call_rate_filtered"] = pd.NA
 
 
-def read_snp_qc(filename: Path) -> pd.DataFrame:
+def read(filename: Path) -> pd.DataFrame:
     return pd.read_csv(filename, dtype=DTYPES)
 
 

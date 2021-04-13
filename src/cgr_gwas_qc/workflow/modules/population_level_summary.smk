@@ -4,7 +4,7 @@ import time
 import pandas as pd
 from more_itertools import flatten
 
-from cgr_gwas_qc.workflow.scripts.sample_qc_table import read_sample_qc
+from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
 
 include: cfg.modules("common.smk")
@@ -26,7 +26,7 @@ checkpoint subjects_per_population:
     run:
         output_path = Path(output[0])
         output_path.mkdir(exist_ok=True, parents=True)
-        df = read_sample_qc(input[0]).query("is_subject_representative")
+        df = sample_qc_table.read(input[0]).query("is_subject_representative")
 
         flag_no_populations = True
         for pop_, grp in df.groupby("Ancestry"):
@@ -139,7 +139,9 @@ checkpoint controls_per_population:
     run:
         output_path = Path(output[0])
         output_path.mkdir(exist_ok=True, parents=True)
-        df = read_sample_qc(input[0]).query("is_subject_representative & case_control == 'Control'")
+        df = sample_qc_table.read(input[0]).query(
+            "is_subject_representative & case_control == 'Control'"
+        )
 
         flag_no_controls = True
         for pop_, grp in df.groupby("Ancestry"):

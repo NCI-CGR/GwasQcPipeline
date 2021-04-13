@@ -19,7 +19,7 @@ import ternary
 import typer
 
 from cgr_gwas_qc.reporting import CASE_CONTROL_COLORS
-from cgr_gwas_qc.workflow.scripts.sample_qc_table import read_sample_qc
+from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -31,7 +31,7 @@ def main(sample_qc: Path, outfile: Path):
 
 
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
-    return read_sample_qc(sample_qc).dropna(subset=["EUR", "AFR", "ASN"])
+    return sample_qc_table.read(sample_qc).dropna(subset=["EUR", "AFR", "ASN"])
 
 
 def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):

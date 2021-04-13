@@ -6,7 +6,7 @@ import pytest
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr
-from cgr_gwas_qc.models.config import Idat, SoftwareParams
+from cgr_gwas_qc.models.config import Idat, SoftwareParams, WorkflowParams
 from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.conda import CondaEnv
 from cgr_gwas_qc.testing.data import FakeData, RealData
@@ -96,6 +96,16 @@ def qsub(monkeypatch):
 ##################################################################################
 # Configuration
 ##################################################################################
+@pytest.fixture(scope="session")
+def software_params():
+    return SoftwareParams()
+
+
+@pytest.fixture(scope="session")
+def workflow_params():
+    return WorkflowParams()
+
+
 @pytest.fixture(scope="session")
 def fake_cfg(tmp_path_factory) -> ConfigMgr:
     """Fake Data config manager object."""
@@ -221,9 +231,9 @@ def snp_qc(tmp_path_factory) -> Path:
 @pytest.mark.real_data
 @pytest.fixture
 def snp_qc_df(snp_qc) -> pd.DataFrame:
-    from cgr_gwas_qc.workflow.scripts.snp_qc_table import read_snp_qc
+    from cgr_gwas_qc.workflow.scripts import snp_qc_table
 
-    return read_snp_qc(snp_qc)
+    return snp_qc_table.read(snp_qc)
 
 
 @pytest.mark.real_data
@@ -273,9 +283,9 @@ def sample_qc(real_cfg, tmp_path_factory) -> Path:
 @pytest.mark.real_data
 @pytest.fixture
 def sample_qc_df(sample_qc) -> pd.DataFrame:
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import read_sample_qc
+    from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
-    return read_sample_qc(sample_qc)
+    return sample_qc_table.read(sample_qc)
 
 
 @pytest.mark.real_data
@@ -312,9 +322,9 @@ def population_qc(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
 @pytest.mark.real_data
 @pytest.fixture
 def population_qc_df(population_qc) -> pd.DataFrame:
-    from cgr_gwas_qc.workflow.scripts.population_qc_table import read_population_qc
+    from cgr_gwas_qc.workflow.scripts import population_qc_table
 
-    return read_population_qc(population_qc)
+    return population_qc_table.read(population_qc)
 
 
 @pytest.mark.real_data

@@ -13,7 +13,6 @@ function to parse/summarize its content. This makes it easier to add new
 components or change the behavior. Search for `TO-ADD` comments for where you
 would have to make modifications to add new components.
 """
-import os
 from pathlib import Path
 from typing import Optional, Sequence
 from warnings import warn
@@ -24,6 +23,7 @@ import typer
 from cgr_gwas_qc.models.config.user_files import Idat
 from cgr_gwas_qc.parsers import plink, sample_sheet
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
+from cgr_gwas_qc.typing import PathLike
 from cgr_gwas_qc.validators import check_file
 from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
 
@@ -164,7 +164,7 @@ def main(
     _save_qc_table(sample_qc, outfile)
 
 
-def read_sample_qc(filename: os.PathLike) -> pd.DataFrame:
+def read(filename: PathLike) -> pd.DataFrame:
     """Read the Sample Level QC Table
 
     Returns:

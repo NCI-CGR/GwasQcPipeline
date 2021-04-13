@@ -6,9 +6,8 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from cgr_gwas_qc import load_config
 from cgr_gwas_qc.parsers.illumina import AdpcReader
-from cgr_gwas_qc.testing import chdir, file_hashes_equal, make_snakefile, run_snakemake
+from cgr_gwas_qc.testing import file_hashes_equal, make_snakefile, run_snakemake
 from cgr_gwas_qc.testing.data import RealData
 
 
@@ -437,7 +436,7 @@ def test_agg_contamination_test(tmp_path, median_idat_intensity):
 @pytest.mark.real_data
 @pytest.mark.workflow
 @pytest.mark.regression
-def test_sample_concordance_plink(tmp_path):
+def test_sample_concordance_plink(software_params, tmp_path):
     # GIVEN: Real data
     data_cache = (
         RealData(tmp_path)
@@ -462,18 +461,12 @@ def test_sample_concordance_plink(tmp_path):
         )
     )
 
-    with chdir(tmp_path):
-        cfg = load_config(pytest=True)
-        maf, ld = cfg.config.software_params.maf_for_ibd, cfg.config.software_params.ld_prune_r2
+    maf = software_params.maf_for_ibd
+    ld = software_params.ld_prune_r2
 
-    (
-        data_cache.copy(
-            "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
-            "sample_level/call_rate_2/samples.imiss",
-        ).copy(
-            "production_outputs/ibd/samples.genome",
-            f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome",
-        )
+    data_cache.copy(
+        "production_outputs/ibd/samples.genome",
+        f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome",
     )
 
     # WHEN: we run snakemake looking for the replicate output files.
@@ -484,17 +477,16 @@ def test_sample_concordance_plink(tmp_path):
         assert_frame_equal(
             (
                 pd.read_csv(obs_)
-                .sort_values(["Subject_ID", "Sample_ID1", "Sample_ID2"])
-                .reset_index(drop=True)
+                .drop(["is_ge_pi_hat", "is_ge_concordance"], axis=1)
+                .set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
             ),
             (
                 pd.read_csv(exp_)
                 .rename({"Concordance": "concordance"}, axis=1)
-                .dropna()  # The legacy workflow incorrectly call samples concordant if they have NAs
-                .sort_values(["Subject_ID", "Sample_ID1", "Sample_ID2"])
-                .reset_index(drop=True)
+                .set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
             ),
             check_exact=False,
+            check_like=True,
         )
 
     _compare(

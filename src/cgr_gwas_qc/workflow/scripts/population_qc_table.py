@@ -96,7 +96,7 @@ def main(
     df.to_csv(outfile, index=False)
 
 
-def read_population_qc(filename: os.PathLike) -> pd.DataFrame:
+def read(filename: os.PathLike) -> pd.DataFrame:
     return pd.read_csv(filename, dtype=DTYPES)
 
 

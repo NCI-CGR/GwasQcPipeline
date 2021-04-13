@@ -250,9 +250,10 @@ def _split_into_qc_and_study_samples(
 
 if __name__ == "__main__":
     if "snakemake" in locals():
-        defaults = {"subject_id_override": None}
-        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
-        defaults.update({k: Path(v) for k, v in snakemake.output.items()})  # type: ignore # noqa
+        defaults = {
+            **{k: Path(v) for k, v in snakemake.input.items()},  # type: ignore # noqa
+            **{k: Path(v) for k, v in snakemake.output.items()},  # type: ignore # noqa
+        }
         main(**defaults)
     else:
         app()
