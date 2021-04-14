@@ -131,6 +131,30 @@ rule agg_population_qc_table:
         "../scripts/agg_population_qc_tables.py"
 
 
+def population_concordance_files(wildcards):
+    _ = checkpoints.subjects_per_population.get(**wildcards).output[0]
+    populations = glob_wildcards("population_level/subject_lists/{population}.txt").population
+
+    if populations == ["no_populations"]:
+        return []
+
+    return expand(
+        "population_level/{population}/subjects_maf{maf}_ld{ld}_pruned.concordance.csv",
+        population=populations,
+        maf=cfg.config.software_params.maf_for_ibd,
+        ld=cfg.config.software_params.ld_prune_r2,
+    )
+
+
+rule agg_population_concordance:
+    input:
+        population_concordance_files,
+    output:
+        "population_level/concordance.csv",
+    script:
+        "../scripts/agg_population_concordance.py"
+
+
 rule plot_autosomal_heterozygosity:
     input:
         rules.agg_population_qc_table.output[0],
