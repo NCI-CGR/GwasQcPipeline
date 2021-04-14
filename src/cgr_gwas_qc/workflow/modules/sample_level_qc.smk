@@ -226,13 +226,11 @@ rule sample_concordance_graf:
     input:
         fpg="sample_level/call_rate_2/samples_1kg_rsID.fpg",
     output:
-        "sample_level/concordance/graf_relatedness.txt",
-    envmodules:
-        cfg.envmodules("graf"),
+        "sample_level/concordance/graf.tsv",
     conda:
         cfg.conda("graf.yml")
     log:
-        "sample_level/concordance/graf_relatedness.log",
+        "sample_level/concordance/graf.log",
     shell:
         "graf "
         "-geno {input.fpg} "
