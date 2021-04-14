@@ -241,6 +241,26 @@ rule sample_concordance_graf:
         "|| exit_code=$?; if [ $exit_code -ne 1 ]; then exit $exit_code; fi" # GRAF returns an exit code of 1, this captures it so snakemake will actually run.
 
 
+rule sample_concordance_king:
+    input:
+        bed="sample_level/call_rate_2/samples.bed",
+        bim="sample_level/call_rate_2/samples.bim",
+        fam="sample_level/call_rate_2/samples.fam",
+    output:
+        within_family="sample_level/concordance/king.kin",
+        between_family="sample_level/concordance/king.kin0",
+        within_family_X="sample_level/concordance/kingX.kin",
+        between_family_X="sample_level/concordance/kingX.kin0",
+    params:
+        out_prefix="sample_level/concordance/king",
+    conda:
+        cfg.conda("king.yml")
+    log:
+        "sample_level/concordance/king.log",
+    shell:
+        "king -b {input.bed} --kinship --prefix {params.out_prefix} > {log} 2>&1"
+
+
 ################################################################################
 # Sample Level Ancestry
 ################################################################################
