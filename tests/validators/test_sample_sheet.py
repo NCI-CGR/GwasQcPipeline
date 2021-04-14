@@ -41,7 +41,7 @@ missing_sections = [
         ",,,\n"
         "[Data],,,\n"
         "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002,004\n"
+        "SP00001,001,002,004\n"
     ),
     # Missing Manifest Section
     (
@@ -50,7 +50,7 @@ missing_sections = [
         ",,,\n"
         "[Data],,,\n"
         "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002,004\n"
+        "SP00001,001,002,004\n"
     ),
     # Missing Data Section
     ("[Header],,,\n" ",,,\n" "[Manifests],,,\n" ",,,\n"),
@@ -78,7 +78,7 @@ truncated_files = [
         ",,,\n"
         "[Data],,,\n"
         "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002"
+        "SP00001,001,002"
     ),
 ]
 
@@ -102,9 +102,9 @@ null_data_rows = [
         "[Header],,,\n"
         "[Data],,,\n"
         "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002,004\n"
-        "SB002,001,002,003\n"
-        "SB001,001,002,003\n"
+        "SP00001,001,002,004\n"
+        "SP00002,001,002,003\n"
+        "SP00001,001,002,003\n"
         ",,,\n"
     ),
     # Other data row is null
@@ -112,10 +112,10 @@ null_data_rows = [
         "[Header],,,\n"
         "[Data],,,\n"
         "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002,004\n"
-        "SB002,001,002,003\n"
+        "SP00001,001,002,004\n"
+        "SP00002,001,002,003\n"
         ",,,\n"
-        "SB001,001,002,003\n"
+        "SP00001,001,002,003\n"
     ),
 ]
 
@@ -140,9 +140,9 @@ null_other_rows = [
         ",,,\n"
         "[Data],,,\n"
         "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002,004\n"
-        "SB002,001,002,003\n"
-        "SB001,001,002,003\n"
+        "SP00001,001,002,004\n"
+        "SP00002,001,002,003\n"
+        "SP00001,001,002,003\n"
     ),
     # Null Manifests row is ok
     (
@@ -150,9 +150,9 @@ null_other_rows = [
         ",,,\n"
         "[Data],,,\n"
         "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002,004\n"
-        "SB002,001,002,003\n"
-        "SB001,001,002,003\n"
+        "SP00001,001,002,004\n"
+        "SP00002,001,002,003\n"
+        "SP00001,001,002,003\n"
     ),
 ]
 
@@ -175,16 +175,16 @@ missing_req_column = [
     (
         "[Data],,\n"
         "col1,LIMS_Individual_ID,col3,col4\n"
-        "SB001,001,002,004\n"
-        "SB002,001,002,003\n"
+        "SP00001,001,002,004\n"
+        "SP00002,001,002,003\n"
     ),
     # Missing LIMS_Individual_ID
     (
         "[Data],,,\n"
         "Sample_ID,col2,col3,col4\n"
-        "SB001,001,002,004\n"
-        "SB002,,002,003\n"
-        "SB002,001,002,003\n"
+        "SP00001,001,002,004\n"
+        "SP00002,,002,003\n"
+        "SP00002,001,002,003\n"
     ),
 ]
 
@@ -218,8 +218,8 @@ missing_values_in_req_column = [
     (
         "[Data],,,\n"
         "Sample_ID,LIMS_Individual_ID,col3,col4\n"
-        "SB001,001,002,004\n"
-        "SB002,001,002,003\n"
+        "SP00001,001,002,004\n"
+        "SP00002,001,002,003\n"
         ",001,002,003\n"
     ),
 ]

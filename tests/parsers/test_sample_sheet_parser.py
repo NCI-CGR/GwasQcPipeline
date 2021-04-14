@@ -128,8 +128,8 @@ def test_empty_row_in_sample_sheet_data(tmp_path):
             """\
         [Data],,,
         Sample_ID,col2,col3,col4
-        SB001,001,002,004
-        SB002,001,002,003
+        SP00001,001,002,004
+        SP00002,001,002,003
         ,,,
         """
         )
@@ -153,12 +153,12 @@ def updated_sample_sheet(sample_manifest: SampleManifest) -> pd.DataFrame:
         "LIMS_Individual_ID",
         params.expected_sex_column,
         params.case_control_column,
-        {"SB00004_PB0001_D01"},
+        {"SP00005"},
     )
 
 
 def test_update_sample_sheet_sample_no_reps(updated_sample_sheet: pd.DataFrame):
-    sr = updated_sample_sheet.query("Sample_ID == 'SB00001_PB0001_A01'").squeeze()
+    sr = updated_sample_sheet.query("Sample_ID == 'SP00001'").squeeze()
     assert 1 == sr.num_samples_per_subject
     assert pd.isna(sr.replicate_ids)
     assert "M" == sr.expected_sex
@@ -168,9 +168,9 @@ def test_update_sample_sheet_sample_no_reps(updated_sample_sheet: pd.DataFrame):
 
 
 def test_update_sample_sheet_sample_w_reps(updated_sample_sheet: pd.DataFrame):
-    sr = updated_sample_sheet.query("Sample_ID == 'SB00002_PB0001_B01'").squeeze()
+    sr = updated_sample_sheet.query("Sample_ID == 'SP00002'").squeeze()
     assert 2 == sr.num_samples_per_subject
-    assert "SB000008_PB00001_F02|SB00002_PB0001_B01" == sr.replicate_ids
+    assert "SP00002|SP00003" == sr.replicate_ids
     assert "F" == sr.expected_sex
     assert "Control" == sr.case_control
     assert not sr.is_internal_control
@@ -178,7 +178,7 @@ def test_update_sample_sheet_sample_w_reps(updated_sample_sheet: pd.DataFrame):
 
 
 def test_update_sample_sheet_internal_control(updated_sample_sheet: pd.DataFrame):
-    sr = updated_sample_sheet.query("Sample_ID == 'SB00005_PB0001_G01'").squeeze()
+    sr = updated_sample_sheet.query("Sample_ID == 'SP00006'").squeeze()
     assert 1 == sr.num_samples_per_subject
     assert pd.isna(sr.replicate_ids)
     assert "M" == sr.expected_sex
@@ -188,7 +188,7 @@ def test_update_sample_sheet_internal_control(updated_sample_sheet: pd.DataFrame
 
 
 def test_update_sample_sheet_excluded_sample(updated_sample_sheet: pd.DataFrame):
-    sr = updated_sample_sheet.query("Sample_ID == 'SB00004_PB0001_D01'").squeeze()
+    sr = updated_sample_sheet.query("Sample_ID == 'SP00005'").squeeze()
     assert 1 == sr.num_samples_per_subject
     assert pd.isna(sr.replicate_ids)
     assert "M" == sr.expected_sex

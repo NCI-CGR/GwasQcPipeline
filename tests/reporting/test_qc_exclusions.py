@@ -7,7 +7,7 @@ from cgr_gwas_qc.reporting.qc_exclusions import ExclusionTables
 
 def test_pre_qc(fake_cfg, mocker: MockerFixture):
     config = mocker.MagicMock()
-    config.Sample_IDs_to_remove = ["SB00001_PB0001_A01"]
+    config.Sample_IDs_to_remove = ["SP00001"]
     pre_qc = ExclusionTables._pre_qc(config, fake_cfg.ss)
     assert 1 == pre_qc.is_array_processing_failure.sum()
 

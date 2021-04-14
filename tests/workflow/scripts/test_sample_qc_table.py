@@ -295,15 +295,15 @@ def test_find_study_subject_representative():
             dedent(
                 """
         Group_By_Subject_ID,Sample_ID,Call_Rate_2,is_pass_sample_qc
-        SB001,S001,.98,True
-        SB002,S002,.98,True
-        SB002,S003,.99,True
-        IB001,I001,.99,False
-        SB003,S004,.90,False
-        SB003,S005,.91,True
-        SB003,S006,.89,True
-        SB004,S007,.89,False
-        SB004,S008,.9,False
+        SP00001,S001,.98,True
+        SP00002,S002,.98,True
+        SP00002,S003,.99,True
+        IB00001,I001,.99,False
+        SP00003,S004,.90,False
+        SP00003,S005,.91,True
+        SP00003,S006,.89,True
+        SP00004,S007,.89,False
+        SP00004,S008,.9,False
         """
             )
         ),
@@ -333,14 +333,14 @@ def test_find_study_subject_with_no_representative():
             dedent(
                 """
         Group_By_Subject_ID,Sample_ID,is_subject_representative,is_internal_control
-        SB001,S001,True,False
-        SB001,S002,False,False
-        SB002,S003,False,False
-        SB002,S004,False,False
-        SB002,S005,True,False
-        SB003,S006,False,False
-        SB003,S007,False,False
-        SB004,I001,False,True
+        SP00001,S001,True,False
+        SP00001,S002,False,False
+        SP00002,S003,False,False
+        SP00002,S004,False,False
+        SP00002,S005,True,False
+        SP00003,S006,False,False
+        SP00003,S007,False,False
+        SP00004,I001,False,True
         """
             )
         ),

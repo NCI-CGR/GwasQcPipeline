@@ -155,6 +155,6 @@ def test_group_by_column(tmp_path):
     # which ever column is specified for each sample separately.
     sr = cfg.ss.set_index("Sample_ID").Group_By_Subject_ID
 
-    assert sr["SB00001_PB0001_A01"] == "I-0000000001"
-    assert sr["SB00004_PB0001_D01"] == "R-000000-4"
-    assert sr["SB00005_PB0001_G01"] == "NCP666"
+    assert sr["SP00001"] == "I-0000000001"
+    assert sr["SP00004"] == "PI00003"
+    assert sr["SP00006"] == "NCP666"
