@@ -37,7 +37,6 @@ from typing import List, Tuple
 
 import pandas as pd
 import typer
-from pandas.core.dtypes import dtypes
 
 from cgr_gwas_qc.parsers import graf, king, sample_sheet
 from cgr_gwas_qc.typing import PathLike
@@ -50,8 +49,8 @@ DTYPES = {
     "Sample_ID2": "string",
     "Subject_ID1": "string",
     "Subject_ID2": "string",
-    "is_internal_control1": "string",
-    "is_internal_control2": "string",
+    "is_internal_control1": "boolean",
+    "is_internal_control2": "boolean",
     "expected_replicate": "boolean",
     "unexpected_replicate": "boolean",
     "PLINK_PI_HAT": "float",
@@ -89,7 +88,7 @@ def read(filename: PathLike):
         - KING_Kinship
         - KING_relationship
     """
-    return pd.read_csv(filename, dtypes=dtypes)
+    return pd.read_csv(filename, dtype=DTYPES)
 
 
 @app.command()
@@ -99,10 +98,10 @@ def main(
     ss = sample_sheet.read(sample_sheet_csv)
     concordance = (
         build(plink_file, graf_file, king_file)
-        .pipe(_add_subject, ss)
-        .pipe(_add_internal_control, ss)
         .pipe(_add_expected_replicates, ss)
         .pipe(_add_unexpected_replicates)
+        .pipe(_add_subject, ss)
+        .pipe(_add_internal_control, ss)
     )
     concordance.reset_index().reindex(DTYPES.keys(), axis=1).to_csv(outfile, index=False)
 
@@ -180,7 +179,7 @@ def _plink(filename: PathLike):
 
 def _graf(filename: PathLike):
     return (
-        graf.read_graf_relatedness(filename)
+        graf.read_relatedness(filename)
         .set_index(["ID1", "ID2"])
         .reindex(["HGMR", "AGMR", "relationship"], axis=1)
         .rename(
