@@ -14,8 +14,9 @@ Sample Concordance Table
     Subject_ID2, string, Subject_ID for the second sample in the pairwise comparison.
     is_internal_control1, string, internal control flag for the first sample in the pairwise comparison.
     is_internal_control2, string, internal control flag for the second sample in the pairwise comparison.
-    expected_replicate, boolean, True if the pair of samples are known replicates.
-    unexpected_replicate, boolean, True if the pair of samples are from different subjects but look identical.
+    is_expected_replicate, boolean, True if the pair of samples are known replicates.
+    is_discordant_replicate, boolean, True if the pair of samples are a known replicate but do not behave the same.
+    is_unexpected_replicate, boolean, True if the pair of samples are from different subjects but look identical.
     PLINK_PI_HAT, float,Proportion IBD i.e. ``P(IBD=2) + 0.5 * P(IBD=1)``
     PLINK_concordance, float, Proportion IBS2 ``IBS2 / (IBS0 + IBS1 + IBS2)``
     PLINK_is_ge_pi_hat, boolean, True if PI_HAT was greater than ``software_params.pi_hat_cutoff``
@@ -51,8 +52,9 @@ DTYPES = {
     "Subject_ID2": "string",
     "is_internal_control1": "boolean",
     "is_internal_control2": "boolean",
-    "expected_replicate": "boolean",
-    "unexpected_replicate": "boolean",
+    "is_expected_replicate": "boolean",
+    "is_discordant_replicate": "boolean",
+    "is_unexpected_replicate": "boolean",
     "PLINK_PI_HAT": "float",
     "PLINK_concordance": "float",
     "PLINK_is_ge_pi_hat": "boolean",
@@ -76,8 +78,9 @@ def read(filename: PathLike):
         - Subject_ID2
         - is_internal_control1
         - is_internal_control2
-        - expected_replicate
-        - unexpected_replicate
+        - is_expected_replicate
+        - is_discordant_replicate
+        - is_unexpected_replicate
         - PLINK_PI_HAT
         - PLINK_concordance
         - PLINK_is_ge_pi_hat
@@ -99,11 +102,14 @@ def main(
     concordance = (
         build(plink_file, graf_file, king_file)
         .pipe(_add_expected_replicates, ss)
+        .pipe(_add_discordant_replicates)
         .pipe(_add_unexpected_replicates)
         .pipe(_add_subject, ss)
         .pipe(_add_internal_control, ss)
     )
-    concordance.reset_index().reindex(DTYPES.keys(), axis=1).to_csv(outfile, index=False)
+    concordance.reset_index().reindex(DTYPES.keys(), axis=1).astype(DTYPES).to_csv(
+        outfile, index=False
+    )
 
 
 def build(plink_file: PathLike, graf_file: PathLike, king_file: PathLike):
@@ -113,7 +119,12 @@ def build(plink_file: PathLike, graf_file: PathLike, king_file: PathLike):
         .join(_graf(graf_file), how="outer")
         .join(_king(king_file), how="outer")
         .rename_axis(["Sample_ID1", "Sample_ID2"])
+        .dropna(subset=["PLINK_PI_HAT", "GRAF_HGMR"], how="all")  # See note below
     )
+
+    # NOTE: King outputs all pairwise comparisons. I don't want to store all of
+    # these so I am dropping a comparison if it is missing from both PLINK and
+    # GRAF.
 
 
 def _add_subject(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame:
@@ -139,13 +150,23 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
     pair.
     """
     known_replicates = _get_known_replicates(ss)
-    df["expected_replicate"] = False
+    df["is_expected_replicate"] = False
     for pair in known_replicates:
         if pair in df.index:
-            df.loc[pair, "expected_replicate"] = True
+            df.loc[pair, "is_expected_replicate"] = True
         else:
-            record = pd.Series({"expected_replicate": True}, name=pair)
+            record = pd.Series({"is_expected_replicate": True}, name=pair)
             df = df.append(record)
+    return df
+
+
+def _add_discordant_replicates(df: pd.DataFrame) -> pd.DataFrame:
+    df["is_discordant_replicate"] = (
+        df.is_expected_replicate
+        & (df.PLINK_is_ge_concordance.isna() | ~df.PLINK_is_ge_concordance)
+        & (df.GRAF_relationship.isna() | (df.GRAF_relationship != "ID"))
+        & (df.KING_relationship.isna() | (df.KING_relationship != "ID"))
+    )
     return df
 
 
@@ -155,8 +176,10 @@ def _add_unexpected_replicates(df: pd.DataFrame) -> pd.DataFrame:
     Using the different concordance measures, flag a pairs of samples that
     appear to be replicates but are from different subjects.
     """
-    df["unexpected_replicate"] = (~df.expected_replicate) & (
-        df.PLINK_is_ge_concordance | (df.GRAF_relationship == "ID") | (df.KING_relationship == "ID")
+    df["is_unexpected_replicate"] = ~df.is_expected_replicate & (
+        (df.PLINK_is_ge_concordance.notna() & df.PLINK_is_ge_concordance)
+        | (df.GRAF_relationship.notna() & (df.GRAF_relationship == "ID"))
+        | (df.KING_relationship.notna() & (df.KING_relationship == "ID"))
     )
     return df
 
