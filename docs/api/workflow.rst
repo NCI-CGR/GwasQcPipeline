@@ -6,6 +6,8 @@ Sample-Level
 
 .. automodule:: cgr_gwas_qc.workflow.scripts.sample_concordance
 
+.. automodule:: cgr_gwas_qc.workflow.scripts.split_sample_concordance
+
 .. automodule:: cgr_gwas_qc.workflow.scripts.sample_qc_table
 
 Subject-Level
