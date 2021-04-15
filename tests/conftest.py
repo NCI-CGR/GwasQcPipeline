@@ -93,6 +93,45 @@ def qsub(monkeypatch):
     monkeypatch.setenv("PATH", qsub_dir, prepend=os.pathsep)
 
 
+@pytest.fixture(scope="session")
+def fake_tmp_path(tmp_path_factory) -> Path:
+    tmp_path = tmp_path_factory.mktemp("fake_data")
+    (tmp_path / "sample_level").mkdir()
+    (tmp_path / "sample_level/ancestry").mkdir()
+    (tmp_path / "sample_level/concordance").mkdir()
+    (tmp_path / "subject_level").mkdir()
+    (tmp_path / "population_level").mkdir()
+    (tmp_path / "population_level/European").mkdir()
+    return tmp_path
+
+
+@pytest.fixture(scope="session")
+def real_tmp_path(tmp_path_factory) -> Path:
+    tmp_path = tmp_path_factory.mktemp("real_data")
+    (tmp_path / "sample_level").mkdir()
+    (tmp_path / "sample_level/ancestry").mkdir()
+    (tmp_path / "sample_level/concordance").mkdir()
+    (tmp_path / "sample_level/call_rate_2").mkdir()
+    (tmp_path / "subject_level").mkdir()
+    (tmp_path / "population_level").mkdir()
+    (tmp_path / "population_level/European").mkdir()
+    return tmp_path
+
+
+@pytest.fixture(scope="session")
+def fake_data_cache():
+    return FakeData()
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def real_data_cache(pytestconfig):
+    if not pytestconfig.getoption("--real-data"):
+        pytest.skip("No real data")
+
+    return RealData()
+
+
 ##################################################################################
 # Configuration
 ##################################################################################
@@ -175,14 +214,13 @@ def real_short_sample_sheet_csv(real_cfg_short: ConfigMgr) -> Path:
 ##################################################################################
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_concordance_table_csv(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
-    """Creates the sample level concordance table."""
+def sample_concordance_plink(real_cfg: ConfigMgr, real_tmp_path) -> Path:
+    """Creates the sample level plink concordance table."""
     from cgr_gwas_qc.workflow.scripts import concordance_table
 
     # GIVEN: Real lmiss files, a fake mapping of array IDs to 1kg rsIDs, and an
     # outfile.
-    tmp_path = tmp_path_factory.mktemp("sample_concordance")
-    outfile = tmp_path / "sample_concordance_table.csv"
+    outfile = real_tmp_path / "sample_level/concordance/plink.csv"
 
     data_cache = RealData()
     concordance_table.main(
@@ -197,7 +235,104 @@ def sample_concordance_table_csv(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def snp_qc_csv(tmp_path_factory) -> Path:
+def sample_concordance_graf(sample_concordance_plink, real_tmp_path) -> Path:
+    """Forges the sample level graf concordance table.
+
+    I don't want to run GRAF to generate this table, so I am building a fake
+    version using PLINK results.
+    """
+    from cgr_gwas_qc.workflow.scripts import concordance_table
+
+    # GIVEN: PLINK results
+    df = concordance_table.read(sample_concordance_plink)
+
+    # WHEN: Simulate GRAF results based on PLINK results.
+    outfile = real_tmp_path / "sample_level/concordance/graf.tsv"
+    df["HG match"] = 0
+    df["HG miss"] = 0
+    df["HGMR"] = 0.0
+    df["AG match"] = 0
+    df["AG miss"] = 0
+    df["AGMR"] = 0.0
+    df["p_value"] = 0.0
+    df["geno relation"] = df.is_ge_concordance.replace({True: "ID", False: "UN"})
+
+    # THEN: Save out the "graf" like table.
+    df.rename({"ID1": "sample1", "ID2": "sample2"}, axis=1).drop(
+        ["PI_HAT", "concordance", "is_ge_pi_hat", "is_ge_concordance"], axis=1
+    ).to_csv(outfile, sep="\t")
+
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def sample_concordance_king(sample_concordance_plink, real_tmp_path) -> Path:
+    """Forges the sample level king concordance table.
+
+    I don't want to run KING to generate this table, so I am building a fake
+    version using PLINK results.
+    """
+    from cgr_gwas_qc.workflow.scripts import concordance_table
+
+    # GIVEN: PLINK results
+    df = concordance_table.read(sample_concordance_plink)
+
+    # WHEN: Simulate KING results based on PLINK results.
+    outfile = real_tmp_path / "sample_level/concordance/king.tsv"
+    df["N_SNP"] = 0
+    df["HetHet"] = 0
+    df["IBS0"] = 0.0
+    df["Kinship"] = df.is_ge_concordance.replace({True: 0.4, False: 0.01})
+
+    # THEN: Save out the "king" like table.
+    df.drop(["PI_HAT", "concordance", "is_ge_pi_hat", "is_ge_concordance"], axis=1).to_csv(
+        outfile, sep="\t"
+    )
+
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def sample_concordance_csv(
+    real_sample_sheet_csv,
+    sample_concordance_plink,
+    sample_concordance_graf,
+    sample_concordance_king,
+    real_tmp_path,
+):
+    from cgr_gwas_qc.workflow.scripts import sample_concordance
+
+    outfile = real_tmp_path / "sample_level/concordance.csv"
+    sample_concordance.main(
+        real_sample_sheet_csv,
+        sample_concordance_plink,
+        sample_concordance_graf,
+        sample_concordance_king,
+        outfile,
+    )
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def split_sample_concordance_tables(sample_concordance_csv, real_tmp_path):
+    from cgr_gwas_qc.workflow.scripts import split_sample_concordance
+
+    split_sample_concordance.main(
+        sample_concordance_csv,
+        real_tmp_path / "sample_level/concordance/KnownReplicates.csv",
+        real_tmp_path / "sample_level/concordance/InternalQcKnown.csv",
+        real_tmp_path / "sample_level/concordance/StudySampleKnown.csv",
+        real_tmp_path / "sample_level/concordance/UnknownReplicates.csv",
+    )
+    return real_tmp_path / "sample_level/concordance"
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def snp_qc_csv(real_tmp_path) -> Path:
     """The SNP QC table.
 
     Return:
@@ -208,13 +343,12 @@ def snp_qc_csv(tmp_path_factory) -> Path:
 
     # GIVEN: Real lmiss files, a fake mapping of array IDs to 1kg rsIDs, and an
     # outfile.
-    tmp_path = tmp_path_factory.mktemp("snp_qc")
     data_cache = RealData()
 
-    fake_1kg = tmp_path / "1kg.csv"
+    fake_1kg = real_tmp_path / "sample_level/call_rate_2/samples_1kg_rsID.csv"
     fake_1kg.write_text("array_id,thousand_genome_id\n")
 
-    outfile = tmp_path / "snp_qc.csv"
+    outfile = real_tmp_path / "sample_level/snp_qc.csv"
 
     # WHEN: I run the main function of the snp qc script.
     snp_qc_table.main(
@@ -238,7 +372,7 @@ def snp_qc_df(snp_qc_csv) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc_csv(real_cfg, tmp_path_factory) -> Path:
+def sample_qc_csv(real_cfg, software_params, real_tmp_path) -> Path:
     """The Sample QC table.
 
     Return:
@@ -249,11 +383,8 @@ def sample_qc_csv(real_cfg, tmp_path_factory) -> Path:
     """
     from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
-    tmp_path = tmp_path_factory.mktemp("sample_qc")
-    outfile = tmp_path / "sample_qc.csv"
-
-    data_cache = RealData(tmp_path)
-    software_params = SoftwareParams()
+    data_cache = RealData()
+    outfile = real_tmp_path / "sample_level/sample_qc.csv"
 
     sample_qc_table.main(
         real_cfg.root / "cgr_sample_sheet.csv",
@@ -290,7 +421,7 @@ def sample_qc_df(sample_qc_csv) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def population_qc_csv(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
+def population_qc_csv(real_cfg: ConfigMgr, real_tmp_path) -> Path:
     """The Population QC table.
 
     Return:
@@ -298,13 +429,11 @@ def population_qc_csv(real_cfg: ConfigMgr, tmp_path_factory) -> Path:
     """
     from cgr_gwas_qc.workflow.scripts import population_qc_table
 
-    tmp_path = tmp_path_factory.mktemp("population_qc")
-    relatives = tmp_path / "relatives.csv"
+    data_cache = RealData()
+    relatives = real_tmp_path / "population_level/European/relatives.csv"
     relatives.write_text("QC_Family_ID,relatives\n")
 
-    outfile = tmp_path / "population_qc.csv"
-
-    data_cache = RealData(tmp_path)
+    outfile = real_tmp_path / "population_level/European/qc.csv"
 
     population_qc_table.main(
         relatives=relatives,
@@ -329,15 +458,14 @@ def population_qc_df(population_qc_csv) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def agg_population_qc_csv(sample_qc_csv, population_qc_csv, tmp_path_factory) -> Path:
+def agg_population_qc_csv(sample_qc_csv, population_qc_csv, real_tmp_path) -> Path:
     """Create the aggregated population qc table"""
     from cgr_gwas_qc.workflow.scripts import agg_population_qc_tables
 
-    tmp_path = tmp_path_factory.mktemp("agg_population_qc")
-    tables = tmp_path / "population_qc_tables.txt"
+    tables = real_tmp_path / "population_level/per_population_qc.done"
     tables.write_text(population_qc_csv.resolve().as_posix())
 
-    outfile = tmp_path / "agg_population_qc.csv"
+    outfile = real_tmp_path / "population_level/population_qc.csv"
 
     agg_population_qc_tables.main(
         sample_qc_table=sample_qc_csv, population_qc_tables=tables, outfile=outfile,
@@ -355,12 +483,29 @@ def agg_population_qc_df(agg_population_qc_csv) -> pd.DataFrame:
 
 
 @pytest.fixture(scope="session")
-def fake_image(tmp_path_factory):
+def fake_image(fake_tmp_path):
     from PIL import Image
 
-    tmp_path = tmp_path_factory.mktemp("images")
-    outfile = tmp_path / "fake.png"
+    outfile = fake_tmp_path / "fake.png"
     img = Image.new("RGB", (1024, 1024), color="gray")
     img.save(outfile)
+
+    return outfile
+
+
+@pytest.fixture(scope="session")
+def fake_sample_concordance_csv(fake_sample_sheet_csv, fake_tmp_path):
+    from cgr_gwas_qc.workflow.scripts import sample_concordance
+
+    outfile = fake_tmp_path / "sample_level/concordance.csv"
+
+    data_cache = FakeData()
+    sample_concordance.main(
+        fake_sample_sheet_csv,
+        data_cache / "cgr/concordance.csv",
+        data_cache / "graf/relatedness.tsv",
+        data_cache / "king/king.kin0",
+        outfile,
+    )
 
     return outfile
