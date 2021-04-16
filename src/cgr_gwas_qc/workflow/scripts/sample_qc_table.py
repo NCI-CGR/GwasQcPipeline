@@ -311,7 +311,7 @@ def _read_known_replicates(
 
     discord_Sample_IDs = (
         pd.read_csv(file_name)  # Subject_ID Sample_ID1 Sample_ID2 Concordance PI_HAT
-        .rename({"Concordance": "concordance"}, axis=1)  # legacy uses uppercase
+        .rename({"PLINK_concordance": "concordance"}, axis=1)  # legacy uses uppercase
         .query("concordance.notna() & concordance < @dup_concordance_cutoff")
         .loc[:, ("Sample_ID1", "Sample_ID2")]
         .melt()

@@ -133,8 +133,8 @@ class InternalControls:
             sample_qc.query(
                 "not is_call_rate_filtered " "& not is_contaminated " "& not is_internal_control"
             ).shape[0],
-            replicates.concordance.min(),
-            replicates.concordance.mean(),
+            replicates.PLINK_concordance.min(),
+            replicates.PLINK_concordance.mean(),
         )
 
 
@@ -152,8 +152,8 @@ class ExpectedReplicates:
             sample_qc.is_replicate_discordant.sum(),
             sample_qc.query("is_pass_sample_qc & not is_subject_representative").shape[0],
             sample_qc.query("is_subject_representative").shape[0],
-            replicates.concordance.min(),
-            replicates.concordance.mean(),
+            replicates.PLINK_concordance.min(),
+            replicates.PLINK_concordance.mean(),
         )
 
 
@@ -167,8 +167,8 @@ class UnExpectedReplicates:
     def construct(cls, sample_qc: pd.DataFrame, replicates: pd.DataFrame) -> "UnExpectedReplicates":
         return cls(
             sample_qc.is_unexpected_replicate.sum(),
-            replicates.concordance.min(),
-            replicates.concordance.mean(),
+            replicates.PLINK_concordance.min(),
+            replicates.PLINK_concordance.mean(),
         )
 
 
