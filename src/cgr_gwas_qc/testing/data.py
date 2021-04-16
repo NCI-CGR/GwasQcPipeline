@@ -28,8 +28,9 @@ from pathlib import Path
 from typing import Iterable, MutableMapping, Optional, TypeVar, Union
 from warnings import warn
 
+from cgr_gwas_qc.cli.pre_flight import update_sample_sheet
 from cgr_gwas_qc.models.config.workflow_params import WorkflowParams
-from cgr_gwas_qc.parsers.sample_sheet import SampleManifest, update_sample_sheet
+from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.testing import make_snakefile, make_test_config
 
 DEFAULT_TEST_DATA_SERVER = "cgemsiii.nci.nih.gov"

@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Generator, List, Optional
 
-from cgr_gwas_qc.parsers import CgrBiAllelicVariantRecord, CgrFile
+from .common import CgrBiAllelicVariantRecord, CgrFile
 
 
 @contextmanager

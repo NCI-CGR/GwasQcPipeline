@@ -1,7 +1,12 @@
-from .adpc import AdpcReader, AdpcRecord, AdpcWriter  # noqa:F401
-from .IlluminaBeadArrayFiles import (  # noqa:F401
-    BeadPoolManifest,
-    GenotypeCalls,
-    RefStrand,
-    complement,
-)
+from .adpc import AdpcReader, AdpcRecord, AdpcWriter
+from .IlluminaBeadArrayFiles import BeadPoolManifest, GenotypeCalls, RefStrand, complement
+
+__all__ = [
+    "AdpcReader",
+    "AdpcRecord",
+    "AdpcWriter",
+    "BeadPoolManifest",
+    "complement",
+    "GenotypeCalls",
+    "RefStrand",
+]

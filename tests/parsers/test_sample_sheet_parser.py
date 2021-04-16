@@ -5,12 +5,10 @@ from textwrap import dedent
 import pandas as pd
 import pytest
 
-from cgr_gwas_qc.models.config.workflow_params import WorkflowParams
 from cgr_gwas_qc.parsers.sample_sheet import (
     SampleManifest,
     _convert_to_key_value_pair,
     _strip_terminal_commas,
-    update_sample_sheet,
 )
 from cgr_gwas_qc.testing.data import FakeData
 
@@ -140,58 +138,3 @@ def test_empty_row_in_sample_sheet_data(tmp_path):
 
     # THEN: we automatically drop that empty row
     assert ss.data.shape[0] == 2
-
-
-################################################################################
-# Adding of custom columns based on config options
-################################################################################
-@pytest.fixture
-def updated_sample_sheet(sample_manifest: SampleManifest) -> pd.DataFrame:
-    params = WorkflowParams()
-    return update_sample_sheet(
-        sample_manifest.data,
-        "LIMS_Individual_ID",
-        params.expected_sex_column,
-        params.case_control_column,
-        {"SP00005"},
-    )
-
-
-def test_update_sample_sheet_sample_no_reps(updated_sample_sheet: pd.DataFrame):
-    sr = updated_sample_sheet.query("Sample_ID == 'SP00001'").squeeze()
-    assert 1 == sr.num_samples_per_subject
-    assert pd.isna(sr.replicate_ids)
-    assert "M" == sr.expected_sex
-    assert "Case" == sr.case_control
-    assert not sr.is_internal_control
-    assert not sr.is_sample_exclusion
-
-
-def test_update_sample_sheet_sample_w_reps(updated_sample_sheet: pd.DataFrame):
-    sr = updated_sample_sheet.query("Sample_ID == 'SP00002'").squeeze()
-    assert 2 == sr.num_samples_per_subject
-    assert "SP00002|SP00003" == sr.replicate_ids
-    assert "F" == sr.expected_sex
-    assert "Control" == sr.case_control
-    assert not sr.is_internal_control
-    assert not sr.is_sample_exclusion
-
-
-def test_update_sample_sheet_internal_control(updated_sample_sheet: pd.DataFrame):
-    sr = updated_sample_sheet.query("Sample_ID == 'SP00006'").squeeze()
-    assert 1 == sr.num_samples_per_subject
-    assert pd.isna(sr.replicate_ids)
-    assert "M" == sr.expected_sex
-    assert "QC" == sr.case_control
-    assert sr.is_internal_control
-    assert not sr.is_sample_exclusion
-
-
-def test_update_sample_sheet_excluded_sample(updated_sample_sheet: pd.DataFrame):
-    sr = updated_sample_sheet.query("Sample_ID == 'SP00005'").squeeze()
-    assert 1 == sr.num_samples_per_subject
-    assert pd.isna(sr.replicate_ids)
-    assert "M" == sr.expected_sex
-    assert "Control" == sr.case_control
-    assert not sr.is_internal_control
-    assert sr.is_sample_exclusion
