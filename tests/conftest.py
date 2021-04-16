@@ -304,7 +304,7 @@ def sample_concordance_csv(
 ):
     from cgr_gwas_qc.workflow.scripts import sample_concordance
 
-    outfile = real_tmp_path / "sample_level/concordance.csv"
+    outfile = real_tmp_path / "sample_level/concordance/summary.csv"
     sample_concordance.main(
         real_sample_sheet_csv,
         sample_concordance_plink,
@@ -491,7 +491,7 @@ def fake_image(fake_tmp_path):
 def fake_sample_concordance_csv(fake_sample_sheet_csv, fake_tmp_path):
     from cgr_gwas_qc.workflow.scripts import sample_concordance
 
-    outfile = fake_tmp_path / "sample_level/concordance.csv"
+    outfile = fake_tmp_path / "sample_level/concordance/summary.csv"
 
     data_cache = FakeData()
     sample_concordance.main(
