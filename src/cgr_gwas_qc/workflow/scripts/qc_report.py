@@ -9,9 +9,9 @@ from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.reporting import ExclusionTables, SampleQC, SubjectQC, env
 from cgr_gwas_qc.workflow.scripts import (
     population_qc_table,
-    sample_concordance,
     sample_qc_table,
     snp_qc_table,
+    split_sample_concordance,
 )
 
 app = typer.Typer(add_completion=False)
@@ -39,9 +39,11 @@ def main(
     snp_qc = snp_qc_table.read(snp_qc_csv)
     sample_qc = sample_qc_table.read(sample_qc_csv)
     population_qc = population_qc_table.read(population_qc_csv)
-    control_replicates = sample_concordance.read_known_sample_concordance(control_replicates_csv)
-    study_replicates = sample_concordance.read_known_sample_concordance(study_replicates_csv)
-    unexpected_replicates = sample_concordance.read_unknown_sample_concordance(
+    control_replicates = split_sample_concordance.read_known_sample_concordance(
+        control_replicates_csv
+    )
+    study_replicates = split_sample_concordance.read_known_sample_concordance(study_replicates_csv)
+    unexpected_replicates = split_sample_concordance.read_unknown_sample_concordance(
         unexpected_replicates_csv
     )
 
