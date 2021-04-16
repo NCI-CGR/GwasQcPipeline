@@ -433,13 +433,34 @@ def test_agg_contamination_test(tmp_path, median_idat_intensity):
 ################################################################################
 # Sample/Replicate Concordance
 ################################################################################
+
+
 @pytest.mark.real_data
-@pytest.mark.workflow
-@pytest.mark.regression
-def test_sample_concordance_plink(software_params, tmp_path):
-    # GIVEN: Real data
-    data_cache = (
+@pytest.fixture(scope="module")
+def sample_concordance_outputs(software_params, graf_inputs, tmp_path_factory):
+    tmp_path = tmp_path_factory.mktemp("sample_concordance_outputs")
+
+    maf = software_params.maf_for_ibd
+    ld = software_params.ld_prune_r2
+
+    (
         RealData(tmp_path)
+        .copy(
+            "production_outputs/ibd/samples.genome",
+            f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome",
+        )
+        .copy(
+            "production_outputs/plink_filter_call_rate_2/samples.bed",
+            "sample_level/call_rate_2/samples.bed",
+        )
+        .copy(
+            "production_outputs/plink_filter_call_rate_2/samples.bim",
+            "sample_level/call_rate_2/samples.bim",
+        )
+        .copy(
+            "production_outputs/plink_filter_call_rate_2/samples.fam",
+            "sample_level/call_rate_2/samples.fam",
+        )
         .make_config()
         .make_cgr_sample_sheet()
         .make_snakefile(
@@ -461,92 +482,47 @@ def test_sample_concordance_plink(software_params, tmp_path):
         )
     )
 
-    maf = software_params.maf_for_ibd
-    ld = software_params.ld_prune_r2
-
-    data_cache.copy(
-        "production_outputs/ibd/samples.genome",
-        f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.genome",
+    shutil.copy(
+        graf_inputs / "sample_level/call_rate_2/samples_1kg_rsID.fpg",
+        tmp_path / "sample_level/call_rate_2/samples_1kg_rsID.fpg",
     )
 
     # WHEN: we run snakemake looking for the replicate output files.
     run_snakemake(tmp_path)
 
-    # THEN:
-    def _compare(obs_, exp_):
-        assert_frame_equal(
-            (
-                pd.read_csv(obs_)
-                .drop(["is_ge_pi_hat", "is_ge_concordance"], axis=1)
-                .set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
-            ),
-            (
-                pd.read_csv(exp_)
-                .rename({"Concordance": "concordance"}, axis=1)
-                .set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
-            ),
-            check_exact=False,
-            check_like=True,
-        )
-
-    _compare(
-        tmp_path / "sample_level/concordance/KnownReplicates.csv",
-        data_cache / "production_outputs/concordance/KnownReplicates.csv",
-    )
-
-    _compare(
-        tmp_path / "sample_level/concordance/InternalQcKnown.csv",
-        data_cache / "production_outputs/concordance/InternalQcKnown.csv",
-    )
-
-    _compare(
-        tmp_path / "sample_level/concordance/StudySampleKnown.csv",
-        data_cache / "production_outputs/concordance/StudySampleKnown.csv",
-    )
+    return tmp_path
 
 
-@pytest.mark.real_data
 @pytest.mark.workflow
 @pytest.mark.regression
-@pytest.mark.slow
-def test_sample_concordance_graf(tmp_path, graf_inputs, conda_envs):
-    conda_envs.copy_env("graf", tmp_path)
-    shutil.copytree(graf_inputs, tmp_path, dirs_exist_ok=True)
-    make_snakefile(
-        tmp_path,
-        """
-        from cgr_gwas_qc import load_config
-
-        cfg = load_config()
-
-        include: cfg.modules("sample_level_qc.smk")
-
-        rule all:
-            input:
-                "sample_level/concordance/graf_relatedness.txt"
-        """,
-    )
-
-    run_snakemake(tmp_path)
-
-    # THEN: Samples marked as ID should also be marked as dups by plink ibd
-    obs_graf = pd.read_csv(
-        tmp_path / "sample_level/concordance/graf_relatedness.txt", sep="\t", comment="#"
-    )
-    obs_dups = {
-        tuple(sorted(x))
-        for x in obs_graf.query("`geno relation` == 'ID'")[["sample1", "sample2"]].itertuples(
-            index=False
+def test_sample_concordance_plink(real_data_cache, sample_concordance_outputs):
+    # GIVEN: Real data
+    # THEN:
+    def _compare(exp_file, obs_file):
+        exp_df = pd.read_csv(exp_file).set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
+        obs_df = (
+            pd.read_csv(obs_file)
+            .rename({"PLINK_PI_HAT": "PI_HAT", "PLINK_concordance": "Concordance"}, axis=1)
+            .set_index(["Subject_ID", "Sample_ID1", "Sample_ID2"])
+            .reindex(["PI_HAT", "Concordance"], axis=1)
         )
-    }  # Set of tuples of Sample_IDs that are identical
 
-    exp_plink = pd.read_csv(RealData() / "production_outputs/concordance/KnownReplicates.csv")
-    exp_dups = {
-        tuple(sorted(x))
-        for x in exp_plink.dropna()[["Sample_ID1", "Sample_ID2"]].itertuples(index=False)
-    }  # Set of tuples of Sample_IDs that are concordant
+        assert_frame_equal(exp_df, obs_df, check_exact=False, check_like=True)
 
-    assert obs_dups == exp_dups
+    _compare(
+        real_data_cache / "production_outputs/concordance/KnownReplicates.csv",
+        sample_concordance_outputs / "sample_level/concordance/KnownReplicates.csv",
+    )
+
+    _compare(
+        real_data_cache / "production_outputs/concordance/InternalQcKnown.csv",
+        sample_concordance_outputs / "sample_level/concordance/InternalQcKnown.csv",
+    )
+
+    _compare(
+        real_data_cache / "production_outputs/concordance/StudySampleKnown.csv",
+        sample_concordance_outputs / "sample_level/concordance/StudySampleKnown.csv",
+    )
 
 
 ################################################################################
