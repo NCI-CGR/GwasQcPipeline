@@ -160,13 +160,39 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
     return df
 
 
+def _discordant_logic(sr: pd.Series) -> bool:
+    if not sr.is_expected_replicate:
+        # not a replicate
+        return False
+
+    if all(
+        [
+            pd.isna(sr.PLINK_is_ge_concordance),
+            pd.isna(sr.GRAF_relationship),
+            pd.isna(sr.KING_relationship),
+        ]
+    ):
+        # No metrics so ignore
+        return False
+
+    if pd.notna(sr.PLINK_is_ge_concordance):
+        # plink call: True if < concordance threshold
+        return not sr.PLINK_is_ge_concordance
+
+    if all([pd.notna(sr.GRAF_relationship), pd.notna(sr.KING_relationship)]):
+        # We have both graf and king calls: True if both are discordant
+        return (sr.GRAF_relationship != "ID") & (sr.KING_relationship != "ID")
+
+    if pd.notna(sr.GRAF_relationship):
+        # We only have graf call
+        return sr.GRAF_relationship != "ID"
+
+    # We only have king call
+    return sr.KING_relationship != "ID"
+
+
 def _add_discordant_replicates(df: pd.DataFrame) -> pd.DataFrame:
-    df["is_discordant_replicate"] = (
-        df.is_expected_replicate
-        & (df.PLINK_is_ge_concordance.isna() | ~df.PLINK_is_ge_concordance)
-        & (df.GRAF_relationship.isna() | (df.GRAF_relationship != "ID"))
-        & (df.KING_relationship.isna() | (df.KING_relationship != "ID"))
-    )
+    df["is_discordant_replicate"] = df.apply(_discordant_logic, axis=1)
     return df
 
 

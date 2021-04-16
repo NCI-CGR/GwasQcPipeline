@@ -72,15 +72,11 @@ def test_add_discordant_replicate_missing_pair(fake_cfg, concordance):
     storage reasons. I want to make sure if an expected replicate is not in
     the table it gets added.
     """
-    # GIVEN: That I have an expected replicate that is not in the concordance table
-    ss = fake_cfg.ss.copy()
-    ss.loc[0, "replicate_ids"] = "SP00001|SP10000"  # Add an expected replicate
-    ss = ss.append(
-        pd.Series({"Sample_ID": "SP10000", "replicate_ids": "SP00001|SP10000"}), ignore_index=True
-    )
+    # GIVEN: That I force the replciate to be discordant
+    concordance.loc[("SP00002", "SP00003"), "PLINK_is_ge_concordance"] = False
 
-    # THEN: I should add that pair and flag them as an expected_replicate
-    df = concordance.pipe(sample_concordance._add_expected_replicates, ss).pipe(
+    # THEN: I should have one flag
+    df = concordance.pipe(sample_concordance._add_expected_replicates, fake_cfg.ss).pipe(
         sample_concordance._add_discordant_replicates
     )
     assert 1 == df.is_discordant_replicate.sum()
@@ -90,18 +86,24 @@ def test_add_discordant_replicate_missing_pair(fake_cfg, concordance):
     "expected_result,is_rep,plink,graf,king",
     [
         (False, False, True, "ID", "ID"),  # Not an expected replicate
-        (False, True, True, "ID", "ID"),  # expected not discordant
-        (False, True, True, "UN", "UN"),  # expected not plink discordant
-        (False, True, False, "ID", "UN"),  # expected not graf discordant
-        (False, True, False, "UN", "ID"),  # expected not king discordant
-        (False, True, True, pd.NA, pd.NA),  # expected not plink missing
-        (False, True, pd.NA, "ID", pd.NA),  # expected not graf missing
-        (False, True, pd.NA, pd.NA, "ID"),  # expected not king missing
-        (True, True, False, pd.NA, pd.NA),  # plink discordant others missing
-        (True, True, pd.NA, "UN", pd.NA),  # graf discordant others missing
-        (True, True, pd.NA, pd.NA, "UN"),  # king discordant others missing
-        (True, True, False, "UN", "UN"),  # all discordant
-        (True, True, pd.NA, pd.NA, pd.NA),  # all missing
+        # PLINK Concordant
+        (False, True, True, "ID", "ID"),  # all concordant
+        (False, True, True, "UN", "UN"),  # GRAF and KING don't matter
+        (False, True, True, pd.NA, pd.NA),  # GRAF and KING don't matter
+        # PLINK Discordant
+        (True, True, False, "ID", "UN"),  # GRAF and KING don't matter
+        (True, True, False, "UN", "ID"),  # GRAF and KING don't matter
+        (True, True, False, pd.NA, pd.NA),  # GRAF and KING don't matter
+        (True, True, False, "UN", "UN"),  # GRAF and KING don't matter
+        # PLINK Missing
+        (False, True, pd.NA, "ID", "ID"),  # GRAF and KING concordant
+        (False, True, pd.NA, "ID", "UN"),  # GRAF and KING disagree
+        (False, True, pd.NA, "UN", "ID"),  # GRAF and KING disagree
+        (False, True, pd.NA, "ID", pd.NA),  # GRAF concordant
+        (False, True, pd.NA, pd.NA, "ID"),  # KING concordant
+        (True, True, pd.NA, "UN", pd.NA),  # GRAF discordant
+        (True, True, pd.NA, pd.NA, "UN"),  # KING discordant
+        (False, True, pd.NA, pd.NA, pd.NA),  # All missing so don't call
     ],
 )
 def test_add_discordant_logic(expected_result, is_rep, plink, graf, king):
