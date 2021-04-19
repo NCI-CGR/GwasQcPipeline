@@ -1,49 +1,6 @@
 import shutil
 
-import pandas as pd
 import pytest
-
-from cgr_gwas_qc.testing.data import RealData
-
-
-@pytest.mark.real_data
-@pytest.fixture
-def control_replicates(tmp_path):
-    outfile = tmp_path / "InternalQcKnown.csv"
-
-    (
-        pd.read_csv(RealData() / "production_outputs/concordance/InternalQcKnown.csv")
-        .rename({"Concordance": "concordance"}, axis=1)
-        .to_csv(outfile)
-    )
-
-    return outfile
-
-
-@pytest.mark.real_data
-@pytest.fixture
-def study_replicates(tmp_path):
-    outfile = tmp_path / "StudySampleKnown.csv"
-    (
-        pd.read_csv(RealData() / "production_outputs/concordance/StudySampleKnown.csv")
-        .rename({"Concordance": "concordance"}, axis=1)
-        .to_csv(outfile)
-    )
-
-    return outfile
-
-
-@pytest.mark.real_data
-@pytest.fixture
-def unknown_replicates(tmp_path):
-    outfile = tmp_path / "UnknownReplicates.csv"
-    (
-        pd.read_csv(RealData() / "production_outputs/concordance/UnknownReplicates.csv")
-        .rename({"Concordance": "concordance"}, axis=1)
-        .to_csv(outfile)
-    )
-
-    return outfile
 
 
 @pytest.mark.real_data
@@ -52,9 +9,7 @@ def test_qc_report(
     snp_qc_csv,
     sample_qc_csv,
     population_qc_csv,
-    control_replicates,
-    study_replicates,
-    unknown_replicates,
+    split_sample_concordance_tables,
     fake_image,
     tmp_path,
 ):
@@ -74,9 +29,9 @@ def test_qc_report(
         snp_qc_csv=snp_qc_csv,
         sample_qc_csv=sample_qc_csv,
         population_qc_csv=population_qc_csv,
-        control_replicates_csv=control_replicates,
-        study_replicates_csv=study_replicates,
-        unexpected_replicates_csv=unknown_replicates,
+        control_replicates_csv=split_sample_concordance_tables / "InternalQcKnown.csv",
+        study_replicates_csv=split_sample_concordance_tables / "StudySampleKnown.csv",
+        unexpected_replicates_csv=split_sample_concordance_tables / "UnknownReplicates.csv",
         call_rate_png=fake_image,
         chrx_inbreeding_png=fake_image,
         ancestry_png=fake_image,

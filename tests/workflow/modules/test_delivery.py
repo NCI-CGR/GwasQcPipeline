@@ -70,10 +70,12 @@ def test_lab_lims_upload(files_for_upload):
     # NOTE: The legacy workflow uses `Sample ID` instead of `Sample_ID`. The
     # dev workflow uses `Sample_ID` so I need to rename production outputs
     # prior to comparisons.
-    obs_ = pd.read_csv(tmp_path / "files_for_lab/SR001-001_00_LimsUpload_0000000.csv").set_index(
-        "Sample_ID"
+    obs_df = (
+        pd.read_csv(tmp_path / "files_for_lab/SR001-001_00_LimsUpload_0000000.csv")
+        .set_index("Sample_ID")
+        .fillna({"Expected Replicate Discordance": False, "Unexpected Replicate": False})
     )
-    exp_ = (
+    exp_df = (
         pd.read_csv(
             data_cache
             / "production_outputs/files_for_lab/SR0446-001_12_LimsUpload_1011201995419_casecontrol_20191011.csv"
@@ -82,7 +84,7 @@ def test_lab_lims_upload(files_for_upload):
         .set_index("Sample_ID")
     )
 
-    assert_frame_equal(obs_, exp_, check_dtype=False, check_like=True)
+    assert_frame_equal(exp_df, obs_df, check_dtype=False, check_like=True)
 
 
 @pytest.mark.regression

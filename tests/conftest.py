@@ -304,7 +304,7 @@ def sample_concordance_csv(
 ):
     from cgr_gwas_qc.workflow.scripts import sample_concordance
 
-    outfile = real_tmp_path / "sample_level/concordance.csv"
+    outfile = real_tmp_path / "sample_level/concordance/summary.csv"
     sample_concordance.main(
         real_sample_sheet_csv,
         sample_concordance_plink,
@@ -372,7 +372,7 @@ def snp_qc_df(snp_qc_csv) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc_csv(real_cfg, software_params, real_tmp_path) -> Path:
+def sample_qc_csv(real_cfg, real_tmp_path, sample_concordance_csv) -> Path:
     """The Sample QC table.
 
     Return:
@@ -393,11 +393,9 @@ def sample_qc_csv(real_cfg, software_params, real_tmp_path) -> Path:
         data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
         data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
         data_cache / "production_outputs/snpweights/samples.snpweights.csv",
-        data_cache / "production_outputs/concordance/KnownReplicates.csv",
-        data_cache / "production_outputs/concordance/UnknownReplicates.csv",
+        sample_concordance_csv,
         data_cache / "production_outputs/all_contam/contam.csv",
         data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-        software_params.dup_concordance_cutoff,
         0.2,
         outfile,
     )
@@ -491,7 +489,7 @@ def fake_image(fake_tmp_path):
 def fake_sample_concordance_csv(fake_sample_sheet_csv, fake_tmp_path):
     from cgr_gwas_qc.workflow.scripts import sample_concordance
 
-    outfile = fake_tmp_path / "sample_level/concordance.csv"
+    outfile = fake_tmp_path / "sample_level/concordance/summary.csv"
 
     data_cache = FakeData()
     sample_concordance.main(

@@ -267,7 +267,7 @@ rule sample_concordance:
         graf_file=rules.sample_concordance_graf.output[0],
         king_file=rules.sample_concordance_king.output.between_family,
     output:
-        "sample_level/concordance.csv",
+        "sample_level/concordance/summary.csv",
     script:
         "../scripts/sample_concordance.py"
 
