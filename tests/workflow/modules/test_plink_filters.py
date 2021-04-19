@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 
 import pytest
 
@@ -11,122 +10,6 @@ from cgr_gwas_qc.testing.data import RealData
 ################################################################################
 # Call Rate Filters
 ################################################################################
-@pytest.mark.real_data
-@pytest.mark.regression
-@pytest.mark.workflow
-def test_old_call_rate_filter_order(tmp_path, conda_envs):
-    """Check call rate filter order.
-
-    The legacy workflow runs marker and sample call rate filters
-    simultaneously. According to the logs it looks like plink actually runs
-    samples then marker filters sequentially. We decided to split this into
-    two steps and reverse the order (i.e., snp then sample filtering). Here I
-    am testing the splitting part to make sure we get the same results. In
-    other words, I am keep in the legacy workflow order (sample -> snp) and
-    to make sure splitting does not change anything.
-    """
-    # GIVEN: A real data repo and plink2 conda env
-    # And a snakefile with sample call rate filter 1 -> snp call rate filter 1
-    conda_envs.copy_env("plink2", tmp_path)
-    data_cache = (
-        RealData(tmp_path)
-        .copy("production_outputs/plink_start/samples.bed", "sample_level/samples.bed")
-        .copy("production_outputs/plink_start/samples.bim", "sample_level/samples.bim")
-        .copy("production_outputs/plink_start/samples.fam", "sample_level/samples.fam")
-        .make_config()
-        .make_cgr_sample_sheet()
-        .make_snakefile(
-            """
-            from cgr_gwas_qc import load_config
-
-            cfg = load_config()
-
-            rule all:
-                input:
-                    "sample_level/call_rate_2/snps.bed"
-
-            def _sample_call_rate_filter(wildcards):
-                if wildcards.cr == "2":
-                    return {
-                        "bed": "{prefix}/call_rate_1/snps.bed",
-                        "bim": "{prefix}/call_rate_1/snps.bim",
-                        "fam": "{prefix}/call_rate_1/snps.fam",
-                    }
-
-                return {
-                    "bed": "{prefix}/samples.bed",
-                    "bim": "{prefix}/samples.bim",
-                    "fam": "{prefix}/samples.fam",
-                }
-
-            rule sample_call_rate_filter:
-                input:
-                    unpack(_sample_call_rate_filter)
-                params:
-                    mind=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"sample_call_rate_{wc.cr}")),
-                    out_prefix="{prefix}/call_rate_{cr}/samples"
-                output:
-                    bed="{prefix}/call_rate_{cr}/samples.bed",
-                    bim="{prefix}/call_rate_{cr}/samples.bim",
-                    fam="{prefix}/call_rate_{cr}/samples.fam",
-                wildcard_constraints:
-                    samp_cr="[1, 2]"
-                log:
-                    "{prefix}/call_rate_{cr}/samples.log",
-                conda:
-                    cfg.conda("plink2.yml")
-                shell:
-                    "plink "
-                    "--bed {input.bed} "
-                    "--bim {input.bim} "
-                    "--fam {input.fam} "
-                    "--mind {params.mind} "
-                    "--make-bed "
-                    "--out {params.out_prefix}"
-
-            rule snp_call_rate_filter:
-                input:
-                    bed="{prefix}/call_rate_{cr}/samples.bed",
-                    bim="{prefix}/call_rate_{cr}/samples.bim",
-                    fam="{prefix}/call_rate_{cr}/samples.fam",
-                params:
-                    geno=lambda wc: 1 - float(cfg.config.software_params.dict().get(f"snp_call_rate_{wc.cr}")),
-                    out_prefix="{prefix}/call_rate_{cr}/snps",
-                output:
-                    bed="{prefix}/call_rate_{cr}/snps.bed",
-                    bim="{prefix}/call_rate_{cr}/snps.bim",
-                    fam="{prefix}/call_rate_{cr}/snps.fam",
-                wildcard_constraints:
-                    snp_cr="[1, 2]"
-                log:
-                    "{prefix}/call_rate_{cr}/snps.log",
-                conda:
-                    cfg.conda("plink2.yml")
-                shell:
-                    "plink "
-                    "--bed {input.bed} "
-                    "--bim {input.bim} "
-                    "--fam {input.fam} "
-                    "--geno {params.geno} "
-                    "--make-bed "
-                    "--out {params.out_prefix}"
-            """
-        )
-    )
-
-    # WHEN: I run snakemake
-    run_snakemake(tmp_path, keep_temp=True)
-
-    # THEN: The file after sample -> snp filtering should match the file from the legacy workflow.
-    obs_cr1 = tmp_path / "sample_level/call_rate_1/snps.bed"
-    exp_cr1 = data_cache / "production_outputs/plink_filter_call_rate_1/samples.bed"
-    assert file_hashes_equal(obs_cr1, exp_cr1)
-
-    obs_cr2 = tmp_path / "sample_level/call_rate_2/snps.bed"
-    exp_cr2 = data_cache / "production_outputs/plink_filter_call_rate_2/samples.bed"
-    assert file_hashes_equal(obs_cr2, exp_cr2)
-
-
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.workflow
@@ -156,24 +39,16 @@ def test_call_rate_filters(tmp_path, conda_envs):
     )
 
     # WHEN: I run snakemake
-    run_snakemake(tmp_path)
+    run_snakemake(tmp_path, keep_temp=True)
 
-    # THEN:
-    # the number of variants and samples filtered should be close to production outputs
-    def parse_call_rate_log(file_name: Path):
-        """Parse a plink log to find out how many snps/samples passed filtering."""
-        m = re.findall(
-            r".*\n(\d+) variants and (\d+) people pass filters and QC.*", file_name.read_text()
-        )
-        variants, samples = m[0]
-        return int(variants), int(samples)
+    # THEN: The final file after filtering should match the file from the legacy workflow.
+    obs_cr1 = tmp_path / "sample_level/call_rate_1/samples.bed"
+    exp_cr1 = data_cache / "production_outputs/plink_filter_call_rate_1/samples.bed"
+    assert file_hashes_equal(obs_cr1, exp_cr1)
 
-    obs_var, obs_samples = parse_call_rate_log(tmp_path / "sample_level/call_rate_2/samples.log")
-    exp_var, exp_samples = parse_call_rate_log(
-        data_cache / "production_outputs/plink_filter_call_rate_2/samples.log"
-    )
-    assert abs(obs_var - exp_var) <= 12000
-    assert abs(obs_samples - exp_samples) <= 5
+    obs_cr2 = tmp_path / "sample_level/call_rate_2/samples.bed"
+    exp_cr2 = data_cache / "production_outputs/plink_filter_call_rate_2/samples.bed"
+    assert file_hashes_equal(obs_cr2, exp_cr2)
 
 
 ################################################################################
