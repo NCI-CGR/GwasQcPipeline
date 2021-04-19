@@ -149,7 +149,7 @@ class ExpectedReplicates:
     @classmethod
     def construct(cls, sample_qc: pd.DataFrame, replicates: pd.DataFrame) -> "ExpectedReplicates":
         return cls(
-            sample_qc.is_replicate_discordant.sum(),
+            sample_qc.is_discordant_replicate.sum(),
             sample_qc.query("is_pass_sample_qc & not is_subject_representative").shape[0],
             sample_qc.query("is_subject_representative").shape[0],
             replicates.PLINK_concordance.min(),

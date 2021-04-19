@@ -21,7 +21,7 @@ def test_sample_qc_table(sample_qc_df):
         "ChrX_Inbreed_estimate": {"name": "X_inbreeding_coefficient", "dtype": "float"},
         "Contamination_Rate": {"name": "Contamination_Rate", "dtype": "float"},
         "Count_of_QC_Issue": {"name": "Count_of_QC_Issue", "dtype": "UInt8"},
-        "Expected Replicate Discordance": {"name": "is_replicate_discordant", "dtype": "boolean"},
+        "Expected Replicate Discordance": {"name": "is_discordant_replicate", "dtype": "boolean"},
         "IdatIntensity": {"name": "IdatIntensity", "dtype": "float"},
         "Identifiler_Needed": {"name": "identifiler_needed", "dtype": "boolean"},
         "Low Call Rate": {"name": "is_call_rate_filtered", "dtype": "boolean"},
@@ -43,7 +43,13 @@ def test_sample_qc_table(sample_qc_df):
         sample_qc_df.reindex([v["name"] for v in mapper.values()], axis=1)
         .set_index("Sample_ID")
         .sort_index()
-        .fillna({"is_call_rate_filtered": True})  # Legacy will have True instead of pd.NA
+        .fillna(
+            {
+                "is_call_rate_filtered": True,  # Legacy will have True instead of NA
+                "is_discordant_replicate": False,  # Legacy will have False instead of NA
+                "is_unexpected_replicate": False,  # Legacy will have False instead of NA
+            }
+        )
     )
 
     assert_frame_equal(exp_df, obs_df)

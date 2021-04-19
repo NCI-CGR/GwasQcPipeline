@@ -20,7 +20,7 @@ REPORT_NAME_MAPPER = {
     "is_cr2_filtered": "Call_Rate_2_filter",
     "is_internal_control": "Internal Control",
     "is_pass_sample_qc": "Sample Pass QC",
-    "is_replicate_discordant": "Expected Replicate Discordance",
+    "is_discordant_replicate": "Expected Replicate Discordance",
     "is_sample_exclusion": "Sample Excluded from QC",
     "is_sex_discordant": "Sex Discordant",
     "is_subject_representative": "Sample Used in Subject Analysis",

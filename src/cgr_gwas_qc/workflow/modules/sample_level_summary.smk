@@ -35,12 +35,10 @@ rule sample_qc_table:
         imiss_cr2="sample_level/call_rate_2/samples.imiss",
         sexcheck_cr1="sample_level/call_rate_1/samples.sexcheck",
         ancestry="sample_level/ancestry/graf_ancestry.txt",
-        known_replicates="sample_level/concordance/KnownReplicates.csv",
-        unknown_replicates="sample_level/concordance/UnknownReplicates.csv",
+        sample_concordance_csv="sample_level/concordance/summary.csv",
         contam=_contam,
         intensity=_intensity,
     params:
-        dup_concordance_cutoff=cfg.config.software_params.dup_concordance_cutoff,
         contam_threshold=cfg.config.software_params.contam_threshold,
     output:
         "sample_level/sample_qc.csv",

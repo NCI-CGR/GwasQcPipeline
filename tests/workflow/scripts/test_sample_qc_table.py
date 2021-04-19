@@ -123,38 +123,16 @@ def test_read_ancestry_GRAF(tmp_path):
 
 
 @pytest.mark.real_data
-def test_read_known_replicates(ss_df, split_sample_concordance_tables):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_known_replicates
+def test_read_concordance(ss_df, sample_concordance_csv):
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_concordance
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
-    filename = split_sample_concordance_tables / "KnownReplicates.csv"
-    cutoff = SoftwareParams().dup_concordance_cutoff
-
     # WHEN: Check for discordant replicates
-    sr = _read_known_replicates(filename, cutoff, ss_df.index)
+    df = _read_concordance(sample_concordance_csv, ss_df.index)
 
     # THEN: Basic properties
-    assert isinstance(sr, pd.Series)
-    assert sr.index.name == "Sample_ID"
-    assert sr.name == "is_replicate_discordant"
-    assert sr.dtype is np.dtype("bool")
-
-
-@pytest.mark.real_data
-def test_read_unknown_replicates(ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_unknown_replicates
-
-    # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
-    filename = RealData() / "production_outputs/concordance/UnknownReplicates.csv"
-
-    # WHEN: I parse unknown concordant samples table.
-    sr = _read_unknown_replicates(filename, ss_df.index)
-
-    # THEN: Basic properties
-    assert isinstance(sr, pd.Series)
-    assert sr.index.name == "Sample_ID"
-    assert sr.name == "is_unexpected_replicate"
-    assert sr.dtype is np.dtype("bool")
+    assert isinstance(df, pd.DataFrame)
+    assert df.index.name == "Sample_ID"
 
 
 @pytest.mark.real_data

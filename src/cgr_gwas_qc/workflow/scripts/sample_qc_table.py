@@ -23,6 +23,7 @@ import typer
 from cgr_gwas_qc.parsers import plink, sample_sheet
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.typing import PathLike
+from cgr_gwas_qc.workflow.scripts import sample_concordance
 from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
 
 app = typer.Typer(add_completion=False)
@@ -48,7 +49,7 @@ DTYPES = {  # Header for main QC table
     "Contamination_Rate": "float",
     "is_contaminated": "boolean",
     "replicate_ids": "string",
-    "is_replicate_discordant": "boolean",
+    "is_discordant_replicate": "boolean",
     "is_unexpected_replicate": "boolean",
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
@@ -69,7 +70,7 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
     "is_call_rate_filtered",
     "is_contaminated",
     "is_sex_discordant",
-    "is_replicate_discordant",
+    "is_discordant_replicate",
     "is_unexpected_replicate",
     # TO-ADD: If you create a new summary binary flag you want to include
     # in the count of QC issues then add the column here.
@@ -78,7 +79,7 @@ QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
 IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run identifiler
     "is_contaminated": "Contaminated",
     "is_sex_discordant": "Sex Discordant",
-    "is_replicate_discordant": "Discordant Replicates",
+    "is_discordant_replicate": "Discordant Replicates",
     "is_unexpected_replicate": "Unexpected Replicate",
     # TO-ADD: If you create a new binary flag do determine if you run
     # identifiler.
@@ -95,8 +96,7 @@ def main(
         ..., help="Path to plink_filter_call_rate_1/samples.sexcheck"
     ),
     ancestry: Path = typer.Argument(..., help="Path to ancestry/graf_ancestry_calls.txt"),
-    known_replicates: Path = typer.Argument(..., help=""),
-    unknown_replicates: Path = typer.Argument(..., help=""),
+    sample_concordance_csv: Path = typer.Argument(..., help=""),
     # Optional inputs
     contam: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_contamination_test.csv"
@@ -105,7 +105,6 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Params
-    dup_concordance_cutoff: float = typer.Option(..., help="Threshold for duplicate concordance."),
     contam_threshold: float = typer.Option(..., help="Threshold for contamination."),
     # Outputs
     outfile: Path = typer.Argument(..., help="Path to output csv"),
@@ -126,8 +125,7 @@ def main(
                 _read_imiss(imiss_cr2, Sample_IDs, "Call_Rate_2"),
                 _read_sexcheck_cr1(sexcheck_cr1, ss.expected_sex),
                 _read_ancestry(ancestry, Sample_IDs),
-                _read_known_replicates(known_replicates, dup_concordance_cutoff, Sample_IDs),
-                _read_unknown_replicates(unknown_replicates, Sample_IDs),
+                _read_concordance(sample_concordance_csv, Sample_IDs),
                 _read_contam(contam, contam_threshold, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
                 # TO-ADD: call function you created to parse/summarize new file
@@ -294,9 +292,7 @@ def _read_SNPweights(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     )
 
 
-def _read_known_replicates(
-    file_name: Path, dup_concordance_cutoff: float, Sample_IDs: pd.Index
-) -> pd.Series:  # noqa
+def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.Series:  # noqa
     """Create a flag of known replicates that show low concordance.
 
     Given a set of samples that are known to be from the same Subject. Flag
@@ -305,49 +301,24 @@ def _read_known_replicates(
     Returns:
         pd.Series:
             - Sample_ID (pd.Index)
-            - is_replicate_discordant (bool): True if replicates show
+            - is_discordant_replicate (bool): True if replicates show
               a concordance below the supplied threshold. Otherwise False.
+            - is_unexpected_replicate (bool): True if replicates are from two
+              different subjects.
    """
-
-    discord_Sample_IDs = (
-        pd.read_csv(file_name)  # Subject_ID Sample_ID1 Sample_ID2 Concordance PI_HAT
-        .rename({"PLINK_concordance": "concordance"}, axis=1)  # legacy uses uppercase
-        .query("concordance.notna() & concordance < @dup_concordance_cutoff")
-        .loc[:, ("Sample_ID1", "Sample_ID2")]
-        .melt()
-        .value.unique()
-    )  # A set of Sample_IDs that were replicates were not concordant.
-
-    sr = pd.Series(False, index=Sample_IDs, name="is_replicate_discordant")
-    sr[sr.index.isin(discord_Sample_IDs)] = True
-
-    return sr
-
-
-def _read_unknown_replicates(file_name: Path, Sample_IDs: pd.Index) -> pd.Series:
-    """Create a flag of for samples that are likely to be unknown replicates.
-
-    Given a set of samples that are not known to be from the same Subject but
-    show high concordance.
-
-    Returns:
-        pd.Series:
-            - Sample_ID (pd.Index)
-            - is_replicate_discordant (bool): True if replicates show
-              a concordance below the supplied threshold. Otherwise False.
-   """
-
-    cord_Sample_IDs = (
-        pd.read_csv(file_name)  # Subject_ID1 Subject_ID2 Sample_ID1 Sample_ID2 Concordance PI_HAT
-        .loc[:, ("Sample_ID1", "Sample_ID2")]
-        .melt()
-        .value.unique()
-    )  # A set of Sample_IDs that look like a replicate with another sample from a different subject.
-
-    sr = pd.Series(False, index=Sample_IDs, name="is_unexpected_replicate")
-    sr[sr.index.isin(cord_Sample_IDs)] = True
-
-    return sr
+    return (
+        sample_concordance.read(filename)
+        .melt(
+            id_vars=["is_discordant_replicate", "is_unexpected_replicate"],
+            value_vars=["Sample_ID1", "Sample_ID2"],
+            var_name="To_Drop",
+            value_name="Sample_ID",
+        )
+        .drop("To_Drop", axis=1)
+        .groupby("Sample_ID")
+        .max()  # Flag a sample as True if it is True for any comparison.
+        .reindex(Sample_IDs)
+    )
 
 
 def _read_contam(
@@ -436,7 +407,7 @@ def _check_pass_qc(sample_qc: pd.DataFrame) -> pd.Series:
 
     We remove all internal controls (``is_internal_control``) and poor
     quality samples (``is_call_rate_filtered``, ``is_contaminated``,
-    ``is_replicate_discordant``).
+    ``is_discordant_replicate``).
     """
     df = sample_qc.copy()
     df.fillna({k: False for k in QC_SUMMARY_FLAGS}, inplace=True)  # query breaks if there are NaNs
@@ -444,7 +415,7 @@ def _check_pass_qc(sample_qc: pd.DataFrame) -> pd.Series:
         ~df.is_internal_control
         & ~df.is_contaminated
         & ~df.is_call_rate_filtered
-        & ~df.is_replicate_discordant
+        & ~df.is_discordant_replicate
     )
 
 
