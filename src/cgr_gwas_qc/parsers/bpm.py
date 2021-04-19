@@ -4,13 +4,8 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Generator, List, Optional, Sequence
 
-from cgr_gwas_qc.parsers import CgrBiAllelicVariantRecord, CgrFile
-from cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles import (
-    BeadPoolManifest,
-    RefStrand,
-    SourceStrand,
-    complement,
-)
+from .common import CgrBiAllelicVariantRecord, CgrFile
+from .illumina.IlluminaBeadArrayFiles import BeadPoolManifest, RefStrand, SourceStrand, complement
 
 
 @contextmanager

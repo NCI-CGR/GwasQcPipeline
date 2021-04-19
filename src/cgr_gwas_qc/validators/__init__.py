@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from . import bgzip, bpm, gtc, sample_sheet  # noqa: F401
+from . import bgzip, bpm, gtc, idat, sample_sheet  # noqa: F401
+
+__all__ = ["bgzip", "bpm", "check_file", "gtc", "idat", "sample_sheet"]
 
 
 def check_file(file_name: Path) -> None:

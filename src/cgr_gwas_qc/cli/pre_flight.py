@@ -4,29 +4,27 @@ from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
 from textwrap import indent
-from typing import Dict, List, Mapping, Optional, Sequence, Set
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set
 
 import pandas as pd
 import typer
 from pydantic.error_wrappers import ValidationError
 
-from cgr_gwas_qc import yaml
+from cgr_gwas_qc import parsers, validators, yaml
 from cgr_gwas_qc.config import config_to_yaml
 from cgr_gwas_qc.exceptions import GwasQcValidationError, SampleSheetNullRowError
 from cgr_gwas_qc.models.config import Config, ReferenceFiles, UserFiles
-from cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles import BeadPoolManifest
-from cgr_gwas_qc.parsers.sample_sheet import SampleManifest, is_sample_manifest, update_sample_sheet
-from cgr_gwas_qc.validators import bgzip, bpm, gtc, idat, sample_sheet
+from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 
 app = typer.Typer(add_completion=False)
 
 
-@dataclass
+@dataclass(frozen=True)
 class ProblemFile:
     Sample_ID: str
     reason: str
-    file_type: str
-    filename: str
+    file_type: Optional[str] = None
+    filename: Optional[str] = None
 
 
 @app.command()
@@ -63,7 +61,9 @@ def main(
 
     if config.Sample_IDs_to_remove:
         # Remove IDs flagged in the config
-        problem_samples |= set(config.Sample_IDs_to_remove)
+        problem_samples |= {
+            ProblemFile(Sample_ID, "ConfigExclusion") for Sample_ID in config.Sample_IDs_to_remove
+        }
 
     # Create a parsed version of the sample sheet with some custom columns
     typer.secho("Saving Updated Sample Sheet to (cgr_sample_sheet.csv)", fg=typer.colors.GREEN)
@@ -101,19 +101,45 @@ def check_config(filename: Path) -> Config:
     return config
 
 
+def check_reference_files(reference_files: ReferenceFiles):
+    bpm_file = reference_files.illumina_manifest_file
+    try:
+        validators.bpm.validate(bpm_file)
+        typer.secho(f"BPM OK ({bpm_file})", fg=typer.colors.GREEN)
+    except Exception as err:
+        msg = err.args[0] if len(err.args) == 1 else err.args[1]
+        typer.secho(f"BPM ERROR: {msg} ({bpm_file})", fg=typer.colors.RED)
+
+    vcf_file = reference_files.thousand_genome_vcf
+    try:
+        validators.bgzip.validate(vcf_file)
+        typer.secho(f"VCF OK ({vcf_file})", fg=typer.colors.GREEN)
+    except Exception as err:
+        msg = err.args[0] if len(err.args) == 1 else err.args[1]
+        typer.secho(f"VCF ERROR: {msg} ({vcf_file})", fg=typer.colors.RED)
+
+    tbi_file = reference_files.thousand_genome_tbi
+    try:
+        validators.bgzip.validate(tbi_file)
+        typer.secho(f"VCF.TBI OK ({tbi_file})", fg=typer.colors.GREEN)
+    except Exception as err:
+        msg = err.args[0] if len(err.args) == 1 else err.args[1]
+        typer.secho(f"VCF.TBI ERROR: {msg} ({tbi_file})", fg=typer.colors.RED)
+
+
 def check_sample_sheet(
     filename: Path, subject_id_column: str, expected_sex_column: str, case_control_column: str
 ) -> pd.DataFrame:
     try:
-        if is_sample_manifest(filename):
+        if parsers.sample_sheet.is_sample_manifest(filename):
             # User provided a CGR like manifest file
-            sample_sheet.validate_manifest(
+            validators.sample_sheet.validate_manifest(
                 filename, subject_id_column, expected_sex_column, case_control_column
             )
-            df = SampleManifest(filename).data
+            df = parsers.sample_sheet.SampleManifest(filename).data
         else:
             # User provided a plain CSV file
-            sample_sheet.validate_sample_sheet(
+            validators.sample_sheet.validate_sample_sheet(
                 filename, subject_id_column, expected_sex_column, case_control_column
             )
             df = pd.read_csv(filename)
@@ -135,33 +161,7 @@ def check_sample_sheet(
     return df
 
 
-def check_reference_files(reference_files: ReferenceFiles):
-    bpm_file = reference_files.illumina_manifest_file
-    try:
-        bpm.validate(bpm_file)
-        typer.secho(f"BPM OK ({bpm_file})", fg=typer.colors.GREEN)
-    except Exception as err:
-        msg = err.args[0] if len(err.args) == 1 else err.args[1]
-        typer.secho(f"BPM ERROR: {msg} ({bpm_file})", fg=typer.colors.RED)
-
-    vcf_file = reference_files.thousand_genome_vcf
-    try:
-        bgzip.validate(vcf_file)
-        typer.secho(f"VCF OK ({vcf_file})", fg=typer.colors.GREEN)
-    except Exception as err:
-        msg = err.args[0] if len(err.args) == 1 else err.args[1]
-        typer.secho(f"VCF ERROR: {msg} ({vcf_file})", fg=typer.colors.RED)
-
-    tbi_file = reference_files.thousand_genome_tbi
-    try:
-        bgzip.validate(tbi_file)
-        typer.secho(f"VCF.TBI OK ({tbi_file})", fg=typer.colors.GREEN)
-    except Exception as err:
-        msg = err.args[0] if len(err.args) == 1 else err.args[1]
-        typer.secho(f"VCF.TBI ERROR: {msg} ({tbi_file})", fg=typer.colors.RED)
-
-
-def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> Set[str]:
+def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> Set[ProblemFile]:
     """Check user files (IDAT, GTC) using multiple threads.
 
     There can be tens of thousands of user files to process here. To speed
@@ -178,18 +178,18 @@ def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> S
     typer.secho("Checking user files for {:,} samples.".format(len(args)))
     futures = pool.starmap(_check_user_files, args)  # Send work to pool of workers
     with typer.progressbar(futures, length=len(args)) as bar:
-        problem_user_files = []
+        problem_user_files = set()
         for results in bar:  # collect results (i.e., problem samples)
-            problem_user_files.extend([problem for problem in results if problem])
+            problem_user_files |= {problem for problem in results if problem}
         _pretty_print_user_problems(problem_user_files)
 
-    return {problem.Sample_ID for problem in problem_user_files}
+    return problem_user_files
 
 
 def update_config_file(config: Config, ss: pd.DataFrame):
     try:
         if config.num_snps == 0:
-            config.num_snps = BeadPoolManifest(
+            config.num_snps = parsers.illumina.BeadPoolManifest(
                 config.reference_files.illumina_manifest_file
             ).num_loci
     except Exception:
@@ -204,40 +204,115 @@ def update_config_file(config: Config, ss: pd.DataFrame):
     config_to_yaml(config)
 
 
-def _check_user_files(user_files: UserFiles, record: Mapping) -> List[Optional[ProblemFile]]:
-    """Check IDAT and GTC files for a given sample."""
-    sample_id = record["Sample_ID"]
-    problems = []
-
-    if user_files.idat_pattern:
-        red_file = user_files.idat_pattern.red.format(**record)
-        problems.append(_check_idat(red_file, "red", sample_id))
-
-        green_file = user_files.idat_pattern.green.format(**record)
-        problems.append(_check_idat(green_file, "green", sample_id))
-
-    if user_files.gtc_pattern:
-        gtc_file = user_files.gtc_pattern.format(**record)
-        problems.append(_check_gtc(gtc_file, sample_id))
-
-    return problems
+def update_sample_sheet(
+    df: pd.DataFrame,
+    subject_id_column: str,
+    expected_sex_column: str,
+    case_control_column: str,
+    problem_samples: Iterable[ProblemFile],
+) -> pd.DataFrame:
+    _add_group_by_column(df, subject_id_column)
+    _add_is_internal_control(df)
+    _add_sample_exclusion(df, problem_samples)
+    _add_idats_exist(df, problem_samples)
+    _update_expected_sex(df, expected_sex_column)
+    _update_case_control(df, case_control_column)
+    return _add_replicate_info(df)
 
 
-def _check_idat(filename: str, color: str, sample_id: str) -> Optional[ProblemFile]:
-    try:
-        idat.validate(Path(filename))
-    except FileNotFoundError:
-        return ProblemFile(sample_id, "FileNotFound", f"idat_{color}", filename)
-    except PermissionError:
-        return ProblemFile(sample_id, "Permissions", f"idat_{color}", filename)
-    except GwasQcValidationError as err:
-        return ProblemFile(sample_id, err.args[0], f"idat_{color}", filename)
-    return None  # No problems
+def _add_group_by_column(df: pd.DataFrame, subject_id_column: str = "Group_By"):
+    """Select which column in the sample sheet to use for subject grouping.
+
+    This function adds the column `Group_By_Subject_ID` to the sample
+    sheet object. The sample sheet contains multiple columns with subject
+    level information. The user defines which column to use in the config
+    ``config.workflow_settings.subject_id_column``.
+
+    Recently, Q1 2021, we started adding a column named ``Group_By`` which
+    contains the column name(s) to use for subject grouping. This allows
+    values from multiple columns to be used.
+
+    Note::
+        We treat ``LIMS_Individual_ID`` as the default value if other values are missing.
+    """
+
+    def _get_subject_id(sr: pd.Series) -> str:
+        if "LIMS_Individual_ID" == subject_id_column:
+            return sr[subject_id_column]
+
+        default_id = sr.get("LIMS_Individual_ID", pd.NA)
+        if "Group_By" == subject_id_column:
+            return sr[sr[subject_id_column]] if pd.notna(sr[sr[subject_id_column]]) else default_id
+        return sr[subject_id_column] if pd.notna(sr[subject_id_column]) else default_id
+
+    df["Group_By_Subject_ID"] = df.apply(_get_subject_id, axis=1)
+
+
+def _add_is_internal_control(df: pd.DataFrame):
+    """Add a flag if a sample is really an internal control.
+
+    This function adds the column ``is_internal_control`` if it does not
+    already exist. This column is generated based on assumptions about CGRs
+    LIMS sheet. Third party users should create this column separately if
+    they have their own internal controls.
+    """
+    if "is_internal_control" in df.columns:
+        # Column already exists, this would allow people to add their own if they want
+        return
+
+    if "Sample_Group" in df.columns:
+        df["is_internal_control"] = (df.Sample_Group == "sVALD-001").astype("boolean")
+        return
+
+    df["is_internal_control"] = False
+
+
+def _add_idats_exist(df, problem_samples: Iterable[ProblemFile]):
+    df["idats_exist"] = True
+    problem_idats = {
+        problem.Sample_ID
+        for problem in problem_samples
+        if problem.file_type
+        and problem.file_type.startswith("idat")
+        and (problem.reason == "FileNotFound")
+    }
+    if problem_idats:
+        mask = df.Sample_ID.isin(problem_idats)
+        df.loc[mask, "idats_exist"] = False
+
+
+def _add_replicate_info(df: pd.DataFrame) -> pd.DataFrame:
+    """Adds information about the number of samples per subject.
+
+    This function adds two columns:
+        - ``num_samples_per_subject`` count of the number of samples per subject
+        - ``replicate_ids`` Concatenated Sample_IDs for samples from the same subject
+    """
+
+    def _replicate_info(x):
+        num_reps = x.shape[0]
+        x["num_samples_per_subject"] = num_reps
+        x["replicate_ids"] = pd.NA
+
+        if num_reps > 1:
+            x["replicate_ids"] = x.Sample_ID.sort_values().str.cat(sep="|")
+
+        return x
+
+    return df.groupby("Group_By_Subject_ID", dropna=False).apply(_replicate_info)
+
+
+def _add_sample_exclusion(df, problem_samples: Optional[Iterable[ProblemFile]]):
+    df["is_sample_exclusion"] = False
+    if problem_samples:
+        problem_sample_ids = {problem.Sample_ID for problem in problem_samples}
+        mask = df.Sample_ID.isin(problem_sample_ids)
+        df.loc[mask, "is_sample_exclusion"] = True
 
 
 def _check_gtc(filename: str, sample_id: str) -> Optional[ProblemFile]:
     try:
-        gtc.validate(Path(filename))
+        validators.gtc.validate(Path(filename))
     except FileNotFoundError:
         return ProblemFile(sample_id, "FileNotFound", "gtc", filename)
     except PermissionError:
@@ -247,7 +322,56 @@ def _check_gtc(filename: str, sample_id: str) -> Optional[ProblemFile]:
     return None  # No problems
 
 
-def _pretty_print_user_problems(problems: Sequence[ProblemFile]):
+def _check_idat(filename: str, color: str, sample_id: str) -> Optional[ProblemFile]:
+    try:
+        validators.idat.validate(Path(filename))
+    except FileNotFoundError:
+        return ProblemFile(sample_id, "FileNotFound", f"idat_{color}", filename)
+    except PermissionError:
+        return ProblemFile(sample_id, "Permissions", f"idat_{color}", filename)
+    except GwasQcValidationError as err:
+        return ProblemFile(sample_id, err.args[0], f"idat_{color}", filename)
+    return None  # No problems
+
+
+def _check_user_files(user_files: UserFiles, record: Mapping) -> Set[Optional[ProblemFile]]:
+    """Check IDAT and GTC files for a given sample."""
+    sample_id = record["Sample_ID"]
+    problems = set()
+
+    if user_files.idat_pattern:
+        red_file = user_files.idat_pattern.red.format(**record)
+        problems.add(_check_idat(red_file, "red", sample_id))
+
+        green_file = user_files.idat_pattern.green.format(**record)
+        problems.add(_check_idat(green_file, "green", sample_id))
+
+    if user_files.gtc_pattern:
+        gtc_file = user_files.gtc_pattern.format(**record)
+        problems.add(_check_gtc(gtc_file, sample_id))
+
+    return problems
+
+
+def _filter_list(problems: Iterable[ProblemFile], file_type: str) -> Dict[str, List[str]]:
+    res = defaultdict(list)
+    for problem in problems:
+        if problem.filename and problem.file_type == file_type:
+            res[problem.reason].append(problem.filename)
+    return res
+
+
+def _pretty_print_paths(data: Mapping[str, Sequence[str]]) -> str:
+    """For each exception output a list of files nicely."""
+    output = ""
+    for k, v in data.items():
+        output += f"  {k}:\n"
+        files = "\n".join(sorted(v))
+        output += f"{indent(files, '    - ')}\n"
+    return output
+
+
+def _pretty_print_user_problems(problems: Iterable[ProblemFile]):
     if idat_red := _filter_list(problems, "idat_red"):
         typer.secho(
             "IDAT RED ERROR: There was a problem with these files:\n{}".format(
@@ -277,22 +401,46 @@ def _pretty_print_user_problems(problems: Sequence[ProblemFile]):
         typer.secho("GTC Files OK.", fg=typer.colors.GREEN)
 
 
-def _filter_list(problems: Sequence[ProblemFile], file_type: str) -> Dict[str, List[str]]:
-    res = defaultdict(list)
-    for problem in problems:
-        if problem.file_type == file_type:
-            res[problem.reason].append(problem.filename)
-    return res
+def _update_case_control(df: pd.DataFrame, case_control_column: str = "Case/Control_Status"):
+    """Normalize Case/Control annotations.
+
+    This function creates a new column ``case_control`` based on the column
+    provided by the user ``config.workflow_settings.case_control_column``.
+    Here we normalize labels values and update labels to ``QC`` for internal
+    controls.
+    """
+    case_control_mapper = {cat.lower(): cat for cat in CASE_CONTROL_DTYPE.categories}
+    df["case_control"] = (
+        df[case_control_column]
+        .str.lower()
+        .map(lambda status: case_control_mapper.get(status, "Unknown"))
+        .astype(CASE_CONTROL_DTYPE)
+    )
+
+    # For internal controls set case_control to qc
+    df.loc[df.is_internal_control, "case_control"] = case_control_mapper["qc"]
 
 
-def _pretty_print_paths(data: Mapping[str, Sequence[str]]) -> str:
-    """For each exception output a list of files nicely."""
-    output = ""
-    for k, v in data.items():
-        output += f"  {k}:\n"
-        files = "\n".join(sorted(v))
-        output += f"{indent(files, '    - ')}\n"
-    return output
+def _update_expected_sex(df: pd.DataFrame, expected_sex_column: str = "Expected_Sex"):
+    """Normalize sex calls.
+
+    This function creates a new column ``expected_sex`` based on the column
+    provided by the user ``config.workflow_settings.expected_sex_column``.
+    Here we normalize sex values and update sex for internal controls.
+    """
+    sex_mapper = {"m": "M", "male": "M", "f": "F", "female": "F"}
+    df["expected_sex"] = (
+        df[expected_sex_column]
+        .str.lower()
+        .map(lambda sex: sex_mapper.get(sex, "U"))
+        .astype(SEX_DTYPE)
+    )
+
+    if "Identifiler_Sex" in df.columns:
+        # For internal controls use the `Indentifiler_Sex` column as `expected_sex`
+        df.loc[df.is_internal_control, "expected_sex"] = df.loc[
+            df.is_internal_control, "Identifiler_Sex"
+        ]
 
 
 if __name__ == "__main__":

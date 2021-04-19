@@ -7,7 +7,6 @@ import pytest
 from pandas.testing import assert_series_equal
 
 from cgr_gwas_qc.models.config.software_params import SoftwareParams
-from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import RealData
 
 
@@ -227,46 +226,6 @@ def test_read_intensity_file_name_none(ss_df):
     assert isinstance(sr, pd.Series)
     assert sr.index.name == "Sample_ID"
     assert sr.name == "IdatIntensity"
-
-
-def test_check_idat_files(real_cfg_short):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_idats_files
-
-    # GIVEN: Fake data using the gtc entrypoint to create the idat files
-    # WHEN: Scan the folder for Idat files.
-    with chdir(real_cfg_short.root):
-        sr = _check_idats_files(
-            real_cfg_short.ss.set_index("Sample_ID"), real_cfg_short.config.user_files.idat_pattern
-        )
-
-    # THEN: Basic properties
-    assert sr.index.name == "Sample_ID"
-    assert sr.name == "idats_exist"
-
-    # All idat files should be found
-    assert all(sr)
-
-
-@pytest.mark.real_data
-def test_check_idat_files_one_missing(real_cfg_short):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _check_idats_files
-
-    # GIVEN: Fake data using the gtc entrypoint to create the idat files
-    ss = real_cfg_short.ss.copy()
-    fake_record = ss.iloc[0, :].copy()
-    fake_record["Sample_ID"] = "fake_Sample_ID"
-    fake_record["SentrixBarcode_A"] = "fake_barcode"
-    ss = ss.append(fake_record, ignore_index=True)
-
-    # WHEN: I add an extra sample (without idat file) and scan the folder for Idat files.
-    with chdir(real_cfg_short.root):
-        sr = _check_idats_files(
-            ss.set_index("Sample_ID"), real_cfg_short.config.user_files.idat_pattern
-        )
-
-    # I should have 4 samples with idat files found and 1 missing these files.
-    assert sum(sr) == 2
-    assert sum(~sr) == 1
 
 
 def test_identifiler_reason():
