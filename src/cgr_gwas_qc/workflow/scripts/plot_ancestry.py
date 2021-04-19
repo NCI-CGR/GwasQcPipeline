@@ -44,19 +44,21 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
 
     # Plot cases and controls separately
     case = sample.query("case_control == 'Case'")
-    case_color = CASE_CONTROL_COLORS[0]
-    tax.scatter(
-        case[["EUR", "AFR", "ASN"]].values, color=case_color, label="Case", **style_defaults
-    )
+    if case.shape[0] > 0:
+        case_color = CASE_CONTROL_COLORS[0]
+        tax.scatter(
+            case[["EUR", "AFR", "ASN"]].values, color=case_color, label="Case", **style_defaults
+        )
 
     control = sample.query("case_control == 'Control'")
-    control_color = CASE_CONTROL_COLORS[1]
-    tax.scatter(
-        control[["EUR", "AFR", "ASN"]].values,
-        color=control_color,
-        label="Control",
-        **style_defaults
-    )
+    if control.shape[0] > 0:
+        control_color = CASE_CONTROL_COLORS[1]
+        tax.scatter(
+            control[["EUR", "AFR", "ASN"]].values,
+            color=control_color,
+            label="Control",
+            **style_defaults
+        )
 
     # Add plot elements
     multiple = 0.1  # Our scale is 0 to 1 and we want 0.1 increments
