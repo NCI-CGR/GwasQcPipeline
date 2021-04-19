@@ -3,8 +3,6 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from cgr_gwas_qc.testing.data import RealData
-
 
 @pytest.mark.real_data
 def test_ArrayProcessing(real_cfg):
@@ -52,11 +50,11 @@ def test_Contamination(sample_qc_df):
 
 @pytest.mark.real_data
 @pytest.fixture
-def control_replicates_df(pytestconfig) -> pd.DataFrame:
+def control_replicates_df(split_sample_concordance_tables, pytestconfig) -> pd.DataFrame:
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
-    return pd.read_csv(RealData() / "production_outputs/concordance/InternalQcKnown.csv").rename(
+    return pd.read_csv(split_sample_concordance_tables / "InternalQcKnown.csv").rename(
         {"Concordance": "concordance"}, axis=1
     )
 
@@ -75,11 +73,11 @@ def test_InternalControls(sample_qc_df, control_replicates_df):
 
 @pytest.mark.real_data
 @pytest.fixture
-def study_replicates_df(pytestconfig) -> pd.DataFrame:
+def study_replicates_df(split_sample_concordance_tables, pytestconfig) -> pd.DataFrame:
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
-    return pd.read_csv(RealData() / "production_outputs/concordance/StudySampleKnown.csv").rename(
+    return pd.read_csv(split_sample_concordance_tables / "StudySampleKnown.csv").rename(
         {"Concordance": "concordance"}, axis=1
     )
 
@@ -99,11 +97,11 @@ def test_ExpectedReplicates(sample_qc_df, study_replicates_df):
 
 @pytest.mark.real_data
 @pytest.fixture
-def unexpected_replicates_df(pytestconfig) -> pd.DataFrame:
+def unexpected_replicates_df(split_sample_concordance_tables, pytestconfig) -> pd.DataFrame:
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
-    return pd.read_csv(RealData() / "production_outputs/concordance/UnknownReplicates.csv").rename(
+    return pd.read_csv(split_sample_concordance_tables / "UnknownReplicates.csv").rename(
         {"Concordance": "concordance"}, axis=1
     )
 

@@ -1,141 +1,57 @@
 import shutil
-from pathlib import Path
 
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
 from cgr_gwas_qc.testing import file_hashes_equal, run_snakemake
 from cgr_gwas_qc.testing.data import RealData
 
 
 @pytest.mark.workflow
-@pytest.mark.real_data
-@pytest.fixture(scope="session")
-def sample_qc_table(tmp_path_factory) -> Path:
-    # GIVEN: All sample QC results (including contamination). NOTE: I am using
-    # SNPweights ancestry b/c I don't have production GRAF output
-    tmp_path = tmp_path_factory.mktemp("sample_level_summary")
-    (
-        RealData(tmp_path)
-        .add_user_files(entry_point="gtc", copy=False)
-        .copy("production_outputs/plink_start/samples_start.imiss", "sample_level/samples.imiss")
-        .copy(
-            "production_outputs/plink_filter_call_rate_1/samples_filter1.imiss",
-            "sample_level/call_rate_1/samples.imiss",
-        )
-        .copy(
-            "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
-            "sample_level/call_rate_1/samples.sexcheck",
-        )
-        .copy(
-            "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
-            "sample_level/call_rate_2/samples.imiss",
-        )
-        .copy(
-            "production_outputs/snpweights/samples.snpweights.csv",
-            "sample_level/ancestry/graf_ancestry.txt",
-        )
-        .copy(
-            "production_outputs/concordance/KnownReplicates.csv",
-            "sample_level/concordance/KnownReplicates.csv",
-        )
-        .copy(
-            "production_outputs/concordance/UnknownReplicates.csv",
-            "sample_level/concordance/UnknownReplicates.csv",
-        )
-        .copy(
-            "production_outputs/all_contam/contam.csv",
-            "sample_level/contamination/verifyIDintensity_contamination.csv",
-        )
-        .copy(
-            "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-            "sample_level/median_idat_intensity.csv",
-        )
-        .make_config(software_params={"contam_threshold": 0.2})
-        .make_cgr_sample_sheet()
-        .make_snakefile(
-            """
-            from cgr_gwas_qc import load_config
-
-            cfg = load_config()
-
-            include: cfg.modules("sample_level_summary.smk")
-
-            rule all:
-                input:
-                    "sample_level/sample_qc.csv"
-            """
-        )
-    )
-
-    # WHEN: I run snakemake to generate the sample_qc_table
-    run_snakemake(tmp_path)
-
-    return tmp_path / "sample_level/sample_qc.csv"
-
-
-@pytest.mark.workflow
 @pytest.mark.regression
 @pytest.mark.real_data
-def test_sample_qc_table(sample_qc_table):
+def test_sample_qc_table(sample_qc_df):
     # GIVEN: The sample qc report
     # THEN: This should be identical to the production outputs except for:
-    exclude_cols = [
-        "Current_Subject_Status",  # old column no longer created
-        "SR",  # old column no longer created
-        "Sample_Status",  # old column no longer created
-        "SexMatch",  # old column no longer created
-        "Subject_Notes",  # old column no longer created
-        "Count_of_SR_SubjectID",  # old column no longer create
-        "Call_Rate_1_filter",  # old column version with Y/N
-        "is_cr1_filtered",  # new column version with bool
-        "Call_Rate_2_filter",  # old column version with Y/N
-        "is_cr2_filtered",  # new column version with bool
-        "IdatsInProjectDir",  # old column version that does not match b/c test data doest not have all Idat files
-        "idats_exist",  # new column version that does not match b/c test data doest not have all Idat files
-        "PI_Subject_ID",  # New column from LIMS
-        "PI_Study_ID",  # New column from LIMS
-        "num_samples_per_subject",  # New column
-        "is_preflight_exclusion",  # New column
-        "identifiler_reason",  # New column
-        "is_internal_control",  # New column
-        "Group_By_Subject_ID",  # New column
-        "is_subject_representative",  # New column
-        "subject_dropped_from_study",  # New column
-        "case_control",  # New column
-        "is_pass_sample_qc",  # New column
-        "is_sample_exclusion",  # New column
-        "replicate_ids",  # New column
-    ]
+    mapper = {
+        "Call_Rate_1": {"name": "Call_Rate_1", "dtype": "float"},
+        "Call_Rate_2": {"name": "Call_Rate_2", "dtype": "float"},
+        "Call_Rate_Initial": {"name": "Call_Rate_Initial", "dtype": "float"},
+        "ChrX_Inbreed_estimate": {"name": "X_inbreeding_coefficient", "dtype": "float"},
+        "Contamination_Rate": {"name": "Contamination_Rate", "dtype": "float"},
+        "Count_of_QC_Issue": {"name": "Count_of_QC_Issue", "dtype": "UInt8"},
+        "Expected Replicate Discordance": {"name": "is_replicate_discordant", "dtype": "boolean"},
+        "IdatIntensity": {"name": "IdatIntensity", "dtype": "float"},
+        "Identifiler_Needed": {"name": "identifiler_needed", "dtype": "boolean"},
+        "Low Call Rate": {"name": "is_call_rate_filtered", "dtype": "boolean"},
+        "Sample_ID": {"name": "Sample_ID", "dtype": "string"},
+        "Sex Discordant": {"name": "is_sex_discordant", "dtype": "boolean"},
+        "Unexpected Replicate": {"name": "is_unexpected_replicate", "dtype": "boolean"},
+    }
 
-    obs_ = (
-        pd.read_csv(sample_qc_table)
-        .drop(exclude_cols, axis=1, errors="ignore")
-        .fillna(
-            {
-                "predicted_sex": "U",  # Legacy will have U instead of pd.NA
-                "is_call_rate_filtered": True,  # Legacy will have True instead of pd.NA
-            }
-        )
-        .rename(REPORT_NAME_MAPPER, axis=1)
-        .sort_values("Sample_ID")
-        .reset_index(drop=True)
-    )
-    exp_ = (
+    exp_df = (
         pd.read_csv(RealData() / "production_outputs/all_sample_qc.csv")
-        .reindex(obs_.columns, axis=1)
-        .sort_values("Sample_ID")
-        .reset_index(drop=True)
+        .rename({k: v["name"] for k, v in mapper.items()}, axis=1)
+        .reindex([v["name"] for v in mapper.values()], axis=1)
+        .astype({v["name"]: v["dtype"] for v in mapper.values()})
+        .set_index("Sample_ID")
+        .sort_index()
     )
 
-    assert_frame_equal(obs_, exp_, check_dtype=False)
+    obs_df = (
+        sample_qc_df.reindex([v["name"] for v in mapper.values()], axis=1)
+        .set_index("Sample_ID")
+        .sort_index()
+        .fillna({"is_call_rate_filtered": True})  # Legacy will have True instead of pd.NA
+    )
+
+    assert_frame_equal(exp_df, obs_df)
 
 
 @pytest.mark.workflow
 @pytest.mark.real_data
-def test_sample_qc_stats(tmp_path, sample_qc_table):
+def test_sample_qc_stats(tmp_path, sample_qc_csv):
     """Test the createion of summary_stats.txt
 
     I am not able to perform regression testing because there are some issues
@@ -167,7 +83,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_table):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copy(sample_qc_table, tmp_path / "sample_level/sample_qc.csv")
+    shutil.copy(sample_qc_csv, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to create sample_qc_summary_stats.txt
     run_snakemake(tmp_path)
@@ -179,7 +95,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_table):
 @pytest.mark.workflow
 @pytest.mark.regression
 @pytest.mark.real_data
-def test_qc_failures(tmp_path, sample_qc_table):
+def test_qc_failures(tmp_path, sample_qc_csv):
     # GIVEN: real data sample sheet, config, and sample_qc_summary table.
     data_cache = (
         RealData(tmp_path)
@@ -205,7 +121,7 @@ def test_qc_failures(tmp_path, sample_qc_table):
         )
     )
     (tmp_path / "sample_level").mkdir()
-    shutil.copy(sample_qc_table, tmp_path / "sample_level/sample_qc.csv")
+    shutil.copy(sample_qc_csv, tmp_path / "sample_level/sample_qc.csv")
 
     # WHEN: run snakemake to create sample_qc_summary_stats.txt
     run_snakemake(tmp_path)

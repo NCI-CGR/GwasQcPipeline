@@ -372,7 +372,9 @@ def snp_qc_df(snp_qc_csv) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc_csv(real_cfg, software_params, real_tmp_path) -> Path:
+def sample_qc_csv(
+    real_cfg, software_params, real_tmp_path, split_sample_concordance_tables
+) -> Path:
     """The Sample QC table.
 
     Return:
@@ -393,8 +395,8 @@ def sample_qc_csv(real_cfg, software_params, real_tmp_path) -> Path:
         data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.imiss",
         data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
         data_cache / "production_outputs/snpweights/samples.snpweights.csv",
-        data_cache / "production_outputs/concordance/KnownReplicates.csv",
-        data_cache / "production_outputs/concordance/UnknownReplicates.csv",
+        split_sample_concordance_tables / "KnownReplicates.csv",
+        split_sample_concordance_tables / "UnknownReplicates.csv",
         data_cache / "production_outputs/all_contam/contam.csv",
         data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
         software_params.dup_concordance_cutoff,

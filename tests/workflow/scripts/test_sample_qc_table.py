@@ -123,11 +123,11 @@ def test_read_ancestry_GRAF(tmp_path):
 
 
 @pytest.mark.real_data
-def test_read_known_replicates(ss_df):
+def test_read_known_replicates(ss_df, split_sample_concordance_tables):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_known_replicates
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
-    filename = RealData() / "production_outputs/concordance/KnownReplicates.csv"
+    filename = split_sample_concordance_tables / "KnownReplicates.csv"
     cutoff = SoftwareParams().dup_concordance_cutoff
 
     # WHEN: Check for discordant replicates
