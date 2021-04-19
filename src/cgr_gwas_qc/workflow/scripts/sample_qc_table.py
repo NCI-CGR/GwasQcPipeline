@@ -20,11 +20,9 @@ from warnings import warn
 import pandas as pd
 import typer
 
-from cgr_gwas_qc.models.config.user_files import Idat
 from cgr_gwas_qc.parsers import plink, sample_sheet
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.typing import PathLike
-from cgr_gwas_qc.validators import check_file
 from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
 
 app = typer.Typer(add_completion=False)
@@ -107,7 +105,6 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Params
-    idat_pattern: Idat = typer.Option(..., help="Idat file name patterns."),
     dup_concordance_cutoff: float = typer.Option(..., help="Threshold for duplicate concordance."),
     contam_threshold: float = typer.Option(..., help="Threshold for contamination."),
     # Outputs
@@ -124,7 +121,6 @@ def main(
         pd.concat(
             [
                 ss,
-                _check_idats_files(ss, idat_pattern),
                 _read_imiss(imiss_start, Sample_IDs, "Call_Rate_Initial"),
                 _read_imiss(imiss_cr1, Sample_IDs, "Call_Rate_1"),
                 _read_imiss(imiss_cr2, Sample_IDs, "Call_Rate_2"),
@@ -411,38 +407,6 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
 
 
 # TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
-
-
-def _check_idats_files(sample_sheet: pd.DataFrame, idat_pattern: Optional[Idat]) -> pd.Series:
-    """Check that red and green IDAT files exist.
-
-    Args:
-        df: A sample table with at least `Sample_ID` and columns needed to fill wildcards.
-        red: A wildcard pattern for red files. Wildcards must be in `df`.
-        green: A wildcard pattern for green files. Wildcards must be in `df`.
-
-    Returns:
-        pd.Series:
-            - Sample_ID (pd.Index)
-            - idats_exist (bool): True if both the red and green Idat files existed
-    """
-    if not idat_pattern:
-        # No Idat path specified in config, return all NaN.
-        return pd.Series(index=sample_sheet.index, dtype="boolean", name="idats_exist")
-
-    results = []
-    for record in sample_sheet.itertuples():
-        Sample_ID = record.Index
-        red = idat_pattern.red.format(**record._asdict())
-        green = idat_pattern.green.format(**record._asdict())
-        try:
-            check_file(Path(red))
-            check_file(Path(green))
-            results.append((Sample_ID, True))
-        except (FileNotFoundError, PermissionError):
-            results.append((Sample_ID, False))
-
-    return pd.Series(dict(results), dtype="boolean", name="idats_exist").rename_axis("Sample_ID")
 
 
 def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):

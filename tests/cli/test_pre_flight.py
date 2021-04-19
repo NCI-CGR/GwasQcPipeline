@@ -170,12 +170,16 @@ def test_check_user_files_missing_both_idat(fake_cfg: ConfigMgr):
 ################################################################################
 @pytest.fixture
 def updated_sample_sheet(fake_cfg, workflow_params) -> pd.DataFrame:
+    ss = fake_cfg.ss.copy()
     return pre_flight.update_sample_sheet(
-        fake_cfg.ss,
+        ss,
         "LIMS_Individual_ID",
         workflow_params.expected_sex_column,
         workflow_params.case_control_column,
-        {"SP00005"},
+        [
+            pre_flight.ProblemFile("SP00005", "test", "test", "test"),
+            pre_flight.ProblemFile("SP00003", "FileNotFound", "idat_green", "test"),
+        ],
     )
 
 
@@ -217,3 +221,8 @@ def test_update_sample_sheet_excluded_sample(updated_sample_sheet: pd.DataFrame)
     assert "Control" == sr.case_control
     assert not sr.is_internal_control
     assert sr.is_sample_exclusion
+
+
+def test_update_sample_sheet_idats_exist(updated_sample_sheet: pd.DataFrame):
+    assert updated_sample_sheet.query("Sample_ID == 'SP00005'").idats_exist.squeeze()
+    assert not updated_sample_sheet.query("Sample_ID == 'SP00003'").idats_exist.squeeze()

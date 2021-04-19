@@ -6,7 +6,7 @@ import pytest
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.config import ConfigMgr
-from cgr_gwas_qc.models.config import Idat, SoftwareParams, WorkflowParams
+from cgr_gwas_qc.models.config import SoftwareParams, WorkflowParams
 from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.conda import CondaEnv
 from cgr_gwas_qc.testing.data import FakeData, RealData
@@ -397,12 +397,6 @@ def sample_qc_csv(real_cfg, software_params, real_tmp_path) -> Path:
         data_cache / "production_outputs/concordance/UnknownReplicates.csv",
         data_cache / "production_outputs/all_contam/contam.csv",
         data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-        Idat(
-            red=data_cache._data_path.as_posix()
-            + "/original_data/{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat",
-            green=data_cache._data_path.as_posix()
-            + "/original_data/{SentrixBarcode_A}_{SentrixPosition_A}_Grn.idat",
-        ),
         software_params.dup_concordance_cutoff,
         0.2,
         outfile,

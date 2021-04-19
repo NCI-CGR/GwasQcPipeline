@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
 from textwrap import indent
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set
 
 import pandas as pd
 import typer
@@ -17,6 +17,14 @@ from cgr_gwas_qc.models.config import Config, ReferenceFiles, UserFiles
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 
 app = typer.Typer(add_completion=False)
+
+
+@dataclass(frozen=True)
+class ProblemFile:
+    Sample_ID: str
+    reason: str
+    file_type: Optional[str] = None
+    filename: Optional[str] = None
 
 
 @app.command()
@@ -53,7 +61,9 @@ def main(
 
     if config.Sample_IDs_to_remove:
         # Remove IDs flagged in the config
-        problem_samples |= set(config.Sample_IDs_to_remove)
+        problem_samples |= {
+            ProblemFile(Sample_ID, "ConfigExclusion") for Sample_ID in config.Sample_IDs_to_remove
+        }
 
     # Create a parsed version of the sample sheet with some custom columns
     typer.secho("Saving Updated Sample Sheet to (cgr_sample_sheet.csv)", fg=typer.colors.GREEN)
@@ -70,14 +80,6 @@ def main(
         # Update the config file with problem samples and re-calculate values
         typer.secho("Saving Updated Config to (cgr_config.yml)", fg=typer.colors.GREEN)
         update_config_file(config, ss)
-
-
-@dataclass
-class ProblemFile:
-    Sample_ID: str
-    reason: str
-    file_type: str
-    filename: str
 
 
 def check_config(filename: Path) -> Config:
@@ -159,9 +161,7 @@ def check_sample_sheet(
     return df
 
 
-def check_user_files(
-    user_files: UserFiles, ss: pd.DataFrame, threads: int
-):  # -> List[ProblemFile]:
+def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> Set[ProblemFile]:
     """Check user files (IDAT, GTC) using multiple threads.
 
     There can be tens of thousands of user files to process here. To speed
@@ -178,12 +178,12 @@ def check_user_files(
     typer.secho("Checking user files for {:,} samples.".format(len(args)))
     futures = pool.starmap(_check_user_files, args)  # Send work to pool of workers
     with typer.progressbar(futures, length=len(args)) as bar:
-        problem_user_files = []
+        problem_user_files = set()
         for results in bar:  # collect results (i.e., problem samples)
-            problem_user_files.extend([problem for problem in results if problem])
+            problem_user_files |= {problem for problem in results if problem}
         _pretty_print_user_problems(problem_user_files)
 
-    return {problem.Sample_ID for problem in problem_user_files}
+    return problem_user_files
 
 
 def update_config_file(config: Config, ss: pd.DataFrame):
@@ -209,11 +209,12 @@ def update_sample_sheet(
     subject_id_column: str,
     expected_sex_column: str,
     case_control_column: str,
-    problem_sample_ids: Optional[Iterable[str]] = None,
+    problem_samples: Iterable[ProblemFile],
 ) -> pd.DataFrame:
     _add_group_by_column(df, subject_id_column)
     _add_is_internal_control(df)
-    _add_sample_exclusion(df, problem_sample_ids)
+    _add_sample_exclusion(df, problem_samples)
+    _add_idats_exist(df, problem_samples)
     _update_expected_sex(df, expected_sex_column)
     _update_case_control(df, case_control_column)
     return _add_replicate_info(df)
@@ -266,6 +267,20 @@ def _add_is_internal_control(df: pd.DataFrame):
     df["is_internal_control"] = False
 
 
+def _add_idats_exist(df, problem_samples: Iterable[ProblemFile]):
+    df["idats_exist"] = True
+    problem_idats = {
+        problem.Sample_ID
+        for problem in problem_samples
+        if problem.file_type
+        and problem.file_type.startswith("idat")
+        and (problem.reason == "FileNotFound")
+    }
+    if problem_idats:
+        mask = df.Sample_ID.isin(problem_idats)
+        df.loc[mask, "idats_exist"] = False
+
+
 def _add_replicate_info(df: pd.DataFrame) -> pd.DataFrame:
     """Adds information about the number of samples per subject.
 
@@ -287,9 +302,10 @@ def _add_replicate_info(df: pd.DataFrame) -> pd.DataFrame:
     return df.groupby("Group_By_Subject_ID", dropna=False).apply(_replicate_info)
 
 
-def _add_sample_exclusion(df, problem_sample_ids: Optional[Iterable[str]]):
+def _add_sample_exclusion(df, problem_samples: Optional[Iterable[ProblemFile]]):
     df["is_sample_exclusion"] = False
-    if problem_sample_ids:
+    if problem_samples:
+        problem_sample_ids = {problem.Sample_ID for problem in problem_samples}
         mask = df.Sample_ID.isin(problem_sample_ids)
         df.loc[mask, "is_sample_exclusion"] = True
 
@@ -318,29 +334,29 @@ def _check_idat(filename: str, color: str, sample_id: str) -> Optional[ProblemFi
     return None  # No problems
 
 
-def _check_user_files(user_files: UserFiles, record: Mapping) -> List[Optional[ProblemFile]]:
+def _check_user_files(user_files: UserFiles, record: Mapping) -> Set[Optional[ProblemFile]]:
     """Check IDAT and GTC files for a given sample."""
     sample_id = record["Sample_ID"]
-    problems = []
+    problems = set()
 
     if user_files.idat_pattern:
         red_file = user_files.idat_pattern.red.format(**record)
-        problems.append(_check_idat(red_file, "red", sample_id))
+        problems.add(_check_idat(red_file, "red", sample_id))
 
         green_file = user_files.idat_pattern.green.format(**record)
-        problems.append(_check_idat(green_file, "green", sample_id))
+        problems.add(_check_idat(green_file, "green", sample_id))
 
     if user_files.gtc_pattern:
         gtc_file = user_files.gtc_pattern.format(**record)
-        problems.append(_check_gtc(gtc_file, sample_id))
+        problems.add(_check_gtc(gtc_file, sample_id))
 
     return problems
 
 
-def _filter_list(problems: Sequence[ProblemFile], file_type: str) -> Dict[str, List[str]]:
+def _filter_list(problems: Iterable[ProblemFile], file_type: str) -> Dict[str, List[str]]:
     res = defaultdict(list)
     for problem in problems:
-        if problem.file_type == file_type:
+        if problem.filename and problem.file_type == file_type:
             res[problem.reason].append(problem.filename)
     return res
 
@@ -355,7 +371,7 @@ def _pretty_print_paths(data: Mapping[str, Sequence[str]]) -> str:
     return output
 
 
-def _pretty_print_user_problems(problems: Sequence[ProblemFile]):
+def _pretty_print_user_problems(problems: Iterable[ProblemFile]):
     if idat_red := _filter_list(problems, "idat_red"):
         typer.secho(
             "IDAT RED ERROR: There was a problem with these files:\n{}".format(

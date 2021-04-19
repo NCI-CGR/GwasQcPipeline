@@ -25,7 +25,7 @@ import subprocess
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from pathlib import Path
-from typing import Iterable, MutableMapping, Optional, TypeVar, Union
+from typing import MutableMapping, Optional, TypeVar, Union
 from warnings import warn
 
 from cgr_gwas_qc.cli.pre_flight import update_sample_sheet
@@ -120,9 +120,7 @@ class DataRepo(ABC):
         """
         raise NotImplementedError
 
-    def make_cgr_sample_sheet(
-        self, problem_sample_ids: Optional[Iterable[str]] = None, **kwargs
-    ) -> U:
+    def make_cgr_sample_sheet(self, **kwargs) -> U:
         """Parse the manifest file and create the cgr sample sheet.
 
         Parses the sample manifest and creates a sample sheet saved to
@@ -149,7 +147,7 @@ class DataRepo(ABC):
                 params.subject_id_column,
                 params.expected_sex_column,
                 params.case_control_column,
-                problem_sample_ids,
+                [],
             ).to_csv(self.working_dir / "cgr_sample_sheet.csv", index=False)
             return self
         else:
