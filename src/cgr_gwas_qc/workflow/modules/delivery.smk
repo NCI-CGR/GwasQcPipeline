@@ -1,7 +1,5 @@
 import pandas as pd
 
-from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
-
 
 ################################################################################
 # Files For Lab
@@ -162,9 +160,21 @@ rule qc_report_docx:
         template=cfg.docx_template,
     output:
         "deliver/{deliver_prefix}QC_Report{deliver_suffix}.docx",
-    wildcard_constraints:
-        ext="docx|pdf|html",
     conda:
         cfg.conda("pandoc.yml")
     shell:
         "pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}"
+
+
+rule qc_report_xlsx:
+    input:
+        sample_sheet_csv="cgr_sample_sheet.csv",
+        sample_concordance_csv="sample_level/concordance/summary.csv",
+        sample_qc_csv="sample_level/sample_qc.csv",
+        population_qc_csv="population_level/population_qc.csv",
+        population_relatives_csv="population_level/relatives.csv",
+        graf="sample_level/ancestry/graf_populations.txt",
+    output:
+        "deliver/{deliver_prefix}QC_Report{deliver_suffix}.xlsx",
+    script:
+        "../scripts/qc_report_table.py"
