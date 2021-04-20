@@ -41,7 +41,6 @@ References:
     - :class:`cgr_gwas_qc.parsers.eigensoft.Eigenvec`
 
 """
-import os
 from pathlib import Path
 from typing import Generator
 
@@ -49,6 +48,7 @@ import pandas as pd
 import typer
 
 from cgr_gwas_qc.parsers import eigensoft, plink
+from cgr_gwas_qc.typing import PathLike
 
 app = typer.Typer(add_completion=False)
 
@@ -96,11 +96,11 @@ def main(
     df.to_csv(outfile, index=False)
 
 
-def read(filename: os.PathLike) -> pd.DataFrame:
+def read(filename: PathLike) -> pd.DataFrame:
     return pd.read_csv(filename, dtype=DTYPES)
 
 
-def _annotate_relations(df: pd.DataFrame, relatives: os.PathLike, population: str) -> pd.DataFrame:
+def _annotate_relations(df: pd.DataFrame, relatives: PathLike, population: str) -> pd.DataFrame:
     related_df = pd.concat(_expand_related(relatives, population), ignore_index=True)
     return df.merge(related_df, on="Subject_ID", how="left")
 
@@ -111,7 +111,7 @@ def _read_het(filename: Path, threshold: float):
     )
 
 
-def _expand_related(relatives: os.PathLike, population: str) -> Generator[pd.DataFrame, None, None]:
+def _expand_related(relatives: PathLike, population: str) -> Generator[pd.DataFrame, None, None]:
     for fam_id, rels in pd.read_csv(relatives).itertuples(index=False):
         for subject in rels.split("|"):
             yield pd.DataFrame(

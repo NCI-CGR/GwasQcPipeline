@@ -28,6 +28,12 @@ def test_add_subject(fake_cfg, concordance):
     assert "Subject_ID2" in df.columns
 
 
+def test_add_case_control(fake_cfg, concordance):
+    df = concordance.pipe(sample_concordance._add_case_control, fake_cfg.ss)
+    assert "case_control1" in df.columns
+    assert "case_control2" in df.columns
+
+
 def test_add_internal_control(fake_cfg, concordance):
     df = concordance.pipe(sample_concordance._add_internal_control, fake_cfg.ss)
     assert "is_internal_control1" in df.columns

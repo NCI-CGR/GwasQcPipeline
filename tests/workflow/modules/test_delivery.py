@@ -299,3 +299,40 @@ def test_deliver_subject_list(files_for_deliver):
         data_cache / "production_outputs/subject_level/SampleUsedforSubject.csv",
         deliver_path / "deliver/SampleUsedforSubject.csv",
     )
+
+
+################################################################################
+# Reports
+################################################################################
+@pytest.mark.real_data
+def test_qc_report_table(sample_concordance_csv, sample_qc_csv, population_qc_csv, tmp_path):
+    (
+        RealData(tmp_path)
+        .make_cgr_sample_sheet()
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            include: cfg.modules("delivery.smk")
+
+            rule all:
+                input:
+                    "deliver/test_QC_Report_test.xlsx"
+            """
+        )
+    )
+    (tmp_path / "sample_level/ancestry").mkdir(parents=True)
+    (tmp_path / "sample_level/concordance").mkdir(parents=True)
+    (tmp_path / "population_level").mkdir(parents=True)
+
+    shutil.copy(sample_concordance_csv, tmp_path / "sample_level/concordance/summary.csv")
+    (tmp_path / "sample_level/ancestry/graf_populations.txt").write_text(
+        "DS No.\tSample\t#SNPs\tGD1\tGD2\tGD3\tGD4\tF(%)\tE(%)\tA(%)\tAfrican\tEuropean\tAsian\tMexican\tIndian-Pakistani\n"
+    )
+    shutil.copy(sample_qc_csv, tmp_path / "sample_level/sample_qc.csv")
+    shutil.copy(population_qc_csv, tmp_path / "population_level/population_qc.csv")
+
+    run_snakemake(tmp_path)

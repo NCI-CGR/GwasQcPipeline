@@ -92,3 +92,6 @@ rule all:
         cfg.config.user_files.output_pattern.format(
             prefix="deliver", file_type="QC_Report", ext="docx"
         ),
+        cfg.config.user_files.output_pattern.format(
+            prefix="deliver", file_type="QC_Report", ext="xlsx"
+        ),
