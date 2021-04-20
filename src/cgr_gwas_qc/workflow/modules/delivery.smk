@@ -171,8 +171,8 @@ rule qc_report_xlsx:
         sample_sheet_csv="cgr_sample_sheet.csv",
         sample_concordance_csv="sample_level/concordance/summary.csv",
         sample_qc_csv="sample_level/sample_qc.csv",
+        population_concordance_csv="population_level/concordance.csv",
         population_qc_csv="population_level/population_qc.csv",
-        population_relatives_csv="population_level/relatives.csv",
         graf="sample_level/ancestry/graf_populations.txt",
     output:
         "deliver/{deliver_prefix}QC_Report{deliver_suffix}.xlsx",

@@ -6,7 +6,12 @@ import typer
 from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.reporting import REPORT_NAME_MAPPER
 from cgr_gwas_qc.typing import PathLike
-from cgr_gwas_qc.workflow.scripts import population_qc_table, sample_concordance, sample_qc_table
+from cgr_gwas_qc.workflow.scripts import (
+    agg_population_concordance,
+    population_qc_table,
+    sample_concordance,
+    sample_qc_table,
+)
 
 app = typer.Typer(add_completion=False)
 
@@ -16,18 +21,20 @@ def main(
     sample_sheet_csv: Path,
     sample_concordance_csv: Path,
     sample_qc_csv: Path,
+    population_concordance_csv: Path,
     population_qc_csv: Path,
     graf: Path,
     outfile: Path,
 ):
 
     with pd.ExcelWriter(outfile) as writer:
-        _all_qc(sample_sheet_csv, sample_qc_csv).to_excel(writer, sheet_name="ALL_QC")
-        _ancestry(sample_qc_csv, graf).to_excel(writer, sample_sheet="ANCESTRY")
-        _concordance(sample_qc_csv, sample_concordance_csv).to_excel(
-            writer, sample_sheet="SAMPLE_CONCORDANCE"
+        _all_qc(sample_sheet_csv, sample_qc_csv).to_excel(writer, sheet_name="ALL_QC", index=False)
+        _sample_concordance(sample_qc_csv, sample_concordance_csv).to_excel(
+            writer, sheet_name="SAMPLE_CONCORDANCE", index=False
         )
-        _families(population_qc_csv).to_excel(writer, sample_sheet="FAMILIES")
+        _ancestry(sample_qc_csv, graf).to_excel(writer, sheet_name="ANCESTRY", index=False)
+        _families(population_qc_csv, writer)
+        _population_concordance(population_concordance_csv, writer)
         _pca(population_qc_csv, writer)
         _het(population_qc_csv, writer)
 
@@ -41,12 +48,12 @@ _ALL_QC_COLUMNS = [
     "Internal Control",
     "Number Samples Per Subject",
     "Replicate IDs",
-    "Sample Used in Subject Analysis",
     "Sample Excluded from QC",
+    "IdatsInProjectDir",
+    "Sample Used in Subject Analysis",
     "Subject Removed",
     # QC Results
     "Sample Pass QC",
-    "IdatsInProjectDir",
     "Low Call Rate",
     "Call_Rate_Initial",
     "Call_Rate_1_filter",
@@ -54,13 +61,15 @@ _ALL_QC_COLUMNS = [
     "Call_Rate_2_filter",
     "Call_Rate_2",
     "Contaminated",
-    "IdatIntensity",
     "Contamination_Rate",
+    "IdatIntensity",
+    "Expected Replicate",
+    "Expected Replicate Discordance",
+    "Unexpected Replicate",
     "Sex Discordant",
     "Expected_Sex",
     "Predicted_Sex",
     "ChrX_Inbreed_estimate",
-    "Unexpected Replicate",
     "AFR",
     "EUR",
     "ASN",
@@ -78,6 +87,48 @@ def _all_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame
         .merge(ss, on="Sample_ID", suffixes=["", "_DROP"])
         .filter(regex="^(?!.*_DROP)")
         .reindex(_ALL_QC_COLUMNS + _additional_columns, axis=1)
+    )
+
+
+_SAMPLE_CONCORDANCE_COLUMNS = [
+    "Sample_ID1",
+    "Sample_ID2",
+    "Subject_ID1",
+    "Subject_ID2",
+    "Case/Control_Status1",
+    "Case/Control_Status2",
+    "Ancestry1",
+    "Ancestry2",
+    "Expected Replicate",
+    "Expected Replicate Discordance",
+    "Unexpected Replicate",
+    "PLINK_PI_HAT",
+    "PLINK_concordance",
+    "PLINK_is_ge_pi_hat",
+    "PLINK_is_ge_concordance",
+    "GRAF_HGMR",
+    "GRAF_AGMR",
+    "GRAF_relationship",
+    "KING_Kinship",
+    "KING_relationship",
+]
+
+
+def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLike) -> pd.DataFrame:
+    ancestry = sample_qc_table.read(sample_qc_csv).set_index("Sample_ID").Ancestry
+    return (
+        sample_concordance.read(sample_concordance_csv)
+        .merge(ancestry.rename_axis("Sample_ID1").rename("Ancestry1"), on="Sample_ID1", how="left")
+        .merge(ancestry.rename_axis("Sample_ID2").rename("Ancestry2"), on="Sample_ID2", how="left")
+        .rename(REPORT_NAME_MAPPER, axis=1)
+        .rename(
+            {
+                "case_control1": REPORT_NAME_MAPPER["case_control"] + "1",
+                "case_control2": REPORT_NAME_MAPPER["case_control"] + "2",
+            },
+            axis=1,
+        )
+        .reindex(_SAMPLE_CONCORDANCE_COLUMNS, axis=1)
     )
 
 
@@ -119,70 +170,51 @@ def _ancestry(sample_qc_csv: PathLike, graf_txt: PathLike) -> pd.DataFrame:
     )
 
 
-_CONCORDANCE_COLUMNS = [
-    "Sample_ID1",
-    "Sample_ID2",
-    "Subject_ID1",
-    "Subject_ID2",
-    "Internal Control1",
-    "Internal Control2",
-    "Case/Control_Status1",
-    "Case/Control_Status2",
-    "Ancestry1",
-    "Ancestry2",
-    "Expected Replicate",
-    "Expected Replicate Discordance",
-    "Unexpected Replicate",
-    "PLINK_PI_HAT",
-    "PLINK_concordance",
-    "PLINK_is_ge_pi_hat",
-    "PLINK_is_ge_concordance",
-    "GRAF_HGMR",
-    "GRAF_AGMR",
-    "GRAF_relationship",
-    "KING_Kinship",
-    "KING_relationship",
-]
-
-
-def _concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLike) -> pd.DataFrame:
-    metadata = (
-        sample_qc_table.read(sample_qc_csv)
-        .set_index("Sample_ID")
-        .rename(REPORT_NAME_MAPPER, axis=1)
-        .reindex(["Case/Control_Status", "Ancestry"], axis=1)
-    )
-    return (
-        sample_concordance.read(sample_concordance_csv)
-        .merge(metadata.rename_axis("Sample_ID1").add_suffix("1"), on="Sample_ID1", how="left")
-        .merge(metadata.rename_axis("Sample_ID2").add_suffix("2"), on="Sample_ID2", how="left")
-        .rename(REPORT_NAME_MAPPER, axis=1)
-        .rename(
-            {
-                "is_internal_control1": "Internal Control1",
-                "is_internal_control2": "Internal Control2",
-            },
-            axis=1,
-        )
-        .reindex(_CONCORDANCE_COLUMNS, axis=1)
-    )
-
-
 _FAMILY_COLUMNS = ["Fam_ID", "Subject_ID"]
 
 
-def _families(population_qc_csv: PathLike) -> pd.DataFrame:
-    return (
+def _families(population_qc_csv: PathLike, writer):
+    df = (
         population_qc_table.read(population_qc_csv)
         .dropna(subset=["QC_Family_ID"])
         .rename(REPORT_NAME_MAPPER, axis=1)
-        .reindex(_FAMILY_COLUMNS, axis=1)
     )
+
+    if df.shape[0] > 0:
+        for population, dd in df.groupby("population"):
+            dd.reindex(_FAMILY_COLUMNS, axis=1).to_excel(
+                writer, sheet_name=f"{population}_FAMILY", index=False
+            )
+
+
+_POPULATION_CONCORDANCE_COLUMNS = [
+    "Subject_ID1",
+    "Subject_ID2",
+    "Case/Control_Status1",
+    "Case/Control_Status2",
+    "PLINK_PI_HAT",
+    "PLINK_is_ge_pi_hat",
+]
+
+
+def _population_concordance(population_concordance_csv: PathLike, writer: pd.ExcelWriter):
+    df = agg_population_concordance.read(population_concordance_csv).rename(
+        {
+            "case_control1": REPORT_NAME_MAPPER["case_control"] + "1",
+            "case_control2": REPORT_NAME_MAPPER["case_control"] + "2",
+        },
+        axis=1,
+    )
+
+    for population, dd in df.groupby("population"):
+        dd.reindex(_POPULATION_CONCORDANCE_COLUMNS, axis=1).to_excel(
+            writer, sheet_name=f"{population}_IBD", index=False
+        )
 
 
 _PCA_COLUMNS = [
     "Subject_ID",
-    "CaCo",
+    "Case/Control_Status",
     "PC1",
     "PC2",
     "PC3",
@@ -197,18 +229,22 @@ _PCA_COLUMNS = [
 
 
 def _pca(population_qc_csv: PathLike, writer: pd.ExcelWriter):
-    df = population_qc_table.read(population_qc_csv)
+    df = population_qc_table.read(population_qc_csv).rename(REPORT_NAME_MAPPER, axis=1)
     for population, dd in df.groupby("population"):
-        dd.reindex(_PCA_COLUMNS, axis=1).to_excel(writer, sheet_name=f"{population}_PCA")
+        dd.reindex(_PCA_COLUMNS, axis=1).to_excel(
+            writer, sheet_name=f"{population}_PCA", index=False
+        )
 
 
-_HET_COLUMNS = ["Subject_ID", "CaCo", "O(HOM)", "E(HOM)", "N(NM)", "F"]
+_HET_COLUMNS = ["Subject_ID", "Case/Control_Status", "O_HOM", "E_HOM", "N_NM", "F"]
 
 
 def _het(population_qc_csv: PathLike, writer: pd.ExcelWriter):
-    df = population_qc_table.read(population_qc_csv)
+    df = population_qc_table.read(population_qc_csv).rename(REPORT_NAME_MAPPER, axis=1)
     for population, dd in df.groupby("population"):
-        dd.reindex(_HET_COLUMNS, axis=1).to_excel(writer, sheet_name=f"{population}_HET")
+        dd.reindex(_HET_COLUMNS, axis=1).to_excel(
+            writer, sheet_name=f"{population}_HET", index=False
+        )
 
 
 if __name__ == "__main__":

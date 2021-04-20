@@ -23,20 +23,32 @@ def qc_report_xlsx(tmp_path_factory) -> Path:
 
 @pytest.mark.real_data
 def test_all_qc(real_sample_sheet_csv, sample_qc_csv, qc_report_xlsx):
+    dtypes = {
+        "Contaminated": bool,
+        "Low Call Rate": bool,
+        "Sex Discordant": bool,
+        "Unexpected Replicate": bool,
+    }
+
     exp_df = (
         pd.read_excel(qc_report_xlsx, sheet_name="ALL_QC", engine="openpyxl")
         .set_index("Sample_ID")
         .sort_index()
+        .reindex(dtypes.keys(), axis=1)
+        .fillna(False)
+        .astype(dtypes)
     )
 
     obs_df = (
         qc_report_table._all_qc(real_sample_sheet_csv, sample_qc_csv)
         .set_index("Sample_ID")
         .sort_index()
+        .reindex(dtypes.keys(), axis=1)
+        .fillna(False)
+        .astype(dtypes)
     )
 
-    columns = ["Low Call Rate", "Contaminated", "Sex Discordant", "Unexpected Replicate"]
-    assert_frame_equal(exp_df[columns], obs_df[columns], check_names=False, check_dtype=False)
+    assert_frame_equal(exp_df, obs_df)
 
 
 @pytest.fixture
@@ -63,14 +75,26 @@ def test_ancestry(sample_qc_df, graf_text, tmp_path):
 
 
 @pytest.mark.real_data
-def test_concordance(sample_qc_csv, sample_concordance_csv):
-    obs_df = qc_report_table._concordance(sample_qc_csv, sample_concordance_csv)
-    assert qc_report_table._CONCORDANCE_COLUMNS == obs_df.columns.tolist()
+def test_sample_concordance(sample_qc_csv, sample_concordance_csv):
+    obs_df = qc_report_table._sample_concordance(sample_qc_csv, sample_concordance_csv)
+    assert qc_report_table._SAMPLE_CONCORDANCE_COLUMNS == obs_df.columns.tolist()
     assert obs_df.iloc[0, :].notna().all()
 
 
+@pytest.mark.real_data
+def test_population_concordance(agg_population_concordance_csv, tmp_path):
+    test_file = tmp_path / "test.xlsx"
+    with pd.ExcelWriter(test_file) as writer:
+        qc_report_table._population_concordance(agg_population_concordance_csv, writer)
+
+    obs_df = pd.read_excel(test_file, "EUR_IBD", engine="openpyxl")
+    assert qc_report_table._POPULATION_CONCORDANCE_COLUMNS == obs_df.columns.tolist()
+    assert obs_df.iloc[0, :].notna().all()
+    assert obs_df.shape[0] == 273
+
+
 @pytest.fixture
-def pop_qc_w_relatives(population_qc_df):
+def pop_qc_w_relatives(population_qc_df, tmp_path):
     fake_pop = population_qc_df.copy()
 
     force_relatives = fake_pop.sample(n=4).Subject_ID
@@ -80,13 +104,6 @@ def pop_qc_w_relatives(population_qc_df):
     fake_pop.loc[mask, "relatives"] = "|".join(relative_ids)
     fake_pop.loc[mask, "QC_Family_ID"] = "fam01"
 
-    return fake_pop
-
-
-@pytest.mark.real_data
-def test_add_families(pop_qc_w_relatives):
-    from cgr_gwas_qc.workflow.scripts.qc_report_table import _add_families
-
-    obs = _add_families(pop_qc_w_relatives)
-
-    assert (4, 2) == obs.shape
+    outfile = tmp_path / "fake_population_qc.csv"
+    fake_pop.to_csv(outfile)
+    return outfile
