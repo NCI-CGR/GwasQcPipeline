@@ -12,14 +12,14 @@ Command Line Interface
                             [--snp_cr_2 SNP_CR_2] [--samp_cr_2 SAMP_CR_2]
                             [--ld_prune_r2 LD_PRUNE_R2]
                             [--maf_for_ibd MAF_FOR_IBD] -s SAMPLE_SHEET
-                            [--subject_id_to_use SUBJECT_ID_TO_USE]
+                            [--subject_id_column SUBJECT_ID_COLUMN]
                             [--ibd_pi_hat_cutoff IBD_PI_HAT_CUTOFF]
                             [--dup_concordance_cutoff DUP_CONCORDANCE_CUTOFF]
                             [--lims_output_dir LIMS_OUTPUT_DIR]
                             [--contam_threshold CONTAM_THRESHOLD]
                             [-i ILLUMINA_MANIFEST_FILE] [-a ADPC_FILE]
                             [-g GTC_DIR]
-                            [--expected_sex_col_name EXPECTED_SEX_COL_NAME]
+                            [--expected_sex_column EXPECTED_SEX_COLUMN]
                             [-q QUEUE] [-u]
 
     optional arguments:
@@ -44,10 +44,10 @@ Command Line Interface
                             /DCEG/CGF/GWAS/Scans/GSA_Lab_QC/SR#/builds/QC_v#_date
     -s SAMPLE_SHEET, --sample_sheet SAMPLE_SHEET
                             Full path to illimina style sample sheet csv file.
-    --subject_id_to_use SUBJECT_ID_TO_USE
+    --subject_id_column SUBJECT_ID_COLUMN
                             Name of column in sample sheet that corresponds to
                             subject ID to use.
-    --expected_sex_col_name EXPECTED_SEX_COL_NAME
+    --expected_sex_column EXPECTED_SEX_COLUMN
                             Name of column in sample sheet that corresponds to
                             expected sex of sample.
 

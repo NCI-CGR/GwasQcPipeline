@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.config &mdash; GwasQcPipeline 1.0.0a3 documentation</title>
+  <title>cgr_gwas_qc.config &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
   
 
   
@@ -176,14 +176,13 @@
   <h1>Source code for cgr_gwas_qc.config</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">snakemake.rules</span> <span class="kn">import</span> <span class="n">expand</span>
 
 <span class="kn">import</span> <span class="nn">cgr_gwas_qc.yaml</span> <span class="k">as</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">cgr_gwas_qc.models.config</span> <span class="kn">import</span> <span class="n">Config</span>
-<span class="kn">from</span> <span class="nn">cgr_gwas_qc.parsers.sample_sheet</span> <span class="kn">import</span> <span class="n">SampleSheet</span>
+<span class="kn">from</span> <span class="nn">cgr_gwas_qc.parsers</span> <span class="kn">import</span> <span class="n">sample_sheet</span>
 
 
 <span class="k">class</span> <span class="nc">CgrGwasQcConfigError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -233,32 +232,27 @@
     <span class="c1">################################################################################</span>
     <span class="c1"># Set-up</span>
     <span class="c1">################################################################################</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">root</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_config</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">user_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">sample_sheet_file</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sample_sheet</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SampleSheet</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">SampleSheet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="p">)</span>
-                <span class="o">.</span><span class="n">add_group_by_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">workflow_params</span><span class="o">.</span><span class="n">subject_id_to_use</span><span class="p">)</span>
-                <span class="o">.</span><span class="n">remove_Sample_IDs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">Sample_IDs_to_remove</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample Sheet: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="si">}</span><span class="s2"> could not be loaded.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">sample_sheet</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ConfigMgr.instance"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.instance">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pytest</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the active ConfigMgr instance.</span>
 
 <span class="sd">        This ensures that only 1 ConfigMgr is created per python session.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pytest</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">find_cgr_files</span><span class="p">())</span>
+
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">find_configs</span><span class="p">())</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">find_cgr_files</span><span class="p">())</span>
+
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span></div>
 
     <span class="c1">################################################################################</span>
@@ -271,20 +265,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Access the sample sheet DataFrame.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample Sheet: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="si">}</span><span class="s2"> was not loaded.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span><span class="o">.</span><span class="n">data</span>
-
-    <span class="nd">@ss</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">ss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Replace the sample sheet DataFrame.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample Sheet: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="si">}</span><span class="s2"> was not loaded.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span>
 
     <span class="c1">################################################################################</span>
     <span class="c1"># Helper functions for snakemake</span>
@@ -371,14 +352,22 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">find_configs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">find_cgr_files</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
     <span class="n">user_config</span> <span class="o">=</span> <span class="n">scan_for_yaml</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">)</span>
+    <span class="n">sample_sheet_file</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;cgr_sample_sheet.csv&quot;</span>
 
     <span class="k">if</span> <span class="n">user_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Please run with a `config.yml` in your working directory.&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">root</span><span class="p">,</span> <span class="n">user_config</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sample_sheet_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+            <span class="s2">&quot;Missing `cgr_sample_sheet.csv`. &quot;</span>
+            <span class="s2">&quot;This file is created during `cgr preflight`, &quot;</span>
+            <span class="s2">&quot;please run preflight prior to trying to run the workflow.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">root</span><span class="p">,</span> <span class="n">user_config</span><span class="p">,</span> <span class="n">sample_sheet_file</span>
 
 
 <span class="k">def</span> <span class="nf">config_to_yaml</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">,</span> <span class="n">yaml_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;config.yml&quot;</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

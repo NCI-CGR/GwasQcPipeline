@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Parsers &mdash; GwasQcPipeline 1.0.0a3 documentation</title>
+  <title>Parsers &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
   
 
   
@@ -114,8 +114,16 @@
 <li class="toctree-l2"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Parsers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.plink">Plink</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.eigensoft">Eigensoft</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.graf">GRAF</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#genetic-relationship-and-fingerprinting">Genetic Relationship and Fingerprinting</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.king">KING</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#king-relationship-inferences">KING Relationship Inferences</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.plink">Plink</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="workflow.html">Workflow Scripts</a></li>
@@ -190,12 +198,367 @@
             
   <div class="section" id="parsers">
 <h1>Parsers<a class="headerlink" href="#parsers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-cgr_gwas_qc.parsers.eigensoft">
+<span id="eigensoft"></span><h2>Eigensoft<a class="headerlink" href="#module-cgr_gwas_qc.parsers.eigensoft" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.eigensoft.</code><code class="sig-name descname">Eigenvec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/eigensoft.html#Eigenvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Eigensoft eigenvec file parser.</p>
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec.filename">
+<code class="sig-name descname">filename</code><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to the eigenvec file from <code class="docutils literal notranslate"><span class="pre">smartpca</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec.components">
+<code class="sig-name descname">components</code><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec.components" title="Permalink to this definition">¶</a></dt>
+<dd><p>A (n x 11) table of principal components</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>ID</strong> (<em>index</em>)</p></td>
+<td><p>object</p></td>
+<td><p>Sample or Subject ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>PC1</p></td>
+<td><p>object</p></td>
+<td><p>The first principal componenet (PC1).</p></td>
+</tr>
+<tr class="row-even"><td><p>PC2</p></td>
+<td><p>object</p></td>
+<td><p>The second principal componenet.</p></td>
+</tr>
+<tr class="row-odd"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>The third to ninth principal components.</p></td>
+</tr>
+<tr class="row-even"><td><p>PC10</p></td>
+<td><p>object</p></td>
+<td><p>The tenth principal componenet.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec.values">
+<code class="sig-name descname">values</code><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>A vector of eigenvalues for PC1 to PC10.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.hsph.harvard.edu/alkes-price/software/">https://www.hsph.harvard.edu/alkes-price/software/</a></p></li>
+<li><p><a class="reference external" href="https://www.cell.com/ajhg/fulltext/S0002-9297(16)00003-3">https://www.cell.com/ajhg/fulltext/S0002-9297(16)00003-3</a></p></li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgr_gwas_qc.parsers.graf">
+<span id="graf"></span><h2>GRAF<a class="headerlink" href="#module-cgr_gwas_qc.parsers.graf" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="genetic-relationship-and-fingerprinting">
+<h3>Genetic Relationship and Fingerprinting<a class="headerlink" href="#genetic-relationship-and-fingerprinting" title="Permalink to this headline">¶</a></h3>
+<p>GRAF is a package that allows estmation or relatedness and ancestry.</p>
+<div class="section" id="relatedness">
+<h4>Relatedness<a class="headerlink" href="#relatedness" title="Permalink to this headline">¶</a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ID1</p></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ID2</p></td>
+<td><p>string</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>HG_match</p></td>
+<td><p>int</p></td>
+<td><p>number of SNPs with matched genotypes when only homozygous SNPs are counted</p></td>
+</tr>
+<tr class="row-odd"><td><p>HG_miss</p></td>
+<td><p>int</p></td>
+<td><p>number of SNPs with mismatched genotypes when only homozygous SNPs are counted</p></td>
+</tr>
+<tr class="row-even"><td><p>HGMR</p></td>
+<td><p>float</p></td>
+<td><p>Homozygous Genotype Mismatch Rate (%)</p></td>
+</tr>
+<tr class="row-odd"><td><p>AG_match</p></td>
+<td><p>int</p></td>
+<td><p>number of SNPs with matched genotypes when all SNPs are counted</p></td>
+</tr>
+<tr class="row-even"><td><p>AG_miss</p></td>
+<td><p>int</p></td>
+<td><p>number of SNPs with mismatched genotypes when all SNPs are counted</p></td>
+</tr>
+<tr class="row-odd"><td><p>AGMR</p></td>
+<td><p>float</p></td>
+<td><p>All Genotype Mismatch Rate (%)</p></td>
+</tr>
+<tr class="row-even"><td><p>relationship</p></td>
+<td><p>string</p></td>
+<td><p>relationship determined by sample genotypes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>p_value</p></td>
+<td><p>float</p></td>
+<td><p>probability that the genetic relationship is NOT the predicted type</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="relationship-values">
+<h5>Relationship Values<a class="headerlink" href="#relationship-values" title="Permalink to this headline">¶</a></h5>
+<p>Categories are assigned by GRAF.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ID</p></td>
+<td><p>duplicate or MZ twin</p></td>
+</tr>
+<tr class="row-odd"><td><p>PO</p></td>
+<td><p>parent-offspring</p></td>
+</tr>
+<tr class="row-even"><td><p>FS</p></td>
+<td><p>full sibling</p></td>
+</tr>
+<tr class="row-odd"><td><p>D2</p></td>
+<td><p>2nd degree relative</p></td>
+</tr>
+<tr class="row-even"><td><p>D3</p></td>
+<td><p>3rd degree relative</p></td>
+</tr>
+<tr class="row-odd"><td><p>UN</p></td>
+<td><p>unrelated</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/ncbi/graf">https://github.com/ncbi/graf</a></p></li>
+<li><p>Jin Y, Schäffer AA, Sherry ST, and Feolo M (2017). Quickly identifying
+identical and closely related subjects in large databases using genotype
+data. PLoS One. 12(6):e0179106.</p></li>
+</ul>
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.graf.read_relatedness">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.graf.</code><code class="sig-name descname">read_relatedness</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/graf.html#read_relatedness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.graf.read_relatedness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the table generated by <code class="docutils literal notranslate"><span class="pre">graf</span> <span class="pre">--out</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>pd.DataFrame</p>
+<ul class="simple">
+<li><p>ID1</p></li>
+<li><p>ID2</p></li>
+<li><p>HG_match</p></li>
+<li><p>HG_miss</p></li>
+<li><p>HGMR</p></li>
+<li><p>AG_match</p></li>
+<li><p>AG_miss</p></li>
+<li><p>AGMR</p></li>
+<li><p>relationship {ID, PO, FS, D2, D3, UN}</p></li>
+<li><p>p_value</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/ncbi/graf#output-files">https://github.com/ncbi/graf#output-files</a></p></li>
+</ul>
+</dd></dl>
+
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="module-cgr_gwas_qc.parsers.king">
+<span id="king"></span><h2>KING<a class="headerlink" href="#module-cgr_gwas_qc.parsers.king" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="king-relationship-inferences">
+<h3>KING Relationship Inferences<a class="headerlink" href="#king-relationship-inferences" title="Permalink to this headline">¶</a></h3>
+<p>KING is a toolset to robustly identify different types of relatedness. Unlike
+other methods, you should only remove markers that fail QC (i.e., don’t mess
+with MAF or LD filters).</p>
+<div class="section" id="kinship-table">
+<h4>Kinship Table<a class="headerlink" href="#kinship-table" title="Permalink to this headline">¶</a></h4>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ID1</p></td>
+<td><p>string</p></td>
+<td><p>Individual ID for the first individual of the pair</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ID2</p></td>
+<td><p>string</p></td>
+<td><p>Individual ID for the second individual of the pair</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>N_SNP</p></td>
+<td><p>UInt32</p></td>
+<td><p>The number of SNPs that do not have missing genotypes in either of the individual</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>HetHet</p></td>
+<td><p>float</p></td>
+<td><p>Proportion of SNPs with double heterozygotes (e.g.</p></td>
+<td><p>AG and AG)</p></td>
+</tr>
+<tr class="row-even"><td><p>IBS0</p></td>
+<td><p>float</p></td>
+<td><p>Proportion of SNPs with zero IBS (identical-by-state) (e.g.</p></td>
+<td><p>AA and GG)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Kinship</p></td>
+<td><p>float</p></td>
+<td><p>Estimated kinship coefficient from the SNP data</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>relationship</p></td>
+<td><p>string</p></td>
+<td><p>The assigned relationship based on Kinship</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="id1">
+<h5>Relationship Values<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h5>
+<p>Categories were assigned based on Kinship ranges provided in the <a class="reference external" href="http://people.virginia.edu/~wc9c/KING/manual.html#WITHIN">KING manual</a>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ID</p></td>
+<td><p>duplicate or MZ twin</p></td>
+</tr>
+<tr class="row-odd"><td><p>D1</p></td>
+<td><p>1st degree relative</p></td>
+</tr>
+<tr class="row-even"><td><p>D2</p></td>
+<td><p>2nd degree relative</p></td>
+</tr>
+<tr class="row-odd"><td><p>D3</p></td>
+<td><p>3rd degree relative</p></td>
+</tr>
+<tr class="row-even"><td><p>UN</p></td>
+<td><p>unrelated</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://people.virginia.edu/~wc9c/KING/manual.html">http://people.virginia.edu/~wc9c/KING/manual.html</a></p></li>
+<li><p>Manichaikul A, Mychaleckyj JC, Rich SS, Daly K, Sale M, Chen WM (2010)
+Robust relationship inference in genome-wide association studies.
+Bioinformatics 26(22):2867-2873</p></li>
+</ul>
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.king.read_kinship">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.king.</code><code class="sig-name descname">read_kinship</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/king.html#read_kinship"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.king.read_kinship" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the table generated by <code class="docutils literal notranslate"><span class="pre">king</span> <span class="pre">--kinship</span></code>.</p>
+<p>Reads the king file and re-assigns ID1/ID2 by sorting IDs
+alphanumerically. Assigns relationships based on Kinship ranges provided
+in KING manual.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>pd.DataFrame</p>
+<ul class="simple">
+<li><p>ID1</p></li>
+<li><p>ID2</p></li>
+<li><p>N_SNP</p></li>
+<li><p>HetHet</p></li>
+<li><p>IBS0</p></li>
+<li><p>Kinship</p></li>
+<li><p>relationship {ID, D1, D2, D3, UN}</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://people.virginia.edu/~wc9c/KING/manual.html#WITHIN">http://people.virginia.edu/~wc9c/KING/manual.html#WITHIN</a></p></li>
+</ul>
+</dd></dl>
+
+</div>
+</div>
+</div>
+</div>
 <div class="section" id="module-cgr_gwas_qc.parsers.plink">
 <span id="plink"></span><h2>Plink<a class="headerlink" href="#module-cgr_gwas_qc.parsers.plink" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_genome">
-<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_genome" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_genome" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse PLINK’s genome file format.</p>
+<p>Each row of the genome file is a pairwise combinations of
+samples/subjects. I am unsure of how plink assigns IID order. Here I sort
+IDs alphanumerically which will make searching for pairs easier because
+you can assume the order.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ID1</span><span class="p">,</span> <span class="n">ID2</span> <span class="o">=</span> <span class="n">sort</span><span class="p">([</span><span class="n">IID1</span><span class="p">,</span> <span class="n">IID2</span><span class="p">])</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><p>A (n x 5) table with the following columns</p>
@@ -224,7 +587,7 @@
 <tbody>
 <tr class="row-even"><td><p>ID1</p></td>
 <td><p>object</p></td>
-<td><p>First Sample or Subject ID</p></td>
+<td><p>First Sample or Subject ID (alphanumerically)</p></td>
 <td></td>
 <td></td>
 <td></td>
@@ -233,7 +596,7 @@
 </tr>
 <tr class="row-odd"><td><p>ID2</p></td>
 <td><p>object</p></td>
-<td><p>Second Sample or Subject ID</p></td>
+<td><p>Second Sample or Subject ID (alphanumerically)</p></td>
 <td></td>
 <td></td>
 <td></td>
@@ -392,7 +755,7 @@
 
 <dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_het">
-<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_het</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_het"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_het" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_het</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_het"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_het" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse PLINK’s het file format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -447,7 +810,7 @@
 
 <dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_hwe">
-<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_hwe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_hwe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_hwe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_hwe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_hwe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_hwe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse PLINK’s hwe file format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -562,7 +925,7 @@
 
 <dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_imiss">
-<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_imiss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_imiss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_imiss" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_imiss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_imiss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_imiss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse PLINK’s imiss file format.</p>
 <p>This reports sample level missing data.</p>
 <dl class="field-list simple">
@@ -618,7 +981,7 @@
 
 <dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_lmiss">
-<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_lmiss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_lmiss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_lmiss" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_lmiss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_lmiss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_lmiss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse PLINK’s lmiss file format.</p>
 <p>This reports snp level missing data.</p>
 <dl class="field-list simple">
@@ -674,7 +1037,7 @@
 
 <dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_sexcheck">
-<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_sexcheck</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_sexcheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_sexcheck" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_sexcheck</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_sexcheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_sexcheck" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse PLINK’s sexcheck file format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -724,88 +1087,6 @@
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/basic_stats#check_sex">https://www.cog-genomics.org/plink/1.9/basic_stats#check_sex</a></p></li>
 <li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#sexcheck">https://www.cog-genomics.org/plink/1.9/formats#sexcheck</a></p></li>
-</ul>
-</dd></dl>
-
-</div>
-<div class="section" id="module-cgr_gwas_qc.parsers.eigensoft">
-<span id="eigensoft"></span><h2>Eigensoft<a class="headerlink" href="#module-cgr_gwas_qc.parsers.eigensoft" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec">
-<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.eigensoft.</code><code class="sig-name descname">Eigenvec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/eigensoft.html#Eigenvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Eigensoft eigenvec file parser.</p>
-<dl class="py attribute">
-<dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec.filename">
-<code class="sig-name descname">filename</code><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec.filename" title="Permalink to this definition">¶</a></dt>
-<dd><p>Path to the eigenvec file from <code class="docutils literal notranslate"><span class="pre">smartpca</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec.components">
-<code class="sig-name descname">components</code><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec.components" title="Permalink to this definition">¶</a></dt>
-<dd><p>A (n x 11) table of principal components</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>name</p></th>
-<th class="head"><p>dtype</p></th>
-<th class="head"><p>description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><strong>ID</strong> (<em>index</em>)</p></td>
-<td><p>object</p></td>
-<td><p>Sample or Subject ID</p></td>
-</tr>
-<tr class="row-odd"><td><p>PC1</p></td>
-<td><p>object</p></td>
-<td><p>The first principal componenet (PC1).</p></td>
-</tr>
-<tr class="row-even"><td><p>PC2</p></td>
-<td><p>object</p></td>
-<td><p>The second principal componenet.</p></td>
-</tr>
-<tr class="row-odd"><td><p>…</p></td>
-<td><p>…</p></td>
-<td><p>The third to ninth principal components.</p></td>
-</tr>
-<tr class="row-even"><td><p>PC10</p></td>
-<td><p>object</p></td>
-<td><p>The tenth principal componenet.</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>pd.DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec.values">
-<code class="sig-name descname">values</code><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec.values" title="Permalink to this definition">¶</a></dt>
-<dd><p>A vector of eigenvalues for PC1 to PC10.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">References</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://www.hsph.harvard.edu/alkes-price/software/">https://www.hsph.harvard.edu/alkes-price/software/</a></p></li>
-<li><p><a class="reference external" href="https://www.cell.com/ajhg/fulltext/S0002-9297(16)00003-3">https://www.cell.com/ajhg/fulltext/S0002-9297(16)00003-3</a></p></li>
 </ul>
 </dd></dl>
 

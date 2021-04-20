@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0a3 documentation</title>
+  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
   
 
   
@@ -205,31 +205,21 @@
 <span id="pre-flight-checks"></span><h2>Pre-Flight Checks<a class="headerlink" href="#module-cgr_gwas_qc.cli.pre_flight" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile">
-<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.cli.pre_flight.</code><code class="sig-name descname">ProblemFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Sample_ID</span></em>, <em class="sig-param"><span class="n">reason</span></em>, <em class="sig-param"><span class="n">file_type</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py attribute">
-<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile.Sample_ID">
-<code class="sig-name descname">Sample_ID</code><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile.Sample_ID" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.cli.pre_flight.</code><code class="sig-name descname">ProblemFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Sample_ID</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">reason</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">file_type</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/pre_flight.html#ProblemFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-<dl class="py attribute">
-<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile.file_type">
-<code class="sig-name descname">file_type</code><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile.file_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile.filename">
-<code class="sig-name descname">filename</code><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile.filename" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 3</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="cgr_gwas_qc.cli.pre_flight.ProblemFile.reason">
-<code class="sig-name descname">reason</code><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile.reason" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
+<dl class="py function">
+<dt id="cgr_gwas_qc.cli.pre_flight.check_user_files">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.pre_flight.</code><code class="sig-name descname">check_user_files</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user_files</span><span class="p">:</span> <span class="n">cgr_gwas_qc.models.config.user_files.UserFiles</span></em>, <em class="sig-param"><span class="n">ss</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">threads</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; Set<span class="p">[</span><a class="reference internal" href="#cgr_gwas_qc.cli.pre_flight.ProblemFile" title="cgr_gwas_qc.cli.pre_flight.ProblemFile">cgr_gwas_qc.cli.pre_flight.ProblemFile</a><span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/pre_flight.html#check_user_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.check_user_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check user files (IDAT, GTC) using multiple threads.</p>
+<p>There can be tens of thousands of user files to process here. To speed
+things up a bit we use parallel processing. This function spins up
+<code class="docutils literal notranslate"><span class="pre">threads</span></code> processes and runs user files checks for each sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Sample_IDs that had a problem with either their IDAT or GTC files.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -239,6 +229,8 @@
 <p>Pre-flight checks include the Sample Sheet, reference files, Idat files,
 and GTC files. For Idat and GTC files, the user provided file name
 pattern is extended using the columns in the sample sheet.</p>
+<p>Pre-flight also creates a parsed version of the sample sheet
+<code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>. This file is used in the Gwas QC workflow.</p>
 </dd></dl>
 
 </div>

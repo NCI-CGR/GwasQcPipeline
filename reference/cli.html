@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0a3 documentation</title>
+  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
   
 
   
@@ -189,14 +189,14 @@ usage: GwasQcWrapper.py <span class="o">[</span>-h<span class="o">]</span> <span
                         <span class="o">[</span>--snp_cr_2 SNP_CR_2<span class="o">]</span> <span class="o">[</span>--samp_cr_2 SAMP_CR_2<span class="o">]</span>
                         <span class="o">[</span>--ld_prune_r2 LD_PRUNE_R2<span class="o">]</span>
                         <span class="o">[</span>--maf_for_ibd MAF_FOR_IBD<span class="o">]</span> -s SAMPLE_SHEET
-                        <span class="o">[</span>--subject_id_to_use SUBJECT_ID_TO_USE<span class="o">]</span>
+                        <span class="o">[</span>--subject_id_column SUBJECT_ID_COLUMN<span class="o">]</span>
                         <span class="o">[</span>--ibd_pi_hat_cutoff IBD_PI_HAT_CUTOFF<span class="o">]</span>
                         <span class="o">[</span>--dup_concordance_cutoff DUP_CONCORDANCE_CUTOFF<span class="o">]</span>
                         <span class="o">[</span>--lims_output_dir LIMS_OUTPUT_DIR<span class="o">]</span>
                         <span class="o">[</span>--contam_threshold CONTAM_THRESHOLD<span class="o">]</span>
                         <span class="o">[</span>-i ILLUMINA_MANIFEST_FILE<span class="o">]</span> <span class="o">[</span>-a ADPC_FILE<span class="o">]</span>
                         <span class="o">[</span>-g GTC_DIR<span class="o">]</span>
-                        <span class="o">[</span>--expected_sex_col_name EXPECTED_SEX_COL_NAME<span class="o">]</span>
+                        <span class="o">[</span>--expected_sex_column EXPECTED_SEX_COLUMN<span class="o">]</span>
                         <span class="o">[</span>-q QUEUE<span class="o">]</span> <span class="o">[</span>-u<span class="o">]</span>
 
 optional arguments:
@@ -221,10 +221,10 @@ Required Arguments:
                         /DCEG/CGF/GWAS/Scans/GSA_Lab_QC/SR#/builds/QC_v#_date
 -s SAMPLE_SHEET, --sample_sheet SAMPLE_SHEET
                         Full path to illimina style sample sheet csv file.
---subject_id_to_use SUBJECT_ID_TO_USE
+--subject_id_column SUBJECT_ID_COLUMN
                         Name of column in sample sheet that corresponds to
                         subject ID to use.
---expected_sex_col_name EXPECTED_SEX_COL_NAME
+--expected_sex_column EXPECTED_SEX_COLUMN
                         Name of column in sample sheet that corresponds to
                         expected sex of sample.
 

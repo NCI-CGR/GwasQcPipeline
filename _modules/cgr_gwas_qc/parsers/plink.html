@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.parsers.plink &mdash; GwasQcPipeline 1.0.0a3 documentation</title>
+  <title>cgr_gwas_qc.parsers.plink &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
   
 
   
@@ -174,12 +174,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for cgr_gwas_qc.parsers.plink</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">cgr_gwas_qc.typing</span> <span class="kn">import</span> <span class="n">PathLike</span>
 
 
-<div class="viewcode-block" id="read_het"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_het">[docs]</a><span class="k">def</span> <span class="nf">read_het</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="read_het"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_het">[docs]</a><span class="k">def</span> <span class="nf">read_het</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s het file format.</span>
 
 <span class="sd">    Returns:</span>
@@ -207,7 +207,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_hwe"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_hwe">[docs]</a><span class="k">def</span> <span class="nf">read_hwe</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="read_hwe"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_hwe">[docs]</a><span class="k">def</span> <span class="nf">read_hwe</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s hwe file format.</span>
 
 <span class="sd">    Returns:</span>
@@ -249,8 +249,15 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_genome"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_genome">[docs]</a><span class="k">def</span> <span class="nf">read_genome</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="read_genome"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_genome">[docs]</a><span class="k">def</span> <span class="nf">read_genome</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s genome file format.</span>
+
+<span class="sd">    Each row of the genome file is a pairwise combinations of</span>
+<span class="sd">    samples/subjects. I am unsure of how plink assigns IID order. Here I sort</span>
+<span class="sd">    IDs alphanumerically which will make searching for pairs easier because</span>
+<span class="sd">    you can assume the order.</span>
+
+<span class="sd">    &gt;&gt;&gt; ID1, ID2 = sort([IID1, IID2])</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        pd.DataFrame:</span>
@@ -259,8 +266,8 @@
 <span class="sd">            .. csv-table::</span>
 <span class="sd">                :header: name, dtype, description</span>
 
-<span class="sd">                ID1, object, First Sample or Subject ID</span>
-<span class="sd">                ID2, object, Second Sample or Subject ID</span>
+<span class="sd">                ID1, object, First Sample or Subject ID (alphanumerically)</span>
+<span class="sd">                ID2, object, Second Sample or Subject ID (alphanumerically)</span>
 <span class="sd">                RT, object, Relationship type inferred from .fam/.ped file {FS: Full Sib, HS, Half Sib, PO: Parent-Offspring, OT; Other}</span>
 <span class="sd">                EZ, object, IBD sharing expected value, based on just .fam/.ped relationship</span>
 <span class="sd">                Z0, float, P(IBD=0)</span>
@@ -281,14 +288,20 @@
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/ibd</span>
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#genome</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_sort_ids</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sort IDs alphanumerically.&quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">[</span><span class="s2">&quot;ID1&quot;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;ID2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">IID1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">IID2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">x</span>
+
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;FID1&quot;</span><span class="p">,</span> <span class="s2">&quot;FID2&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;IID1&quot;</span><span class="p">:</span> <span class="s2">&quot;ID1&quot;</span><span class="p">,</span> <span class="s2">&quot;IID2&quot;</span><span class="p">:</span> <span class="s2">&quot;ID2&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_sort_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;IID1&quot;</span><span class="p">,</span> <span class="s2">&quot;IID2&quot;</span><span class="p">,</span> <span class="s2">&quot;FID1&quot;</span><span class="p">,</span> <span class="s2">&quot;FID2&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_imiss"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_imiss">[docs]</a><span class="k">def</span> <span class="nf">read_imiss</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="read_imiss"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_imiss">[docs]</a><span class="k">def</span> <span class="nf">read_imiss</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s imiss file format.</span>
 
 <span class="sd">    This reports sample level missing data.</span>
@@ -318,7 +331,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_lmiss"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_lmiss">[docs]</a><span class="k">def</span> <span class="nf">read_lmiss</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="read_lmiss"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_lmiss">[docs]</a><span class="k">def</span> <span class="nf">read_lmiss</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s lmiss file format.</span>
 
 <span class="sd">    This reports snp level missing data.</span>
@@ -343,7 +356,7 @@
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_sexcheck"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_sexcheck">[docs]</a><span class="k">def</span> <span class="nf">read_sexcheck</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<div class="viewcode-block" id="read_sexcheck"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_sexcheck">[docs]</a><span class="k">def</span> <span class="nf">read_sexcheck</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Parse PLINK&#39;s sexcheck file format.</span>
 
 <span class="sd">    Returns:</span>

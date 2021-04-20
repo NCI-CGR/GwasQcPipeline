@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Workflow Scripts &mdash; GwasQcPipeline 1.0.0a3 documentation</title>
+  <title>Workflow Scripts &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
   
 
   
@@ -114,7 +114,9 @@
 <li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="parsers.html">Parsers</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Workflow Scripts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.workflow.scripts.sample_qc_table">Sample-Level</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.workflow.scripts.sample_concordance">Sample-Level</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sample-concordance-table">Sample Concordance Table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#split-sample-concordance-tables">Split Sample Concordance Tables</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#sample-qc-table-py">sample_qc_table.py</a></li>
 </ul>
 </li>
@@ -122,6 +124,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#related-subjects-py">related_subjects.py</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#population-qc-table-py">population_qc_table.py</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#agg-population-qc-tables-py">agg_population_qc_tables.py</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.workflow.scripts.concordance_table">General</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#base-concordance-table">Base Concordance Table</a></li>
 </ul>
 </li>
 </ul>
@@ -197,9 +203,325 @@
             
   <div class="section" id="workflow-scripts">
 <h1>Workflow Scripts<a class="headerlink" href="#workflow-scripts" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-cgr_gwas_qc.workflow.scripts.sample_qc_table">
-<span id="sample-level"></span><h2>Sample-Level<a class="headerlink" href="#module-cgr_gwas_qc.workflow.scripts.sample_qc_table" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="sample-qc-table-py">
+<div class="section" id="module-cgr_gwas_qc.workflow.scripts.sample_concordance">
+<span id="sample-level"></span><h2>Sample-Level<a class="headerlink" href="#module-cgr_gwas_qc.workflow.scripts.sample_concordance" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sample-concordance-table">
+<h3>Sample Concordance Table<a class="headerlink" href="#sample-concordance-table" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">workflow/scripts/sample_concordance.py</span></code></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sample_ID1</p></td>
+<td><p>string</p></td>
+<td><p>Sample_ID for the first sample in the pairwise comparison.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample_ID2</p></td>
+<td><p>string</p></td>
+<td><p>Sample_ID for the second sample in the pairwise comparison.</p></td>
+</tr>
+<tr class="row-even"><td><p>Subject_ID1</p></td>
+<td><p>string</p></td>
+<td><p>Subject_ID for the first sample in the pairwise comparison.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Subject_ID2</p></td>
+<td><p>string</p></td>
+<td><p>Subject_ID for the second sample in the pairwise comparison.</p></td>
+</tr>
+<tr class="row-even"><td><p>case_control1</p></td>
+<td><p>string</p></td>
+<td><p>Case/Control information for the first sample in the pairwise comparison.</p></td>
+</tr>
+<tr class="row-odd"><td><p>case_control2</p></td>
+<td><p>string</p></td>
+<td><p>Case/Control information for the second sample in the pairwise comparison.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_internal_control1</p></td>
+<td><p>boolean</p></td>
+<td><p>True if first sample is an internal control.</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_internal_control2</p></td>
+<td><p>boolean</p></td>
+<td><p>True if second sample is an internal control.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_expected_replicate</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the pair of samples are known replicates.</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_discordant_replicate</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the pair of samples are a known replicate but do not behave the same.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_unexpected_replicate</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the pair of samples are from different subjects but look identical.</p></td>
+</tr>
+<tr class="row-odd"><td><p>PLINK_PI_HAT</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBD i.e. <code class="docutils literal notranslate"><span class="pre">P(IBD=2)</span> <span class="pre">+</span> <span class="pre">0.5</span> <span class="pre">*</span> <span class="pre">P(IBD=1)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>PLINK_concordance</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBS2 <code class="docutils literal notranslate"><span class="pre">IBS2</span> <span class="pre">/</span> <span class="pre">(IBS0</span> <span class="pre">+</span> <span class="pre">IBS1</span> <span class="pre">+</span> <span class="pre">IBS2)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>PLINK_is_ge_pi_hat</p></td>
+<td><p>boolean</p></td>
+<td><p>True if PI_HAT was greater than <code class="docutils literal notranslate"><span class="pre">software_params.pi_hat_cutoff</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>PLINK_is_ge_concordance</p></td>
+<td><p>boolean</p></td>
+<td><p>True if concordance was greater than <code class="docutils literal notranslate"><span class="pre">software_params.dup_concordance_cutoff</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>GRAF_HGMR</p></td>
+<td><p>float</p></td>
+<td><p>Homozygous Genotype Mismatch Rate (%)</p></td>
+</tr>
+<tr class="row-even"><td><p>GRAF_AGMR</p></td>
+<td><p>float</p></td>
+<td><p>All Genotype Mismatch Rate (%)</p></td>
+</tr>
+<tr class="row-odd"><td><p>GRAF_relationship</p></td>
+<td><p>string</p></td>
+<td><p>relationship determined by sample genotypes.</p></td>
+</tr>
+<tr class="row-even"><td><p>KING_Kinship</p></td>
+<td><p>float</p></td>
+<td><p>Estimated kinship coefficient from the SNP data</p></td>
+</tr>
+<tr class="row-odd"><td><p>KING_relationship</p></td>
+<td><p>string</p></td>
+<td><p>The assigned relationship based on Kinship</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#module-cgr_gwas_qc.workflow.scripts.concordance_table" title="cgr_gwas_qc.workflow.scripts.concordance_table"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgr_gwas_qc.workflow.scripts.concordance_table</span></code></a></p></li>
+<li><p><a class="reference internal" href="parsers.html#module-cgr_gwas_qc.parsers.king" title="cgr_gwas_qc.parsers.king"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.king</span></code></a></p></li>
+<li><p><a class="reference internal" href="parsers.html#module-cgr_gwas_qc.parsers.graf" title="cgr_gwas_qc.parsers.graf"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.graf</span></code></a></p></li>
+</ul>
+</div>
+<span class="target" id="module-cgr_gwas_qc.workflow.scripts.split_sample_concordance"></span><div class="section" id="split-sample-concordance-tables">
+<h3>Split Sample Concordance Tables<a class="headerlink" href="#split-sample-concordance-tables" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">workflow/scripts/split_sample_concordance.py</span></code></p>
+<p>This script uses sample concordance based on pairwise IBD estimations. We
+expect samples from the same subject to show high concordance while samples
+from different subjects should not be related. This script outputs 4 tables:</p>
+<div class="section" id="known-replicates">
+<h4>Known Replicates<a class="headerlink" href="#known-replicates" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/KnownReplicates.csv</span></code> (Full Table)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/InternalQcKnown.csv</span></code> (QC Samples Only)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/StudySampleKnown.csv</span></code> (Study Samples Only)</p></li>
+</ul>
+<p>These tables have the following format:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Subject_ID</p></td>
+<td><p>string</p></td>
+<td><p>The Subject_ID for the replicate</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Sample_ID1</p></td>
+<td><p>string</p></td>
+<td><p>Sample_ID1 for the pairwise comparison.</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Sample_ID2</p></td>
+<td><p>string</p></td>
+<td><p>Sample_ID2 for the pairwise comparison.</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>is_internal_control1</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the first sample in the comparison is an internal control.</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>is_internal_control2</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the second sample in the comparison is an internal control.</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>is_discordant_replicate</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the pair is a known replicate but PLINK</p></td>
+<td><p>GRAF</p></td>
+<td><p>and KING could not call it as a replicate</p></td>
+</tr>
+<tr class="row-even"><td><p>PLINK_PI_HAT</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBD i.e. <code class="docutils literal notranslate"><span class="pre">P(IBD=2)</span> <span class="pre">+</span> <span class="pre">0.5*P(IBD=1)</span></code></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>PLINK_concordance</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBS2 <code class="docutils literal notranslate"><span class="pre">IBS2</span> <span class="pre">/</span> <span class="pre">(IBS0</span> <span class="pre">+</span> <span class="pre">IBS1</span> <span class="pre">+</span> <span class="pre">IBS2)</span></code></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>PLINK_is_ge_pi_hat</p></td>
+<td><p>boolean</p></td>
+<td><p>True if PI_HAT was greater than <code class="docutils literal notranslate"><span class="pre">software_params.pi_hat_cutoff</span></code></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>PLINK_is_ge_concordance</p></td>
+<td><p>boolean</p></td>
+<td><p>True if concordance was greater than <code class="docutils literal notranslate"><span class="pre">software_params.dup_concordance_cutoff</span></code></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>GRAF_HGMR</p></td>
+<td><p>float</p></td>
+<td><p>Homozygous Genotype Mismatch Rate (%)</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>GRAF_AGMR</p></td>
+<td><p>float</p></td>
+<td><p>All Genotype Mismatch Rate (%)</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>GRAF_relationship</p></td>
+<td><p>string</p></td>
+<td><p>relationship determined by sample genotypes.</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>KING_Kinship</p></td>
+<td><p>float</p></td>
+<td><p>Estimated kinship coefficient from the SNP data</p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>KING_relationship</p></td>
+<td><p>string</p></td>
+<td><p>The assigned relationship based on Kinship</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="unknown-replicates">
+<h4>Unknown Replicates<a class="headerlink" href="#unknown-replicates" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/UnknownReplicates.csv</span></code> (Full Table)</p></li>
+</ul>
+<p>This table has the following format:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Subject_ID1</p></td>
+<td><p>string</p></td>
+<td><p>The Subject_ID for <code class="docutils literal notranslate"><span class="pre">Sample_ID1</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Subject_ID2</p></td>
+<td><p>string</p></td>
+<td><p>The Subject_ID for <code class="docutils literal notranslate"><span class="pre">Sample_ID2</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Sample_ID1</p></td>
+<td><p>string</p></td>
+<td><p>Sample_ID1 for the pairwise comparison.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample_ID2</p></td>
+<td><p>string</p></td>
+<td><p>Sample_ID2 for the pairwise comparison.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_internal_control1</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the first sample in the comparison is an internal control.</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_internal_control2</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the second sample in the comparison is an internal control.</p></td>
+</tr>
+<tr class="row-even"><td><p>PLINK_PI_HAT</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBD i.e. <code class="docutils literal notranslate"><span class="pre">P(IBD=2)</span> <span class="pre">+</span> <span class="pre">0.5*P(IBD=1)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>PLINK_concordance</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBS2 <code class="docutils literal notranslate"><span class="pre">IBS2</span> <span class="pre">/</span> <span class="pre">(IBS0</span> <span class="pre">+</span> <span class="pre">IBS1</span> <span class="pre">+</span> <span class="pre">IBS2)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>PLINK_is_ge_pi_hat</p></td>
+<td><p>boolean</p></td>
+<td><p>True if PI_HAT was greater than <code class="docutils literal notranslate"><span class="pre">software_params.pi_hat_cutoff</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>PLINK_is_ge_concordance</p></td>
+<td><p>boolean</p></td>
+<td><p>True if concordance was greater than <code class="docutils literal notranslate"><span class="pre">software_params.dup_concordance_cutoff</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>GRAF_HGMR</p></td>
+<td><p>float</p></td>
+<td><p>Homozygous Genotype Mismatch Rate (%)</p></td>
+</tr>
+<tr class="row-odd"><td><p>GRAF_AGMR</p></td>
+<td><p>float</p></td>
+<td><p>All Genotype Mismatch Rate (%)</p></td>
+</tr>
+<tr class="row-even"><td><p>GRAF_relationship</p></td>
+<td><p>string</p></td>
+<td><p>relationship determined by sample genotypes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>KING_Kinship</p></td>
+<td><p>float</p></td>
+<td><p>Estimated kinship coefficient from the SNP data</p></td>
+</tr>
+<tr class="row-even"><td><p>KING_relationship</p></td>
+<td><p>string</p></td>
+<td><p>The assigned relationship based on Kinship</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#module-cgr_gwas_qc.workflow.scripts.sample_concordance" title="cgr_gwas_qc.workflow.scripts.sample_concordance"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgr_gwas_qc.workflow.scripts.sample_concordance</span></code></a></p></li>
+</ul>
+</div>
+</div>
+<span class="target" id="module-cgr_gwas_qc.workflow.scripts.sample_qc_table"></span><div class="section" id="sample-qc-table-py">
 <h3>sample_qc_table.py<a class="headerlink" href="#sample-qc-table-py" title="Permalink to this headline">¶</a></h3>
 <p>Generate the internal sample QC report.</p>
 <p>This script takes various outputs from the GwasQcPipeline and
@@ -219,7 +541,7 @@ population. Any two subjects whose <code class="docutils literal notranslate"><s
 defined <code class="docutils literal notranslate"><span class="pre">pi_hat_threshold</span></code> [1] will be considered related.</p>
 <p>Output:</p>
 <blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">{prefix}/subjects_relatives_pi_hat_gt{pi}.csv</span></code></p>
+<div><p><code class="docutils literal notranslate"><span class="pre">{prefix}/relatives.csv</span></code></p>
 <p>This table contains information about which subjects appear to be related
 according to IBS/IBD. An arbitrary family ID is assigned to help tracking.</p>
 <p>1. Uses <code class="docutils literal notranslate"><span class="pre">PI_HAT</span></code> from IBS/IBD estimation to identify pairwise groups of
@@ -246,7 +568,7 @@ related subjects.
 </tr>
 </tbody>
 </table>
-<p><code class="docutils literal notranslate"><span class="pre">{prefix}/subjects_to_remove_pi_hat_gt{pi}.txt</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">{prefix}/related_subjects_to_remove.txt</span></code></p>
 <p>Using a greeding algorithm, select subjects, with the most relationships,
 to prune from the dataset to eliminate relatedness.</p>
 <p>1. Uses <code class="docutils literal notranslate"><span class="pre">PI_HAT</span></code> from IBS/IBD estimation to identify pairwise groups of
@@ -448,6 +770,53 @@ metadata from the sample qc table.</p>
 <li><p><a class="reference internal" href="parsers.html#cgr_gwas_qc.parsers.plink.read_het" title="cgr_gwas_qc.parsers.plink.read_het"><code class="xref py py-func docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.plink.read_het()</span></code></a></p></li>
 <li><p><a class="reference internal" href="parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec" title="cgr_gwas_qc.parsers.eigensoft.Eigenvec"><code class="xref py py-class docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.eigensoft.Eigenvec</span></code></a></p></li>
 </ul>
+</div>
+</div>
+<div class="section" id="module-cgr_gwas_qc.workflow.scripts.concordance_table">
+<span id="general"></span><h2>General<a class="headerlink" href="#module-cgr_gwas_qc.workflow.scripts.concordance_table" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="base-concordance-table">
+<h3>Base Concordance Table<a class="headerlink" href="#base-concordance-table" title="Permalink to this headline">¶</a></h3>
+<p>Reads the plink <code class="docutils literal notranslate"><span class="pre">.genome</span></code> format file and calculates concordance as
+<code class="docutils literal notranslate"><span class="pre">IBS2</span> <span class="pre">/</span> <span class="pre">(IBS0</span> <span class="pre">+</span> <span class="pre">IBS1</span> <span class="pre">+</span> <span class="pre">IBS2)</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ID1</p></td>
+<td><p>string</p></td>
+<td><p>ID1 for the pairwise comparison.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ID2</p></td>
+<td><p>string</p></td>
+<td><p>ID2 for the pairwise comparison.</p></td>
+</tr>
+<tr class="row-even"><td><p>PI_HAT</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBD i.e. <code class="docutils literal notranslate"><span class="pre">P(IBD=2)</span> <span class="pre">+</span> <span class="pre">0.5</span> <span class="pre">*</span> <span class="pre">P(IBD=1)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>concordance</p></td>
+<td><p>float</p></td>
+<td><p>Proportion IBS2 <code class="docutils literal notranslate"><span class="pre">IBS2</span> <span class="pre">/</span> <span class="pre">(IBS0</span> <span class="pre">+</span> <span class="pre">IBS1</span> <span class="pre">+</span> <span class="pre">IBS2)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>is_ge_pi_hat</p></td>
+<td><p>boolean</p></td>
+<td><p>True if PI_HAT was greater than <code class="docutils literal notranslate"><span class="pre">software_params.pi_hat_cutoff</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>is_ge_concordance</p></td>
+<td><p>boolean</p></td>
+<td><p>True if concordance was greater than <code class="docutils literal notranslate"><span class="pre">software_params.dup_concordance_cutoff</span></code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
