@@ -148,7 +148,8 @@ def population_concordance_files(wildcards):
 
 rule agg_population_concordance:
     input:
-        population_concordance_files,
+        sample_sheet_csv="cgr_sample_sheet.csv",
+        ibd_files=population_concordance_files,
     output:
         "population_level/concordance.csv",
     script:

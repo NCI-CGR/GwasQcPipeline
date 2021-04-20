@@ -474,6 +474,24 @@ def agg_population_qc_df(agg_population_qc_csv) -> pd.DataFrame:
     return read_agg_population_qc_tables(agg_population_qc_csv)
 
 
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def agg_population_concordance_csv(sample_concordance_csv, real_tmp_path) -> Path:
+    """Create the aggregated population qc table"""
+    from cgr_gwas_qc.workflow.scripts import agg_population_concordance, sample_concordance
+
+    df = (
+        sample_concordance.read(sample_concordance_csv)
+        .assign(population="EUR")
+        .reindex(agg_population_concordance.DTYPES.keys(), axis=1)
+        .drop_duplicates()
+    )
+
+    outfile = real_tmp_path / "population_level/concordance.csv"
+    df.to_csv(outfile, index=False)
+    return outfile
+
+
 @pytest.fixture(scope="session")
 def fake_image(fake_tmp_path):
     from PIL import Image
