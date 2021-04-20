@@ -34,6 +34,12 @@ def test_add_case_control(fake_cfg, concordance):
     assert "case_control2" in df.columns
 
 
+def test_add_internal_control(fake_cfg, concordance):
+    df = concordance.pipe(sample_concordance._add_internal_control, fake_cfg.ss)
+    assert "is_internal_control1" in df.columns
+    assert "is_internal_control2" in df.columns
+
+
 def test_add_expected_replicate(fake_cfg, concordance):
     df = concordance.pipe(sample_concordance._add_expected_replicates, fake_cfg.ss)
     assert 1 == df.is_expected_replicate.sum()

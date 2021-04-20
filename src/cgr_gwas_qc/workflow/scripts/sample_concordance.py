@@ -14,6 +14,8 @@ Sample Concordance Table
     Subject_ID2, string, Subject_ID for the second sample in the pairwise comparison.
     case_control1, string, Case/Control information for the first sample in the pairwise comparison.
     case_control2, string, Case/Control information for the second sample in the pairwise comparison.
+    is_internal_control1, boolean, True if first sample is an internal control.
+    is_internal_control2, boolean, True if second sample is an internal control.
     is_expected_replicate, boolean, True if the pair of samples are known replicates.
     is_discordant_replicate, boolean, True if the pair of samples are a known replicate but do not behave the same.
     is_unexpected_replicate, boolean, True if the pair of samples are from different subjects but look identical.
@@ -52,6 +54,8 @@ DTYPES = {
     "Subject_ID2": "string",
     "case_control1": "string",
     "case_control2": "string",
+    "is_internal_control1": "boolean",
+    "is_internal_control2": "boolean",
     "is_expected_replicate": "boolean",
     "is_discordant_replicate": "boolean",
     "is_unexpected_replicate": "boolean",
@@ -78,6 +82,8 @@ def read(filename: PathLike):
         - Subject_ID2
         - case_control1
         - case_control2
+        - is_internal_control1
+        - is_internal_control2
         - is_expected_replicate
         - is_discordant_replicate
         - is_unexpected_replicate
@@ -106,6 +112,7 @@ def main(
         .pipe(_add_unexpected_replicates)
         .pipe(_add_subject, ss)
         .pipe(_add_case_control, ss)
+        .pipe(_add_internal_control, ss)
     )
     concordance.reset_index().reindex(DTYPES.keys(), axis=1).astype(DTYPES).to_csv(
         outfile, index=False
@@ -137,9 +144,17 @@ def _add_subject(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame:
 
 def _add_case_control(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame:
     """Add case_control information for each Sample in pair"""
-    s2ic = ss.set_index("Sample_ID").case_control
-    return df.join(s2ic.rename_axis("Sample_ID1").rename("case_control1")).join(
-        s2ic.rename_axis("Sample_ID2").rename("case_control2")
+    s2cc = ss.set_index("Sample_ID").case_control
+    return df.join(s2cc.rename_axis("Sample_ID1").rename("case_control1")).join(
+        s2cc.rename_axis("Sample_ID2").rename("case_control2")
+    )
+
+
+def _add_internal_control(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame:
+    """Add internal_control information for each Sample in pair"""
+    s2ic = ss.set_index("Sample_ID").is_internal_control
+    return df.join(s2ic.rename_axis("Sample_ID1").rename("is_internal_control1")).join(
+        s2ic.rename_axis("Sample_ID2").rename("is_internal_control2")
     )
 
 
