@@ -56,8 +56,10 @@ def main(sample_sheet_csv: Path, ibd_files: List[Path], outfile: Path):
     if ibd_files:
         ss = (
             sample_sheet.read(sample_sheet_csv)
+            .reindex(["Group_By_Subject_ID", "case_control"], axis=1)
+            .drop_duplicates()
             .set_index("Group_By_Subject_ID")
-            .case_control.drop_duplicates()
+            .squeeze()
         )
 
         df = (
@@ -97,7 +99,8 @@ def _read_concordance_table(filename: Path):
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {
-            **{k: Path(v) for k, v in snakemake.input.items()},  # type: ignore # noqa
+            "sample_sheet_csv": Path(snakemake.input["sample_sheet_csv"]),  # type: ignore # noqa
+            "ibd_files": [Path(v) for v in snakemake.input["ibd_files"]],  # type: ignore # noqa
             "outfile": Path(snakemake.output[0]),  # type: ignore # noqa
         }
         main(**defaults)
