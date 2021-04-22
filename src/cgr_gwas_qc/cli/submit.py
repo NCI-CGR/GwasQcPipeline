@@ -44,7 +44,7 @@ def main(
         "cgems": cgems,
         "biowulf": biowulf,
         "time_hr": time_hr,
-        "local_mem_mb": 500,
+        "local_mem_mb": 1024,
         "local_tasks": 1,
         "added_options": "--notemp " if notemp else "",
     }
