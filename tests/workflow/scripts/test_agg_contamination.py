@@ -2,7 +2,7 @@ from textwrap import dedent
 
 import pytest
 
-from cgr_gwas_qc.workflow.scripts import agg_contamination_test
+from cgr_gwas_qc.workflow.scripts import agg_contamination
 
 
 @pytest.fixture
@@ -66,7 +66,7 @@ def imiss_file(tmp_path):
 
 @pytest.fixture
 def agg_df(contam_files, intensity_csv, imiss_file):
-    return agg_contamination_test.build(contam_files, intensity_csv, imiss_file)
+    return agg_contamination.build(contam_files, intensity_csv, imiss_file)
 
 
 def test_mask_low_intensity(agg_df, software_params):
@@ -75,7 +75,7 @@ def test_mask_low_intensity(agg_df, software_params):
     SP00003 should be NA b/c of low intensity.
     SP00004 should be NA b/c of missing in imiss file.
     """
-    obs_df = agg_contamination_test._mask_low_intensity(agg_df, software_params.intensity_threshold)
+    obs_df = agg_contamination._mask_low_intensity(agg_df, software_params.intensity_threshold)
     assert obs_df["%Mix"].isna().sum() == 2
 
 
@@ -84,6 +84,6 @@ def test_flag_contaminated(agg_df, software_params):
 
     SP00002 should be contaminated.
     """
-    obs_df = agg_contamination_test._flag_contaminated(agg_df, software_params.contam_threshold)
+    obs_df = agg_contamination._flag_contaminated(agg_df, software_params.contam_threshold)
     assert 1 == obs_df["is_ge_contam_threshold"].sum()
     assert "SP00002" == obs_df[obs_df.is_ge_contam_threshold].squeeze().Sample_ID
