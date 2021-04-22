@@ -137,15 +137,18 @@ if (
         is below the threshold and the file is not in the ``imiss`` file.
         """
         input:
-            contamination=cfg.expand(rules.per_sample_verifyIDintensity_contamination.output),
-            median_idat_intensity=rules.agg_median_idat_intensity.output[0],
-            imiss="sample_level/call_rate_2/samples.imiss",
+            contamination_files=cfg.expand(
+                rules.per_sample_verifyIDintensity_contamination.output
+            ),
+            median_intensity_file=rules.agg_median_idat_intensity.output[0],
+            imiss_file="sample_level/call_rate_2/samples.imiss",
         params:
             intensity_threshold=cfg.config.software_params.intensity_threshold,
+            contam_threshold=cfg.config.software_params.contam_threshold,
         output:
-            "sample_level/contamination/verifyIDintensity_contamination.csv",
+            "sample_level/contamination.csv",
         script:
-            "../scripts/agg_contamination_test.py"
+            "../scripts/agg_contamination.py"
 
 
 ################################################################################

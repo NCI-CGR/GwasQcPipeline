@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_series_equal
 
-from cgr_gwas_qc.models.config.software_params import SoftwareParams
 from cgr_gwas_qc.testing.data import RealData
 
 
@@ -136,23 +135,32 @@ def test_read_concordance(ss_df, sample_concordance_csv):
 
 
 @pytest.mark.real_data
-def test_read_contam(ss_df):
+@pytest.fixture
+def updated_contam(software_params, tmp_path):
+    filename = RealData() / "production_outputs/all_contam/contam.csv"
+    outfile = tmp_path / "contam.csv"
+    (
+        pd.read_csv(filename)
+        .rename({"ID": "Sample_ID"}, axis=1)
+        .assign(is_contaminated=lambda x: x["%Mix"] > software_params.contam_threshold)
+        .to_csv(outfile, index=False)
+    )
+    return outfile
+
+
+@pytest.mark.real_data
+def test_read_contam(ss_df, updated_contam):
     from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_contam
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
-    filename = RealData() / "production_outputs/all_contam/contam.csv"
-    cutoff = SoftwareParams().contam_threshold
-
     # WHEN: Parse the contamination table
-    df = _read_contam(filename, cutoff, ss_df.index)
+    df = _read_contam(updated_contam, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
     assert df.index.name == "Sample_ID"
     assert "Contamination_Rate" in df.columns
     assert "is_contaminated" in df.columns
-    assert df.dtypes["is_contaminated"] is np.dtype("bool")
-    assert df.dtypes["Contamination_Rate"] is np.dtype("float64")
 
 
 @pytest.mark.real_data
@@ -161,10 +169,9 @@ def test_read_contam_file_name_none(ss_df):
 
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
     filename = None
-    cutoff = SoftwareParams().contam_threshold
 
     # WHEN: Parse the contamination table.
-    df = _read_contam(filename, cutoff, ss_df.index)
+    df = _read_contam(filename, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)

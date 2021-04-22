@@ -23,7 +23,7 @@ import typer
 from cgr_gwas_qc.parsers import plink, sample_sheet
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE, SEX_DTYPE
 from cgr_gwas_qc.typing import PathLike
-from cgr_gwas_qc.workflow.scripts import sample_concordance
+from cgr_gwas_qc.workflow.scripts import agg_contamination, sample_concordance
 from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags
 
 app = typer.Typer(add_completion=False)
@@ -104,8 +104,6 @@ def main(
     intensity: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
-    # Params
-    contam_threshold: float = typer.Option(..., help="Threshold for contamination."),
     # Outputs
     outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
@@ -126,7 +124,7 @@ def main(
                 _read_sexcheck_cr1(sexcheck_cr1, ss.expected_sex),
                 _read_ancestry(ancestry, Sample_IDs),
                 _read_concordance(sample_concordance_csv, Sample_IDs),
-                _read_contam(contam, contam_threshold, Sample_IDs),
+                _read_contam(contam, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
                 # TO-ADD: call function you created to parse/summarize new file
             ],
@@ -321,33 +319,28 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.Series:  # noq
     )
 
 
-def _read_contam(
-    file_name: Optional[Path], contam_threshold: float, Sample_IDs: pd.Index
-) -> pd.DataFrame:
+def _read_contam(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.DataFrame:
     """Parse verifyIDintensity contamination information.
 
     Returns:
         pd.DataFrame:
-            - Sample_ID (pd.index)
-            - Contamination_Rate (float): The contamination rate as estimated
-              by verifyIDintensity.
-            - is_contaminated (bool): True if the contamination rate is greater
-              than the supplied threshold.
+        - Sample_ID (pd.index)
+        - Contamination_Rate (float): The contamination rate as estimated
+            by verifyIDintensity (%Mix).
+        - is_contaminated (bool): True if the contamination rate is greater
+            than the supplied threshold.
     """
 
     if file_name is None:
         return pd.DataFrame(index=Sample_IDs, columns=["Contamination_Rate", "is_contaminated"])
 
-    df = (
-        pd.read_csv(file_name)
-        .rename({"ID": "Sample_ID", "%Mix": "Contamination_Rate"}, axis=1)
+    return (
+        agg_contamination.read(file_name)
+        .rename({"%Mix": "Contamination_Rate"}, axis=1)
         .set_index("Sample_ID")
+        .reindex(["Contamination_Rate", "is_contaminated"], axis=1)
+        .reindex(Sample_IDs)
     )
-
-    df["is_contaminated"] = df.Contamination_Rate > contam_threshold
-    df.loc[df.Contamination_Rate.isna(), "is_contaminated"] = False
-
-    return df.reindex(Sample_IDs)[["Contamination_Rate", "is_contaminated"]]
 
 
 def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Series:

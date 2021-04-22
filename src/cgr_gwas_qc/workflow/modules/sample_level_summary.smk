@@ -16,7 +16,7 @@ rule snp_qc_table:
 def _contam(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
     if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:
-        return "sample_level/contamination/verifyIDintensity_contamination.csv"
+        return "sample_level/contamination.csv"
     return []
 
 
@@ -38,8 +38,6 @@ rule sample_qc_table:
         sample_concordance_csv="sample_level/concordance/summary.csv",
         contam=_contam,
         intensity=_intensity,
-    params:
-        contam_threshold=cfg.config.software_params.contam_threshold,
     output:
         "sample_level/sample_qc.csv",
     script:

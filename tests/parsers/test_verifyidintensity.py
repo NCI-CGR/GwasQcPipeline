@@ -4,7 +4,7 @@ from textwrap import dedent
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from cgr_gwas_qc.parsers.verifyidintensity import remove_header_delim
+from cgr_gwas_qc.parsers.verifyidintensity import _remove_header_delim
 
 
 def test_remove_header_delim():
@@ -27,7 +27,7 @@ def test_remove_header_delim():
     )
 
     # WHEN-THEN: we parse the table it should remove the row of "----"
-    assert remove_header_delim(observed) == expected
+    assert _remove_header_delim(observed) == expected
 
 
 def test_pandas_parsing_multiple_spaces():
