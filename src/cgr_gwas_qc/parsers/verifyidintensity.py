@@ -4,8 +4,10 @@ from pathlib import Path
 
 import pandas as pd
 
+from cgr_gwas_qc.typing import PathLike
 
-def parse_sample_contamination_output(file_name: Path) -> pd.DataFrame:
+
+def read(filename: PathLike) -> pd.DataFrame:
     """Parse verifyIDintensity contamination output file.
 
     The summary table provided by verifyIDintensity is poorly formatted. It
@@ -16,25 +18,31 @@ def parse_sample_contamination_output(file_name: Path) -> pd.DataFrame:
     easy aggregation.
 
     Args:
-        file_name (Path): Path to a `*/{Sample_ID}.contam.out` file.
+        filename (Path): Path to a `*/{Sample_ID}.contam.out` file.
 
     Returns:
-        pd.DataFrame: A DataFrame with ``Sample_ID %Mix LLK LLK0``
+        pd.DataFrame:
+
+        - Sample_ID
+        - %Mix
+        - LLK
+        - LLK0
     """
-    data = remove_header_delim(file_name.read_text())
+    filepath = Path(filename)
+    data = _remove_header_delim(filepath.read_text())
 
     # Here we use ``delim_whitespace`` because these are multiple spaces and
     # not a tab.
     contam = pd.read_csv(StringIO(data), skiprows=2, delim_whitespace=True)
 
     # Add the Sample_ID so we can aggregate all samples together.
-    sample_id = file_name.stem.split(".")[0]
+    sample_id = filepath.stem.split(".")[0]
     contam.ID = sample_id
 
     return contam.rename({"ID": "Sample_ID"}, axis=1)
 
 
-def remove_header_delim(data: str) -> str:
+def _remove_header_delim(data: str) -> str:
     """Remove the table header delimiter from verifyIDintensity output.
 
     verifyIDintensity adds a row of "---" to deliminate the header. This
