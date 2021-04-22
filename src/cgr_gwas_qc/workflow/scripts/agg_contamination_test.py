@@ -2,65 +2,91 @@
 from pathlib import Path
 from typing import List
 
-import numpy as np
 import pandas as pd
 import typer
 
-from cgr_gwas_qc.parsers.verifyidintensity import parse_sample_contamination_output
+from cgr_gwas_qc.parsers import plink, verifyidintensity
+from cgr_gwas_qc.typing import PathLike
 
 app = typer.Typer(add_completion=False)
+
+DTYPES = {
+    "Sample_ID": "string",
+    "%Mix": "float",
+    "LLK": "float",
+    "LLK0": "float",
+    "is_ge_contam": "boolean",
+}
+
+
+def read(filename: PathLike):
+    return pd.read_csv(filename, dtypes=DTYPES)
 
 
 @app.command()
 def main(
-    contamination_files: List[Path] = typer.Argument(
-        ..., help="List of Paths with sample contamination estimates."
-    ),
-    median_intensity_file: Path = typer.Argument(
-        ..., help="Path to aggregated median IDAT intensities.", exists=True, readable=True
-    ),
-    imiss_file: Path = typer.Argument(
-        ...,
-        help="Path to sample based missing report from lvl2 call rate.",
-        exists=True,
-        readable=True,
-    ),
-    intensity_threshold: int = typer.Argument(..., help="IDAT intensity threshold."),
-    out_file: Path = typer.Argument(
-        ..., help="Path to output file.", file_okay=True, writable=True
-    ),
+    contamination_files: List[Path],
+    median_intensity_file: Path,
+    imiss_file: Path,
+    intensity_threshold: int,
+    contam_threshold: int,
+    outfile: Path,
 ) -> None:
-    aggregated_sample_contamination = pd.concat(
-        [parse_sample_contamination_output(sample) for sample in contamination_files],
-        ignore_index=True,
-    )
-    median_intensity = pd.read_csv(median_intensity_file)
-    aggregated_sample_missingness = parse_imiss(imiss_file)
 
-    df = aggregated_sample_contamination.merge(median_intensity, on="Sample_ID").merge(
-        aggregated_sample_missingness, on="Sample_ID"
+    df = (
+        build(contamination_files, median_intensity_file, imiss_file)
+        .pipe(_mask_low_intensity, intensity_threshold)
+        .pip(_flag_contaminated, contam_threshold)
     )
 
-    # Set %Mix to NA if below intensity threshold or not in imiss file
-    mask = (df.median_intensity < intensity_threshold) & df.F_MISS.isnull()
-    df.loc[mask, "%Mix"] = np.nan
-
-    # Only output a subset of columns. Mostly only care about ``Sample_ID`` and ``%Mix``.
-    df[["Sample_ID", "%Mix", "LLK", "LLK0"]].to_csv(out_file, index=False)
+    df.reindex(DTYPES.keys()).to_csv(outfile, index=False)
 
 
-def parse_imiss(file_name: Path):
-    return pd.read_csv(file_name, delim_whitespace=True).rename({"IID": "Sample_ID"}, axis=1)
+def build(
+    contamination_files: List[Path], median_intensity_file: Path, imiss_file: Path
+) -> pd.DataFrame:
+    return (
+        pd.concat(
+            [
+                _aggregate_contamination(contamination_files).set_index("Sample_ID"),
+                pd.read_csv(median_intensity_file).set_index("Sample_ID"),
+                plink.read_imiss(imiss_file).rename_axis("Sample_ID"),
+            ],
+            axis=1,
+        )
+        .rename_axis("Sample_ID")
+        .reset_index()
+    )
+
+
+def _aggregate_contamination(filenames: List[Path]) -> pd.DataFrame:
+    return pd.concat([verifyidintensity.read(sample) for sample in filenames], ignore_index=True)
+
+
+def _mask_low_intensity(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
+    """Set %Mix to NA if below intensity threshold or not in imiss file"""
+    mask = (df.median_intensity < threshold) | df.F_MISS.isna()
+    df.loc[mask, "%Mix"] = pd.NA
+    return df
+
+
+def _flag_contaminated(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
+    df["is_ge_contam_threshold"] = False
+    mask = df["%Mix"] >= threshold
+    df.loc[mask, "is_ge_contam_threshold"] = True
+    return df
 
 
 if __name__ == "__main__":
     if "snakemake" in locals():
-        main(
-            [Path(x) for x in snakemake.input.contamination],  # type: ignore # noqa
-            Path(snakemake.input.median_idat_intensity),  # type: ignore # noqa
-            Path(snakemake.input.imiss),  # type: ignore # noqa
-            snakemake.params.intensity_threshold,  # type: ignore # noqa
-            Path(snakemake.output[0]),  # type: ignore # noqa
-        )
+        defaults = {
+            **{
+                k: Path(v) if isinstance(v, str) else [Path(f) for f in v]
+                for k, v in snakemake.input.items()  # type: ignore # noqa
+            },
+            **{k: v for k, v in snakemake.params.items()},  # type: ignore # noqa
+            "outfile": Path(snakemake.output[0]),  # type: ignore # noqa
+        }
+        main(**defaults)
     else:
         app()
