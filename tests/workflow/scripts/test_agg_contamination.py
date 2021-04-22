@@ -85,5 +85,5 @@ def test_flag_contaminated(agg_df, software_params):
     SP00002 should be contaminated.
     """
     obs_df = agg_contamination._flag_contaminated(agg_df, software_params.contam_threshold)
-    assert 1 == obs_df["is_ge_contam_threshold"].sum()
-    assert "SP00002" == obs_df[obs_df.is_ge_contam_threshold].squeeze().Sample_ID
+    assert 1 == obs_df["is_contaminated"].sum()
+    assert "SP00002" == obs_df[obs_df.is_contaminated].squeeze().Sample_ID

@@ -15,12 +15,12 @@ DTYPES = {
     "%Mix": "float",
     "LLK": "float",
     "LLK0": "float",
-    "is_ge_contam": "boolean",
+    "is_contaminated": "boolean",
 }
 
 
 def read(filename: PathLike):
-    return pd.read_csv(filename, dtypes=DTYPES)
+    return pd.read_csv(filename, dtype=DTYPES)
 
 
 @app.command()
@@ -71,9 +71,9 @@ def _mask_low_intensity(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
 
 
 def _flag_contaminated(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
-    df["is_ge_contam_threshold"] = False
+    df["is_contaminated"] = False
     mask = df["%Mix"] >= threshold
-    df.loc[mask, "is_ge_contam_threshold"] = True
+    df.loc[mask, "is_contaminated"] = True
     return df
 
 
