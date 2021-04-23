@@ -26,7 +26,9 @@ would have to make modifications to add new components.
     case_control, CASE_CONTROL_DTYPE, Phenotype status {Case, Control, QC, Unknown}
     is_internal_control, boolean, True if the sample is an internal control.
     is_sample_exclusion, boolean, True if the sample is excluded in the config or missing IDAT/GTC files.
-    idats_exist, boolean, True if the IDAT files were present.
+    is_user_exclusion, boolean, True if the sample is excluded in the config
+    is_missing_idats, boolean, True if the IDAT files were missing during pre-flight.
+    is_missing_gtc, boolean, True if the IDAT files were missing during pre-flight.
     Call_Rate_Initial, float, The Initial sample call rate before any filters.
     Call_Rate_1, float, The sample call rate after the first filter.
     Call_Rate_2, float, The sample call rate after the second filter.
@@ -82,7 +84,9 @@ DTYPES = {  # Header for main QC table
     "case_control": CASE_CONTROL_DTYPE,
     "is_internal_control": "boolean",
     "is_sample_exclusion": "boolean",
-    "idats_exist": "boolean",
+    "is_user_exclusion": "boolean",
+    "is_missing_idats": "boolean",
+    "is_missing_gtc": "boolean",
     "Call_Rate_Initial": "float",
     "Call_Rate_1": "float",
     "Call_Rate_2": "float",
@@ -125,7 +129,9 @@ def read(filename: PathLike) -> pd.DataFrame:
         - case_control
         - is_internal_control
         - is_sample_exclusion
-        - idats_exist
+        - is_user_exclusion
+        - is_missing_idats
+        - is_missing_gtc
         - Call_Rate_Initial
         - Call_Rate_1
         - Call_Rate_2
@@ -558,7 +564,9 @@ def _add_analytic_exclusion(
     pre-flight checks.
     """
     exclusion_criteria = {
-        "is_sample_exclusion": "Sample Exclusion",
+        "is_user_exclusion": "User Exclusion",
+        "is_missing_idats": "Missing IDATs",
+        "is_missing_gtc": "Missing GTCs",
         "is_cr1_filtered": "Call Rate 1 Filtered",
         "is_cr2_filtered": "Call Rate 2 Filtered",
     }
