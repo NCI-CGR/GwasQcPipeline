@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 from pathlib import Path
 
-import pandas as pd
 import typer
+
+from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -16,7 +17,7 @@ def main(
     ctrl: Path = typer.Argument(..., help="Path to output file internal_controls.txt"),
 ):
 
-    df = pd.read_csv(all_samples)
+    df = sample_qc_table.read(all_samples)
     _save_sample_flag_as_file(df, "is_call_rate_filtered", cr)
     _save_sample_flag_as_file(df, "is_contaminated", contam)
     _save_sample_flag_as_file(df, "is_sex_discordant", sex)
