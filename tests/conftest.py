@@ -171,7 +171,10 @@ def real_cfg(tmp_path_factory, pytestconfig) -> ConfigMgr:
         pytest.skip("No real data")
 
     tmp_path = tmp_path_factory.mktemp("real_config")
-    RealData(tmp_path).make_config().make_cgr_sample_sheet()
+    RealData(tmp_path).make_config(
+        workflow_params=dict(subject_id_column="PI_Subject_ID"),
+        software_params=dict(contam_threshold=0.2),
+    ).make_cgr_sample_sheet()
 
     with chdir(tmp_path):
         cfg = load_config(pytest=True)
@@ -193,9 +196,10 @@ def real_cfg_short(tmp_path_factory, pytestconfig) -> ConfigMgr:
         pytest.skip("No real data")
 
     tmp_path = tmp_path_factory.mktemp("real_config_short")
-    RealData(tmp_path, full_sample_sheet=False).add_user_files(
-        entry_point="gtc"
-    ).make_config().make_cgr_sample_sheet()
+    RealData(tmp_path, full_sample_sheet=False).add_user_files(entry_point="gtc").make_config(
+        workflow_params=dict(subject_id_column="PI_Subject_ID"),
+        software_params=dict(contam_threshold=0.2),
+    ).make_cgr_sample_sheet()
 
     with chdir(tmp_path):
         cfg = load_config(pytest=True)
@@ -372,7 +376,23 @@ def snp_qc_df(snp_qc_csv) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
-def sample_qc_csv(real_cfg, real_tmp_path, sample_concordance_csv) -> Path:
+def contamination_csv(real_tmp_path, real_cfg) -> Path:
+    """Update legacy to match development version."""
+    outfile = real_tmp_path / "sample_level/contamination.csv"
+    (
+        pd.read_csv(RealData() / "production_outputs/all_contam/contam.csv")
+        .rename({"ID": "Sample_ID"}, axis=1)
+        .assign(
+            is_contaminated=lambda x: x["%Mix"] >= real_cfg.config.software_params.contam_threshold
+        )
+        .to_csv(outfile, index=False)
+    )
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def sample_qc_csv(real_cfg, real_tmp_path, sample_concordance_csv, contamination_csv) -> Path:
     """The Sample QC table.
 
     Return:
@@ -394,9 +414,12 @@ def sample_qc_csv(real_cfg, real_tmp_path, sample_concordance_csv) -> Path:
         data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck",
         data_cache / "production_outputs/snpweights/samples.snpweights.csv",
         sample_concordance_csv,
-        data_cache / "production_outputs/all_contam/contam.csv",
+        contamination_csv,
         data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
-        0.2,
+        True,
+        True,
+        True,
+        True,
         outfile,
     )
 
