@@ -38,6 +38,11 @@ rule sample_qc_table:
         sample_concordance_csv="sample_level/concordance/summary.csv",
         contam=_contam,
         intensity=_intensity,
+    params:
+        remove_contam=cfg.config.workflow_params.remove_contam,
+        remove_rep_discordant=cfg.config.workflow_params.remove_rep_discordant,
+        remove_unexpected_rep=cfg.config.workflow_params.remove_unexpected_rep,
+        remove_sex_discordant=cfg.config.workflow_params.remove_sex_discordant,
     output:
         "sample_level/sample_qc.csv",
     script:

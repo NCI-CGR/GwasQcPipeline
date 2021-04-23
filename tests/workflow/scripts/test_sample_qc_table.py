@@ -1,4 +1,3 @@
-from io import StringIO
 from textwrap import dedent
 
 import numpy as np
@@ -7,6 +6,7 @@ import pytest
 from pandas.testing import assert_series_equal
 
 from cgr_gwas_qc.testing.data import RealData
+from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
 
 @pytest.mark.real_data
@@ -132,6 +132,9 @@ def test_read_concordance(ss_df, sample_concordance_csv):
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
     assert df.index.name == "Sample_ID"
+    assert sorted(
+        ["is_discordant_replicate", "is_unexpected_replicate", "unexpected_replicate_ids"]
+    ) == sorted(df.columns)
 
 
 @pytest.mark.real_data
@@ -214,7 +217,7 @@ def test_read_intensity_file_name_none(ss_df):
 
 
 def test_identifiler_reason():
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _identifiler_reason
+    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _get_reason
 
     df = pd.DataFrame(
         {
@@ -224,80 +227,108 @@ def test_identifiler_reason():
             "three": [False, False, False, True],
         }
     )
-
-    obs_ = _identifiler_reason(df, ["one", "two", "three"])
-    exp_ = pd.Series(["", "one;two", "two", "one;two;three"])
+    flags = {"one": "A", "two": "B", "three": "C"}
+    obs_ = _get_reason(df, flags)
+    exp_ = pd.Series([pd.NA, "A|B", "B", "A|B|C"])
     assert_series_equal(obs_, exp_)
 
 
-def test_find_study_subject_representative():
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _find_study_subject_representative
+@pytest.fixture
+def fake_sample_qc() -> pd.DataFrame:
+    columns = [
+        "Sample_ID",
+        "Group_By_Subject_ID",
+        "is_sample_exclusion",
+        "is_internal_control",
+        "Call_Rate_2",
+        "is_cr1_filtered",
+        "is_cr2_filtered",
+        "is_contaminated",
+        "is_discordant_replicate",
+        "is_unexpected_replicate",
+        "is_sex_discordant",
+    ]
+    data = [
+        ("SP00001", "SB00001", False, False, 0.99, False, False, False, False, False, False),
+        ("SP00002", "SB00002", False, False, 0.82, False, True, False, False, False, False),
+        ("SP00003", "SB00003", False, False, 0.99, False, False, True, True, False, False),
+        ("SP00004", "SB00003", False, False, 0.99, False, False, False, True, False, False),
+        ("SP00005", "SB00004", False, False, 0.99, False, False, False, True, False, False),
+        ("SP00006", "SB00004", False, False, 0.99, False, False, False, True, False, False),
+        ("SP00007", "SB00005", False, False, 0.99, False, False, False, False, True, False),
+        ("SP00008", "SB00006", False, False, 0.99, False, False, False, False, True, False),
+        ("SP00009", "SB00007", False, False, 0.99, False, False, False, False, False, True),
+        ("SP00010", "SB00008", False, False, 0.99, False, False, False, False, False, False),
+        ("SP00011", "SB00008", False, False, 0.94, False, False, False, False, False, False),
+        ("SP00012", "SB00009", False, False, 0.99, False, False, False, False, False, False),
+        ("SP00013", "SB00009", False, False, 0.98, False, False, False, False, False, False),
+        ("SP00014", "SB00009", False, False, 0.97, False, False, False, False, False, False),
+    ]
+    return pd.DataFrame(data, columns=columns).set_index("Sample_ID")
 
-    # GIVEN: A slimmed down QC report
-    df = pd.read_csv(
-        StringIO(
-            dedent(
-                """
-        Group_By_Subject_ID,Sample_ID,Call_Rate_2,is_pass_sample_qc
-        SP00001,S001,.98,True
-        SP00002,S002,.98,True
-        SP00002,S003,.99,True
-        IB00001,I001,.99,False
-        SP00003,S004,.90,False
-        SP00003,S005,.91,True
-        SP00003,S006,.89,True
-        SP00004,S007,.89,False
-        SP00004,S008,.9,False
-        """
-            )
-        ),
-        index_col="Sample_ID",
+
+@pytest.mark.parametrize(
+    "contam,rep_discordant,unexpected_rep,sex_discordant,num_removed",
+    [
+        (False, False, False, False, 1),  # call rate filtered
+        (True, False, False, False, 2),
+        (False, True, False, False, 5),
+        (False, False, True, False, 3),
+        (False, False, False, True, 2),
+        (True, True, False, False, 5),
+        (True, True, True, True, 8),
+    ],
+)
+def test_add_analytic_exclusion(
+    fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant, num_removed
+):
+    sample_qc_table._add_analytic_exclusion(
+        fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant
     )
+    assert num_removed == fake_sample_qc.analytic_exclusion.sum()
 
-    # WHEN: I look for the representative sample for each Subject Group
-    # THEN: observed should be the same as expected.
-    obs_ = _find_study_subject_representative(df)
-    exp_ = pd.Series(
-        [True, False, True, False, False, True, False, False, False],
-        index=["S001", "S002", "S003", "I001", "S004", "S005", "S006", "S007", "S008"],
+
+@pytest.mark.parametrize(
+    "contam,rep_discordant,unexpected_rep,sex_discordant,num_subjects",
+    [
+        (False, False, False, False, 8),
+        (True, False, False, False, 8),
+        (False, True, False, False, 6),
+        (False, False, True, False, 6),
+        (False, False, False, True, 7),
+        (True, True, False, False, 6),
+        (True, True, True, True, 3),
+    ],
+)
+def test_add_subject_representative(
+    fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant, num_subjects
+):
+    sample_qc_table._add_analytic_exclusion(
+        fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant
     )
+    sample_qc_table._add_subject_representative(fake_sample_qc)
+    assert num_subjects == fake_sample_qc.is_subject_representative.sum()
 
-    # THEN: Basic properties
-    assert_series_equal(obs_, exp_, check_names=False)
 
-
-def test_find_study_subject_with_no_representative():
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import (
-        _find_study_subject_with_no_representative,
+@pytest.mark.parametrize(
+    "contam,rep_discordant,unexpected_rep,sex_discordant,num_subjects",
+    [
+        (False, False, False, False, 1),
+        (True, False, False, False, 1),
+        (False, True, False, False, 3),
+        (False, False, True, False, 3),
+        (False, False, False, True, 2),
+        (True, True, False, False, 3),
+        (True, True, True, True, 6),
+    ],
+)
+def test_add_subject_dropped_from_study(
+    fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant, num_subjects
+):
+    sample_qc_table._add_analytic_exclusion(
+        fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant
     )
-
-    # GIVEN: A slimmed down QC report
-    df = pd.read_csv(
-        StringIO(
-            dedent(
-                """
-        Group_By_Subject_ID,Sample_ID,is_subject_representative,is_internal_control
-        SP00001,S001,True,False
-        SP00001,S002,False,False
-        SP00002,S003,False,False
-        SP00002,S004,False,False
-        SP00002,S005,True,False
-        SP00003,S006,False,False
-        SP00003,S007,False,False
-        SP00004,I001,False,True
-        """
-            )
-        ),
-        index_col="Sample_ID",
-    )
-
-    # WHEN: I look for the representative sample for each Subject Group
-    # THEN: observed should be the same as expected.
-    obs_ = _find_study_subject_with_no_representative(df)
-    exp_ = pd.Series(
-        data=[False, False, False, False, False, True, True, False],
-        index=["S001", "S002", "S003", "S004", "S005", "S006", "S007", "I001"],
-    )
-
-    # THEN: Basic properties
-    assert_series_equal(obs_, exp_, check_names=False)
+    sample_qc_table._add_subject_representative(fake_sample_qc)
+    sample_qc_table._add_subject_dropped_from_study(fake_sample_qc)
+    subs = fake_sample_qc.groupby("Group_By_Subject_ID").subject_dropped_from_study.all()
+    assert num_subjects == subs.sum()
