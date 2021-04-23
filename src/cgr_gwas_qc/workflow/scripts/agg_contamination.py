@@ -36,10 +36,10 @@ def main(
     df = (
         build(contamination_files, median_intensity_file, imiss_file)
         .pipe(_mask_low_intensity, intensity_threshold)
-        .pip(_flag_contaminated, contam_threshold)
+        .pipe(_flag_contaminated, contam_threshold)
     )
 
-    df.reindex(DTYPES.keys()).to_csv(outfile, index=False)
+    df.reindex(DTYPES.keys(), axis=1).to_csv(outfile, index=False)
 
 
 def build(
