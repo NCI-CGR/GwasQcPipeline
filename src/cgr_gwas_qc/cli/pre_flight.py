@@ -214,7 +214,8 @@ def update_sample_sheet(
     _add_group_by_column(df, subject_id_column)
     _add_is_internal_control(df)
     _add_sample_exclusion(df, problem_samples)
-    _add_idats_exist(df, problem_samples)
+    _add_missing_idats(df, problem_samples)
+    _add_missing_gtc(df, problem_samples)
     _update_expected_sex(df, expected_sex_column)
     _update_case_control(df, case_control_column)
     return _add_replicate_info(df)
@@ -267,8 +268,8 @@ def _add_is_internal_control(df: pd.DataFrame):
     df["is_internal_control"] = False
 
 
-def _add_idats_exist(df, problem_samples: Iterable[ProblemFile]):
-    df["idats_exist"] = True
+def _add_missing_idats(df, problem_samples: Iterable[ProblemFile]):
+    df["is_missing_idats"] = False
     problem_idats = {
         problem.Sample_ID
         for problem in problem_samples
@@ -278,7 +279,21 @@ def _add_idats_exist(df, problem_samples: Iterable[ProblemFile]):
     }
     if problem_idats:
         mask = df.Sample_ID.isin(problem_idats)
-        df.loc[mask, "idats_exist"] = False
+        df.loc[mask, "is_missing_idats"] = True
+
+
+def _add_missing_gtc(df, problem_samples: Iterable[ProblemFile]):
+    df["is_missing_gtc"] = False
+    problem_gtcs = {
+        problem.Sample_ID
+        for problem in problem_samples
+        if problem.file_type
+        and problem.file_type.startswith("gtc")
+        and (problem.reason == "FileNotFound")
+    }
+    if problem_gtcs:
+        mask = df.Sample_ID.isin(problem_gtcs)
+        df.loc[mask, "is_missing_gtc"] = True
 
 
 def _add_replicate_info(df: pd.DataFrame) -> pd.DataFrame:
