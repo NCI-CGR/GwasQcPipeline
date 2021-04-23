@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 """
+Internal Sample QC Report
+-------------------------
 
-sample_qc_table.py
-------------------
-
-Generate the internal sample QC report.
+``workflow/scripts/sample_qc_table.py``
 
 This script takes various outputs from the GwasQcPipeline and
 aggregates/summarizes results into an internal QC report. Here we use a
@@ -12,11 +11,55 @@ functional approach to build up the QC report. Each file has it's own
 function to parse/summarize its content. This makes it easier to add new
 components or change the behavior. Search for `TO-ADD` comments for where you
 would have to make modifications to add new components.
+
+.. csv-table::
+    :header: name, dtype, description
+
+    Sample_ID, string, The sample identifier used by the workflow.
+    Group_By_Subject_ID, string, The subject identifier used by the workflow
+    num_samples_per_subject, UInt8, The total number of ``Sample_ID`` per ``Group_By_Subject_ID``.
+    analytic_exclusion: boolean, True if the sample failed QC criteria.
+    num_analytic_exclusion: boolean, The number of QC criteria the sample failed.
+    analytic_exclusion_reason: string, A list of QC criteria the sample failed.
+    is_subject_representative, boolean, True if the ``Sample_ID`` is used to represent the subject.
+    subject_dropped_from_study, boolean, True if there are no samples passing QC for this subject.
+    case_control, CASE_CONTROL_DTYPE, Phenotype status {Case, Control, QC, Unknown}
+    is_internal_control, boolean, True if the sample is an internal control.
+    is_sample_exclusion, boolean, True if the sample is excluded in the config or missing IDAT/GTC files.
+    is_user_exclusion, boolean, True if the sample is excluded in the config
+    is_missing_idats, boolean, True if the IDAT files were missing during pre-flight.
+    is_missing_gtc, boolean, True if the IDAT files were missing during pre-flight.
+    Call_Rate_Initial, float, The Initial sample call rate before any filters.
+    Call_Rate_1, float, The sample call rate after the first filter.
+    Call_Rate_2, float, The sample call rate after the second filter.
+    is_cr1_filtered, boolean, True if a sample was removed by the first call rate filter.
+    is_cr2_filtered, boolean, True if a sample was removed by the second call rate filter.
+    is_call_rate_filtered, boolean, True if a sample was removed by either call rate filter.
+    IdatIntensity, float, The median IDAT intensity.
+    Contamination_Rate, float, The SNPweights contamination rate (%Mix)
+    is_contaminated, boolean, True if a sample exceed the contamination rate threshold.
+    replicate_ids, string, Concatenated Sample_IDs that are replicates.
+    is_discordant_replicate, boolean, True if the replicates had low concordance.
+    is_unexpected_replicate, boolean, True if two subjects had high concordance.
+    unexpected_replicate_ids, string, Concatenated Sample_IDs that are unexpected replicates.
+    expected_sex, SEX_DTYPE, The expected sex from the provided sample sheet.
+    predicted_sex, SEX_DTYPE, The predicted sex based on X chromosome heterozygosity.
+    X_inbreeding_coefficient, float, The X chromosome F coefficient.
+    is_sex_discordant, boolean, True if expected and predicted sex did not match.
+    AFR, float, Proportion African ancestry.
+    EUR, float, Proportion European ancestry.
+    ASN, float, Proportion East Asian ancestry.
+    Ancestry, category, Assigned ancestral population (GRAF).
+    identifiler_needed, boolean, True if the lab needs to run Identifiler.
+    identifiler_reason, string, The QC problem that needs checked with Identifiler.
+
 """
+from itertools import product
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Dict, Iterable, Mapping, Optional, Tuple
 from warnings import warn
 
+import networkx as nx
 import pandas as pd
 import typer
 
@@ -33,12 +76,17 @@ DTYPES = {  # Header for main QC table
     "Sample_ID": "string",
     "Group_By_Subject_ID": "string",
     "num_samples_per_subject": "UInt8",
+    "analytic_exclusion": "boolean",
+    "num_analytic_exclusion": "boolean",
+    "analytic_exclusion_reason": "string",
     "is_subject_representative": "boolean",
     "subject_dropped_from_study": "boolean",
     "case_control": CASE_CONTROL_DTYPE,
     "is_internal_control": "boolean",
     "is_sample_exclusion": "boolean",
-    "idats_exist": "boolean",
+    "is_user_exclusion": "boolean",
+    "is_missing_idats": "boolean",
+    "is_missing_gtc": "boolean",
     "Call_Rate_Initial": "float",
     "Call_Rate_1": "float",
     "Call_Rate_2": "float",
@@ -51,6 +99,7 @@ DTYPES = {  # Header for main QC table
     "replicate_ids": "string",
     "is_discordant_replicate": "boolean",
     "is_unexpected_replicate": "boolean",
+    "unexpected_replicate_ids": "string",
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
     "X_inbreeding_coefficient": "float",
@@ -59,31 +108,55 @@ DTYPES = {  # Header for main QC table
     "EUR": "float",
     "ASN": "float",
     "Ancestry": "category",
-    "Count_of_QC_Issue": "UInt8",
-    "is_pass_sample_qc": "boolean",
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
 }
 
 
-QC_SUMMARY_FLAGS = [  # Set of binary flags used for summarizing sample quality
-    "is_call_rate_filtered",
-    "is_contaminated",
-    "is_sex_discordant",
-    "is_discordant_replicate",
-    "is_unexpected_replicate",
-    # TO-ADD: If you create a new summary binary flag you want to include
-    # in the count of QC issues then add the column here.
-]
+def read(filename: PathLike) -> pd.DataFrame:
+    """Read the Sample Level QC Table
 
-IDENTIFILER_FLAGS = {  # Set of binary flags used to determine if we need to run identifiler
-    "is_contaminated": "Contaminated",
-    "is_sex_discordant": "Sex Discordant",
-    "is_discordant_replicate": "Discordant Replicates",
-    "is_unexpected_replicate": "Unexpected Replicate",
-    # TO-ADD: If you create a new binary flag do determine if you run
-    # identifiler.
-}
+    Returns:
+        pd.DataFrame:
+        - Sample_ID
+        - Group_By_Subject_ID
+        - num_samples_per_subject
+        - analytic_exclusion
+        - num_analytic_exclusion
+        - analytic_exclusion_reason
+        - is_subject_representative
+        - subject_dropped_from_study
+        - case_control
+        - is_internal_control
+        - is_sample_exclusion
+        - is_user_exclusion
+        - is_missing_idats
+        - is_missing_gtc
+        - Call_Rate_Initial
+        - Call_Rate_1
+        - Call_Rate_2
+        - is_cr1_filtered
+        - is_cr2_filtered
+        - is_call_rate_filtered
+        - IdatIntensity
+        - Contamination_Rate
+        - is_contaminated
+        - replicate_ids
+        - is_discordant_replicate
+        - is_unexpected_replicate
+        - unexpected_replicate_ids
+        - expected_sex
+        - predicted_sex
+        - X_inbreeding_coefficient
+        - is_sex_discordant
+        - AFR
+        - EUR
+        - ASN
+        - Ancestry
+        - identifiler_needed
+        - identifiler_reason
+    """
+    return pd.read_csv(filename, dtype=DTYPES)
 
 
 @app.command()
@@ -104,17 +177,49 @@ def main(
     intensity: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
+    # Params
+    remove_contam: bool = True,
+    remove_rep_discordant: bool = True,
+    remove_unexpected_rep: bool = True,
+    remove_sex_discordant: bool = True,
     # Outputs
     outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
-
     ss = sample_sheet.read(sample_sheet_csv, remove_exclusions=False).set_index("Sample_ID")
-    Sample_IDs = ss.index
+    sample_qc = build(
+        ss,
+        imiss_start,
+        imiss_cr1,
+        imiss_cr2,
+        sexcheck_cr1,
+        ancestry,
+        sample_concordance_csv,
+        contam,
+        intensity,
+    )
+    add_qc_columns(
+        sample_qc,
+        remove_contam,
+        remove_sex_discordant,
+        remove_rep_discordant,
+        remove_unexpected_rep,
+    )
+    save(sample_qc, outfile)
 
-    ################################################################################
-    # Build QC Table
-    ################################################################################
-    sample_qc = (
+
+def build(
+    ss: pd.DataFrame,
+    imiss_start: Path,
+    imiss_cr1: Path,
+    imiss_cr2: Path,
+    sexcheck_cr1: Path,
+    ancestry: Path,
+    sample_concordance_csv: Path,
+    contam: Optional[Path],
+    intensity: Optional[Path],
+) -> pd.DataFrame:
+    Sample_IDs = ss.index
+    return (
         pd.concat(
             [
                 ss,
@@ -134,37 +239,6 @@ def main(
         .reset_index()
     )
 
-    ################################################################################
-    # Add Summary Columns
-    ################################################################################
-    add_call_rate_flags(sample_qc)
-
-    # Count the number of QC issues
-    sample_qc["Count_of_QC_Issue"] = sample_qc[QC_SUMMARY_FLAGS].sum(axis=1).astype(int)
-
-    # Add a flag to run identifiler based if any of these columns are True
-    sample_qc["identifiler_needed"] = sample_qc[IDENTIFILER_FLAGS].any(axis=1)
-    sample_qc["identifiler_reason"] = _identifiler_reason(sample_qc, list(IDENTIFILER_FLAGS))
-
-    # Add flag for which samples to keep as subject
-    sample_qc["is_pass_sample_qc"] = _check_pass_qc(sample_qc)
-    sample_qc["is_subject_representative"] = _find_study_subject_representative(sample_qc)
-    sample_qc["subject_dropped_from_study"] = _find_study_subject_with_no_representative(sample_qc)
-    ################################################################################
-    # Save Output
-    ################################################################################
-    _save_qc_table(sample_qc, outfile)
-
-
-def read(filename: PathLike) -> pd.DataFrame:
-    """Read the Sample Level QC Table
-
-    Returns:
-        pd.DataFrame:
-            Assigning specific data types for optimal parsing.
-    """
-    return pd.read_csv(filename, dtype=DTYPES)
-
 
 def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Series:
     """Read the starting call rates.
@@ -179,7 +253,8 @@ def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Serie
         .rename_axis("Sample_ID")
         .assign(**{col_name: lambda x: 1 - x.F_MISS})
         .reindex(Sample_IDs)
-        .loc[:, col_name]
+        .reindex([col_name], axis=1)
+        .squeeze()
     )
 
 
@@ -290,7 +365,7 @@ def _read_SNPweights(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     )
 
 
-def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.Series:  # noqa
+def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     """Create a flag of known replicates that show low concordance.
 
     Given a set of samples that are known to be from the same Subject. Flag
@@ -304,9 +379,9 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.Series:  # noq
             - is_unexpected_replicate (bool): True if replicates are from two
               different subjects.
    """
-    return (
-        sample_concordance.read(filename)
-        .melt(
+    df = sample_concordance.read(filename)
+    flags = (
+        df.melt(
             id_vars=["is_discordant_replicate", "is_unexpected_replicate"],
             value_vars=["Sample_ID1", "Sample_ID2"],
             var_name="To_Drop",
@@ -315,8 +390,48 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.Series:  # noq
         .drop("To_Drop", axis=1)
         .groupby("Sample_ID")
         .max()  # Flag a sample as True if it is True for any comparison.
-        .reindex(Sample_IDs)
+        .astype("boolean")
     )
+
+    unexpected_ids = (
+        _connected_ids(
+            df.set_index(["Sample_ID1", "Sample_ID2"]).query("is_unexpected_replicate").index.values
+        )
+        .rename_axis("Sample_ID")
+        .rename("unexpected_replicate_ids")
+        .astype("string")
+    )
+
+    return flags.join(unexpected_ids).reindex(Sample_IDs)
+
+
+def _connected_ids(ids: Iterable[Tuple[str, str]]) -> pd.Series:
+    """Create groups of connected IDs.
+
+    Given an iterable of tuples, where each tuple represents an edge in a graph. Builds
+    the full graph and then for each subgraph creates a list of connected ids
+    in the form `ID1|ID2|...`.
+
+    Example
+    -------
+    >>> dict(_connected_ids([("one", "two"), ("two", "three"), ("four", "five")]))
+    ... {
+            "one": "one|two|three",
+            "two": "one|two|three",
+            "three": "one|two|three",
+            "four": "four|five",
+            "five": "four|five",
+        }
+    """
+    G = nx.Graph()
+    G.add_edges_from(ids)
+    groups: Dict[str, str] = {}
+
+    for subgraph in sorted(nx.connected_components(G), key=len):
+        ids_string = "|".join(sorted(subgraph))
+        groups.update(product(subgraph, [ids_string]))
+
+    return pd.Series(groups)
 
 
 def _read_contam(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.DataFrame:
@@ -332,7 +447,9 @@ def _read_contam(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.DataFram
     """
 
     if file_name is None:
-        return pd.DataFrame(index=Sample_IDs, columns=["Contamination_Rate", "is_contaminated"])
+        return pd.DataFrame(
+            index=Sample_IDs, columns=["Contamination_Rate", "is_contaminated"],
+        ).astype({"Contamination_Rate": "float", "is_contaminated": "boolean"})
 
     return (
         agg_contamination.read(file_name)
@@ -373,97 +490,152 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
 # TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
 
 
-def _identifiler_reason(sample_qc: pd.DataFrame, cols: Sequence[str]):
-    """Summary string of the reason for needing identifiler.
+def add_qc_columns(
+    sample_qc: pd.DataFrame,
+    remove_contam: bool,
+    remove_rep_discordant: bool,
+    remove_unexpected_rep: bool,
+    remove_sex_discordant: bool,
+) -> pd.DataFrame:
+    add_call_rate_flags(sample_qc)
+    _add_identifiler(sample_qc)
+    _add_analytic_exclusion(
+        sample_qc,
+        remove_contam,
+        remove_rep_discordant,
+        remove_unexpected_rep,
+        remove_sex_discordant,
+    )
+    _add_subject_representative(sample_qc)
+    _add_subject_dropped_from_study(sample_qc)
 
-    If `identifiler_needed` then, if the binary flag in `cols` is True, then
-    concatenate the column names.
+    return sample_qc
+
+
+def _add_identifiler(sample_qc: pd.DataFrame) -> pd.DataFrame:
+    """Add a flag to run identifiler based if any of these columns are True"""
+    identifiler_flags = {  # Set of binary flags used to determine if we need to run identifiler
+        "is_contaminated": "Contamination",
+        "is_sex_discordant": "Sex Discordance",
+        "is_discordant_replicate": "Replicate Discordance",
+        "is_unexpected_replicate": "Unexpected Replicate",
+        # TO-ADD: If you create a new binary flag do determine if you run
+        # identifiler.
+    }
+    sample_qc["identifiler_needed"] = sample_qc[identifiler_flags.keys()].any(axis=1)
+    sample_qc["identifiler_reason"] = _get_reason(sample_qc, identifiler_flags)
+    return sample_qc
+
+
+def _get_reason(sample_qc: pd.DataFrame, flags: Mapping[str, str]):
+    """Summary string of the reason.
+
+    Given a set of boolean columns, this will create a series with the column
+    names where there were True values.
 
     Example:
-        >>> cols = ["is_sex_discordant", "is_contaminated"]
+        >>> df.columns == ["is_sex_discordant", "is_contaminated"]
         >>> df.values == np.ndarray([[True, True], [True, False], [False, False]])
-        >>> _identifiler_reason(df, cols)
-        pd.Series(["is_sex_discordant;is_contaminated", "is_sex_discordant", ""])
+        >>> _identifiler_reason(df, {"is_sex_discordant": "Sex Discordant", "is_contaminated": "Contaminated"})
+        pd.Series(["Sex Discordant;Contaminated", "Sex Discordant", ""])
     """
+    cols = list(flags.keys())
 
     def reason_string(row: pd.Series) -> str:
-        if row.identifiler_needed:
-            flags = row[cols].fillna(False)
-            return ";".join(IDENTIFILER_FLAGS.get(x, x) for x in flags.index[flags])
-        return ""
+        row_flags = row.reindex(cols).fillna(False)
+        if row_flags.any():
+            return "|".join(sorted(flags.get(x, x) for x in row_flags.index[row_flags]))
+        return pd.NA
 
     return sample_qc.apply(reason_string, axis=1)
 
 
-def _check_pass_qc(sample_qc: pd.DataFrame) -> pd.Series:
-    """True if a sample passed on sample level QC checks.
+def _add_analytic_exclusion(
+    sample_qc: pd.DataFrame,
+    remove_contam: bool,
+    remove_rep_discordant: bool,
+    remove_unexpected_rep: bool,
+    remove_sex_discordant: bool,
+) -> pd.DataFrame:
+    """Adds a flag to remove samples based on provided conditions.
 
-    We remove all internal controls (``is_internal_control``) and poor
-    quality samples (``is_call_rate_filtered``, ``is_contaminated``,
-    ``is_discordant_replicate``).
+    Some of the conditions are user configurable, but we always exclude
+    samples with low call rate and samples marked for exclusion during
+    pre-flight checks.
     """
-    df = sample_qc.copy()
-    df.fillna({k: False for k in QC_SUMMARY_FLAGS}, inplace=True)  # query breaks if there are NaNs
-    return (
-        ~df.is_internal_control
-        & ~df.is_contaminated
-        & ~df.is_call_rate_filtered
-        & ~df.is_discordant_replicate
+    exclusion_criteria = {
+        "is_user_exclusion": "User Exclusion",
+        "is_missing_idats": "Missing IDATs",
+        "is_missing_gtc": "Missing GTCs",
+        "is_cr1_filtered": "Call Rate 1 Filtered",
+        "is_cr2_filtered": "Call Rate 2 Filtered",
+    }
+
+    if remove_contam:
+        exclusion_criteria["is_contaminated"] = "Contamination"
+
+    if remove_rep_discordant:
+        exclusion_criteria["is_discordant_replicate"] = "Replicate Discordance"
+
+    if remove_unexpected_rep:
+        exclusion_criteria["is_unexpected_replicate"] = "Unexpected Replicate"
+
+    if remove_sex_discordant:
+        exclusion_criteria["is_sex_discordant"] = "Sex Discordance"
+
+    sample_qc["analytic_exclusion"] = sample_qc.reindex(exclusion_criteria.keys(), axis=1).any(
+        axis=1
     )
+    sample_qc["num_analytic_exclusion"] = (
+        sample_qc.reindex(exclusion_criteria.keys(), axis=1).sum(axis=1).astype(int)
+    )
+    sample_qc["analytic_exclusion_reason"] = _get_reason(sample_qc, exclusion_criteria)
+
+    return sample_qc
 
 
-def _find_study_subject_representative(sample_qc: pd.DataFrame) -> pd.Series:
+def _add_subject_representative(sample_qc: pd.DataFrame) -> pd.DataFrame:
     """Flag indicating which sample to use as subject representative.
 
-    We use a single representative sample for subject level analysis. First
-    we keep all samples (``is_pass_sample_qc``). For subject IDs with
-    multiple remaining samples, we select the sample that has the highest
-    Call Rate 2.
+    First we remove the following samples:
 
-    Returns:
-        pd.Series:
-            - Sample_ID (pd.Index): sorted by `sample_qc.index`
-            - A boolean flag where True indicates a sample was used as the
-              subject representative.
+    - Samples to be kept for subject level analysis (``analytic_exclusion``)
+    - Internal QC controls (``is_internal_control``)
+
+    For subject IDs with multiple remaining samples, we select the sample
+    that has the highest Call Rate 2.
     """
-    return (
-        sample_qc.query("is_pass_sample_qc")
-        .groupby("Group_By_Subject_ID")
-        .apply(
-            lambda x: x.Call_Rate_2 == x.Call_Rate_2.max()
-        )  # Select the sample with highest call rate as representative
-        .droplevel(0)  # drop the subject label b/c don't need
-        .reindex(
-            sample_qc.index
-        )  # Add the samples that were filtered by the query step and make sure everything aligns
-        .fillna(False)
-    )
+    sub_repr = []
+    for _, dd in sample_qc.query("not analytic_exclusion & not is_internal_control").groupby(
+        "Group_By_Subject_ID"
+    ):
+        best_cr = dd.Call_Rate_2.argmax()
+        sub_repr.append(dd.iloc[best_cr].name)
+
+    sample_qc["is_subject_representative"] = sample_qc.index.isin(sub_repr)
+
+    return sample_qc
 
 
-def _find_study_subject_with_no_representative(sample_qc: pd.DataFrame) -> pd.Series:
-    """Flag indicating which subjects have representative sample.
+def _add_subject_dropped_from_study(sample_qc: pd.DataFrame) -> pd.Series:
+    """Flag indicating which subjects have no representative sample.
 
     This flag excludes internal controls which by nature are ignored in
     subject level analysis.
-
-    Returns:
-        pd.Series:
-            - Sample_ID (pd.Index): sorted by `sample_qc.index`
-            - A boolean flag where True indicates the subject (i.e., all
-              samples) has no representative sample.
     """
-    subject_w_no_rep = (
-        sample_qc.query("not is_internal_control")
-        .groupby("Group_By_Subject_ID")
-        .is_subject_representative.sum()
-        == 0
-    ).pipe(lambda x: x.index[x])
-    return sample_qc.Group_By_Subject_ID.isin(subject_w_no_rep)
+    subject_w_no_sample = []  # sourcery skip: list-comprehension
+    for sub, dd in sample_qc.query("not is_internal_control").groupby("Group_By_Subject_ID"):
+        if dd.is_subject_representative.sum() == 0:
+            subject_w_no_sample.append(sub)
+    sample_qc["subject_dropped_from_study"] = sample_qc.Group_By_Subject_ID.isin(
+        subject_w_no_sample
+    )
+    return sample_qc
 
 
-def _save_qc_table(sample_qc: pd.DataFrame, file_name: Path) -> None:
+def save(sample_qc: pd.DataFrame, filename: Path) -> None:
     """Save main QC table."""
-    sample_qc.reindex(DTYPES, axis=1).to_csv(file_name, index=False)
+    sample_qc.reindex(DTYPES, axis=1).to_csv(filename, index=False)
 
 
 if __name__ == "__main__":

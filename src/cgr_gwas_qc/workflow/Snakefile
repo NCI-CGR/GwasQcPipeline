@@ -63,6 +63,7 @@ if cfg.ss.shape[0] < 1_000:
 
 rule all:
     input:
+        "sample_level/summary_stats.txt"
         "deliver/samples.bed",
         "deliver/samples.bim",
         "deliver/samples.fam",

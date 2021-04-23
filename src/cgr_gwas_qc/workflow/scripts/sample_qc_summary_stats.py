@@ -6,11 +6,8 @@ import numpy as np
 import pandas as pd
 import typer
 
-from cgr_gwas_qc import load_config
-from cgr_gwas_qc.config import ConfigMgr
-from cgr_gwas_qc.paths import make_path_list
 from cgr_gwas_qc.reporting import env
-from cgr_gwas_qc.validators import check_file
+from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -18,21 +15,16 @@ template = env.get_template("summary_stats.txt.j2")
 
 
 @app.command()
-def main(file_name: Path, file_out: Path):
+def main(filename: Path, outfile: Path):
     """Generate summary statistics from the sample qc table.
-
-    Args:
-        file_name (Path): Path to the `all_sample_qc.csv` file.
-        file_out (Path): Path to the output file.
     """
-    cfg = load_config()
-    df = pd.read_csv(file_name)
+    df = sample_qc_table.read(filename)
 
     payload = {
         "working_dir": os.getcwd(),
         "n_samples": df.shape[0],
-        "n_no_gtc": _number_missing_gtc_files(cfg, df),
-        "idats": _value_counts_w_na(df.idats_exist),
+        "n_no_gtc": df.is_missing_gtc.sum(),
+        "idats": _value_counts_w_na(df.is_missing_idats),
         "call_rate_initial": _table_summary_str(df.Call_Rate_Initial),
         "contamination_rate": _table_summary_w_na(df.Contamination_Rate),
         "intensity": _table_summary_str(df.IdatIntensity),
@@ -45,21 +37,7 @@ def main(file_name: Path, file_out: Path):
         "issues": _value_counts_w_na(df["Count_of_QC_Issue"]),
     }
 
-    file_out.write_text(template.render(**payload))
-
-
-def _number_missing_gtc_files(cfg: ConfigMgr, df: pd.DataFrame) -> int:
-    if cfg.config.user_files.gtc_pattern is None:
-        return df.shape[0]
-
-    cnt = 0
-    for file_name in make_path_list(cfg.expand(cfg.config.user_files.gtc_pattern)):
-        try:
-            check_file(file_name)
-        except (FileNotFoundError, PermissionError):
-            cnt += 1
-
-    return cnt
+    outfile.write_text(template.render(**payload))
 
 
 def _table_summary(sr: pd.Series) -> pd.DataFrame:

@@ -223,6 +223,6 @@ def test_update_sample_sheet_excluded_sample(updated_sample_sheet: pd.DataFrame)
     assert sr.is_sample_exclusion
 
 
-def test_update_sample_sheet_idats_exist(updated_sample_sheet: pd.DataFrame):
-    assert updated_sample_sheet.query("Sample_ID == 'SP00005'").idats_exist.squeeze()
-    assert not updated_sample_sheet.query("Sample_ID == 'SP00003'").idats_exist.squeeze()
+def test_update_sample_sheet_missing_idats(updated_sample_sheet: pd.DataFrame):
+    assert not updated_sample_sheet.query("Sample_ID == 'SP00005'").is_missing_idats.squeeze()
+    assert updated_sample_sheet.query("Sample_ID == 'SP00003'").is_missing_idats.squeeze()
