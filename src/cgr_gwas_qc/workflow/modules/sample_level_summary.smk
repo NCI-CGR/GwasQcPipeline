@@ -53,7 +53,7 @@ rule sample_qc_summary_stats:
     input:
         rules.sample_qc_table.output[0],
     output:
-        "sample_level/sample_qc_summary_stats.txt",
+        "sample_level/summary_stats.txt",
     script:
         "../scripts/sample_qc_summary_stats.py"
 
