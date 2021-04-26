@@ -8,6 +8,8 @@ import pandas as pd
 
 @dataclass
 class SubjectQC:
+    unexpected_replicates: "UnExpectedReplicates"
+    sex_verification: "SexVerification"
     relatives: "Relatedness"
     autosomal: "Autosomal"
     pca: "Pca"
@@ -16,16 +18,53 @@ class SubjectQC:
     @classmethod
     def construct(
         cls,
+        subject_qc: pd.DataFrame,
+        unexpected_replicates: Path,
+        chrx_inbreeding_png: Path,
         population_qc: pd.DataFrame,
         autosomal_heterozygosity_png_dir: Path,
         pca_png_dir: Path,
         hwe_png_dir: Path,
     ) -> "SubjectQC":
         return cls(
-            relatives=Relatedness.construct(population_qc),
-            autosomal=Autosomal.construct(population_qc, autosomal_heterozygosity_png_dir),
-            pca=Pca.construct(pca_png_dir),
-            hwe=Hwe.construct(hwe_png_dir),
+            UnExpectedReplicates.construct(subject_qc, unexpected_replicates),
+            SexVerification.construct(subject_qc, chrx_inbreeding_png),
+            Relatedness.construct(population_qc),
+            Autosomal.construct(population_qc, autosomal_heterozygosity_png_dir),
+            Pca.construct(pca_png_dir),
+            Hwe.construct(hwe_png_dir),
+        )
+
+
+@dataclass
+class UnExpectedReplicates:
+    num_unexpected_replicates: int
+    min_concordance: float
+    mean_concordance: float
+
+    @classmethod
+    def construct(
+        cls, subject_qc: pd.DataFrame, replicates: pd.DataFrame
+    ) -> "UnExpectedReplicates":
+        return cls(
+            subject_qc.is_unexpected_replicate.sum(),
+            replicates.PLINK_concordance.min(),
+            replicates.PLINK_concordance.mean(),
+        )
+
+
+@dataclass
+class SexVerification:
+    num_sex_discordant: int
+    num_remaining: int
+    png: str
+
+    @classmethod
+    def construct(cls, subject_qc: pd.DataFrame, png: Path) -> "SexVerification":
+        return cls(
+            subject_qc.is_sex_discordant.sum(),
+            (~subject_qc.is_sex_discordant).sum(),
+            png.resolve().as_posix(),
         )
 
 

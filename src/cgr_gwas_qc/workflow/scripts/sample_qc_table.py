@@ -73,7 +73,7 @@ DTYPES = {  # Header for main QC table
     "Group_By_Subject_ID": "string",
     "num_samples_per_subject": "UInt8",
     "analytic_exclusion": "boolean",
-    "num_analytic_exclusion": "boolean",
+    "num_analytic_exclusion": "UInt8",
     "analytic_exclusion_reason": "string",
     "is_subject_representative": "boolean",
     "subject_dropped_from_study": "boolean",

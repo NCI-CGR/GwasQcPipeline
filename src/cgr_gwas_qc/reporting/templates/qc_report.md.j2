@@ -74,17 +74,17 @@ Replicate samples are included in every project to be used to assess overall pro
 
 ## Sex Verification
 
-Sex of each remaining subject is verified by comparing the reported sex with the observed sex based on X chromosome method-of-moments F coefficient ([observed hom. count] - [expected count]) / ([total observations] - [expected count]) using [PLINK](https://www.cog-genomics.org/plink2). F coefficient is expected to be close to 0.0 and 1.0 for females and males respectively. The threshold is set to 0.5, the midpoint of these expected values. Sex check results can be found in the "ALL_QC" tab of "{{ excel_file_name }}", including any sex discrepancies (**Figure 2**). {{ sample_qc.sex_verification.num_sex_discordant | numFormat }} subjects were found to be sex discordant.
+Sex of each remaining subject is verified by comparing the reported sex with the observed sex based on X chromosome method-of-moments F coefficient ([observed hom. count] - [expected count]) / ([total observations] - [expected count]) using [PLINK](https://www.cog-genomics.org/plink2). F coefficient is expected to be close to 0.0 and 1.0 for females and males respectively. The threshold is set to 0.5, the midpoint of these expected values. Sex check results can be found in the "ALL_QC" tab of "{{ excel_file_name }}", including any sex discrepancies (**Figure 2**). {{ subject_qc.sex_verification.num_sex_discordant | numFormat }} subjects were found to be sex discordant.
 
 NOTE: Samples that fail the sex concordance check may be eligible for recovery efforts, including screening for sex chromosome aneuploidies by STR profiling as well as confirmation of reported sex with the investigator. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
 
-![]({{ sample_qc.sex_verification.png }})
+![]({{ subject_qc.sex_verification.png }})
 
 **Figure 2** chrX F coefficient distribution of female samples and male samples
 
 ## Unexpected Replicates
 
-Pairwise genotype concordance for all subjects was assessed to discover unexpected replicates. Subjects with genotype concordance > {{ config.software_params.dup_concordance_cutoff | toPct | numFormat(0) }}% at a set of LD-pruned SNPs were considered replicates. {{ sample_qc.unexpected_replicates.num_unexpected_replicates | numFormat }} subjects were identified as unexpected replicates. See the "UNEXPECTED_REPLICATES_SUBJECTS" tab of "{{ excel_file_name }}" for more details. In addition, sample level unexpected replicate information is listed in the "UNEXPECTED_REPLICATES_SAMPLES" tab.
+Pairwise genotype concordance for all subjects was assessed to discover unexpected replicates. Subjects with genotype concordance > {{ config.software_params.dup_concordance_cutoff | toPct | numFormat(0) }}% at a set of LD-pruned SNPs were considered replicates. {{ subject_qc.unexpected_replicates.num_unexpected_replicates | numFormat }} subjects were identified as unexpected replicates. See the "UNEXPECTED_REPLICATES_SUBJECTS" tab of "{{ excel_file_name }}" for more details. In addition, sample level unexpected replicate information is listed in the "UNEXPECTED_REPLICATES_SAMPLES" tab.
 
 NOTE: Subjects with unexpected replicates identified may be eligible for recovery efforts, including confirmation of concordance by STR profiling as well as confirmation of subject information with the investigator. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
 

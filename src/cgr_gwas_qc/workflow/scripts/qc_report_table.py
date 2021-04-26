@@ -21,6 +21,7 @@ def main(
     sample_sheet_csv: Path,
     sample_concordance_csv: Path,
     sample_qc_csv: Path,
+    subject_qc_csv: Path,
     population_concordance_csv: Path,
     population_qc_csv: Path,
     graf: Path,

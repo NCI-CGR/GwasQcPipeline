@@ -58,8 +58,8 @@ class ExclusionTables:
             "is_cr2_filtered": "Completion Rate 2nd Filter",
             "is_contaminated": "Contaminated",
             "is_internal_control": "Internal QC Samples Removed",
-            "is_pass_sample_qc": "Samples Remaining for Analysis",
-            "is_expected_duplicate_removed": "Expected Duplicates Removed",  # added below
+            "samples_remaining": "Samples Remaining for Analysis",
+            "dropped_replicate": "Expected Duplicates Removed",  # added below
             "is_subject_representative": "Subjects Remaining",
         }
 
@@ -72,16 +72,16 @@ class ExclusionTables:
         }
 
         agg_df = (
-            df.reindex(["case_control", *row_names.keys()], axis=1).groupby("case_control").sum()
+            df.assign(samples_remaining=lambda x: ~x.analytic_exclusion & ~x.is_internal_control)
+            .assign(dropped_replicate=lambda x: x.samples_remaining & ~x.is_subject_representative)
+            .reindex(["case_control", *row_names.keys()], axis=1)
+            .groupby("case_control")
+            .sum()
         )
         agg_df.index = agg_df.index.astype("object")  # remove categorical
 
         return (
-            agg_df.assign(
-                is_expected_duplicate_removed=lambda x: x.is_pass_sample_qc
-                - x.is_subject_representative
-            )
-            .T.assign(total=lambda x: x.sum(axis=1).astype("Int32"))
+            agg_df.T.assign(total=lambda x: x.sum(axis=1).astype("Int32"))
             .reindex(row_names.keys())
             .rename(row_names)
             .reindex(col_names.keys(), axis=1)
