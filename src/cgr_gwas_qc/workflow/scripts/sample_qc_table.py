@@ -40,8 +40,6 @@ would have to make modifications to add new components.
     is_contaminated, boolean, True if a sample exceed the contamination rate threshold.
     replicate_ids, string, Concatenated Sample_IDs that are replicates.
     is_discordant_replicate, boolean, True if the replicates had low concordance.
-    is_unexpected_replicate, boolean, True if two subjects had high concordance.
-    unexpected_replicate_ids, string, Concatenated Sample_IDs that are unexpected replicates.
     expected_sex, SEX_DTYPE, The expected sex from the provided sample sheet.
     predicted_sex, SEX_DTYPE, The predicted sex based on X chromosome heterozygosity.
     X_inbreeding_coefficient, float, The X chromosome F coefficient.
@@ -54,12 +52,10 @@ would have to make modifications to add new components.
     identifiler_reason, string, The QC problem that needs checked with Identifiler.
 
 """
-from itertools import product
 from pathlib import Path
-from typing import Dict, Iterable, Mapping, Optional, Tuple
+from typing import Mapping, Optional
 from warnings import warn
 
-import networkx as nx
 import pandas as pd
 import typer
 
@@ -98,8 +94,6 @@ DTYPES = {  # Header for main QC table
     "is_contaminated": "boolean",
     "replicate_ids": "string",
     "is_discordant_replicate": "boolean",
-    "is_unexpected_replicate": "boolean",
-    "unexpected_replicate_ids": "string",
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
     "X_inbreeding_coefficient": "float",
@@ -143,8 +137,6 @@ def read(filename: PathLike) -> pd.DataFrame:
         - is_contaminated
         - replicate_ids
         - is_discordant_replicate
-        - is_unexpected_replicate
-        - unexpected_replicate_ids
         - expected_sex
         - predicted_sex
         - X_inbreeding_coefficient
@@ -180,8 +172,6 @@ def main(
     # Params
     remove_contam: bool = True,
     remove_rep_discordant: bool = True,
-    remove_unexpected_rep: bool = True,
-    remove_sex_discordant: bool = True,
     # Outputs
     outfile: Path = typer.Argument(..., help="Path to output csv"),
 ):
@@ -198,11 +188,7 @@ def main(
         intensity,
     )
     add_qc_columns(
-        sample_qc,
-        remove_contam,
-        remove_sex_discordant,
-        remove_rep_discordant,
-        remove_unexpected_rep,
+        sample_qc, remove_contam, remove_rep_discordant,
     )
     save(sample_qc, outfile)
 
@@ -376,13 +362,11 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
             - Sample_ID (pd.Index)
             - is_discordant_replicate (bool): True if replicates show
               a concordance below the supplied threshold. Otherwise False.
-            - is_unexpected_replicate (bool): True if replicates are from two
-              different subjects.
    """
     df = sample_concordance.read(filename)
-    flags = (
+    return (
         df.melt(
-            id_vars=["is_discordant_replicate", "is_unexpected_replicate"],
+            id_vars=["is_discordant_replicate"],
             value_vars=["Sample_ID1", "Sample_ID2"],
             var_name="To_Drop",
             value_name="Sample_ID",
@@ -391,47 +375,8 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
         .groupby("Sample_ID")
         .max()  # Flag a sample as True if it is True for any comparison.
         .astype("boolean")
+        .reindex(Sample_IDs)
     )
-
-    unexpected_ids = (
-        _connected_ids(
-            df.set_index(["Sample_ID1", "Sample_ID2"]).query("is_unexpected_replicate").index.values
-        )
-        .rename_axis("Sample_ID")
-        .rename("unexpected_replicate_ids")
-        .astype("string")
-    )
-
-    return flags.join(unexpected_ids).reindex(Sample_IDs)
-
-
-def _connected_ids(ids: Iterable[Tuple[str, str]]) -> pd.Series:
-    """Create groups of connected IDs.
-
-    Given an iterable of tuples, where each tuple represents an edge in a graph. Builds
-    the full graph and then for each subgraph creates a list of connected ids
-    in the form `ID1|ID2|...`.
-
-    Example
-    -------
-    >>> dict(_connected_ids([("one", "two"), ("two", "three"), ("four", "five")]))
-    ... {
-            "one": "one|two|three",
-            "two": "one|two|three",
-            "three": "one|two|three",
-            "four": "four|five",
-            "five": "four|five",
-        }
-    """
-    G = nx.Graph()
-    G.add_edges_from(ids)
-    groups: Dict[str, str] = {}
-
-    for subgraph in sorted(nx.connected_components(G), key=len):
-        ids_string = "|".join(sorted(subgraph))
-        groups.update(product(subgraph, [ids_string]))
-
-    return pd.Series(groups)
 
 
 def _read_contam(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.DataFrame:
@@ -491,20 +436,12 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
 
 
 def add_qc_columns(
-    sample_qc: pd.DataFrame,
-    remove_contam: bool,
-    remove_rep_discordant: bool,
-    remove_unexpected_rep: bool,
-    remove_sex_discordant: bool,
+    sample_qc: pd.DataFrame, remove_contam: bool, remove_rep_discordant: bool,
 ) -> pd.DataFrame:
     add_call_rate_flags(sample_qc)
     _add_identifiler(sample_qc)
     _add_analytic_exclusion(
-        sample_qc,
-        remove_contam,
-        remove_rep_discordant,
-        remove_unexpected_rep,
-        remove_sex_discordant,
+        sample_qc, remove_contam, remove_rep_discordant,
     )
     _add_subject_representative(sample_qc)
     _add_subject_dropped_from_study(sample_qc)
@@ -518,7 +455,6 @@ def _add_identifiler(sample_qc: pd.DataFrame) -> pd.DataFrame:
         "is_contaminated": "Contamination",
         "is_sex_discordant": "Sex Discordance",
         "is_discordant_replicate": "Replicate Discordance",
-        "is_unexpected_replicate": "Unexpected Replicate",
         # TO-ADD: If you create a new binary flag do determine if you run
         # identifiler.
     }
@@ -551,11 +487,7 @@ def _get_reason(sample_qc: pd.DataFrame, flags: Mapping[str, str]):
 
 
 def _add_analytic_exclusion(
-    sample_qc: pd.DataFrame,
-    remove_contam: bool,
-    remove_rep_discordant: bool,
-    remove_unexpected_rep: bool,
-    remove_sex_discordant: bool,
+    sample_qc: pd.DataFrame, remove_contam: bool, remove_rep_discordant: bool,
 ) -> pd.DataFrame:
     """Adds a flag to remove samples based on provided conditions.
 
@@ -576,12 +508,6 @@ def _add_analytic_exclusion(
 
     if remove_rep_discordant:
         exclusion_criteria["is_discordant_replicate"] = "Replicate Discordance"
-
-    if remove_unexpected_rep:
-        exclusion_criteria["is_unexpected_replicate"] = "Unexpected Replicate"
-
-    if remove_sex_discordant:
-        exclusion_criteria["is_sex_discordant"] = "Sex Discordance"
 
     sample_qc["analytic_exclusion"] = sample_qc.reindex(exclusion_criteria.keys(), axis=1).any(
         axis=1

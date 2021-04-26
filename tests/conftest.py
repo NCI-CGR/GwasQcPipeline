@@ -418,8 +418,6 @@ def sample_qc_csv(real_cfg, real_tmp_path, sample_concordance_csv, contamination
         data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
         True,
         True,
-        True,
-        True,
         outfile,
     )
 

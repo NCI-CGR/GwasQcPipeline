@@ -25,8 +25,8 @@ localrules: # Always run these rules locally b/c they are quick
     sample_qc_table,
     sample_qc_summary_stats,
     sample_lists_from_qc_flags,
+    subject_qc_table,
     subject_representative,
-    sample_to_subject_map,
     subjects_per_population,
     per_population_qc_done,
     per_population_controls_qc_done,
@@ -53,8 +53,7 @@ if cfg.ss.shape[0] < 1_000:
         plink_stats_hardy,
         plink_stats_ibd,
         plink_stats_het, # subject_level_summary
-        kept_samples,
-        renamed_subjects,
+        convert_samples_to_subjects,
         related_subjects,
         remove_related_subjects, # population_level_summary
         plink_split_population,
@@ -63,7 +62,7 @@ if cfg.ss.shape[0] < 1_000:
 
 rule all:
     input:
-        "sample_level/summary_stats.txt"
+        "sample_level/summary_stats.txt",
         "deliver/samples.bed",
         "deliver/samples.bim",
         "deliver/samples.fam",
