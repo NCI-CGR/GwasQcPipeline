@@ -434,6 +434,33 @@ def sample_qc_df(sample_qc_csv) -> pd.DataFrame:
 
 @pytest.mark.real_data
 @pytest.fixture(scope="session")
+def subject_qc_csv(real_tmp_path, sample_qc_csv, sample_concordance_csv) -> Path:
+    """The Subject QC table.
+
+    Return:
+        Path to a generated Subject QC table generated from real data.
+    """
+    from cgr_gwas_qc.workflow.scripts import subject_qc_table
+
+    outfile = real_tmp_path / "subject_level/subject_qc.csv"
+
+    subject_qc_table.main(
+        sample_qc_csv, sample_concordance_csv, True, True, outfile,
+    )
+
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def subject_qc_df(subject_qc_csv) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts import subject_qc_table
+
+    return subject_qc_table.read(subject_qc_csv)
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
 def population_qc_csv(real_cfg: ConfigMgr, real_tmp_path) -> Path:
     """The Population QC table.
 
