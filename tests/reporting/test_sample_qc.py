@@ -96,26 +96,6 @@ def test_ExpectedReplicates(sample_qc_df, study_replicates_df):
 
 
 @pytest.mark.real_data
-@pytest.fixture
-def unexpected_replicates_df(split_sample_concordance_tables, pytestconfig) -> pd.DataFrame:
-    if not pytestconfig.getoption("--real-data"):
-        pytest.skip("No real data")
-
-    return pd.read_csv(split_sample_concordance_tables / "UnknownReplicates.csv").rename(
-        {"Concordance": "concordance"}, axis=1
-    )
-
-
-@pytest.mark.real_data
-def test_UnExpectedReplicates(sample_qc_df, unexpected_replicates_df):
-    from cgr_gwas_qc.reporting.sample_qc import UnExpectedReplicates
-
-    unexpected = UnExpectedReplicates.construct(sample_qc_df, unexpected_replicates_df)
-
-    assert 0 == unexpected.num_unexpected_replicates
-
-
-@pytest.mark.real_data
 def test_SampleSummary(sample_qc_df):
     from cgr_gwas_qc.reporting.sample_qc import SampleSummary
 
@@ -126,15 +106,6 @@ def test_SampleSummary(sample_qc_df):
     assert 197 == sm.num_starting_subjects
     assert 36 == sm.num_samples_excluded
     assert 184 == sm.num_subjects_remaining
-
-
-@pytest.mark.real_data
-def test_SexVerification(sample_qc_df):
-    from cgr_gwas_qc.reporting.sample_qc import SexVerification
-
-    sv = SexVerification.construct(sample_qc_df, Path("test.png"))
-
-    assert 3 == sv.num_sex_discordant
 
 
 @pytest.mark.real_data
