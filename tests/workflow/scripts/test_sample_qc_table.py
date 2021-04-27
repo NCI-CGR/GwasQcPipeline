@@ -132,9 +132,6 @@ def test_read_concordance(ss_df, sample_concordance_csv):
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
     assert df.index.name == "Sample_ID"
-    assert sorted(
-        ["is_discordant_replicate", "is_unexpected_replicate", "unexpected_replicate_ids"]
-    ) == sorted(df.columns)
 
 
 @pytest.mark.real_data
@@ -245,89 +242,51 @@ def fake_sample_qc() -> pd.DataFrame:
         "is_cr2_filtered",
         "is_contaminated",
         "is_discordant_replicate",
-        "is_unexpected_replicate",
-        "is_sex_discordant",
     ]
     data = [
-        ("SP00001", "SB00001", False, False, 0.99, False, False, False, False, False, False),
-        ("SP00002", "SB00002", False, False, 0.82, False, True, False, False, False, False),
-        ("SP00003", "SB00003", False, False, 0.99, False, False, True, True, False, False),
-        ("SP00004", "SB00003", False, False, 0.99, False, False, False, True, False, False),
-        ("SP00005", "SB00004", False, False, 0.99, False, False, False, True, False, False),
-        ("SP00006", "SB00004", False, False, 0.99, False, False, False, True, False, False),
-        ("SP00007", "SB00005", False, False, 0.99, False, False, False, False, True, False),
-        ("SP00008", "SB00006", False, False, 0.99, False, False, False, False, True, False),
-        ("SP00009", "SB00007", False, False, 0.99, False, False, False, False, False, True),
-        ("SP00010", "SB00008", False, False, 0.99, False, False, False, False, False, False),
-        ("SP00011", "SB00008", False, False, 0.94, False, False, False, False, False, False),
-        ("SP00012", "SB00009", False, False, 0.99, False, False, False, False, False, False),
-        ("SP00013", "SB00009", False, False, 0.98, False, False, False, False, False, False),
-        ("SP00014", "SB00009", False, False, 0.97, False, False, False, False, False, False),
+        ("SP00001", "SB00001", False, False, 0.99, False, False, False, False),
+        ("SP00002", "SB00002", False, False, 0.82, False, True, False, False),
+        ("SP00003", "SB00003", False, False, 0.99, False, False, True, True),
+        ("SP00004", "SB00003", False, False, 0.99, False, False, False, True),
+        ("SP00005", "SB00004", False, False, 0.99, False, False, False, True),
+        ("SP00006", "SB00004", False, False, 0.99, False, False, False, True),
+        ("SP00007", "SB00005", False, False, 0.99, False, False, False, False),
+        ("SP00008", "SB00006", False, False, 0.99, False, False, False, False),
+        ("SP00009", "SB00007", False, False, 0.99, False, False, False, False),
+        ("SP00010", "SB00008", False, False, 0.99, False, False, False, False),
+        ("SP00011", "SB00008", False, False, 0.94, False, False, False, False),
+        ("SP00012", "SB00009", False, False, 0.99, False, False, False, False),
+        ("SP00013", "SB00009", False, False, 0.98, False, False, False, False),
+        ("SP00014", "SB00009", False, False, 0.97, False, False, False, False),
     ]
     return pd.DataFrame(data, columns=columns).set_index("Sample_ID")
 
 
 @pytest.mark.parametrize(
-    "contam,rep_discordant,unexpected_rep,sex_discordant,num_removed",
-    [
-        (False, False, False, False, 1),  # call rate filtered
-        (True, False, False, False, 2),
-        (False, True, False, False, 5),
-        (False, False, True, False, 3),
-        (False, False, False, True, 2),
-        (True, True, False, False, 5),
-        (True, True, True, True, 8),
-    ],
+    "contam,rep_discordant,num_removed",
+    [(False, False, 1), (True, False, 2), (False, True, 5), (True, True, 5)],  # call rate filtered
 )
-def test_add_analytic_exclusion(
-    fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant, num_removed
-):
-    sample_qc_table._add_analytic_exclusion(
-        fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant
-    )
+def test_add_analytic_exclusion(fake_sample_qc, contam, rep_discordant, num_removed):
+    sample_qc_table._add_analytic_exclusion(fake_sample_qc, contam, rep_discordant)
     assert num_removed == fake_sample_qc.analytic_exclusion.sum()
 
 
 @pytest.mark.parametrize(
-    "contam,rep_discordant,unexpected_rep,sex_discordant,num_subjects",
-    [
-        (False, False, False, False, 8),
-        (True, False, False, False, 8),
-        (False, True, False, False, 6),
-        (False, False, True, False, 6),
-        (False, False, False, True, 7),
-        (True, True, False, False, 6),
-        (True, True, True, True, 3),
-    ],
+    "contam,rep_discordant,num_subjects",
+    [(False, False, 8), (True, False, 8), (False, True, 6), (True, True, 6)],
 )
-def test_add_subject_representative(
-    fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant, num_subjects
-):
-    sample_qc_table._add_analytic_exclusion(
-        fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant
-    )
+def test_add_subject_representative(fake_sample_qc, contam, rep_discordant, num_subjects):
+    sample_qc_table._add_analytic_exclusion(fake_sample_qc, contam, rep_discordant)
     sample_qc_table._add_subject_representative(fake_sample_qc)
     assert num_subjects == fake_sample_qc.is_subject_representative.sum()
 
 
 @pytest.mark.parametrize(
-    "contam,rep_discordant,unexpected_rep,sex_discordant,num_subjects",
-    [
-        (False, False, False, False, 1),
-        (True, False, False, False, 1),
-        (False, True, False, False, 3),
-        (False, False, True, False, 3),
-        (False, False, False, True, 2),
-        (True, True, False, False, 3),
-        (True, True, True, True, 6),
-    ],
+    "contam,rep_discordant,num_subjects",
+    [(False, False, 1), (True, False, 1), (False, True, 3), (True, True, 3)],
 )
-def test_add_subject_dropped_from_study(
-    fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant, num_subjects
-):
-    sample_qc_table._add_analytic_exclusion(
-        fake_sample_qc, contam, rep_discordant, unexpected_rep, sex_discordant
-    )
+def test_add_subject_dropped_from_study(fake_sample_qc, contam, rep_discordant, num_subjects):
+    sample_qc_table._add_analytic_exclusion(fake_sample_qc, contam, rep_discordant)
     sample_qc_table._add_subject_representative(fake_sample_qc)
     sample_qc_table._add_subject_dropped_from_study(fake_sample_qc)
     subs = fake_sample_qc.groupby("Group_By_Subject_ID").subject_dropped_from_study.all()

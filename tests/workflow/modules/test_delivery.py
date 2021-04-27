@@ -99,7 +99,7 @@ def test_identifiler_needed(files_for_upload):
     exp_ = pd.read_csv(
         data_cache
         / "production_outputs/files_for_lab/SR0446-001_12_Identifiler_1011201995419_casecontrol_20191011.csv"
-    )
+    ).replace({"Sex Discordant": "Sex Discordance"})
 
     assert_frame_equal(obs_, exp_, check_dtype=False)
 
@@ -305,7 +305,14 @@ def test_deliver_subject_list(files_for_deliver):
 # Reports
 ################################################################################
 @pytest.mark.real_data
-def test_qc_report_table(sample_concordance_csv, sample_qc_csv, population_qc_csv, tmp_path):
+def test_qc_report_table(
+    sample_concordance_csv,
+    sample_qc_csv,
+    subject_qc_csv,
+    agg_population_concordance_csv,
+    population_qc_csv,
+    tmp_path,
+):
     (
         RealData(tmp_path)
         .make_cgr_sample_sheet()
@@ -326,6 +333,7 @@ def test_qc_report_table(sample_concordance_csv, sample_qc_csv, population_qc_cs
     )
     (tmp_path / "sample_level/ancestry").mkdir(parents=True)
     (tmp_path / "sample_level/concordance").mkdir(parents=True)
+    (tmp_path / "subject_level").mkdir(parents=True)
     (tmp_path / "population_level").mkdir(parents=True)
 
     shutil.copy(sample_concordance_csv, tmp_path / "sample_level/concordance/summary.csv")
@@ -333,6 +341,8 @@ def test_qc_report_table(sample_concordance_csv, sample_qc_csv, population_qc_cs
         "DS No.\tSample\t#SNPs\tGD1\tGD2\tGD3\tGD4\tF(%)\tE(%)\tA(%)\tAfrican\tEuropean\tAsian\tMexican\tIndian-Pakistani\n"
     )
     shutil.copy(sample_qc_csv, tmp_path / "sample_level/sample_qc.csv")
+    shutil.copy(subject_qc_csv, tmp_path / "subject_level/subject_qc.csv")
     shutil.copy(population_qc_csv, tmp_path / "population_level/population_qc.csv")
+    shutil.copy(agg_population_concordance_csv, tmp_path / "population_level/concordance.csv")
 
     run_snakemake(tmp_path)

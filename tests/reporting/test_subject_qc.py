@@ -2,9 +2,39 @@ import shutil
 from pathlib import Path
 from typing import Tuple
 
+import pandas as pd
 import pytest
 
 # real_config, sample_sheet_full, sample_qc_df, population_qc_df
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def unexpected_replicates_df(split_sample_concordance_tables, pytestconfig) -> pd.DataFrame:
+    if not pytestconfig.getoption("--real-data"):
+        pytest.skip("No real data")
+
+    return pd.read_csv(split_sample_concordance_tables / "UnknownReplicates.csv").rename(
+        {"Concordance": "concordance"}, axis=1
+    )
+
+
+@pytest.mark.real_data
+def test_UnExpectedReplicates(subject_qc_df, unexpected_replicates_df):
+    from cgr_gwas_qc.reporting.subject_qc import UnExpectedReplicates
+
+    unexpected = UnExpectedReplicates.construct(subject_qc_df, unexpected_replicates_df)
+
+    assert 0 == unexpected.num_unexpected_replicates
+
+
+@pytest.mark.real_data
+def test_SexVerification(subject_qc_df):
+    from cgr_gwas_qc.reporting.subject_qc import SexVerification
+
+    sv = SexVerification.construct(subject_qc_df, Path("test.png"))
+
+    assert 3 == sv.num_sex_discordant
 
 
 @pytest.mark.real_data

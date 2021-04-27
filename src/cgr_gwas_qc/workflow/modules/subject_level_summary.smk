@@ -1,34 +1,57 @@
 import pandas as pd
 
 
-rule subject_representative:
+rule subject_qc_table:
     input:
-        "sample_level/sample_qc.csv",
+        sample_qc_csv="sample_level/sample_qc.csv",
+        sample_concordance_csv="sample_level/concordance/summary.csv",
+    params:
+        remove_sex_discordant=cfg.config.workflow_params.remove_sex_discordant,
+        remove_unexpected_rep=cfg.config.workflow_params.remove_unexpected_rep,
     output:
-        temp("subject_level/subject_representative.txt"),
+        "subject_level/subject_qc.csv",
+    script:
+        "../scripts/subject_qc_table.py"
+
+
+rule subject_representative:
+    """Select samples to be subject representative.
+
+    Pull out samples that have no analytic exclusions. Create mapping file
+    for plink to convert Sample_IDs to Subject_IDs.
+    """
+    input:
+        rules.subject_qc_table.output[0],
+    output:
+        selected=temp("subject_level/selected_subjects.txt"),
+        sample2subject=temp("subject_level/sample_to_subject.txt"),
     run:
-        (
-            pd.read_csv(input[0])
-            .query("is_subject_representative")
-            .assign(Sample_ID2=lambda x: x.Sample_ID)
-            .reindex(["Sample_ID", "Sample_ID2"], axis=1)
-            .to_csv(output[0], sep=" ", index=False, header=False)
+        from cgr_gwas_qc.workflow.scripts import subject_qc_table
+
+        df = subject_qc_table.read(input[0]).query("not subject_analytic_exclusion")
+
+        df.reindex(["Sample_ID", "Sample_ID"], axis=1).to_csv(
+            output.selected, sep=" ", index=False, header=False
         )
 
+        df.reindex(
+            ["Sample_ID", "Sample_ID", "Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1,
+        ).to_csv(output.sample2subject, sep=" ", index=False, header=False)
 
-rule kept_samples:
+
+rule pull_subject_representative:
     input:
         bed="sample_level/call_rate_2/samples.bed",
         bim="sample_level/call_rate_2/samples.bim",
         fam="sample_level/call_rate_2/samples.fam",
-        to_keep=rules.subject_representative.output[0],
+        selected=rules.subject_representative.output.selected,
     params:
         out_prefix="subject_level/samples",
     output:
-        bed=temp("subject_level/samples.bed"),
-        bim=temp("subject_level/samples.bim"),
-        fam=temp("subject_level/samples.fam"),
-        nosex=temp("subject_level/samples.nosex"),
+        bed="subject_level/samples.bed",
+        bim="subject_level/samples.bim",
+        fam="subject_level/samples.fam",
+        nosex="subject_level/samples.nosex",
     log:
         "subject_level/samples.log",
     envmodules:
@@ -43,35 +66,19 @@ rule kept_samples:
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
-        "--keep {input.to_keep} "
+        "--keep {input.selected} "
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
 
-rule sample_to_subject_map:
+rule convert_Sample_ID_to_Subject_ID:
     input:
-        "sample_level/sample_qc.csv",
-    output:
-        temp("subject_level/samples_to_subjects.txt"),
-    run:
-        (
-            pd.read_csv(input[0])
-            .query("is_subject_representative")
-            .assign(Sample_ID2=lambda x: x.Sample_ID)
-            .assign(Subject_ID2=lambda x: x.Group_By_Subject_ID)
-            .reindex(["Sample_ID", "Sample_ID2", "Group_By_Subject_ID", "Subject_ID2"], axis=1,)
-            .to_csv(output[0], sep=" ", index=False, header=False)
-        )
-
-
-rule renamed_subjects:
-    input:
-        bed=rules.kept_samples.output.bed,
-        bim=rules.kept_samples.output.bim,
-        fam=rules.kept_samples.output.fam,
-        to_rename=rules.sample_to_subject_map.output[0],
+        bed=rules.pull_subject_representative.output.bed,
+        bim=rules.pull_subject_representative.output.bim,
+        fam=rules.pull_subject_representative.output.fam,
+        sample2subject=rules.subject_representative.output.sample2subject,
     params:
         out_prefix="subject_level/subjects",
     output:
@@ -93,7 +100,7 @@ rule renamed_subjects:
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
-        "--update-ids {input.to_rename} "
+        "--update-ids {input.sample2subject} "
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem_mb} "

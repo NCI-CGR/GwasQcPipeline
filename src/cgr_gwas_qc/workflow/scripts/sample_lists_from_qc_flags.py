@@ -27,10 +27,9 @@ def main(
 
 def _save_sample_flag_as_file(df, col, file_name):
     (
-        df.fillna(False)  # If missing assume False
-        .assign(Sample_ID2=lambda x: x.Sample_ID)
+        df.fillna({col: False})  # If missing assume False
         .query(f"`{col}`")
-        .reindex(["Sample_ID", "Sample_ID2"], axis=1)
+        .reindex(["Sample_ID", "Sample_ID"], axis=1)
         .to_csv(file_name, index=False, header=False, sep=" ")
     )
 

@@ -11,6 +11,7 @@ from cgr_gwas_qc.workflow.scripts import (
     population_qc_table,
     sample_concordance,
     sample_qc_table,
+    subject_qc_table,
 )
 
 app = typer.Typer(add_completion=False)
@@ -21,6 +22,7 @@ def main(
     sample_sheet_csv: Path,
     sample_concordance_csv: Path,
     sample_qc_csv: Path,
+    subject_qc_csv: Path,
     population_concordance_csv: Path,
     population_qc_csv: Path,
     graf: Path,
@@ -28,9 +30,14 @@ def main(
 ):
 
     with pd.ExcelWriter(outfile) as writer:
-        _all_qc(sample_sheet_csv, sample_qc_csv).to_excel(writer, sheet_name="ALL_QC", index=False)
+        _sample_qc(sample_sheet_csv, sample_qc_csv).to_excel(
+            writer, sheet_name="SAMPLE_QC", index=False
+        )
         _sample_concordance(sample_qc_csv, sample_concordance_csv).to_excel(
             writer, sheet_name="SAMPLE_CONCORDANCE", index=False
+        )
+        _subject_qc(sample_sheet_csv, subject_qc_csv).to_excel(
+            writer, sheet_name="SUBJECT_QC", index=False
         )
         _ancestry(sample_qc_csv, graf).to_excel(writer, sheet_name="ANCESTRY", index=False)
         _families(population_qc_csv, writer)
@@ -39,7 +46,7 @@ def main(
         _het(population_qc_csv, writer)
 
 
-_ALL_QC_COLUMNS = [
+_SAMPLE_QC_COLUMNS = [
     # Core IDs
     "Sample_ID",
     "Group_By_Subject_ID",
@@ -78,15 +85,15 @@ _ALL_QC_COLUMNS = [
 ]
 
 
-def _all_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame:
+def _sample_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame:
     ss = sample_sheet.read(sample_sheet_csv).rename(REPORT_NAME_MAPPER, axis=1)
-    _additional_columns = [x for x in ss.columns if x not in _ALL_QC_COLUMNS]
+    _additional_columns = [x for x in ss.columns if x not in _SAMPLE_QC_COLUMNS]
     return (
         sample_qc_table.read(sample_qc_csv)
         .rename(REPORT_NAME_MAPPER, axis=1)
         .merge(ss, on="Sample_ID", suffixes=["", "_DROP"])
         .filter(regex="^(?!.*_DROP)")
-        .reindex(_ALL_QC_COLUMNS + _additional_columns, axis=1)
+        .reindex(_SAMPLE_QC_COLUMNS + _additional_columns, axis=1)
     )
 
 
@@ -129,6 +136,38 @@ def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLik
             axis=1,
         )
         .reindex(_SAMPLE_CONCORDANCE_COLUMNS, axis=1)
+    )
+
+
+_SUBJECT_QC_COLUMNS = [
+    "Group_By_Subject_ID",
+    "Sample_ID",
+    "Case/Control_Status",
+    "subject_analytic_exclusion",
+    "num_subject_analytic_exclusion",
+    "subject_analytic_exclusion_reason",
+    "Unexpected Replicate",
+    "unexpected_replicate_ids",
+    "Expected_Sex",
+    "Predicted_Sex",
+    "ChrX_Inbreed_estimate",
+    "Sex Discordant",
+    "AFR",
+    "EUR",
+    "ASN",
+    "Ancestry",
+]
+
+
+def _subject_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame:
+    ss = sample_sheet.read(sample_sheet_csv).rename(REPORT_NAME_MAPPER, axis=1)
+    _additional_columns = [x for x in ss.columns if x not in _SUBJECT_QC_COLUMNS]
+    return (
+        subject_qc_table.read(sample_qc_csv)
+        .rename(REPORT_NAME_MAPPER, axis=1)
+        .merge(ss, on="Sample_ID", suffixes=["", "_DROP"])
+        .filter(regex="^(?!.*_DROP)")
+        .reindex(_SUBJECT_QC_COLUMNS + _additional_columns, axis=1)
     )
 
 

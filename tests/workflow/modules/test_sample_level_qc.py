@@ -404,7 +404,7 @@ def test_agg_contamination_test(tmp_path, median_idat_intensity):
 
             rule all:
                 input:
-                    "sample_level/contamination/verifyIDintensity_contamination.csv"
+                    "sample_level/contamination.csv"
             """
         )
     )
@@ -416,18 +416,21 @@ def test_agg_contamination_test(tmp_path, median_idat_intensity):
 
     # THEN: The observed and subset of the expected have almost identical
     # values.
-    obs_ = pd.read_csv(
-        tmp_path / "sample_level/contamination/verifyIDintensity_contamination.csv"
-    ).set_index("Sample_ID")
+    obs_df = (
+        pd.read_csv(tmp_path / "sample_level/contamination.csv")
+        .set_index("Sample_ID")
+        .drop("is_contaminated", axis=1)
+        .dropna(how="any")
+    )
 
-    exp_ = (
+    exp_df = (
         pd.read_csv(data_cache / "production_outputs/all_contam/contam.csv")
         .rename({"ID": "Sample_ID"}, axis=1)
         .set_index("Sample_ID")
-        .reindex(obs_.index)
+        .reindex(obs_df.index)
     )
 
-    assert_frame_equal(obs_, exp_)
+    assert_frame_equal(exp_df, obs_df)
 
 
 ################################################################################

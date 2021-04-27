@@ -418,8 +418,6 @@ def sample_qc_csv(real_cfg, real_tmp_path, sample_concordance_csv, contamination
         data_cache / "production_outputs/all_sample_idat_intensity/idat_intensity.csv",
         True,
         True,
-        True,
-        True,
         outfile,
     )
 
@@ -432,6 +430,33 @@ def sample_qc_df(sample_qc_csv) -> pd.DataFrame:
     from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
     return sample_qc_table.read(sample_qc_csv)
+
+
+@pytest.mark.real_data
+@pytest.fixture(scope="session")
+def subject_qc_csv(real_tmp_path, sample_qc_csv, sample_concordance_csv) -> Path:
+    """The Subject QC table.
+
+    Return:
+        Path to a generated Subject QC table generated from real data.
+    """
+    from cgr_gwas_qc.workflow.scripts import subject_qc_table
+
+    outfile = real_tmp_path / "subject_level/subject_qc.csv"
+
+    subject_qc_table.main(
+        sample_qc_csv, sample_concordance_csv, True, True, outfile,
+    )
+
+    return outfile
+
+
+@pytest.mark.real_data
+@pytest.fixture
+def subject_qc_df(subject_qc_csv) -> pd.DataFrame:
+    from cgr_gwas_qc.workflow.scripts import subject_qc_table
+
+    return subject_qc_table.read(subject_qc_csv)
 
 
 @pytest.mark.real_data

@@ -22,7 +22,7 @@ def qc_report_xlsx(tmp_path_factory) -> Path:
 
 
 @pytest.mark.real_data
-def test_all_qc(real_sample_sheet_csv, sample_qc_csv, qc_report_xlsx):
+def test_sample_qc(real_sample_sheet_csv, sample_qc_csv, qc_report_xlsx):
     dtypes = {
         "Contaminated": bool,
         "Low Call Rate": bool,
@@ -40,7 +40,7 @@ def test_all_qc(real_sample_sheet_csv, sample_qc_csv, qc_report_xlsx):
     )
 
     obs_df = (
-        qc_report_table._all_qc(real_sample_sheet_csv, sample_qc_csv)
+        qc_report_table._sample_qc(real_sample_sheet_csv, sample_qc_csv)
         .set_index("Sample_ID")
         .sort_index()
         .reindex(dtypes.keys(), axis=1)

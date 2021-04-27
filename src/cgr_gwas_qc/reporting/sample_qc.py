@@ -14,9 +14,7 @@ class SampleQC:
     contamination: "Contamination"
     internal_controls: "InternalControls"
     expected_replicates: "ExpectedReplicates"
-    unexpected_replicates: "UnExpectedReplicates"
     summary: "SampleSummary"
-    sex_verification: "SexVerification"
     ancestry: "Ancestry"
 
     @classmethod
@@ -28,9 +26,7 @@ class SampleQC:
         sample_qc: pd.DataFrame,
         control_replicates: pd.DataFrame,
         study_replicates: pd.DataFrame,
-        unexpected_replicates: pd.DataFrame,
         call_rate_png: Path,
-        chrx_inbreeding_png: Path,
         ancestry_png: Path,
     ) -> "SampleQC":
 
@@ -40,9 +36,7 @@ class SampleQC:
             Contamination.construct(sample_qc),
             InternalControls.construct(sample_qc, control_replicates),
             ExpectedReplicates.construct(sample_qc, study_replicates),
-            UnExpectedReplicates.construct(sample_qc, unexpected_replicates),
             SampleSummary.construct(sample_qc),
-            SexVerification.construct(sample_qc, chrx_inbreeding_png),
             Ancestry.construct(sample_qc, ancestry_png),
         )
 
@@ -150,23 +144,10 @@ class ExpectedReplicates:
     def construct(cls, sample_qc: pd.DataFrame, replicates: pd.DataFrame) -> "ExpectedReplicates":
         return cls(
             sample_qc.is_discordant_replicate.sum(),
-            sample_qc.query("is_pass_sample_qc & not is_subject_representative").shape[0],
+            sample_qc.query(
+                "not is_internal_control & not analytic_exclusion & not is_subject_representative"
+            ).shape[0],
             sample_qc.query("is_subject_representative").shape[0],
-            replicates.PLINK_concordance.min(),
-            replicates.PLINK_concordance.mean(),
-        )
-
-
-@dataclass
-class UnExpectedReplicates:
-    num_unexpected_replicates: int
-    min_concordance: float
-    mean_concordance: float
-
-    @classmethod
-    def construct(cls, sample_qc: pd.DataFrame, replicates: pd.DataFrame) -> "UnExpectedReplicates":
-        return cls(
-            sample_qc.is_unexpected_replicate.sum(),
             replicates.PLINK_concordance.min(),
             replicates.PLINK_concordance.mean(),
         )
@@ -201,21 +182,6 @@ class SampleSummary:
             sample_qc.is_internal_control
         ] = "QC"  # Treat internal controls as a single subject
         return Subject_IDs.unique().shape[0]
-
-
-@dataclass
-class SexVerification:
-    num_sex_discordant: int
-    num_remaining: int
-    png: str
-
-    @classmethod
-    def construct(cls, sample_qc: pd.DataFrame, png: Path) -> "SexVerification":
-        return cls(
-            sample_qc.query("is_subject_representative & is_sex_discordant").shape[0],
-            sample_qc.query("is_subject_representative & not is_sex_discordant").shape[0],
-            png.resolve().as_posix(),
-        )
 
 
 @dataclass

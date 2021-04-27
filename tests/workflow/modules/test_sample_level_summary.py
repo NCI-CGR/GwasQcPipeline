@@ -20,14 +20,12 @@ def test_sample_qc_table(sample_qc_df):
         "Call_Rate_Initial": {"name": "Call_Rate_Initial", "dtype": "float"},
         "ChrX_Inbreed_estimate": {"name": "X_inbreeding_coefficient", "dtype": "float"},
         "Contamination_Rate": {"name": "Contamination_Rate", "dtype": "float"},
-        "Count_of_QC_Issue": {"name": "Count_of_QC_Issue", "dtype": "UInt8"},
         "Expected Replicate Discordance": {"name": "is_discordant_replicate", "dtype": "boolean"},
         "IdatIntensity": {"name": "IdatIntensity", "dtype": "float"},
         "Identifiler_Needed": {"name": "identifiler_needed", "dtype": "boolean"},
         "Low Call Rate": {"name": "is_call_rate_filtered", "dtype": "boolean"},
         "Sample_ID": {"name": "Sample_ID", "dtype": "string"},
         "Sex Discordant": {"name": "is_sex_discordant", "dtype": "boolean"},
-        "Unexpected Replicate": {"name": "is_unexpected_replicate", "dtype": "boolean"},
     }
 
     exp_df = (
@@ -47,7 +45,6 @@ def test_sample_qc_table(sample_qc_df):
             {
                 "is_call_rate_filtered": True,  # Legacy will have True instead of NA
                 "is_discordant_replicate": False,  # Legacy will have False instead of NA
-                "is_unexpected_replicate": False,  # Legacy will have False instead of NA
             }
         )
     )
@@ -84,7 +81,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_csv):
 
             rule all:
                 input:
-                    "sample_level/sample_qc_summary_stats.txt"
+                    "sample_level/summary_stats.txt"
             """
         )
     )
@@ -95,7 +92,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_csv):
     run_snakemake(tmp_path)
 
     # THEN: The file should end with my sample counts
-    assert (tmp_path / "sample_level/sample_qc_summary_stats.txt").read_text().endswith("203  17\n")
+    assert (tmp_path / "sample_level/summary_stats.txt").read_text().endswith("206  14    0\n")
 
 
 @pytest.mark.workflow

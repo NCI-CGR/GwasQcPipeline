@@ -12,6 +12,7 @@ from cgr_gwas_qc.workflow.scripts import (
     sample_qc_table,
     snp_qc_table,
     split_sample_concordance,
+    subject_qc_table,
 )
 
 app = typer.Typer(add_completion=False)
@@ -23,6 +24,7 @@ def main(
     sample_sheet_csv: Path,
     snp_qc_csv: Path,
     sample_qc_csv: Path,
+    subject_qc_csv: Path,
     population_qc_csv: Path,
     control_replicates_csv: Path,
     study_replicates_csv: Path,
@@ -38,6 +40,7 @@ def main(
     ss = sample_sheet.read(sample_sheet_csv)
     snp_qc = snp_qc_table.read(snp_qc_csv)
     sample_qc = sample_qc_table.read(sample_qc_csv)
+    subject_qc = subject_qc_table.read(subject_qc_csv)
     population_qc = population_qc_table.read(population_qc_csv)
     control_replicates = split_sample_concordance.read_known_sample_concordance(
         control_replicates_csv
@@ -62,13 +65,17 @@ def main(
             sample_qc,
             control_replicates,
             study_replicates,
-            unexpected_replicates,
             call_rate_png,
-            chrx_inbreeding_png,
             ancestry_png,
         ),
         "subject_qc": SubjectQC.construct(
-            population_qc, autosomal_heterozygosity_png_dir, pca_png_dir, hwe_png_dir
+            subject_qc,
+            unexpected_replicates,
+            chrx_inbreeding_png,
+            population_qc,
+            autosomal_heterozygosity_png_dir,
+            pca_png_dir,
+            hwe_png_dir,
         ),
         "exclusion_tables": ExclusionTables.construct(config, ss, sample_qc, population_qc),
     }
