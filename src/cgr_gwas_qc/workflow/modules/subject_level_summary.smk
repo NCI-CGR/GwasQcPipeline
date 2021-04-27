@@ -23,29 +23,62 @@ rule subject_representative:
     input:
         rules.subject_qc_table.output[0],
     output:
-        sample2subject=temp("subject_level/sample_to_subject.txt"),
         selected=temp("subject_level/selected_subjects.txt"),
+        sample2subject=temp("subject_level/sample_to_subject.txt"),
     run:
         from cgr_gwas_qc.workflow.scripts import subject_qc_table
 
         df = subject_qc_table.read(input[0]).query("not subject_analytic_exclusion")
 
+        df.reindex(["Sample_ID", "Sample_ID"], axis=1).to_csv(
+            output.selected, sep=" ", index=False, header=False
+        )
+
         df.reindex(
             ["Sample_ID", "Sample_ID", "Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1,
         ).to_csv(output.sample2subject, sep=" ", index=False, header=False)
 
-        df.reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1).to_csv(
-            output.selected, sep=" ", index=False, header=False
-        )
 
-
-rule convert_samples_to_subjects:
+rule pull_subject_representative:
     input:
         bed="sample_level/call_rate_2/samples.bed",
         bim="sample_level/call_rate_2/samples.bim",
         fam="sample_level/call_rate_2/samples.fam",
-        sample2subject=rules.subject_representative.output.sample2subject,
         selected=rules.subject_representative.output.selected,
+    params:
+        out_prefix="subject_level/samples",
+    output:
+        bed="subject_level/samples.bed",
+        bim="subject_level/samples.bim",
+        fam="subject_level/samples.fam",
+        nosex="subject_level/samples.nosex",
+    log:
+        "subject_level/samples.log",
+    envmodules:
+        cfg.envmodules("plink2"),
+    conda:
+        cfg.conda("plink2.yml")
+    threads: lambda wildcards, attempt: attempt * 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--keep {input.selected} "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem_mb} "
+        "--out {params.out_prefix}"
+
+
+rule convert_Sample_ID_to_Subject_ID:
+    input:
+        bed=rules.pull_subject_representative.output.bed,
+        bim=rules.pull_subject_representative.output.bim,
+        fam=rules.pull_subject_representative.output.fam,
+        sample2subject=rules.subject_representative.output.sample2subject,
     params:
         out_prefix="subject_level/subjects",
     output:
@@ -68,7 +101,6 @@ rule convert_samples_to_subjects:
         "--bim {input.bim} "
         "--fam {input.fam} "
         "--update-ids {input.sample2subject} "
-        "--keep {input.selected} "
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem_mb} "
