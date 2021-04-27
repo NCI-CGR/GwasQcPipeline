@@ -104,6 +104,8 @@ _SAMPLE_CONCORDANCE_COLUMNS = [
     "Subject_ID2",
     "Case/Control_Status1",
     "Case/Control_Status2",
+    "Sample Used in Subject Analysis1",
+    "Sample Used in Subject Analysis2",
     "Ancestry1",
     "Ancestry2",
     "Expected Replicate",
@@ -123,10 +125,23 @@ _SAMPLE_CONCORDANCE_COLUMNS = [
 
 def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLike) -> pd.DataFrame:
     ancestry = sample_qc_table.read(sample_qc_csv).set_index("Sample_ID").Ancestry
+    representative = (
+        sample_qc_table.read(sample_qc_csv).set_index("Sample_ID").is_subject_representative
+    )
     return (
         sample_concordance.read(sample_concordance_csv)
         .merge(ancestry.rename_axis("Sample_ID1").rename("Ancestry1"), on="Sample_ID1", how="left")
         .merge(ancestry.rename_axis("Sample_ID2").rename("Ancestry2"), on="Sample_ID2", how="left")
+        .merge(
+            representative.rename_axis("Sample_ID1").rename("Sample Used in Subject Analysis1"),
+            on="Sample_ID1",
+            how="left",
+        )
+        .merge(
+            representative.rename_axis("Sample_ID2").rename("Sample Used in Subject Analysis2"),
+            on="Sample_ID2",
+            how="left",
+        )
         .rename(REPORT_NAME_MAPPER, axis=1)
         .rename(
             {
