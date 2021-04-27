@@ -173,6 +173,8 @@ def _subject_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataF
 
 _ANCESTRY_COLUMNS = [
     "Sample_ID",
+    "Group_By_Subject_ID",
+    "Sample Used in Subject Analysis",
     "Case/Control_Status",
     "#SNPs",
     "GD1",
@@ -193,7 +195,14 @@ _ANCESTRY_COLUMNS = [
 
 def _ancestry(sample_qc_csv: PathLike, graf_txt: PathLike) -> pd.DataFrame:
     sample_qc = sample_qc_table.read(sample_qc_csv).reindex(
-        ["Sample_ID", "case_control", "Ancestry"], axis=1
+        [
+            "Sample_ID",
+            "Group_By_Subject_ID",
+            "case_control",
+            "is_subject_representative",
+            "Ancestry",
+        ],
+        axis=1,
     )
 
     graf = (
