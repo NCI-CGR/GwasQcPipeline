@@ -81,6 +81,7 @@ if cfg.config.user_files.gtc_pattern:
         threads: 8
         resources:
             mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+            time_hr=lambda wildcards, attempt: 4 * attempt,
         shell:
             "plink "
             "--merge-list {input.merge_list} "
