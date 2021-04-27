@@ -36,7 +36,7 @@ def main(
         _sample_concordance(sample_qc_csv, sample_concordance_csv).to_excel(
             writer, sheet_name="SAMPLE_CONCORDANCE", index=False
         )
-        _subject_qc(sample_qc_csv, subject_qc_csv).to_excel(
+        _subject_qc(sample_sheet_csv, subject_qc_csv).to_excel(
             writer, sheet_name="SUBJECT_QC", index=False
         )
         _ancestry(sample_qc_csv, graf).to_excel(writer, sheet_name="ANCESTRY", index=False)
