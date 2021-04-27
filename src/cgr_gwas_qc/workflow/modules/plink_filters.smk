@@ -360,7 +360,6 @@ rule cleaned_filter:
         cfg.envmodules("plink2"),
     conda:
         cfg.conda("plink2.yml")
-    threads: 2
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,

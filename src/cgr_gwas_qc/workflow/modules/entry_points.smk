@@ -33,7 +33,7 @@ if cfg.config.user_files.gtc_pattern:
             ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
             map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
         resources:
-            mem_gb=1,
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
         group:
             "per_sample_gtc_to_ped"
         script:
@@ -80,14 +80,14 @@ if cfg.config.user_files.gtc_pattern:
             cfg.conda("plink2.yml")
         threads: 8
         resources:
-            mem=16000,
+            mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
         shell:
             "plink "
             "--merge-list {input.merge_list} "
             "--make-bed "
             "--out {params.prefix} "
             "--threads {threads} "
-            "--memory {resources.mem}"
+            "--memory {resources.mem_mb}"
 
 
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
@@ -114,14 +114,14 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
         conda:
             cfg.conda("plink2.yml")
         resources:
-            mem=10000,
+            mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
         shell:
             "plink "
             "--ped {input.ped} "
             "--map {input.map_} "
             "--make-bed "
             "--out {params.prefix} "
-            "--memory {resources.mem}"
+            "--memory {resources.mem_mb}"
 
 
 elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user_files.fam:

@@ -31,7 +31,7 @@ if (
                 "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
             ),
         resources:
-            mem_gb=1,
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
         group:
             "per_sample_median_idat_intensity"
         envmodules:
@@ -69,7 +69,7 @@ if (
         output:
             temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
         resources:
-            mem_gb=1,
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
         group:
             "per_sample_gtc_to_adpc"
         script:
@@ -121,7 +121,7 @@ if (
         output:
             temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
         resources:
-            mem_gb=1,
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
         group:
             "per_sample_verifyIDintensity_contamination"
         conda:
