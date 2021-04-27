@@ -275,6 +275,8 @@ rule sample_concordance:
         king_file=rules.sample_concordance_king.output.between_family,
     output:
         "sample_level/concordance/summary.csv",
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * 2 * attempt,
     script:
         "../scripts/sample_concordance.py"
 
