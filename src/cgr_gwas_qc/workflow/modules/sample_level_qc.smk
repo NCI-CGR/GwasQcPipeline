@@ -253,8 +253,12 @@ rule sample_concordance_king:
         cfg.conda("king.yml")
     log:
         "sample_level/concordance/king.log",
+    threads: 8
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+        time_hr=lambda wildcards, attempt: 2 * attempt,
     shell:
-        "king -b {input.bed} --kinship --prefix {params.out_prefix} > {log} 2>&1 "
+        "king -b {input.bed} --kinship --prefix {params.out_prefix} --cpu {threads} > {log} 2>&1 "
         "&& touch {output.within_family} "
         "&& touch {output.between_family} "
         "&& touch {output.within_family_X} "
