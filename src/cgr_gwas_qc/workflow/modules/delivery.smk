@@ -94,9 +94,9 @@ rule deliver_original_sample_data:
 
 rule deliver_subject_data:
     input:
-        bed="subject_level/subjects.bed",
-        bim="subject_level/subjects.bim",
-        fam="subject_level/subjects.fam",
+        bed="subject_level/samples.bed",
+        bim="subject_level/samples.bim",
+        fam="subject_level/samples.fam",
     output:
         bed="deliver/subjects.bed",
         bim="deliver/subjects.bim",
