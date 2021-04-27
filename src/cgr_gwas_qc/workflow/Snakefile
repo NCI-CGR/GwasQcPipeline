@@ -53,7 +53,8 @@ if cfg.ss.shape[0] < 1_000:
         plink_stats_hardy,
         plink_stats_ibd,
         plink_stats_het, # subject_level_summary
-        convert_samples_to_subjects,
+        pull_subject_representative,
+        convert_Sample_ID_to_Subject_ID,
         related_subjects,
         remove_related_subjects, # population_level_summary
         plink_split_population,
