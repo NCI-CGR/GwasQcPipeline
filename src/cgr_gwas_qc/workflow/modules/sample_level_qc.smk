@@ -276,7 +276,8 @@ rule sample_concordance:
     output:
         "sample_level/concordance/summary.csv",
     resources:
-        mem_mb=lambda wildcards, attempt: 1024 * 2 * attempt,
+        mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
+        time_hr=lambda wildcards, attempt: 2 * attempt,
     script:
         "../scripts/sample_concordance.py"
 
