@@ -13,7 +13,7 @@ NOTE: This is an interim QC report for {{ config.project_name }}. Samples/subjec
 
 {{ config.num_samples | numFormat }} samples representing {{ sample_qc.summary.num_starting_subjects | numFormat}} subjects were scanned at {{ config.num_snps | numFormat }} loci on the {{ config.snp_array }} Illumina genotyping array (**Table 1**).
 
-**Table 1**. Sample manifest summary before processing
+**Table 1**. Sample manifest summary before processing.
 
 | Study Name         | Array           | Case:Control          | Male:Female           | Total Count       |
 |:-------------------|:----------------|----------------------:|----------------------:|------------------:|
@@ -24,7 +24,18 @@ NOTE: This is an interim QC report for {{ config.project_name }}. Samples/subjec
 
 ## Array Processing
 
-A total of {{ config.num_samples | numFormat }} samples were scanned on the {{ config.snp_array }} array using the [standard Illumina microarray data analysis workflow](https://www.illumina.com/documents/products/technotes/technote_array_analysis_workflows.pdf) and a custom cluster file ({{ config.reference_files.illumina_cluster_file  or "which can be provided on request" }}). {{ sample_qc.array_processing.num_failed_array_processing | numFormat }} samples failed to produce valid output files (either "idat" and/or "gtc" files) during array processing and were not  included in the study. Array processing failures typically happen because the probe intensity is too low to register during scanning. After removing these {{ sample_qc.array_processing.num_failed_array_processing | numFormat }} samples, {{ sample_qc.array_processing.num_samples_qc_processed | numFormat }} samples remained.
+A total of {{ config.num_samples | numFormat }} samples were scanned on the {{ config.snp_array }} array using the [standard Illumina microarray data analysis workflow](https://www.illumina.com/documents/products/technotes/technote_array_analysis_workflows.pdf) and a custom cluster file ({{ config.reference_files.illumina_cluster_file or "which can be provided on request" }}).
+{% if sample_qc.array_processing.num_samples_excluded > 0 %}
+There were {{ sample_qc.array_processing.num_samples_excluded | numFormat }} samples excluded from QC analysis.
+{% if sample_qc.array_processing.num_array_processing_failure > 0 %}
+Of these, {{ sample_qc.array_processing.num_array_processing_failure | numFormat }} samples failed to produced valid output files during array processing (either IDAT files {{sample_qc.array_processing.num_missing_idats | numFormat }} or GTC files {{sample_qc.array_processing.num_missing_gtc | numFormat }}). Array processing failures typically happen because the probe intensity is too low to register during scanning.
+{% endif %}
+{% if sample_qc.array_processing.num_user_exclusions > 0 %}
+There were {{ sample_qc.array_processing.num_user_exclusions | numFormat }} samples specifically excluded by use when running the QC pipeline.
+{% endif %}
+{% else %}
+All {{ sample_qc.array_processing.num_samples_qc_processed | numFormat }} samples successfully passed array processing.
+{% endif %}
 
 ## Completion Rate Filters
 
@@ -57,7 +68,7 @@ NOTE: Samples that fail due to completion rate may be eligible for recovery. Rec
 ## Sample Contamination Filters
 
 Samples may become contaminated at multiple steps throughout the laboratory processing pipeline.
-For genotyping, contamination rates that surpass 20% may reduce the ability to bin signals into the discrete clusters required to call separate genotypes. Laboratory QC processes (i.e., STR fingerprinting Identifiler<sup>TM</sup>), if run, can typically identify and exclude samples contaminated during extraction or staging. Here we estimate sample contamination using [VerifyIDintensity](https://genome.sph.umich.edu/wiki/VerifyIDintensity) on samples that passes completion rate filters and have a median raw intensity > {{ config.intensity_threshold | numFormat }} (internal tests show this tool to be unreliable for low intensity data) to identify samples contaminated during array processing or those not screened by the STR assay. VerifyIDintensity is run individually on each sample using 1000 Genome's B-allele frequencies ({{ config.software_params.contam_population }} population) for all included GSA SNPs. Samples with a predicted contamination > {{ config.software_params.contam_threshold | toPct | numFormat(0) }}% are excluded. Though many contaminated samples fail completion rate filters, it is informative to know if contamination is the cause of low completion rate. {{ sample_qc.contamination.num_pass_cr_and_contaminated | numFormat }} samples that passed completion rate filters were predicted to be contaminated and excluded at this step. Removing these {{ sample_qc.contamination.num_pass_cr_and_contaminated | numFormat }} samples from the {{ sample_qc.completion_rate.num_sample_pass_call_rate | numFormat }} samples (**Table 2a**) left {{ sample_qc.contamination.num_remaining | numFormat }} remaining.
+For genotyping, contamination rates that surpass {{ config.software_params.contam_threshold | toPct | numFormat(0) }}% may reduce the ability to bin signals into the discrete clusters required to call separate genotypes. Laboratory QC processes (i.e., STR fingerprinting Identifiler™), if run, can typically identify and exclude contaminated samples during extraction or staging. Here we estimate sample contamination using [VerifyIDintensity](https://genome.sph.umich.edu/wiki/VerifyIDintensity) on samples that passes completion rate filters and have a median raw intensity > {{ config.intensity_threshold | numFormat }} (internal tests show this tool to be unreliable for low intensity data) to identify samples contaminated during array processing or those not screened by the STR assay. VerifyIDintensity is run individually on each sample using 1000 Genome's B-allele frequencies ({{ config.software_params.contam_population }} population) for all included GSA SNPs. Samples with a predicted contamination > {{ config.software_params.contam_threshold | toPct | numFormat(0) }}% are excluded. Though many contaminated samples fail completion rate filters, it is informative to know if contamination is the cause of low completion rate. {{ sample_qc.contamination.num_pass_cr_and_contaminated | numFormat }} samples that passed completion rate filters were predicted to be contaminated and excluded at this step. Removing these {{ sample_qc.contamination.num_pass_cr_and_contaminated | numFormat }} samples from the {{ sample_qc.completion_rate.num_sample_pass_call_rate | numFormat }} samples (**Table 2a**) left {{ sample_qc.contamination.num_remaining | numFormat }} remaining.
 
 NOTE: Samples that fail contamination screening may be eligible for recovery efforts, including screening the source sample for contamination by STR profiling to determine if a new aliquot or new extraction would be required for a repeat attempt. Final QC reports will have already addressed possible recovery avenues, and thus the contamination threshold set at this step by CGR in conjunction with the investigator will reflect final analytical exclusions.
 
@@ -73,27 +84,39 @@ Similar to internal QC controls, technical replicates of study samples are inclu
 In this project the minimum concordance of replicates was {{ sample_qc.expected_replicates.min_concordance | toPct | numFormat }}% and the mean concordance was {{ sample_qc.expected_replicates.mean_concordance | toPct | numFormat }}%.
 We removed {{ sample_qc.expected_replicates.num_low_concordance | numFormat }} study samples with low replicate concordance.
 
-### Unexpected Replicates
-
-Another possibility is that two study subjects were taken from the same individual (i.e., biological replicates or tumor/normal sampling).
-We consider subjects with pairwise concordance (proportion IBS2) > {{ config.software_params.dup_concordance_cutoff | toPct | numFormat(0) }}%, for a set of LD-pruned SNPs, as replicates.
-In this project, we found {{ sample_qc.unexpected_replicates.num_unexpected_replicates | numFormat }} subjects that were unexpected replicates.
-See the "SAMPLE_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
-
-NOTE: Subjects with unexpected replicates identified may be eligible for recovery efforts, including confirmation of concordance by STR profiling and confirmation of subject information with the investigator. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
-
 ### Replicate Pruning (Subject Representative)
 
-Finally, for the remaining study samples with replicates (expected or unexpected), we selected the replicate with the highest completion rate to represent that subject.
-Here we removed {{ sample_qc.expected_replicates.num_not_subject_representative | numFormat }} expected replicates and {{ sample_qc.unexpected_replicates.num_not_subject_representative | numFormat or "NOT IMPLEMENTED"}} unexpected replicates, leaving {{ sample_qc.summary.num_subjects_remaining | numFormat }} samples corresponding to unique subjects.
+Finally, for the remaining study subjects with replicates, we selected the replicate with the highest completion rate to represent that subject.
+Here we removed {{ sample_qc.expected_replicates.num_not_subject_representative | numFormat }} expected replicates, leaving {{ sample_qc.summary.num_subjects_remaining | numFormat }} samples corresponding to unique subjects.
 See the "SAMPLE_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
-
 
 # PART II (Subject Level QC)
 
 {{ config.num_samples | numFormat }} samples were scanned in this project. In total, {{ sample_qc.summary.num_samples_excluded | numFormat }} samples were excluded as a result of the sample level exclusions in PART I. This left {{ sample_qc.summary.num_subjects_remaining | numFormat }} samples that were mapped to subject IDs. These {{ sample_qc.summary.num_subjects_remaining | numFormat }} subjects were checked for further exclusions in the sections below.
 
-## Global Subject Relatedness
+## Sex Verification
+
+Subject sex is verified by comparing the reported sex with the observed sex based on X chromosome method-of-moments F coefficient ([observed hom. count] - [expected count]) / ([total observations] - [expected count]) using [PLINK](https://www.cog-genomics.org/plink2).
+The F coefficient is expected to be close to 0.0 and 1.0 for females and males, respectively.
+To assign the observed sex, we used a threshold of 0.5 (i.e., the midpoint between expected values).
+Sex check results can be found in the "SUBJECT_QC" tab of "{{ excel_file_name }}", including any sex discrepancies (**Figure 2**). There were {{ subject_qc.sex_verification.num_sex_discordant | numFormat }} sex discordant subjects.
+
+NOTE: Samples that fail the sex concordance check may be eligible for recovery efforts, including screening for sex chromosome aneuploidies by STR profiling and confirmation of reported sex with the investigator. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
+
+![]({{ subject_qc.sex_verification.png }})
+
+**Figure 2** F coefficient distribution (chromosome X) by reported sex.
+
+## Unexpected Replicates
+
+Next, we checked if two study subjects were taken from the same individual (i.e., biological replicates or tumor/normal sampling).
+We consider subjects with pairwise concordance (proportion IBS2) > {{ config.software_params.dup_concordance_cutoff | toPct | numFormat(0) }}%, for a set of LD-pruned SNPs, as replicates.
+In this project, we found {{ subject_qc.unexpected_replicates.num_unexpected_replicates | numFormat }} subjects that were unexpected replicates.
+See the "SUBJECT_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
+
+NOTE: Subjects with unexpected replicates identified may be eligible for recovery efforts, including confirmation of concordance by STR profiling and confirmation of subject information with the investigator. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
+
+## Subject Relatedness (project wide)
 
 Similar to replicate concordance, we globally assessed pairwise subject relatedness. Here we provide three metrics: Identity-by-descent (IBD) ([PLINK](https://www.cog-genomics.org/plink2)), genotype mismatch rates ([GRAF](https://github.com/ncbi/graf)), and kinship coefficients ([KING](https://people.virginia.edu/~wc9c/KING/)).
 All three metrics will provide a similar view of relatedness but have different levels of robustness and the ability to separate different types of relationships.
@@ -103,23 +126,10 @@ A `PI_HAT` value > 0.2 is considered closely related (1st and 2nd degree).
 Using a combination of HGMR and AGMR, each pair is classified as duplicate or identical twin (ID), parent-offspring (PO), full siblings (FS), 2nd degree (D2), 3rd degree (D3), or unrelated (UN) individuals.
 [KING](https://people.virginia.edu/~wc9c/KING/) estimates pairwise kinship coefficients and assigns relationships ([described here](https://people.virginia.edu/~wc9c/KING/manual.html#WITHIN)) as duplicate or identical twin (ID), 1st degree (D1), 2nd degree (D2), 3rd degree (D3), and unrelated (UN) individuals.
 This global view of relatedness can help identify related subjects across populations.
-See the "SAMPLE_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
+See the "SUBJECT_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
 However, we also estimate relatedness and prune relatives on a per population basis (see below).
 
-## Sex Verification
-
-Subject sex is verified by comparing the reported sex with the observed sex based on X chromosome method-of-moments F coefficient ([observed hom. count] - [expected count]) / ([total observations] - [expected count]) using [PLINK](https://www.cog-genomics.org/plink2).
-The F coefficient is expected to be close to 0.0 and 1.0 for females and males, respectively.
-To assign the observed sex, we used a threshold of 0.5 (i.e., the midpoint between expected values).
-Sex check results can be found in the "ALL_QC" tab of "{{ excel_file_name }}", including any sex discrepancies (**Figure 2**). There were {{ sample_qc.sex_verification.num_sex_discordant | numFormat }} sex discordant subjects.
-
-NOTE: Samples that fail the sex concordance check may be eligible for recovery efforts, including screening for sex chromosome aneuploidies by STR profiling and confirmation of reported sex with the investigator. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
-
-![]({{ sample_qc.sex_verification.png }})
-
-**Figure 2** F coefficient distribution (chromosome X) by reported sex.
-
-## Assessment of Ancestry
+## Ancestry Assignment
 
 Subject ancestry was inferred using [GRAF-pop](https://github.com/ncbi/graf). This method calculates genetic distances between each subject and estimates ancestry as the ancestral proportions on these distances.
 Ancestral proportions are based on the 1000G project.
@@ -135,14 +145,14 @@ Ancestry results can be found in the "ANCESTRY" tab of " {{ excel_file_name }}."
 
 {{ sample_qc.ancestry.table }}
 
-## Per Ancestry Group Subject Relatedness
+## Subject Relatedness (per ancestry group)
 
 [GRAF](https://github.com/ncbi/graf) and [KING](https://people.virginia.edu/~wc9c/KING/) relationship estimates are robust to population structure. However, IBD requires accurate MAFs and should be estimated separately for each population. For each ancestry group we used [PLINK](https://www.cog-genomics.org/plink2) to estimate `PI_HAT` (proportion IBD). We consider two subjects closely related (1st or 2nd degree) if they have `PI_HAT` (proportion IBD) > {{ config.software_params.pi_hat_threshold | toPct | numFormat(0) }}.
 A total of {{ subject_qc.relatives.num_related_subjects | numFormat }} subjects were found to be related at the 1st or 2nd degree level.
 These subjects can be split into {{ subject_qc.relatives.num_qc_families | numFormat }} families. Subjects with family IDs can be found in "FAMILIES" tab of "{{ excel_file_name }}".
 See the "*_IBD" tab(s) of "{{ excel_file_name }}" for more details.
 
-## Per Ancestry Group Autosomal Heterozygosity
+## Autosomal Heterozygosity (per ancestry group)
 
 Extreme autosomal heterozygosity (or homozygosity) is indicative of genotyping failure or contamination.
 Similar to the sex checks, we used [PLINK](https://www.cog-genomics.org/plink2) to estimated autosomal heterozygosity by calculating the autosomal method-of-moments F coefficient ([observed hom. count] - [expected count]) / ([total observations] - [expected count]).
@@ -156,7 +166,7 @@ F coefficients were estimated separately for each ancestry group because calcula
 
 {% endfor %}
 
-## Per Ancestry Group Population Substructure (PCA)
+## Population Substructure (PCA per ancestry group)
 
 Next, we examined per ancestry group population substructure using principal components analysis (PCA) in unrelated subjects. We performed PCA ("smartpca" from [Eigensoft](https://www.hsph.harvard.edu/alkes-price/software/)) on a set of MAF and LD-pruning markers.
 See the "*_PCA" tab(s) of "{{ excel_file_name }}" for more details.
@@ -171,7 +181,7 @@ Here we show the pair plot for each ancestry group's first six principal compone
 {% endfor %}
 
 
-## Per Ancestry Group Deviation from Hardy-Weinberg Equilibrium
+## Deviation from Hardy-Weinberg Equilibrium (HWE per ancestry group)
 
 We assessed deviations from Hardy-Weinberg Equilibrium (HWE) in unrelated control samples (if Ca/Co status was available) using [PLINK](https://www.cog-genomics.org/plink2).
 We used only autosomal SNP loci with a MAF > {{ config.software_params.maf_for_hwe | numFormat }}.
@@ -191,7 +201,7 @@ Treat loci with extreme p-values (p <= 0.001) with caution in further associatio
 
 The current data started with {{ config.num_samples }} samples. The sample level exclusion counts below were performed in the sequential order listed, so the sample counts in each step represent unique exclusions at each level.
 
-We provide a complete and detailed QC summary including completion rate, predicted contamination rate, sex discordance, unexpected duplicates, and population structure for all samples in the "ALL_QC" tab of "{{ excel_file_name }}."
+We provide a complete and detailed QC summary including completion rate, predicted contamination rate, sex discordance, unexpected duplicates, and population structure for all samples in the "SAMPLE_QC" tab of "{{ excel_file_name }}."
 
 **Table 4a** Summary of sample level exclusions.
 

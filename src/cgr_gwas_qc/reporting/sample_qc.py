@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pandas as pd
 
-from cgr_gwas_qc.models.config import Config
 from cgr_gwas_qc.reporting.templating import number_formater
 
 
@@ -20,7 +19,6 @@ class SampleQC:
     @classmethod
     def construct(
         cls,
-        config: Config,
         sample_sheet: pd.DataFrame,
         snp_qc: pd.DataFrame,
         sample_qc: pd.DataFrame,
@@ -31,7 +29,7 @@ class SampleQC:
     ) -> "SampleQC":
 
         return cls(
-            ArrayProcessing.construct(config, sample_sheet),
+            ArrayProcessing.construct(sample_sheet),
             CompletionRate.construct(snp_qc, sample_qc, call_rate_png),
             Contamination.construct(sample_qc),
             InternalControls.construct(sample_qc, control_replicates),
@@ -43,19 +41,24 @@ class SampleQC:
 
 @dataclass
 class ArrayProcessing:
-    num_failed_array_processing: int
+    num_samples_excluded: int
+    num_missing_idats: int
+    num_missing_gtc: int
+    num_array_processing_failure: int
+    num_user_exclusions: int
     num_samples_qc_processed: int
 
     @classmethod
-    def construct(cls, config: Config, sample_sheet: pd.DataFrame) -> "ArrayProcessing":
-        if config.Sample_IDs_to_remove:
-            num_failed_array_processing = len(config.Sample_IDs_to_remove)
-        else:
-            num_failed_array_processing = 0
-
+    def construct(cls, sample_sheet: pd.DataFrame) -> "ArrayProcessing":
         return cls(
-            num_failed_array_processing=num_failed_array_processing,
-            num_samples_qc_processed=sample_sheet.shape[0],
+            num_samples_excluded=sample_sheet.is_sample_exclusion.sum(),
+            num_missing_idats=sample_sheet.is_missing_idats.sum(),
+            num_missing_gtc=sample_sheet.is_missing_gtc.sum(),
+            num_array_processing_failure=(
+                sample_sheet.is_missing_idats | sample_sheet.is_missing_gtc
+            ).sum(),
+            num_user_exclusions=sample_sheet.is_user_exclusion.sum(),
+            num_samples_qc_processed=(~sample_sheet.is_sample_exclusion).sum(),
         )
 
 

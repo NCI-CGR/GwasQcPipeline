@@ -59,7 +59,6 @@ def main(
         ),  # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
         "config": config,
         "sample_qc": SampleQC.construct(
-            config,
             ss,
             snp_qc,
             sample_qc,
