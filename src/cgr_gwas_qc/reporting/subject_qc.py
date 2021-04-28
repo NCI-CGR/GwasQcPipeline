@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from pathlib import Path
 from string import ascii_lowercase
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
+
+from cgr_gwas_qc.reporting.constants import REPORT_NAME_MAPPER
 
 
 @dataclass
@@ -18,6 +20,7 @@ class SubjectQC:
     @classmethod
     def construct(
         cls,
+        ss: pd.DataFrame,
         subject_qc: pd.DataFrame,
         unexpected_replicates: Path,
         chrx_inbreeding_png: Path,
@@ -28,7 +31,7 @@ class SubjectQC:
     ) -> "SubjectQC":
         return cls(
             UnExpectedReplicates.construct(subject_qc, unexpected_replicates),
-            SexVerification.construct(subject_qc, chrx_inbreeding_png),
+            SexVerification.construct(ss, subject_qc, chrx_inbreeding_png),
             Relatedness.construct(population_qc),
             Autosomal.construct(population_qc, autosomal_heterozygosity_png_dir),
             Pca.construct(pca_png_dir),
@@ -58,13 +61,41 @@ class SexVerification:
     num_sex_discordant: int
     num_remaining: int
     png: str
+    table: Optional[str]
 
     @classmethod
-    def construct(cls, subject_qc: pd.DataFrame, png: Path) -> "SexVerification":
+    def construct(cls, ss: pd.DataFrame, subject_qc: pd.DataFrame, png: Path) -> "SexVerification":
         return cls(
             subject_qc.is_sex_discordant.sum(),
             (~subject_qc.is_sex_discordant).sum(),
             png.resolve().as_posix(),
+            cls.build_table(ss, subject_qc),
+        )
+
+    @staticmethod
+    def build_table(ss: pd.DataFrame, subject_qc: pd.DataFrame) -> Optional[str]:
+        cols = [
+            "Sample_ID",
+            "Group_By_Subject_ID",
+            "Sample_Name",
+            "Identifiler_Sex",
+            "Project",
+            "expected_sex",
+            "predicted_sex",
+            "XY characters",
+        ]
+        df = subject_qc.query("is_sex_discordant")
+
+        if df.shape[0] == 0:
+            return None
+
+        return (
+            df.merge(ss, how="left", on="Sample_ID", suffixes=["", "_DROP"])
+            .reindex(cols, axis=1)
+            .rename(REPORT_NAME_MAPPER, axis=1)
+            .set_index("Sample_ID")
+            .fillna({"XY characters": "Not Analyzed"})
+            .to_markdown()
         )
 
 

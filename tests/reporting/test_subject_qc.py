@@ -1,4 +1,5 @@
 import shutil
+from io import StringIO
 from pathlib import Path
 from typing import Tuple
 
@@ -29,12 +30,21 @@ def test_UnExpectedReplicates(subject_qc_df, unexpected_replicates_df):
 
 
 @pytest.mark.real_data
-def test_SexVerification(subject_qc_df):
+def test_SexVerification(real_cfg, subject_qc_df):
     from cgr_gwas_qc.reporting.subject_qc import SexVerification
 
-    sv = SexVerification.construct(subject_qc_df, Path("test.png"))
+    sv = SexVerification.construct(real_cfg.ss, subject_qc_df, Path("test.png"))
 
     assert 3 == sv.num_sex_discordant
+
+    # The markdown table should have the same number of rows
+    obs_df = (
+        pd.read_csv(StringIO(sv.table), sep="|", skipinitialspace=True)
+        .dropna(axis=1, how="all")
+        .iloc[1:, :]
+    )
+    obs_df.columns = obs_df.columns.str.strip()
+    assert 3 == obs_df.shape[0]
 
 
 @pytest.mark.real_data

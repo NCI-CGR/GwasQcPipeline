@@ -107,6 +107,10 @@ NOTE: Samples that fail the sex concordance check may be eligible for recovery e
 
 **Figure 2** F coefficient distribution (chromosome X) by reported sex.
 
+{% if subject_qc.sex_verification.table %}
+{{ subject_qc.sex_verification.table }}
+{% endif %}
+
 ## Unexpected Replicates
 
 Next, we checked if two study subjects were taken from the same individual (i.e., biological replicates or tumor/normal sampling).
