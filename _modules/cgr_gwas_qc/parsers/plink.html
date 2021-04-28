@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.parsers.plink &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
+  <title>cgr_gwas_qc.parsers.plink &mdash; GwasQcPipeline 1.0.0b1 documentation</title>
   
 
   
@@ -200,7 +200,7 @@
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#het</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;FID&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;IID&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">})</span>
         <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;FID&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;IID&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="s2">&quot;O(HOM)&quot;</span><span class="p">:</span> <span class="s2">&quot;O_HOM&quot;</span><span class="p">,</span> <span class="s2">&quot;E(HOM)&quot;</span><span class="p">:</span> <span class="s2">&quot;E_HOM&quot;</span><span class="p">,</span> <span class="s2">&quot;N(NM)&quot;</span><span class="p">:</span> <span class="s2">&quot;N_NM&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
@@ -295,7 +295,11 @@
         <span class="k">return</span> <span class="n">x</span>
 
     <span class="k">return</span> <span class="p">(</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="n">filename</span><span class="p">,</span>
+            <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;FID1&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;IID1&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;FID2&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;IID2&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
         <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_sort_ids</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;IID1&quot;</span><span class="p">,</span> <span class="s2">&quot;IID2&quot;</span><span class="p">,</span> <span class="s2">&quot;FID1&quot;</span><span class="p">,</span> <span class="s2">&quot;FID2&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="p">)</span></div>
@@ -324,7 +328,7 @@
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#imiss</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;FID&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;IID&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">})</span>
         <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;FID&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;IID&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
@@ -353,7 +357,14 @@
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/basic_stats#missing</span>
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#lmiss</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;CHR&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SNP&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;N_MISS&quot;</span><span class="p">:</span> <span class="s2">&quot;UInt32&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;N_GENO&quot;</span><span class="p">:</span> <span class="s2">&quot;UInt32&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;F_MISS&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="read_sexcheck"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.plink.read_sexcheck">[docs]</a><span class="k">def</span> <span class="nf">read_sexcheck</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -377,7 +388,7 @@
 <span class="sd">        - https://www.cog-genomics.org/plink/1.9/formats#sexcheck</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">delim_whitespace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;FID&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;IID&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">})</span>
         <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;FID&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;IID&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>

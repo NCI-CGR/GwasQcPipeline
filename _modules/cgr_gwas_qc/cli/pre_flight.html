@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.cli.pre_flight &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
+  <title>cgr_gwas_qc.cli.pre_flight &mdash; GwasQcPipeline 1.0.0b1 documentation</title>
   
 
   
@@ -238,7 +238,7 @@
     <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">Sample_IDs_to_remove</span><span class="p">:</span>
         <span class="c1"># Remove IDs flagged in the config</span>
         <span class="n">problem_samples</span> <span class="o">|=</span> <span class="p">{</span>
-            <span class="n">ProblemFile</span><span class="p">(</span><span class="n">Sample_ID</span><span class="p">,</span> <span class="s2">&quot;ConfigExclusion&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">Sample_ID</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">Sample_IDs_to_remove</span>
+            <span class="n">ProblemFile</span><span class="p">(</span><span class="n">Sample_ID</span><span class="p">,</span> <span class="s2">&quot;UserExclusion&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">Sample_ID</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">Sample_IDs_to_remove</span>
         <span class="p">}</span>
 
     <span class="c1"># Create a parsed version of the sample sheet with some custom columns</span>
@@ -390,7 +390,9 @@
     <span class="n">_add_group_by_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">subject_id_column</span><span class="p">)</span>
     <span class="n">_add_is_internal_control</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="n">_add_sample_exclusion</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
-    <span class="n">_add_idats_exist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
+    <span class="n">_add_user_exclusion</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
+    <span class="n">_add_missing_idats</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
+    <span class="n">_add_missing_gtc</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
     <span class="n">_update_expected_sex</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">expected_sex_column</span><span class="p">)</span>
     <span class="n">_update_case_control</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">case_control_column</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_add_replicate_info</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -443,18 +445,42 @@
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;is_internal_control&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_add_idats_exist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]):</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;idats_exist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">problem_idats</span> <span class="o">=</span> <span class="p">{</span>
+<span class="k">def</span> <span class="nf">_add_user_exclusion</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]):</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;is_user_exclusion&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">problem_ids</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">problem</span><span class="o">.</span><span class="n">Sample_ID</span> <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problem_samples</span> <span class="k">if</span> <span class="n">problem</span><span class="o">.</span><span class="n">reason</span> <span class="o">==</span> <span class="s2">&quot;UserExclusion&quot;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">problem_ids</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Sample_ID</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">problem_ids</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="s2">&quot;is_user_exclusion&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_add_missing_idats</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]):</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;is_missing_idats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">problem_ids</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">problem</span><span class="o">.</span><span class="n">Sample_ID</span>
         <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problem_samples</span>
         <span class="k">if</span> <span class="n">problem</span><span class="o">.</span><span class="n">file_type</span>
         <span class="ow">and</span> <span class="n">problem</span><span class="o">.</span><span class="n">file_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;idat&quot;</span><span class="p">)</span>
         <span class="ow">and</span> <span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">reason</span> <span class="o">==</span> <span class="s2">&quot;FileNotFound&quot;</span><span class="p">)</span>
     <span class="p">}</span>
-    <span class="k">if</span> <span class="n">problem_idats</span><span class="p">:</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Sample_ID</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">problem_idats</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="s2">&quot;idats_exist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">problem_ids</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Sample_ID</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">problem_ids</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="s2">&quot;is_missing_idats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_add_missing_gtc</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]):</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;is_missing_gtc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">problem_ids</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">problem</span><span class="o">.</span><span class="n">Sample_ID</span>
+        <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problem_samples</span>
+        <span class="k">if</span> <span class="n">problem</span><span class="o">.</span><span class="n">file_type</span>
+        <span class="ow">and</span> <span class="n">problem</span><span class="o">.</span><span class="n">file_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;gtc&quot;</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">reason</span> <span class="o">==</span> <span class="s2">&quot;FileNotFound&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">problem_ids</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Sample_ID</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">problem_ids</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="s2">&quot;is_missing_gtc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
 
 <span class="k">def</span> <span class="nf">_add_replicate_info</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>

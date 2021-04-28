@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Workflow Scripts &mdash; GwasQcPipeline 1.0.0a4 documentation</title>
+  <title>Workflow Scripts &mdash; GwasQcPipeline 1.0.0b1 documentation</title>
   
 
   
@@ -117,7 +117,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.workflow.scripts.sample_concordance">Sample-Level</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#sample-concordance-table">Sample Concordance Table</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#split-sample-concordance-tables">Split Sample Concordance Tables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#sample-qc-table-py">sample_qc_table.py</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#internal-sample-qc-report">Internal Sample QC Report</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.workflow.scripts.related_subjects">Subject-Level</a><ul>
@@ -521,15 +521,281 @@ from different subjects should not be related. This script outputs 4 tables:</p>
 </ul>
 </div>
 </div>
-<span class="target" id="module-cgr_gwas_qc.workflow.scripts.sample_qc_table"></span><div class="section" id="sample-qc-table-py">
-<h3>sample_qc_table.py<a class="headerlink" href="#sample-qc-table-py" title="Permalink to this headline">¶</a></h3>
-<p>Generate the internal sample QC report.</p>
+<span class="target" id="module-cgr_gwas_qc.workflow.scripts.sample_qc_table"></span><div class="section" id="internal-sample-qc-report">
+<h3>Internal Sample QC Report<a class="headerlink" href="#internal-sample-qc-report" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">workflow/scripts/sample_qc_table.py</span></code></p>
 <p>This script takes various outputs from the GwasQcPipeline and
 aggregates/summarizes results into an internal QC report. Here we use a
 functional approach to build up the QC report. Each file has it’s own
 function to parse/summarize its content. This makes it easier to add new
 components or change the behavior. Search for <cite>TO-ADD</cite> comments for where you
 would have to make modifications to add new components.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+<th class="head"></th>
+<th class="head"></th>
+<th class="head"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sample_ID</p></td>
+<td><p>string</p></td>
+<td><p>The sample identifier used by the workflow.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Group_By_Subject_ID</p></td>
+<td><p>string</p></td>
+<td><p>The subject identifier used by the workflow</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>num_samples_per_subject</p></td>
+<td><p>UInt32</p></td>
+<td><p>The total number of <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> per <code class="docutils literal notranslate"><span class="pre">Group_By_Subject_ID</span></code>.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>analytic_exclusion: boolean</p></td>
+<td><p>True if the sample failed QC criteria.</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>num_analytic_exclusion: boolean</p></td>
+<td><p>The number of QC criteria the sample failed.</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>analytic_exclusion_reason: string</p></td>
+<td><p>A list of QC criteria the sample failed.</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>is_subject_representative</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> is used to represent the subject.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>subject_dropped_from_study</p></td>
+<td><p>boolean</p></td>
+<td><p>True if there are no samples passing QC for this subject.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>case_control</p></td>
+<td><p>CASE_CONTROL_DTYPE</p></td>
+<td><p>Phenotype status {Case</p></td>
+<td><p>Control</p></td>
+<td><p>QC</p></td>
+<td><p>Unknown}</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_internal_control</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the sample is an internal control.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>is_sample_exclusion</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the sample is excluded in the config or missing IDAT/GTC files.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>is_user_exclusion</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the sample is excluded in the config</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>is_missing_idats</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the IDAT files were missing during pre-flight.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>is_missing_gtc</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the IDAT files were missing during pre-flight.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Call_Rate_Initial</p></td>
+<td><p>float</p></td>
+<td><p>The Initial sample call rate before any filters.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Call_Rate_1</p></td>
+<td><p>float</p></td>
+<td><p>The sample call rate after the first filter.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Call_Rate_2</p></td>
+<td><p>float</p></td>
+<td><p>The sample call rate after the second filter.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>is_cr1_filtered</p></td>
+<td><p>boolean</p></td>
+<td><p>True if a sample was removed by the first call rate filter.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>is_cr2_filtered</p></td>
+<td><p>boolean</p></td>
+<td><p>True if a sample was removed by the second call rate filter.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>is_call_rate_filtered</p></td>
+<td><p>boolean</p></td>
+<td><p>True if a sample was removed by either call rate filter.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>IdatIntensity</p></td>
+<td><p>float</p></td>
+<td><p>The median IDAT intensity.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Contamination_Rate</p></td>
+<td><p>float</p></td>
+<td><p>The SNPweights contamination rate (%Mix)</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>is_contaminated</p></td>
+<td><p>boolean</p></td>
+<td><p>True if a sample exceed the contamination rate threshold.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>replicate_ids</p></td>
+<td><p>string</p></td>
+<td><p>Concatenated Sample_IDs that are replicates.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>is_discordant_replicate</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the replicates had low concordance.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>expected_sex</p></td>
+<td><p>SEX_DTYPE</p></td>
+<td><p>The expected sex from the provided sample sheet.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>predicted_sex</p></td>
+<td><p>SEX_DTYPE</p></td>
+<td><p>The predicted sex based on X chromosome heterozygosity.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>X_inbreeding_coefficient</p></td>
+<td><p>float</p></td>
+<td><p>The X chromosome F coefficient.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>is_sex_discordant</p></td>
+<td><p>boolean</p></td>
+<td><p>True if expected and predicted sex did not match.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>AFR</p></td>
+<td><p>float</p></td>
+<td><p>Proportion African ancestry.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>EUR</p></td>
+<td><p>float</p></td>
+<td><p>Proportion European ancestry.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>ASN</p></td>
+<td><p>float</p></td>
+<td><p>Proportion East Asian ancestry.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Ancestry</p></td>
+<td><p>category</p></td>
+<td><p>Assigned ancestral population (GRAF).</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>identifiler_needed</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the lab needs to run Identifiler.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>identifiler_reason</p></td>
+<td><p>string</p></td>
+<td><p>The QC problem that needs checked with Identifiler.</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="section" id="module-cgr_gwas_qc.workflow.scripts.related_subjects">
