@@ -124,13 +124,9 @@ def build(plink_file: PathLike, graf_file: PathLike, king_file: PathLike):
     return (
         _plink(plink_file)
         .join(_graf(graf_file), how="outer")
-        .join(_king(king_file), how="left")  # See note below
+        .join(_king(king_file), how="outer")
         .rename_axis(["Sample_ID1", "Sample_ID2"])
     )
-
-    # NOTE: King outputs all pairwise comparisons. I don't want to store all of
-    # these so I am dropping a comparison if it is missing from both PLINK and
-    # GRAF.
 
 
 def _add_subject(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame:
@@ -253,7 +249,7 @@ def _graf(filename: PathLike):
 
 def _king(filename: PathLike):
     return (
-        king.read_kinship(filename)
+        king.read_related(filename)
         .set_index(["ID1", "ID2"])
         .reindex(["Kinship", "relationship"], axis=1)
         .rename({"Kinship": "KING_Kinship", "relationship": "KING_relationship"}, axis=1)

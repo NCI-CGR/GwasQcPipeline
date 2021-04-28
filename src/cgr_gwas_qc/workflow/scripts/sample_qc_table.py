@@ -17,7 +17,7 @@ would have to make modifications to add new components.
 
     Sample_ID, string, The sample identifier used by the workflow.
     Group_By_Subject_ID, string, The subject identifier used by the workflow
-    num_samples_per_subject, UInt8, The total number of ``Sample_ID`` per ``Group_By_Subject_ID``.
+    num_samples_per_subject, UInt32, The total number of ``Sample_ID`` per ``Group_By_Subject_ID``.
     analytic_exclusion: boolean, True if the sample failed QC criteria.
     num_analytic_exclusion: boolean, The number of QC criteria the sample failed.
     analytic_exclusion_reason: string, A list of QC criteria the sample failed.
@@ -71,7 +71,7 @@ app = typer.Typer(add_completion=False)
 DTYPES = {  # Header for main QC table
     "Sample_ID": "string",
     "Group_By_Subject_ID": "string",
-    "num_samples_per_subject": "UInt8",
+    "num_samples_per_subject": "UInt32",
     "analytic_exclusion": "boolean",
     "num_analytic_exclusion": "UInt8",
     "analytic_exclusion_reason": "string",

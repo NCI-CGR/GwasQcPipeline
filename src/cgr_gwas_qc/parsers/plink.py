@@ -184,8 +184,8 @@ def read_lmiss(filename: PathLike) -> pd.DataFrame:
     dtypes = {
         "CHR": "string",
         "SNP": "string",
-        "N_MISS": "UInt8",
-        "N_GENO": "UInt8",
+        "N_MISS": "UInt32",
+        "N_GENO": "UInt32",
         "F_MISS": "float",
     }
     return pd.read_csv(filename, delim_whitespace=True, dtype=dtypes)

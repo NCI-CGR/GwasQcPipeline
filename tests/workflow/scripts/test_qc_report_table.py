@@ -71,14 +71,13 @@ def test_ancestry(sample_qc_df, graf_text, tmp_path):
     fake_qc.to_csv(tmp_path / "fake.csv", index=False)
     obs_df = qc_report_table._ancestry(tmp_path / "fake.csv", graf_text)
 
-    assert (4, 16) == obs_df.shape
+    assert (4, 18) == obs_df.shape
 
 
 @pytest.mark.real_data
 def test_sample_concordance(sample_qc_csv, sample_concordance_csv):
     obs_df = qc_report_table._sample_concordance(sample_qc_csv, sample_concordance_csv)
     assert qc_report_table._SAMPLE_CONCORDANCE_COLUMNS == obs_df.columns.tolist()
-    assert obs_df.iloc[0, :].notna().all()
 
 
 @pytest.mark.real_data
@@ -89,7 +88,6 @@ def test_population_concordance(agg_population_concordance_csv, tmp_path):
 
     obs_df = pd.read_excel(test_file, "EUR_IBD", engine="openpyxl")
     assert qc_report_table._POPULATION_CONCORDANCE_COLUMNS == obs_df.columns.tolist()
-    assert obs_df.iloc[0, :].notna().all()
     assert obs_df.shape[0] == 273
 
 

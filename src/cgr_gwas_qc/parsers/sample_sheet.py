@@ -12,7 +12,7 @@ from cgr_gwas_qc.typing import PathLike
 DTYPES = {
     "Sample_ID": "string",
     "Group_By_Subject_ID": "string",
-    "num_samples_per_subject": "UInt8",
+    "num_samples_per_subject": "UInt32",
     "replicate_ids": "string",
     "expected_sex": SEX_DTYPE,
     "case_control": CASE_CONTROL_DTYPE,
