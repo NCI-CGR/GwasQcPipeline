@@ -8,10 +8,10 @@ import pytest
 def test_ArrayProcessing(real_cfg):
     from cgr_gwas_qc.reporting.sample_qc import ArrayProcessing
 
-    ap = ArrayProcessing.construct(real_cfg.config, real_cfg.ss)
+    ap = ArrayProcessing.construct(real_cfg.ss)
 
     assert 220 == ap.num_samples_qc_processed
-    assert 0 == ap.num_failed_array_processing
+    assert 0 == ap.num_array_processing_failure
 
 
 @pytest.mark.real_data
