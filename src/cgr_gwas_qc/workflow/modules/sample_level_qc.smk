@@ -247,6 +247,7 @@ rule sample_concordance_king:
         between_family="sample_level/concordance/king.kin0",
         within_family_X="sample_level/concordance/kingX.kin",
         between_family_X="sample_level/concordance/kingX.kin0",
+        segments="sample_level/concordance/kingallsegs.txt",
     params:
         out_prefix="sample_level/concordance/king",
     conda:
@@ -258,13 +259,12 @@ rule sample_concordance_king:
         mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
         time_hr=lambda wildcards, attempt: 2 * attempt,
     shell:
-        "king -b {input.bed} --kinship --prefix {params.out_prefix} --cpu {threads} > {log} 2>&1 "
+        "king -b {input.bed} --related --degree 3 --prefix {params.out_prefix} --cpu {threads} > {log} 2>&1 "
         "&& touch {output.within_family} "
         "&& touch {output.between_family} "
         "&& touch {output.within_family_X} "
-        "&& touch {output.between_family_X} " # king does not always output all files
-         # adding these touch statements so it plays nice
-         # with snakemake
+        "&& touch {output.between_family_X} "
+        "&& touch {output.segments} " # king does not always output all files so touch for snakemake
 
 
 rule sample_concordance:
