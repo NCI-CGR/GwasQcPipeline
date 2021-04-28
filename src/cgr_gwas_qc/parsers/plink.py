@@ -24,7 +24,7 @@ def read_het(filename: PathLike) -> pd.DataFrame:
         - https://www.cog-genomics.org/plink/1.9/formats#het
     """
     return (
-        pd.read_csv(filename, delim_whitespace=True)
+        pd.read_csv(filename, delim_whitespace=True, dtype={"FID": "string", "IID": "string"})
         .drop("FID", axis=1)
         .rename({"IID": "ID", "O(HOM)": "O_HOM", "E(HOM)": "E_HOM", "N(NM)": "N_NM"}, axis=1)
         .set_index("ID")
@@ -119,7 +119,11 @@ def read_genome(filename: PathLike) -> pd.DataFrame:
         return x
 
     return (
-        pd.read_csv(filename, delim_whitespace=True)
+        pd.read_csv(
+            filename,
+            delim_whitespace=True,
+            dtype={"FID1": "string", "IID1": "string", "FID2": "string", "IID2": "string"},
+        )
         .apply(_sort_ids, axis=1)
         .drop(["IID1", "IID2", "FID1", "FID2"], axis=1)
     )
@@ -148,7 +152,7 @@ def read_imiss(filename: PathLike) -> pd.DataFrame:
         - https://www.cog-genomics.org/plink/1.9/formats#imiss
     """
     return (
-        pd.read_csv(filename, delim_whitespace=True)
+        pd.read_csv(filename, delim_whitespace=True, dtype={"FID": "string", "IID": "string"})
         .drop("FID", axis=1)
         .rename({"IID": "ID"}, axis=1)
         .set_index("ID")
@@ -177,7 +181,14 @@ def read_lmiss(filename: PathLike) -> pd.DataFrame:
         - https://www.cog-genomics.org/plink/1.9/basic_stats#missing
         - https://www.cog-genomics.org/plink/1.9/formats#lmiss
     """
-    return pd.read_csv(filename, delim_whitespace=True)
+    dtypes = {
+        "CHR": "string",
+        "SNP": "string",
+        "N_MISS": "UInt8",
+        "N_GENO": "UInt8",
+        "F_MISS": "float",
+    }
+    return pd.read_csv(filename, delim_whitespace=True, dtype=dtypes)
 
 
 def read_sexcheck(filename: PathLike) -> pd.DataFrame:
@@ -201,7 +212,7 @@ def read_sexcheck(filename: PathLike) -> pd.DataFrame:
         - https://www.cog-genomics.org/plink/1.9/formats#sexcheck
     """
     return (
-        pd.read_csv(filename, delim_whitespace=True)
+        pd.read_csv(filename, delim_whitespace=True, dtype={"FID": "string", "IID": "string"})
         .drop("FID", axis=1)
         .rename({"IID": "ID"}, axis=1)
         .set_index("ID")
