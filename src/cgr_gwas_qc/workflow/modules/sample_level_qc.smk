@@ -31,7 +31,7 @@ if (
                 "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
             ),
         resources:
-            mem_gb=1,
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
         group:
             "per_sample_median_idat_intensity"
         envmodules:
@@ -69,7 +69,7 @@ if (
         output:
             temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
         resources:
-            mem_gb=1,
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
         group:
             "per_sample_gtc_to_adpc"
         script:
@@ -121,7 +121,7 @@ if (
         output:
             temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
         resources:
-            mem_gb=1,
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
         group:
             "per_sample_verifyIDintensity_contamination"
         conda:
@@ -253,8 +253,12 @@ rule sample_concordance_king:
         cfg.conda("king.yml")
     log:
         "sample_level/concordance/king.log",
+    threads: 8
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+        time_hr=lambda wildcards, attempt: 2 * attempt,
     shell:
-        "king -b {input.bed} --kinship --prefix {params.out_prefix} > {log} 2>&1 "
+        "king -b {input.bed} --kinship --prefix {params.out_prefix} --cpu {threads} > {log} 2>&1 "
         "&& touch {output.within_family} "
         "&& touch {output.between_family} "
         "&& touch {output.within_family_X} "
@@ -271,6 +275,9 @@ rule sample_concordance:
         king_file=rules.sample_concordance_king.output.between_family,
     output:
         "sample_level/concordance/summary.csv",
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
+        time_hr=lambda wildcards, attempt: 2 * attempt,
     script:
         "../scripts/sample_concordance.py"
 

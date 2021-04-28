@@ -124,9 +124,8 @@ def build(plink_file: PathLike, graf_file: PathLike, king_file: PathLike):
     return (
         _plink(plink_file)
         .join(_graf(graf_file), how="outer")
-        .join(_king(king_file), how="outer")
+        .join(_king(king_file), how="left")  # See note below
         .rename_axis(["Sample_ID1", "Sample_ID2"])
-        .dropna(subset=["PLINK_PI_HAT", "GRAF_HGMR"], how="all")  # See note below
     )
 
     # NOTE: King outputs all pairwise comparisons. I don't want to store all of

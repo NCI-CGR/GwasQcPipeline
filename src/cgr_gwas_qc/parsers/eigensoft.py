@@ -41,6 +41,7 @@ class Eigenvec:
             header=None,
             usecols=range(11),
             names=["ID", *(f"PC{i}" for i in range(1, 11))],
+            dtype={"ID": "string"},
         ).set_index("ID")
 
     def get_values(self) -> np.ndarray:
