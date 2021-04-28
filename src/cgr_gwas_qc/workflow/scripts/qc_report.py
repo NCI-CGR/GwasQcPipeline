@@ -68,6 +68,7 @@ def main(
             ancestry_png,
         ),
         "subject_qc": SubjectQC.construct(
+            ss,
             subject_qc,
             unexpected_replicates,
             chrx_inbreeding_png,
