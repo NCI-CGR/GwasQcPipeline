@@ -128,13 +128,15 @@ def update_properties(options: Dict, cluster_config: Dict, job_properties: Dict)
 
 
 def _remove_time(options: Dict):
-    for key in options.keys():
+    keys = list(options.keys())
+    for key in keys:
         if key.startswith("time"):
             del options[key]
 
 
 def _remove_mem(options: Dict):
-    for key in options.keys():
+    keys = list(options.keys())
+    for key in keys:
         if key.startswith("mem"):
             del options[key]
 
