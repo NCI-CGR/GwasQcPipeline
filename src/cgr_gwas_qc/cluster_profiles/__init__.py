@@ -134,6 +134,18 @@ def update_group_properties(
     rulenames = _get_rule_names(jobscript)
     rulename = ".".join(sorted(set(rulenames)))  # concatenate rulenames: rule1.rule2
     options["rulename"] = f"GROUP.{rulename}"
+
+    # Adjust per sample group resources to sane values
+    if (len(set(rulenames)) == 1) & (_rulename := rulenames[0]).startswith("per_"):
+        n_samples = len(rulenames)
+        n_parallel = cluster_config.get("n_parallel", 4)
+
+        time_min = cluster_config[_rulename]["time_min"]
+        options["time_hr"] = (time_min * n_samples / n_parallel) / 60
+
+        options["threads"] = cluster_config[_rulename]["threads"] * n_parallel
+        options["mem_gb"] = cluster_config[_rulename]["mem_gb"] * n_parallel
+
     return None
 
 
