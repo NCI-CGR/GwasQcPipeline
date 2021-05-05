@@ -246,7 +246,7 @@ apipkg = ">=1.4"
 testing = ["pre-commit"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A platform independent file lock."
 name = "filelock"
 optional = false
@@ -1140,6 +1140,23 @@ version = "1.15.0"
 
 [[package]]
 category = "main"
+description = "Utils for streaming large files (S3, HDFS, GCS, Azure Blob Storage, gzip, bz2...)"
+name = "smart-open"
+optional = false
+python-versions = ">=3.6.*"
+version = "5.0.0"
+
+[package.extras]
+all = ["boto3", "google-cloud-storage", "azure-storage-blob", "azure-common", "azure-core", "requests"]
+azure = ["azure-storage-blob", "azure-common", "azure-core"]
+gcs = ["google-cloud-storage"]
+http = ["requests"]
+s3 = ["boto3"]
+test = ["boto3", "google-cloud-storage", "azure-storage-blob", "azure-common", "azure-core", "requests", "mock", "moto[server] (==1.3.14)", "pathlib2", "responses", "paramiko", "parameterizedtestcase", "pytest", "pytest-rerunfailures"]
+webhdfs = ["requests"]
+
+[[package]]
+category = "main"
 description = "A pure Python implementation of a sliding window memory map manager"
 name = "smmap"
 optional = false
@@ -1166,13 +1183,14 @@ description = "Snakemake is a workflow management system that aims to reduce the
 name = "snakemake"
 optional = false
 python-versions = "*"
-version = "5.32.0"
+version = "6.3.0"
 
 [package.dependencies]
 appdirs = "*"
 configargparse = "*"
 datrie = "*"
 docutils = "*"
+filelock = "*"
 gitpython = "*"
 jsonschema = "*"
 nbformat = "*"
@@ -1181,6 +1199,8 @@ pulp = ">=2.0"
 pyyaml = "*"
 ratelimiter = "*"
 requests = "*"
+smart_open = "*"
+stopit = "*"
 toposort = "*"
 wrapt = "*"
 
@@ -1378,6 +1398,14 @@ test = ["pytest"]
 
 [[package]]
 category = "main"
+description = "Timeout control decorator and context managers, raise any exception in another thread"
+name = "stopit"
+optional = false
+python-versions = "*"
+version = "1.1.2"
+
+[[package]]
+category = "main"
 description = "Pretty-print tabular data"
 name = "tabulate"
 optional = false
@@ -1534,7 +1562,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "jaraco.test (>=3.2.0)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [metadata]
-content-hash = "0672da18e0d1098843ee4a3bd5def3dbda68f6ee42485b7c70188d2dddf8e45e"
+content-hash = "64552436fe3ff533f29750d77c92c4fff9592e38f5e93fa8aac303eafa4099db"
 lock-version = "1.1"
 python-versions = "^3.8"
 
@@ -2290,6 +2318,10 @@ six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
 ]
+smart-open = [
+    {file = "smart_open-5.0.0-py3-none-any.whl", hash = "sha256:ed310ac51a797051b42f9437a566ac8149a3abf8c80ab994a8bd92d96fb7cf44"},
+    {file = "smart_open-5.0.0.tar.gz", hash = "sha256:02e5e02207d955a1f9fd924c37900ac272536bd24393ae731b6945d4f766015f"},
+]
 smmap = [
     {file = "smmap-3.0.4-py2.py3-none-any.whl", hash = "sha256:54c44c197c819d5ef1991799a7e30b662d1e520f2ac75c9efbeb54a742214cf4"},
     {file = "smmap-3.0.4.tar.gz", hash = "sha256:9c98bbd1f9786d22f14b3d4126894d56befb835ec90cef151af566c7e19b5d24"},
@@ -2299,7 +2331,7 @@ snakefmt = [
     {file = "snakefmt-0.2.4.tar.gz", hash = "sha256:6b80508ff0607f3c88e84b966570a19ae2da3a628c57319308cfec9364399532"},
 ]
 snakemake = [
-    {file = "snakemake-5.32.0.tar.gz", hash = "sha256:793a6ccf54461078fd79849702a5338f5ace533bac32b2f4088e5b5da2f10567"},
+    {file = "snakemake-6.3.0.tar.gz", hash = "sha256:eb6a59c7cfe847333d792fad8ef04a478bed8f2184f0f447c011b15dfbc20a49"},
 ]
 snowballstemmer = [
     {file = "snowballstemmer-2.0.0-py2.py3-none-any.whl", hash = "sha256:209f257d7533fdb3cb73bdbd24f436239ca3b2fa67d56f6ff88e86be08cc5ef0"},
@@ -2355,6 +2387,9 @@ sphinxcontrib-qthelp = [
 sphinxcontrib-serializinghtml = [
     {file = "sphinxcontrib-serializinghtml-1.1.4.tar.gz", hash = "sha256:eaa0eccc86e982a9b939b2b82d12cc5d013385ba5eadcc7e4fed23f4405f77bc"},
     {file = "sphinxcontrib_serializinghtml-1.1.4-py2.py3-none-any.whl", hash = "sha256:f242a81d423f59617a8e5cf16f5d4d74e28ee9a66f9e5b637a18082991db5a9a"},
+]
+stopit = [
+    {file = "stopit-1.1.2.tar.gz", hash = "sha256:f7f39c583fd92027bd9d06127b259aee7a5b7945c1f1fa56263811e1e766996d"},
 ]
 tabulate = [
     {file = "tabulate-0.8.9-py3-none-any.whl", hash = "sha256:d7c013fe7abbc5e491394e10fa845f8f32fe54f8dc60c6622c6cf482d25d47e4"},
