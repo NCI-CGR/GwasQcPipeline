@@ -127,6 +127,18 @@ def update_properties(options: Dict, cluster_config: Dict, job_properties: Dict)
     return None
 
 
+def _remove_time(options: Dict):
+    for key in options.keys():
+        if key.startswith("time"):
+            del options[key]
+
+
+def _remove_mem(options: Dict):
+    for key in options.keys():
+        if key.startswith("mem"):
+            del options[key]
+
+
 def update_group_properties(
     options: Dict, cluster_config: Dict, job_properties: Dict, jobscript: str
 ):
@@ -140,11 +152,14 @@ def update_group_properties(
         n_samples = len(rulenames)
         n_parallel = cluster_config.get("n_parallel", 4)
 
+        _remove_time(options)
         time_min = cluster_config[_rulename]["time_min"]
         options["time_hr"] = (time_min * n_samples / n_parallel) / 60
 
-        options["threads"] = cluster_config[_rulename]["threads"] * n_parallel
+        _remove_mem(options)
         options["mem_gb"] = cluster_config[_rulename]["mem_gb"] * n_parallel
+
+        options["threads"] = cluster_config[_rulename]["threads"] * n_parallel
 
     return None
 
