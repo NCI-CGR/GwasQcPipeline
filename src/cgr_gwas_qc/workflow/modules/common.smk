@@ -26,8 +26,8 @@ rule plink_bed_to_ped:
         bim="{prefix}.bim",
         fam="{prefix}.fam",
     output:
-        ped=temp("{prefix}.ped"),
-        map_=temp("{prefix}.map"),
+        ped=temp("{prefix}.eigenstrat.ped"),
+        map_=temp("{prefix}.eigenstrat.map"),
     log:
         "{prefix}.log",
     envmodules:
@@ -46,7 +46,7 @@ rule plink_bed_to_ped:
         "--keep-allele-order "
         "--threads {threads} "
         "--memory {resources.mem_mb} "
-        "--out {wildcards.prefix}"
+        "--out {wildcards.prefix}.eigenstrat"
 
 
 rule concordance_table:
@@ -79,9 +79,9 @@ def eigensoft_config_inputs(wildcards):
 
     # Default is to convert PED/MAP to EIGENSTRAT
     return {
-        "gen": f"{prefix}.ped",
-        "snp": f"{prefix}.map",
-        "ind": f"{prefix}.ped",
+        "gen": f"{prefix}.eigenstrat.ped",
+        "snp": f"{prefix}.eigenstrat.map",
+        "ind": f"{prefix}.eigenstrat.ped",
     }
 
 
@@ -100,9 +100,9 @@ def eigensoft_config_params(wildcards):
 
     # Default is to convert PED/MAP to EIGENSTRAT
     return f"""\
-    genotypename: {prefix}.ped
-    snpname: {prefix}.map
-    indivname: {prefix}.ped
+    genotypename: {prefix}.eigenstrat.ped
+    snpname: {prefix}.eigenstrat.map
+    indivname: {prefix}.eigenstrat.ped
     outputformat: EIGENSTRAT
     genooutfilename: {prefix}.gen
     snpoutfilename: {prefix}.snp
@@ -126,8 +126,8 @@ rule eigensoft_config:
 
 rule eigensoft_convert:
     input:
-        ped="{prefix}.ped",
-        map_="{prefix}.map",
+        ped="{prefix}.eigenstrat.ped",
+        map_="{prefix}.eigenstrat.map",
         par="{prefix}.convert.par",
     output:
         gen=temp("{prefix}.gen"),

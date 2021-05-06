@@ -82,7 +82,7 @@ def test_check_custom_cluster_profile_no_cmd(tmp_path):
         check_custom_cluster_profile(cluster_profile, queue, cmd)
 
 
-@pytest.mark.parametrize("sample_size,group_size", [(10, None), (101, 10), (10_000, 10)])
+@pytest.mark.parametrize("sample_size,group_size", [(10, 500), (101, 500), (10_000, 1000)])
 def test_get_group_size_mocks(sample_size, group_size):
     from cgr_gwas_qc.cli.submit import get_group_size
 
@@ -97,20 +97,17 @@ def test_get_per_sample_rules():
     assert 4 == len(per_sample_rules)
 
 
-@pytest.mark.parametrize("sample_size,group_size", [(10, None), (101, 10), (10_000, 10)])
+@pytest.mark.parametrize("sample_size,group_size", [(10, 500), (101, 500), (10_000, 1000)])
 def test_get_grouping_settings(sample_size, group_size):
     from cgr_gwas_qc.cli.submit import get_grouping_settings
 
-    if group_size is None:
-        expected = ""
-    else:
-        expected = (
-            "--group-components "
-            f"per_sample_gtc_to_adpc={group_size} "
-            f"per_sample_gtc_to_ped={group_size} "
-            f"per_sample_median_idat_intensity={group_size} "
-            f"per_sample_verifyIDintensity_contamination={group_size}"
-        )
+    expected = (
+        "--group-components "
+        f"per_sample_gtc_to_adpc={group_size} "
+        f"per_sample_gtc_to_ped={group_size} "
+        f"per_sample_median_idat_intensity={group_size} "
+        f"per_sample_verifyIDintensity_contamination={group_size}"
+    )
     assert expected == get_grouping_settings(sample_size)
 
 

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 import snakemake
@@ -17,7 +18,7 @@ def test_cgems_submission_end_to_end(tmp_path, qsub):
             "-d",
             tmp_path.as_posix(),
             "--profile",
-            "src/cgr_gwas_qc/cluster_profiles/cgems",
+            Path("src/cgr_gwas_qc/cluster_profiles/cgems").absolute().as_posix(),
         ]
 
         snakemake.main(args)

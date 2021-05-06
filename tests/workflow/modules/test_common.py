@@ -1,3 +1,4 @@
+import os
 from textwrap import dedent
 
 import pytest
@@ -26,8 +27,8 @@ def test_bed_to_ped(tmp_path, conda_envs):
 
             rule all:
                 input:
-                    "samples.ped",
-                    "samples.map",
+                    "samples.eigenstrat.ped",
+                    "samples.eigenstrat.map",
             """
         )
     )
@@ -35,8 +36,8 @@ def test_bed_to_ped(tmp_path, conda_envs):
     run_snakemake(tmp_path, keep_temp=True)
 
     # THEN: the files exists
-    assert (tmp_path / "samples.ped").exists()
-    assert (tmp_path / "samples.map").exists()
+    assert (tmp_path / "samples.eigenstrat.ped").exists()
+    assert (tmp_path / "samples.eigenstrat.map").exists()
 
     # NOTE: I tried comparing to the original PED/MAPs but plink is changing
     # marker order and allele order. This would require building a obs and exp
@@ -44,13 +45,16 @@ def test_bed_to_ped(tmp_path, conda_envs):
     # exist is good enough for now.
 
 
+@pytest.mark.skipif(
+    os.environ.get("GITHUB_ACTIONS", "false") == "true", reason="Broken on GitHub Actions"
+)
 def test_eigenstrat_config(tmp_path):
     # GIVEN: a fake PED/MAP and config
     (
         FakeData(tmp_path)
         .make_cgr_sample_sheet()
-        .copy("plink/samples.ped", tmp_path / "samples.ped")
-        .copy("plink/samples.map", tmp_path / "samples.map")
+        .copy("plink/samples.ped", tmp_path / "samples.eigenstrat.ped")
+        .copy("plink/samples.map", tmp_path / "samples.eigenstrat.map")
         .make_config()
         .make_snakefile(
             """
@@ -74,9 +78,9 @@ def test_eigenstrat_config(tmp_path):
     obs_ = (tmp_path / "samples.convert.par").read_text()
     exp_ = dedent(
         """\
-        genotypename: samples.ped
-        snpname: samples.map
-        indivname: samples.ped
+        genotypename: samples.eigenstrat.ped
+        snpname: samples.eigenstrat.map
+        indivname: samples.eigenstrat.ped
         outputformat: EIGENSTRAT
         genooutfilename: samples.gen
         snpoutfilename: samples.snp
@@ -95,8 +99,12 @@ def test_eigensoft_convert(tmp_path, conda_envs):
     data_cache = (
         RealData(tmp_path)
         .make_cgr_sample_sheet()
-        .copy("production_outputs/pca/EUR_subjects_ld_prune.ped", tmp_path / "subjects.ped")
-        .copy("production_outputs/pca/EUR_subjects_ld_prune.map", tmp_path / "subjects.map")
+        .copy(
+            "production_outputs/pca/EUR_subjects_ld_prune.ped", tmp_path / "subjects.eigenstrat.ped"
+        )
+        .copy(
+            "production_outputs/pca/EUR_subjects_ld_prune.map", tmp_path / "subjects.eigenstrat.map"
+        )
         .make_config()
         .make_snakefile(
             """

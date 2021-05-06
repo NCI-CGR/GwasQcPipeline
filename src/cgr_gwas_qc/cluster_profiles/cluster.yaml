@@ -1,26 +1,45 @@
-n_parallel: 12
-
 __default__:
   mem_gb: 1
   time_hr: 1
   threads: 1
 
-per_sample_gtc_to_ped:
-  threads: 1
-  mem_gb: 1
-  time_min: 5
+group_jobs:
+  per_sample_gtc_to_ped:
+    small:
+      threads: 6
+      mem_gb: 3
+      time_hr: 2
+    large:
+      threads: 12
+      mem_gb: 5
+      time_hr: 2
 
-per_sample_gtc_to_adpc:
-  threads: 1
-  mem_gb: 1
-  time_min: 5
+  per_sample_gtc_to_adpc:
+    small:
+      threads: 12
+      mem_gb: 6
+      time_hr: 1
+    large:
+      threads: 24
+      mem_gb: 8
+      time_min: 2
 
-per_sample_median_idat_intensity:
-  threads: 1
-  mem_gb: 1
-  time_min: 5
+  per_sample_median_idat_intensity:
+    small:
+      threads: 12
+      mem_gb: 2
+      time_hr: 1
+    large:
+      threads: 12
+      mem_gb: 2
+      time_hr: 1
 
-per_sample_verifyIDintensity_contamination:
-  threads: 1
-  mem_gb: 1
-  time_min: 5
+  per_sample_verifyIDintensity_contamination:
+    small:
+      threads: 4
+      mem_gb: 1
+      time_hr: 1
+    large:
+      threads: 8
+      mem_gb: 1
+      time_hr: 1
