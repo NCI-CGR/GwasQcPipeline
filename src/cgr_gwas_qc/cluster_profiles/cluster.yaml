@@ -21,17 +21,17 @@ group_jobs:
       time_hr: 1
     large:
       threads: 24
-      mem_gb: 8
+      mem_gb: 12
       time_hr: 2
 
   per_sample_median_idat_intensity:
     small:
       threads: 12
-      mem_gb: 2
+      mem_gb: 4
       time_hr: 1
     large:
       threads: 12
-      mem_gb: 2
+      mem_gb: 4
       time_hr: 1
 
   per_sample_verifyIDintensity_contamination:
