@@ -1,3 +1,4 @@
+import os
 from textwrap import dedent
 
 import pytest
@@ -44,6 +45,9 @@ def test_bed_to_ped(tmp_path, conda_envs):
     # exist is good enough for now.
 
 
+@pytest.mark.skipif(
+    os.environ.get("GITHUB_ACTIONS", "false") == "true", reason="Broken on GitHub Actions"
+)
 def test_eigenstrat_config(tmp_path):
     # GIVEN: a fake PED/MAP and config
     (
