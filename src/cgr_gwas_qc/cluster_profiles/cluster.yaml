@@ -26,12 +26,12 @@ group_jobs:
 
   per_sample_median_idat_intensity:
     small:
-      threads: 4
-      mem_gb: 3
+      threads: 12
+      mem_gb: 2
       time_hr: 1
     large:
-      threads: 8
-      mem_gb: 3
+      threads: 12
+      mem_gb: 2
       time_hr: 1
 
   per_sample_verifyIDintensity_contamination:

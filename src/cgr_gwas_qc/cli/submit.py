@@ -54,6 +54,7 @@ def main(
     if sample_size < 1_000:  # bump up local resources and run a bunch or rules there
         payload["local_tasks"] = 4
         payload["local_mem_mb"] = 1024 * 4
+        payload["time_hr"] = 8
 
     if cgems:
         payload["profile"] = get_profile("cgems")
