@@ -120,7 +120,7 @@ def update_properties(options: Dict, cluster_config: Dict, job_properties: Dict)
     options["threads"] = job_properties.get("threads")
 
     # Load resources
-    options.update(cluster_config.get(options["rulename"], {}))  # cluster.yml
+    _update_cluster_options(options, cluster_config.get(options["rulename"], {}))  # cluster.yml
     options.update(job_properties.get("cluster", {}))  # --cluster-config
     options.update(job_properties.get("resources", {}))  # resources directive
 
@@ -141,27 +141,43 @@ def _remove_mem(options: Dict):
             del options[key]
 
 
+def _update_cluster_options(options: Dict, new_options: Dict):
+    for key, value in new_options.items():
+        if key.startswith("time"):
+            _remove_time(options)
+
+        if key.startswith("mem"):
+            _remove_mem(options)
+
+        options[key] = value
+
+
 def update_group_properties(
     options: Dict, cluster_config: Dict, job_properties: Dict, jobscript: str
 ):
     update_properties(options, cluster_config, job_properties)
     rulenames = _get_rule_names(jobscript)
-    rulename = ".".join(sorted(set(rulenames)))  # concatenate rulenames: rule1.rule2
+    n_rules = len(rulenames)
+
+    unique_rulenames = set(rulenames)
+    n_unique_rules = len(unique_rulenames)
+
+    rulename = ".".join(sorted(unique_rulenames))  # concatenate rulenames: rule1.rule2
     options["rulename"] = f"GROUP.{rulename}"
 
-    # Adjust per sample group resources to sane values
-    if (len(set(rulenames)) == 1) & (_rulename := rulenames[0]).startswith("per_"):
-        n_samples = len(rulenames)
-        n_parallel = cluster_config.get("n_parallel", 4)
+    # Adjust multi-sample group resources to sane values. NOTE: this only will
+    # work well if the cluster correctly use resource masks to limit the number
+    # of CPUs.
+    if n_unique_rules == 1:
+        n_samples = n_rules
+        _rulename = rulenames[0]
 
-        _remove_time(options)
-        time_min = cluster_config[_rulename]["time_min"]
-        options["time_hr"] = (time_min * n_samples / n_parallel) / 60
+        if n_samples < 1000:
+            rule_options = cluster_config["group_jobs"][_rulename]["small"]
+        else:
+            rule_options = cluster_config["group_jobs"][_rulename]["large"]
 
-        _remove_mem(options)
-        options["mem_gb"] = cluster_config[_rulename]["mem_gb"] * n_parallel
-
-        options["threads"] = cluster_config[_rulename]["threads"] * n_parallel
+        _update_cluster_options(options, rule_options)
 
     return None
 

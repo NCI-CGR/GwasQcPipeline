@@ -120,34 +120,21 @@ def get_profile(cluster: str):
         return (cgr_profiles / "biowulf").as_posix()
 
 
-def get_group_size(n_samples: int) -> Optional[int]:
+def get_group_size(n_samples: int) -> int:
     """Return how many samples to group together"""
-
-    if n_samples < 50:
-        return None
-
-    if n_samples < 1000:
-        return 10
-
-    return int(n_samples / 1000)
+    return 500 if n_samples <= 1000 else 1000
 
 
 def get_per_sample_rules() -> List[str]:
     """Pull list of rules to group from cluster.yml"""
     cluster_file = Path(__file__).parents[1].resolve() / "cluster_profiles/cluster.yaml"
     cluster_profile = load_configfile(cluster_file)
-    return sorted([key for key in cluster_profile.keys() if key.startswith("per_sample")])
+    return sorted([key for key in cluster_profile["group_jobs"].keys()])
 
 
 def get_grouping_settings(sample_size: int):
-    # 1. Figure out the group size to use
-    group_size = get_group_size(sample_size)
-
-    if group_size is None:
-        return ""
-
-    # 2. Get a list of group rules
-    rules_to_group = get_per_sample_rules()
+    group_size = get_group_size(sample_size)  # 1. Figure out the group size to use
+    rules_to_group = get_per_sample_rules()  # 2. Get a list of per sample rules to group
 
     # 3. Build group setting string
     group_options = []
