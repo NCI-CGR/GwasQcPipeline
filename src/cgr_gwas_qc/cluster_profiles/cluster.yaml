@@ -22,7 +22,7 @@ group_jobs:
     large:
       threads: 24
       mem_gb: 8
-      time_min: 2
+      time_hr: 2
 
   per_sample_median_idat_intensity:
     small:
