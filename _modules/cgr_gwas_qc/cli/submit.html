@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.cli.submit &mdash; GwasQcPipeline 1.0.0b1 documentation</title>
+  <title>cgr_gwas_qc.cli.submit &mdash; GwasQcPipeline 1.0.0b2 documentation</title>
   
 
   
@@ -230,6 +230,7 @@
     <span class="k">if</span> <span class="n">sample_size</span> <span class="o">&lt;</span> <span class="mi">1_000</span><span class="p">:</span>  <span class="c1"># bump up local resources and run a bunch or rules there</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;local_tasks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;local_mem_mb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;time_hr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
 
     <span class="k">if</span> <span class="n">cgems</span><span class="p">:</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_profile</span><span class="p">(</span><span class="s2">&quot;cgems&quot;</span><span class="p">)</span>
@@ -296,34 +297,21 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">cgr_profiles</span> <span class="o">/</span> <span class="s2">&quot;biowulf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="get_group_size"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.submit.get_group_size">[docs]</a><span class="k">def</span> <span class="nf">get_group_size</span><span class="p">(</span><span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<div class="viewcode-block" id="get_group_size"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.submit.get_group_size">[docs]</a><span class="k">def</span> <span class="nf">get_group_size</span><span class="p">(</span><span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Return how many samples to group together&quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">10</span>
-
-    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="mi">500</span> <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&lt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">1000</span></div>
 
 
 <div class="viewcode-block" id="get_per_sample_rules"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.submit.get_per_sample_rules">[docs]</a><span class="k">def</span> <span class="nf">get_per_sample_rules</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Pull list of rules to group from cluster.yml&quot;&quot;&quot;</span>
     <span class="n">cluster_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;cluster_profiles/cluster.yaml&quot;</span>
     <span class="n">cluster_profile</span> <span class="o">=</span> <span class="n">load_configfile</span><span class="p">(</span><span class="n">cluster_file</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cluster_profile</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;per_sample&quot;</span><span class="p">)])</span></div>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cluster_profile</span><span class="p">[</span><span class="s2">&quot;group_jobs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span></div>
 
 
 <span class="k">def</span> <span class="nf">get_grouping_settings</span><span class="p">(</span><span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-    <span class="c1"># 1. Figure out the group size to use</span>
-    <span class="n">group_size</span> <span class="o">=</span> <span class="n">get_group_size</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">group_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-
-    <span class="c1"># 2. Get a list of group rules</span>
-    <span class="n">rules_to_group</span> <span class="o">=</span> <span class="n">get_per_sample_rules</span><span class="p">()</span>
+    <span class="n">group_size</span> <span class="o">=</span> <span class="n">get_group_size</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>  <span class="c1"># 1. Figure out the group size to use</span>
+    <span class="n">rules_to_group</span> <span class="o">=</span> <span class="n">get_per_sample_rules</span><span class="p">()</span>  <span class="c1"># 2. Get a list of per sample rules to group</span>
 
     <span class="c1"># 3. Build group setting string</span>
     <span class="n">group_options</span> <span class="o">=</span> <span class="p">[]</span>
