@@ -8,6 +8,7 @@ Inputs:
 
 Outputs:
 
+    - sample_level/median_idat_intensity.csv
     - sample_level/contamination.csv
 """
 from cgr_gwas_qc import load_config
@@ -15,19 +16,19 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
-include: cfg.modules("plink_filters")
-include: cfg.modules("plink_stats")
-
-
+################################################################################
+# All Targets
+################################################################################
 def _contamination_outputs(wildcards):
+    """Only build targets if we have IDAT & GTC & remove contam set"""
     if (
         cfg.config.user_files.idat_pattern
         and cfg.config.user_files.gtc_pattern
         and cfg.config.workflow_params.remove_contam
     ):
         return [
-            "sample_level/contamination.csv",
             "sample_level/median_idat_intensity.csv",
+            "sample_level/contamination.csv",
         ]
 
     return []
@@ -38,6 +39,17 @@ rule all_contamination:
         _contamination_outputs,
 
 
+################################################################################
+# Imports
+################################################################################
+include: cfg.modules("plink_filters")
+include: cfg.modules("plink_stats")
+include: cfg.subworkflow("entry_points")
+
+
+################################################################################
+# Workflow Rules
+################################################################################
 rule per_sample_median_idat_intensity:
     """Calculate median intensity of Red and Green channels."""
     input:
