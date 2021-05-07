@@ -23,7 +23,7 @@ def test_bed_to_ped(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("common.smk")
+            include: cfg.modules("common")
 
             rule all:
                 input:
@@ -62,7 +62,7 @@ def test_eigenstrat_config(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.modules("common.smk")
+            include: cfg.modules("common")
 
             rule all:
                 input:
@@ -112,7 +112,7 @@ def test_eigensoft_convert(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("common.smk")
+            include: cfg.modules("common")
 
             rule all:
                 input:
@@ -157,7 +157,7 @@ def test_eigensoft_smartpca(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("common.smk")
+            include: cfg.modules("common")
 
             rule all:
                 input:

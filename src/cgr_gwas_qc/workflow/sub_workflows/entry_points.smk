@@ -88,7 +88,7 @@ if cfg.config.user_files.gtc_pattern:
         envmodules:
             cfg.envmodules("plink2"),
         conda:
-            cfg.conda("plink2.yml")
+            cfg.conda("plink2")
         threads: 8
         resources:
             mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
@@ -124,7 +124,7 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
         envmodules:
             cfg.envmodules("plink2"),
         conda:
-            cfg.conda("plink2.yml")
+            cfg.conda("plink2")
         resources:
             mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
         shell:

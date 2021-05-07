@@ -128,7 +128,7 @@ class ConfigMgr:
 
         Given a conda env file_name, prepends the full path to that file.
         """
-        return (cls.CONDA_DIR / filename).as_posix()
+        return (cls.CONDA_DIR / f"{filename}.yml").as_posix()
 
     @classmethod
     def rules(cls, filename: str) -> str:
@@ -136,7 +136,7 @@ class ConfigMgr:
 
         Given a rule file_name, prepends the full path to that rule.
         """
-        return (cls.RULE_DIR / filename).as_posix()
+        return (cls.RULE_DIR / f"{filename}.smk").as_posix()
 
     @classmethod
     def modules(cls, filename: str) -> str:
@@ -144,7 +144,7 @@ class ConfigMgr:
 
         Given a rule file_name, prepends the full path to that module.
         """
-        return (cls.MODULE_DIR / filename).as_posix()
+        return (cls.MODULE_DIR / f"{filename}.smk").as_posix()
 
     @classmethod
     def scripts(cls, filename: str) -> str:

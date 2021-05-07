@@ -15,8 +15,8 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
-include: cfg.modules("plink_filters.smk")
-include: cfg.modules("plink_stats.smk")
+include: cfg.modules("plink_filters")
+include: cfg.modules("plink_stats")
 
 
 def _contamination_outputs(wildcards):
@@ -56,7 +56,7 @@ rule per_sample_median_idat_intensity:
     group:
         "per_sample_median_idat_intensity"
     conda:
-        cfg.conda("illuminaio.yml")
+        cfg.conda("illuminaio")
     script:
         "../scripts/median_idat_intensity.R"
 
@@ -146,7 +146,7 @@ rule per_sample_verifyIDintensity_contamination:
     group:
         "per_sample_verifyIDintensity_contamination"
     conda:
-        cfg.conda("verifyidintensity.yml")
+        cfg.conda("verifyidintensity")
     shell:
         "verifyIDintensity -m {params.snps} -n 1 -b {input.abf} -v -p -i {input.adpc} > {output}"
 

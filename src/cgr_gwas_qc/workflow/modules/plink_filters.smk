@@ -1,4 +1,4 @@
-include: cfg.modules("common.smk")
+include: cfg.modules("common")
 
 
 rule sample_call_rate_1:
@@ -19,7 +19,7 @@ rule sample_call_rate_1:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -53,7 +53,7 @@ rule snp_call_rate_1:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -87,7 +87,7 @@ rule sample_call_rate_2:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -121,7 +121,7 @@ rule snp_call_rate_2:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -160,7 +160,7 @@ rule maf_filter:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -214,7 +214,7 @@ rule approx_ld:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -252,7 +252,7 @@ rule ld_prune:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -286,7 +286,7 @@ rule snps_only_filter:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -320,7 +320,7 @@ rule autosome_only_filter:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -359,7 +359,7 @@ rule cleaned_filter:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,

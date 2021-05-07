@@ -8,7 +8,7 @@ Calculate a variety of statistics that are supported by plink.
 """
 
 
-include: cfg.modules("common.smk")
+include: cfg.modules("common")
 
 
 rule plink_stats_call_rate:
@@ -30,7 +30,7 @@ rule plink_stats_call_rate:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -61,7 +61,7 @@ rule plink_stats_sexcheck:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     shell:
         "plink "
         "--bed {input.bed} "
@@ -88,7 +88,7 @@ rule plink_stats_allele_freq:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     shell:
         "plink "
         "--bed {input.bed} "
@@ -115,7 +115,7 @@ rule plink_stats_hardy:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     shell:
         "plink "
         "--bed {input.bed} "
@@ -150,7 +150,7 @@ rule plink_stats_ibd:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     shell:
         "plink "
         "--bed {input.bed} "
@@ -180,7 +180,7 @@ rule plink_stats_het:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     shell:
         "plink "
         "--bed {input.bed} "

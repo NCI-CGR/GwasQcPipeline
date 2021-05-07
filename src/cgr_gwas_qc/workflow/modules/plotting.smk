@@ -5,7 +5,7 @@ rule graf_relatedness_png:
     output:
         "sample_level/plots/graf_relatedness.png",
     conda:
-        cfg.conda("graf.yml")
+        cfg.conda("graf")
     shell:
         "PlotGraf.pl {input[0]} {output[0]} 3"
 
@@ -17,6 +17,6 @@ rule graf_ancestry_png:
     output:
         "sample_level/plots/graf_ancestry.png",
     conda:
-        cfg.conda("graf.yml")
+        cfg.conda("graf")
     shell:
         "PlotPopulations.pl {input[0]} {output[0]} "

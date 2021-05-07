@@ -57,7 +57,7 @@ rule pull_subject_representative:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -91,7 +91,7 @@ rule convert_Sample_ID_to_Subject_ID:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -137,7 +137,7 @@ rule remove_related_subjects:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,

@@ -23,7 +23,7 @@ def test_subjects_per_population(tmp_path, sample_qc_csv):
 
             cfg = load_config()
 
-            include: cfg.modules("population_level_summary.smk")
+            include: cfg.modules("population_level_summary")
 
             rule all:
                 input:
@@ -86,7 +86,7 @@ def test_plink_split_population(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("population_level_summary.smk")
+            include: cfg.modules("population_level_summary")
 
             rule all:
                 input:
@@ -140,11 +140,11 @@ def test_per_population_qc_done(tmp_path, conda_envs, sample_qc_csv, software_pa
 
             cfg = load_config()
 
-            include: cfg.modules("common.smk")
-            include: cfg.modules("plink_stats.smk")
-            include: cfg.modules("plink_filters.smk")
-            include: cfg.modules("subject_level_summary.smk")
-            include: cfg.modules("population_level_summary.smk")
+            include: cfg.modules("common")
+            include: cfg.modules("plink_stats")
+            include: cfg.modules("plink_filters")
+            include: cfg.modules("subject_level_summary")
+            include: cfg.modules("population_level_summary")
 
             rule all:
                 input:
@@ -203,11 +203,11 @@ def test_per_population_qc_done_no_populations(tmp_path, conda_envs, sample_qc_c
 
             cfg = load_config()
 
-            include: cfg.modules("common.smk")
-            include: cfg.modules("plink_stats.smk")
-            include: cfg.modules("plink_filters.smk")
-            include: cfg.modules("subject_level_summary.smk")
-            include: cfg.modules("population_level_summary.smk")
+            include: cfg.modules("common")
+            include: cfg.modules("plink_stats")
+            include: cfg.modules("plink_filters")
+            include: cfg.modules("subject_level_summary")
+            include: cfg.modules("population_level_summary")
 
             rule all:
                 input:
@@ -243,7 +243,7 @@ def test_controls_per_population(tmp_path, sample_qc_csv):
 
             cfg = load_config()
 
-            include: cfg.modules("population_level_summary.smk")
+            include: cfg.modules("population_level_summary")
 
             rule all:
                 input:
@@ -316,8 +316,8 @@ def test_plink_split_controls(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("plink_filters.smk")
-            include: cfg.modules("population_level_summary.smk")
+            include: cfg.modules("plink_filters")
+            include: cfg.modules("population_level_summary")
 
             rule all:
                 input:
@@ -383,11 +383,11 @@ def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc_csv, so
 
             cfg = load_config()
 
-            include: cfg.modules("common.smk")
-            include: cfg.modules("plink_stats.smk")
-            include: cfg.modules("plink_filters.smk")
-            include: cfg.modules("subject_level_summary.smk")
-            include: cfg.modules("population_level_summary.smk")
+            include: cfg.modules("common")
+            include: cfg.modules("plink_stats")
+            include: cfg.modules("plink_filters")
+            include: cfg.modules("subject_level_summary")
+            include: cfg.modules("population_level_summary")
 
             rule all:
                 input:
@@ -432,11 +432,11 @@ def test_per_population_controls_qc_done_no_controls(tmp_path, conda_envs, sampl
 
             cfg = load_config()
 
-            include: cfg.modules("common.smk")
-            include: cfg.modules("plink_stats.smk")
-            include: cfg.modules("plink_filters.smk")
-            include: cfg.modules("subject_level_summary.smk")
-            include: cfg.modules("population_level_summary.smk")
+            include: cfg.modules("common")
+            include: cfg.modules("plink_stats")
+            include: cfg.modules("plink_filters")
+            include: cfg.modules("subject_level_summary")
+            include: cfg.modules("population_level_summary")
 
             rule all:
                 input:

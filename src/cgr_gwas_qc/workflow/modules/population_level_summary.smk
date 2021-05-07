@@ -7,7 +7,7 @@ from more_itertools import flatten
 from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
 
-include: cfg.modules("common.smk")
+include: cfg.modules("common")
 
 
 ################################################################################
@@ -65,7 +65,7 @@ rule plink_split_population:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -230,7 +230,7 @@ rule plink_split_controls:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,

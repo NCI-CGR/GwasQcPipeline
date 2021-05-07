@@ -34,7 +34,7 @@ def test_create_subjects(tmp_path, conda_envs, sample_qc_csv, sample_concordance
 
             cfg = load_config()
 
-            include: cfg.modules("subject_level_summary.smk")
+            include: cfg.modules("subject_level_summary")
 
             rule all:
                 input:
@@ -85,9 +85,9 @@ def test_remove_related_subjects(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("plink_filters.smk")
-            include: cfg.modules("plink_stats.smk")
-            include: cfg.modules("subject_level_summary.smk")
+            include: cfg.modules("plink_filters")
+            include: cfg.modules("plink_stats")
+            include: cfg.modules("subject_level_summary")
 
             rule all:
                 input:

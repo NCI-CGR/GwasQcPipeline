@@ -33,7 +33,7 @@ rule plink_bed_to_ped:
     envmodules:
         cfg.envmodules("plink2"),
     conda:
-        cfg.conda("plink2.yml")
+        cfg.conda("plink2")
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -136,7 +136,7 @@ rule eigensoft_convert:
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:
-        cfg.conda("eigensoft.yml")
+        cfg.conda("eigensoft")
     shell:
         "convertf -p {input.par}"
 
@@ -152,6 +152,6 @@ rule eigensoft_smartpca:
     envmodules:
         cfg.envmodules("eigensoft"),
     conda:
-        cfg.conda("eigensoft.yml")
+        cfg.conda("eigensoft")
     shell:
         "smartpca -p {input.par}"

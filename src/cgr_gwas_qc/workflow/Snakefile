@@ -7,15 +7,14 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
-include: cfg.modules("common.smk")
-include: cfg.modules("entry_points.smk")
-include: cfg.modules("plink_stats.smk")
-include: cfg.modules("plink_filters.smk")
-include: cfg.modules("sample_level_qc.smk")
-include: cfg.modules("sample_level_summary.smk")
-include: cfg.modules("subject_level_summary.smk")
-include: cfg.modules("population_level_summary.smk")
-include: cfg.modules("delivery.smk")
+include: cfg.modules("common")
+include: cfg.modules("plink_stats")
+include: cfg.modules("plink_filters")
+include: cfg.modules("sample_level_qc")
+include: cfg.modules("sample_level_summary")
+include: cfg.modules("subject_level_summary")
+include: cfg.modules("population_level_summary")
+include: cfg.modules("delivery")
 
 
 localrules: # Always run these rules locally b/c they are quick

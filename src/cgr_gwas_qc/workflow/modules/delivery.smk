@@ -162,7 +162,7 @@ rule qc_report_docx:
     output:
         "deliver/{deliver_prefix}QC_Report{deliver_suffix}.docx",
     conda:
-        cfg.conda("pandoc.yml")
+        cfg.conda("pandoc")
     shell:
         "pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}"
 
