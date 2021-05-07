@@ -47,11 +47,14 @@ def main(
         "time_hr": time_hr,
         "local_mem_mb": 1024,
         "local_tasks": 1,
-        "added_options": "--notemp " if notemp else "",
+        "added_options": "",
     }
 
+    if notemp:
+        payload["added_options"] += "--notemp "  # type: ignore
+
     if subworkflow:
-        payload["snakefile"] = ConfigMgr.subworkflow(subworkflow)
+        payload["added_options"] += f"--subworkflow {subworkflow} "  # type: ignore
 
     cfg = load_config()
     sample_size = cfg.ss.shape[0]

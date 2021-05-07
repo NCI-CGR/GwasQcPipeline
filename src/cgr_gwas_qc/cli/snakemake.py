@@ -26,6 +26,7 @@ def main(ctx: typer.Context):
     Where possible values of WORKFLOW are:
 
     - entry_points
+    - contamination
 
     """
     args = ctx.args

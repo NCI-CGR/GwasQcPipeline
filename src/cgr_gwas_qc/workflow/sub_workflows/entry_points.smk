@@ -10,6 +10,17 @@ All entry points should create:
     - sample_level/samples.bim
     - sample_level/samples.fam
 """
+from cgr_gwas_qc import load_config
+
+cfg = load_config()
+
+
+rule all_entry_points:
+    input:
+        "sample_level/samples.bed",
+        "sample_level/samples.bim",
+        "sample_level/samples.fam",
+
 
 if cfg.config.user_files.gtc_pattern:
 
@@ -24,7 +35,7 @@ if cfg.config.user_files.gtc_pattern:
         """
         input:
             gtc=lambda wc: cfg.expand(
-                cfg.config.user_files.gtc_pattern, query=f"Sample_ID == '{wc.Sample_ID}'"
+                cfg.config.user_files.gtc_pattern, query=f"Sample_ID == '{wc.Sample_ID}'",
             )[0],
             bpm=cfg.config.reference_files.illumina_manifest_file,
         params:
