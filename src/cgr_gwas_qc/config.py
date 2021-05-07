@@ -49,6 +49,7 @@ class ConfigMgr:
     RULE_DIR = WORKFLOW_DIR / "rules"
     MODULE_DIR = WORKFLOW_DIR / "modules"
     SCRIPTS_DIR = WORKFLOW_DIR / "scripts"
+    SUBWORKFLOW_DIR = WORKFLOW_DIR / "sub_workflows"
     SNAKEFILE = WORKFLOW_DIR / "Snakefile"
 
     __instance = None
@@ -121,33 +122,45 @@ class ConfigMgr:
         modules = self.config.dict().get("env_modules")
         return modules.get(module_name, "") if modules else ""
 
-    def conda(self, file_name: str) -> str:
+    @classmethod
+    def conda(cls, filename: str) -> str:
         """Return path to a conda env file.
 
         Given a conda env file_name, prepends the full path to that file.
         """
-        return (self.CONDA_DIR / file_name).as_posix()
+        return (cls.CONDA_DIR / filename).as_posix()
 
-    def rules(self, file_name: str) -> str:
+    @classmethod
+    def rules(cls, filename: str) -> str:
         """Return the path to a rule file.
 
         Given a rule file_name, prepends the full path to that rule.
         """
-        return (self.RULE_DIR / file_name).as_posix()
+        return (cls.RULE_DIR / filename).as_posix()
 
-    def modules(self, file_name: str) -> str:
+    @classmethod
+    def modules(cls, filename: str) -> str:
         """Return the path to a module file.
 
         Given a rule file_name, prepends the full path to that module.
         """
-        return (self.MODULE_DIR / file_name).as_posix()
+        return (cls.MODULE_DIR / filename).as_posix()
 
-    def scripts(self, file_name: str) -> str:
+    @classmethod
+    def scripts(cls, filename: str) -> str:
         """Return the path to an internal script.
 
         Given a script file_name, prepends the full path to that script.
         """
-        return (self.SCRIPTS_DIR / file_name).as_posix()
+        return (cls.SCRIPTS_DIR / filename).as_posix()
+
+    @classmethod
+    def subworkflow(cls, workflow: str) -> str:
+        """Return the path to a sub-workflow.
+
+        Given a sub-workflow name, give the full path to the snakefile.
+        """
+        return (cls.SUBWORKFLOW_DIR / f"{workflow}.smk").as_posix()
 
     @property
     def docx_template(self) -> str:
