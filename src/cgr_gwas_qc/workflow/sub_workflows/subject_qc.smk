@@ -12,8 +12,8 @@ cfg = load_config()
 ################################################################################
 rule all_subject_qc:
     input:
-        "subject_level/population_qc.csv",
         "subject_level/concordance.csv",
+        "subject_level/population_qc.csv",
         "subject_level/.population_plots.done",
         "subject_level/.control_plots.done",
 
@@ -21,14 +21,27 @@ rule all_subject_qc:
 ################################################################################
 # Imports
 ################################################################################
-include: cfg.modules("common")
-include: cfg.modules("plink_filters")
-include: cfg.modules("plink_stats")
-
-
 subworkflow sample_qc:
-    snakefile: cfg.subworkflow("sample_qc")
-    workdir: cfg.root.as_posix()
+    snakefile:
+        cfg.subworkflow("sample_qc")
+    workdir:
+        cfg.root.as_posix()
+
+
+module plink:
+    snakefile:
+        cfg.modules("plink")
+
+
+use rule genome, ld, het, hwe, maf_filter, ld_filter, snps_only_filter, autosome_only_filter, keep_bfile from plink as plink_*
+
+
+module eigensoft:
+    snakefile:
+        cfg.modules("eigensoft")
+
+
+use rule * from eigensoft as eigensoft_*
 
 
 ################################################################################
@@ -66,7 +79,7 @@ checkpoint selected_subjects:
 
 
 # Convert Sample Level data to Subject Level
-rule files_for_plink_subject_filters:
+rule list_of_subjects_to_analyze:
     """Create mapping file for plink to convert Sample_IDs to Subject_IDs."""
     input:
         rules.selected_subjects.output[0],
@@ -79,16 +92,17 @@ rule files_for_plink_subject_filters:
             output.selected, sep=" ", index=False, header=False
         )
         qc.reindex(
-            ["Sample_ID", "Sample_ID", "Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1,
+            ["Sample_ID", "Sample_ID", "Group_By_Subject_ID", "Group_By_Subject_ID"],
+            axis=1,
         ).to_csv(output.sample2subject, sep=" ", index=False, header=False)
 
 
-rule pull_subject_representative:
+use rule keep_ids from plink as plink_subject_filter with:
     input:
         bed=sample_qc("sample_level/call_rate_2/samples.bed"),
         bim=sample_qc("sample_level/call_rate_2/samples.bim"),
         fam=sample_qc("sample_level/call_rate_2/samples.fam"),
-        selected=rules.files_for_plink_subject_filters.output.selected,
+        to_keep=rules.list_of_subjects_to_analyze.output.selected,
     params:
         out_prefix="subject_level/samples",
     output:
@@ -98,29 +112,14 @@ rule pull_subject_representative:
         nosex="subject_level/samples.nosex",
     log:
         "subject_level/samples.log",
-    conda:
-        cfg.conda("plink2")
-    threads: lambda wildcards, attempt: attempt * 2
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--keep {input.selected} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
 
 
-rule convert_Sample_ID_to_Subject_ID:
+use rule rename_ids from plink as plink_convert_sample_id_to_subject_id with:
     input:
-        bed=rules.pull_subject_representative.output.bed,
-        bim=rules.pull_subject_representative.output.bim,
-        fam=rules.pull_subject_representative.output.fam,
-        sample2subject=rules.files_for_plink_subject_filters.output.sample2subject,
+        bed=rules.plink_subject_filter.output.bed,
+        bim=rules.plink_subject_filter.output.bim,
+        fam=rules.plink_subject_filter.output.fam,
+        id_map=rules.list_of_subjects_to_analyze.output.sample2subject,
     params:
         out_prefix="subject_level/subjects",
     output:
@@ -130,21 +129,6 @@ rule convert_Sample_ID_to_Subject_ID:
         nosex="subject_level/subjects.nosex",
     log:
         "subject_level/subjects.log",
-    conda:
-        cfg.conda("plink2")
-    threads: lambda wildcards, attempt: attempt * 2
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--update-ids {input.sample2subject} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
 
 
 # -------------------------------------------------------------------------------
@@ -178,11 +162,11 @@ rule split_subjects_by_population:
         )
 
 
-rule split_plink_file_by_population:
+use rule keep_ids from plink as plink_split_subjects_by_population with:
     input:
-        bed="subject_level/subjects.bed",
-        bim="subject_level/subjects.bim",
-        fam="subject_level/subjects.fam",
+        bed=rules.plink_convert_sample_id_to_subject_id.output.bed,
+        bim=rules.plink_convert_sample_id_to_subject_id.output.bim,
+        fam=rules.plink_convert_sample_id_to_subject_id.output.fam,
         to_keep="subject_level/{population}/subjects.txt",
     params:
         out_prefix="subject_level/{population}/subjects",
@@ -195,24 +179,21 @@ rule split_plink_file_by_population:
         "subject_level/{population}/subjects.log",
     wildcard_constraints:
         population="\w+",
-    conda:
-        cfg.conda("plink2")
-    threads: lambda wildcards, attempt: attempt * 2
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--keep {input.to_keep} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
 
 
 # Within Population Subject Concordance
+rule subject_concordance_plink:
+    input:
+        "{prefix}.genome",
+    params:
+        concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
+        pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
+    output:
+        "{prefix}.concordance.csv",
+    script:
+        "../scripts/concordance_table.py"
+
+
 def _population_concordance_files(wildcards):
     populations = _get_populations(wildcards)
 
@@ -220,7 +201,7 @@ def _population_concordance_files(wildcards):
         return []
 
     return expand(
-        "subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.concordance.csv",
+        "subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.keep.concordance.csv",
         population=populations,
         maf=cfg.config.software_params.maf_for_ibd,
         ld=cfg.config.software_params.ld_prune_r2,
@@ -240,50 +221,36 @@ rule agg_population_concordance:
 # Remove Related Subjects
 rule related_subjects:
     input:
-        "{{prefix}}/subjects_maf{maf}_ld{ld}_pruned.concordance.csv".format(
-            maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
+        "subject_level/{{population}}/subjects_maf{maf}_ld{ld}_pruned.keep.concordance.csv".format(
+            maf=cfg.config.software_params.maf_for_ibd,
+            ld=cfg.config.software_params.ld_prune_r2,
         ),
     output:
-        relatives="{prefix}/relatives.csv",
-        to_remove="{prefix}/related_subjects_to_remove.txt",
+        relatives="subject_level/{population}/relatives.csv",
+        to_remove="subject_level/{population}/related_subjects_to_remove.txt",
     script:
         "../scripts/related_subjects.py"
 
 
-rule remove_related_subjects:
+use rule remove_ids from plink as plink_remove_related_subjects with:
     input:
-        bed="{prefix}/subjects.bed",
-        bim="{prefix}/subjects.bim",
-        fam="{prefix}/subjects.fam",
+        bed="subject_level/{population}/subjects.bed",
+        bim="subject_level/{population}/subjects.bim",
+        fam="subject_level/{population}/subjects.fam",
         to_remove=rules.related_subjects.output.to_remove,
     params:
-        out_prefix="{prefix}/subjects_unrelated",
+        out_prefix="subject_level/{population}/subjects_unrelated",
     output:
-        bed="{prefix}/subjects_unrelated.bed",
-        bim="{prefix}/subjects_unrelated.bim",
-        fam="{prefix}/subjects_unrelated.fam",
-        nosex="{prefix}/subjects_unrelated.nosex",
+        bed="subject_level/{population}/subjects_unrelated.bed",
+        bim="subject_level/{population}/subjects_unrelated.bim",
+        fam="subject_level/{population}/subjects_unrelated.fam",
+        nosex="subject_level/{population}/subjects_unrelated.nosex",
     log:
-        "{prefix}/subjects_unrelated.log",
-    conda:
-        cfg.conda("plink2")
-    threads: lambda wildcards, attempt: attempt * 2
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--remove {input.to_remove} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
+        "subject_level/{population}/subjects_unrelated.log",
 
 
 # PCA
-rule convert_bed_to_ped:
+use rule bed_to_ped from plink as plink_convert_bed_to_ped with:
     input:
         bed="subject_level/{population}/{prefix}.bed",
         bim="subject_level/{population}/{prefix}.bim",
@@ -295,116 +262,14 @@ rule convert_bed_to_ped:
         out_prefix="subject_level/{population}/{prefix}",
     log:
         "subject_level/{population}/{prefix}.log",
-    conda:
-        cfg.conda("plink2")
-    threads: lambda wildcards, attempt: attempt * 2
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--recode "
-        "--keep-allele-order "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
-
-def eigensoft_config_inputs(wildcards):
-    tool = wildcards.tool
-    population = wildcards.population
-    prefix = wildcards.prefix
-    if tool == "pca":
-        return {
-            "gen": f"subject_level/{population}/{prefix}.gen",
-            "snp": f"subject_level/{population}/{prefix}.snp",
-            "ind": f"subject_level/{population}/{prefix}.ind",
-        }
-
-    # Default is to convert PED/MAP to EIGENSTRAT
-    return {
-        "gen": f"subject_level/{population}/{prefix}.ped",
-        "snp": f"subject_level/{population}/{prefix}.map",
-        "ind": f"subject_level/{population}/{prefix}.ped",
-    }
-
-
-def eigensoft_config_params(wildcards):
-    tool = wildcards.tool
-    population = wildcards.population
-    prefix = wildcards.prefix
-
-    if tool == "pca":
-        return f"""\
-        genotypename: subject_level/{population}/{prefix}.gen
-        snpname: subject_level/{population}/{prefix}.snp
-        indivname: subject_level/{population}/{prefix}.ind
-        evecoutname: subject_level/{population}/{prefix}.eigenvec
-        fastmode: YES
-        """
-
-    # Default is to convert PED/MAP to EIGENSTRAT
-    return f"""\
-    genotypename: subject_level/{population}/{prefix}.ped
-    snpname: subject_level/{population}/{prefix}.map
-    indivname: subject_level/{population}/{prefix}.ped
-    outputformat: EIGENSTRAT
-    genooutfilename: subject_level/{population}/{prefix}.gen
-    snpoutfilename: subject_level/{population}/{prefix}.snp
-    indoutfilename: subject_level/{population}/{prefix}.ind
-    familynames: NO
-    """
-
-
-rule eigensoft_create_par:
-    input:
-        unpack(eigensoft_config_inputs),
-    params:
-        eigensoft_config_params,
-    output:
-        temp("subject_level/{population}/{prefix}.{tool}.par"),
-    wildcard_constraints:
-        tool="convert|pca",
-    run:
-        Path(output[0]).write_text(dedent(params[0]))
-
-
-rule eigensoft_convert:
-    input:
-        ped=rules.convert_bed_to_ped.output.ped,
-        map_=rules.convert_bed_to_ped.output.map_,
-        par="subject_level/{population}/{prefix}.convert.par",
-    output:
-        gen=temp("subject_level/{population}/{prefix}.gen"),
-        snp=temp("subject_level/{population}/{prefix}.snp"),
-        ind=temp("subject_level/{population}/{prefix}.ind"),
-    conda:
-        cfg.conda("eigensoft")
-    shell:
-        "convertf -p {input.par}"
-
-
-rule eigensoft_smartpca:
-    input:
-        gen=rules.eigensoft_convert.output.gen,
-        snp=rules.eigensoft_convert.output.snp,
-        ind=rules.eigensoft_convert.output.ind,
-        par="subject_level/{population}/{prefix}.pca.par",
-    output:
-        gen="subject_level/{population}/{prefix}.eigenvec",
-    conda:
-        cfg.conda("eigensoft")
-    shell:
-        "smartpca -p {input.par}"
 
 
 rule plot_pca:
     input:
         qc_table=rules.selected_subjects.output[0],
-        eigenvec="subject_level/{{population}}/subjects_unrelated_maf{maf}_ld{ld}_pruned.eigenvec".format(
-            maf=cfg.config.software_params.maf_for_ibd, ld=cfg.config.software_params.ld_prune_r2,
+        eigenvec="subject_level/{{population}}/subjects_unrelated_maf{maf}_ld{ld}_pruned.keep.eigenvec".format(
+            maf=cfg.config.software_params.maf_for_ibd,
+            ld=cfg.config.software_params.ld_prune_r2,
         ),
     params:
         population="{population}",
@@ -471,7 +336,9 @@ def _population_plots(wildcards):
     return flatten(
         [
             expand(rules.plot_pca.output[0], population=populations),
-            expand(rules.plot_autosomal_heterozygosity.output[0], population=populations),
+            expand(
+                rules.plot_autosomal_heterozygosity.output[0], population=populations
+            ),
         ]
     )
 
@@ -500,7 +367,7 @@ rule controls_per_population:
         )
 
 
-rule plink_split_controls:
+use rule keep_ids from plink as plink_split_controls_by_population with:
     input:
         bed="subject_level/{population}/subjects_unrelated.bed",
         bim="subject_level/{population}/subjects_unrelated.bim",
@@ -515,26 +382,11 @@ rule plink_split_controls:
         nosex="subject_level/{population}/controls_unrelated.nosex",
     log:
         "subject_level/{population}/controls_unrelated.log",
-    conda:
-        cfg.conda("plink2")
-    threads: lambda wildcards, attempt: attempt * 2
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--keep {input.to_keep} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
 
 
 rule plot_hwe:
     input:
-        "subject_level/{{population}}/controls_unrelated_maf{maf}_snps_autosome_cleaned.hwe".format(
+        "subject_level/{{population}}/controls_unrelated_maf{maf}_snps_autosome.keep.hwe".format(
             maf=cfg.config.software_params.maf_for_hwe,
         ),
     params:
