@@ -208,6 +208,70 @@ rule autosome_only_filter:
         "--out {params.out_prefix}"
 
 
+rule keep_ids:
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+        to_keep="{prefix}_to_keep.txt",
+    params:
+        out_prefix="{prefix}.filtered",
+    output:
+        bed="{prefix}.filtered.bed",
+        bim="{prefix}.filtered.bim",
+        fam="{prefix}.filtered.fam",
+        nosex="{prefix}.filtered.nosex",
+    log:
+        "{prefix}.filtered.log",
+    conda:
+        cfg.conda("plink2")
+    threads: lambda wildcards, attempt: attempt * 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--keep {input.to_keep} "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem_mb} "
+        "--out {params.out_prefix}"
+
+
+rule remove_ids:
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+        to_remove="{prefix}_to_remove.txt",
+    params:
+        out_prefix="{prefix}.filtered",
+    output:
+        bed="{prefix}.filtered.bed",
+        bim="{prefix}.filtered.bim",
+        fam="{prefix}.filtered.fam",
+        nosex="{prefix}.filtered.nosex",
+    log:
+        "{prefix}.filtered.log",
+    conda:
+        cfg.conda("plink2")
+    threads: lambda wildcards, attempt: attempt * 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--remove {input.to_remove} "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem_mb} "
+        "--out {params.out_prefix}"
+
+
 rule keep_bfile:
     """Tell snakemake to keep the file.
 
@@ -239,6 +303,70 @@ rule keep_bfile:
         "--bim {input.bim} "
         "--fam {input.fam} "
         "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem_mb} "
+        "--out {params.out_prefix}"
+
+
+################################################################################
+# Converters
+################################################################################
+rule rename_ids:
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+        id_map="{prefix}.id_map.txt",
+    params:
+        out_prefix="{prefix}.renamed",
+    output:
+        bed="{prefix}.renamed.bed",
+        bim="{prefix}.renamed.bim",
+        fam="{prefix}.renamed.fam",
+        nosex="{prefix}.renamed.nosex",
+    log:
+        "{prefix}.renamed.log",
+    conda:
+        cfg.conda("plink2")
+    threads: lambda wildcards, attempt: attempt * 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--update-ids {input.id_map} "
+        "--make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem_mb} "
+        "--out {params.out_prefix}"
+
+
+rule bed_to_ped:
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+    output:
+        ped="{prefix}.ped",
+        map_="{prefix}.map",
+    params:
+        out_prefix="{prefix}",
+    log:
+        "{prefix}.log",
+    conda:
+        cfg.conda("plink2")
+    threads: lambda wildcards, attempt: attempt * 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    shell:
+        "plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--recode "
+        "--keep-allele-order "
         "--threads {threads} "
         "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
@@ -420,8 +548,8 @@ rule genome:
         bim="{prefix}.bim",
         fam="{prefix}.fam",
     params:
-        ibd_min=0.05,
-        ibd_max=1.0,
+        ibd_min=cfg.config.software_params.ibd_pi_hat_min,
+        ibd_max=cfg.config.software_params.ibd_pi_hat_max,
         out_prefix="{prefix}",
     output:
         genome="{prefix}.genome",
