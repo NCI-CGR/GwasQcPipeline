@@ -53,28 +53,23 @@ def read(filename: PathLike) -> pd.DataFrame:
 
 @app.command()
 def main(sample_sheet_csv: Path, ibd_files: List[Path], outfile: Path):
-    if ibd_files:
-        ss = (
-            sample_sheet.read(sample_sheet_csv)
-            .reindex(["Group_By_Subject_ID", "case_control"], axis=1)
-            .drop_duplicates()
-            .set_index("Group_By_Subject_ID")
-            .squeeze()
-        )
+    if not ibd_files:
+        pd.DataFrame(columns=DTYPES.keys()).to_csv(outfile, index=False)
+        return None
 
-        df = (
-            pd.concat(
-                [_read_concordance_table(filename) for filename in ibd_files], ignore_index=True
-            )
-            .merge(
-                ss.rename_axis("Subject_ID1").rename("case_control1"), on="Subject_ID1", how="left"
-            )
-            .merge(
-                ss.rename_axis("Subject_ID2").rename("case_control2"), on="Subject_ID2", how="left"
-            )
-        )
-    else:
-        df = pd.DataFrame([], columns=DTYPES.keys(), dtype=DTYPES)
+    ss = (
+        sample_sheet.read(sample_sheet_csv)
+        .reindex(["Group_By_Subject_ID", "case_control"], axis=1)
+        .drop_duplicates()
+        .set_index("Group_By_Subject_ID")
+        .squeeze()
+    )
+
+    df = (
+        pd.concat([_read_concordance_table(filename) for filename in ibd_files], ignore_index=True)
+        .merge(ss.rename_axis("Subject_ID1").rename("case_control1"), on="Subject_ID1", how="left")
+        .merge(ss.rename_axis("Subject_ID2").rename("case_control2"), on="Subject_ID2", how="left")
+    )
 
     df.reindex(DTYPES.keys(), axis=1).to_csv(outfile, index=False)
 
@@ -98,9 +93,15 @@ def _read_concordance_table(filename: Path):
 
 if __name__ == "__main__":
     if "snakemake" in locals():
+        ibd_files = snakemake.input.ibd_files  # type: ignore # noqa
+        if isinstance(ibd_files, str):
+            filenames = [Path(ibd_files)]
+        else:
+            filenames = [Path(x) for x in ibd_files]
+
         defaults = {
-            "sample_sheet_csv": Path(snakemake.input["sample_sheet_csv"]),  # type: ignore # noqa
-            "ibd_files": [Path(v) for v in snakemake.input["ibd_files"]],  # type: ignore # noqa
+            "sample_sheet_csv": Path(snakemake.input.sample_sheet_csv),  # type: ignore # noqa
+            "ibd_files": filenames,  # type: ignore # noqa
             "outfile": Path(snakemake.output[0]),  # type: ignore # noqa
         }
         main(**defaults)

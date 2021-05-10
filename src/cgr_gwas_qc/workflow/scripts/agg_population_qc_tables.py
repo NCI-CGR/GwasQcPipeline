@@ -41,6 +41,7 @@ References:
 
 """
 from pathlib import Path
+from typing import List
 
 import pandas as pd
 import typer
@@ -76,32 +77,31 @@ DTYPES = {
 
 
 @app.command()
-def main(sample_qc_table: Path, population_qc_tables: Path, outfile: Path):
-    if population_qc_tables.stat().st_size == 0:
+def main(subject_qc_table: Path, population_qc_tables: List[Path], outfile: Path):
+    if not population_qc_tables:
         # No populations to aggregate save an empty table
         pd.DataFrame(columns=DTYPES.keys()).to_csv(outfile, index=False)
         return None
 
     df = (
         aggregate_qc_tables(population_qc_tables)
-        .pipe(add_metadata, filename=sample_qc_table)
+        .pipe(add_metadata, filename=subject_qc_table)
         .reindex(DTYPES.keys(), axis=1)
     )
 
     df.to_csv(outfile, index=False)
 
 
-def aggregate_qc_tables(population_files: Path) -> pd.DataFrame:
-    filenames = population_files.read_text().strip().splitlines()
+def aggregate_qc_tables(population_files: List[Path]) -> pd.DataFrame:
     return pd.concat(
-        [population_qc_table.read(Path(filename)) for filename in filenames], ignore_index=True
+        [population_qc_table.read(Path(filename)) for filename in population_files],
+        ignore_index=True,
     )
 
 
 def add_metadata(df: pd.DataFrame, filename: Path):
     metadata = (
         pd.read_csv(filename)
-        .query("is_subject_representative")
         .reindex(["Group_By_Subject_ID", "Sample_ID", "case_control"], axis=1)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
     )
@@ -117,9 +117,17 @@ def read_agg_population_qc_tables(filename: Path):
 
 if __name__ == "__main__":
     if "snakemake" in locals():
-        defaults = {}
-        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
-        defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
+        qc_files = snakemake.input.population_qc_tables  # type: ignore # noqa
+        if isinstance(qc_files, str):
+            filenames = [Path(qc_files)]
+        else:
+            filenames = [Path(x) for x in qc_files]
+
+        defaults = {
+            "subject_qc_table": Path(snakemake.input.subject_qc_table),  # type: ignore # noqa
+            "population_qc_tables": filenames,
+            "outfile": Path(snakemake.output[0]),  # type: ignore # noqa
+        }
         main(**defaults)
     else:
         app()

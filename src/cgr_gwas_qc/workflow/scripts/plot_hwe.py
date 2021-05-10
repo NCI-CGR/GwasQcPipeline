@@ -7,9 +7,7 @@ This script plots the p-value QQ-plot for the Hardy-Weinberg equilibrium exact-t
 Output:
     ``population_level/hwe_plots/{population}.png``
 """
-import os
 from pathlib import Path
-from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,15 +21,12 @@ app = typer.Typer(add_completion=False)
 
 
 @app.command()
-def main(hwe_files: Path, outdir: Path):
-    outdir.mkdir(exist_ok=True, parents=True)
+def main(hwe_file: Path, population: str, outfile: Path):
+    df = load_p_values(hwe_file)
+    g = plot(df, population)
 
-    # Iterate over hwe file list
-    for filename in map(Path, hwe_files.read_text().strip().splitlines()):
-        population = filename.parent.name  # {prefix}/{population}/controls*.hwe
-        outfile = outdir / f"{population}.png"
-        df = load_p_values(filename)
-        plot(df, population, outfile)
+    if outfile:
+        g.savefig(outfile)
 
 
 def load_p_values(filename: Path) -> pd.DataFrame:
@@ -42,7 +37,7 @@ def load_p_values(filename: Path) -> pd.DataFrame:
     return pd.DataFrame({"observed_p": observed_p, "expected_p": expected_p})
 
 
-def plot(df: pd.DataFrame, population: str, outfile: Optional[os.PathLike] = None):
+def plot(df: pd.DataFrame, population: str):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
 
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -62,8 +57,7 @@ def plot(df: pd.DataFrame, population: str, outfile: Optional[os.PathLike] = Non
     # Remove outside edges for a cleaner plot
     sns.despine(ax=ax)
 
-    if outfile:
-        fig.savefig(outfile)
+    return fig
 
 
 def get_counts(df: pd.DataFrame) -> str:
@@ -84,8 +78,9 @@ def get_counts(df: pd.DataFrame) -> str:
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {}
-        defaults.update({"hwe_files": Path(snakemake.input[0])})  # type: ignore # noqa
-        defaults.update({"outdir": Path(snakemake.output[0])})  # type: ignore # noqa
+        defaults.update({"hwe_file": Path(snakemake.input[0])})  # type: ignore # noqa
+        defaults.update(dict(snakemake.params))  # type: ignore # noqa
+        defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
         main(**defaults)
     else:
         app()

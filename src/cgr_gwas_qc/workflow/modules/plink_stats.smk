@@ -8,7 +8,7 @@ Calculate a variety of statistics that are supported by plink.
 """
 
 
-include: cfg.modules("common")
+# include: cfg.modules("common")
 
 
 rule plink_stats_call_rate:
