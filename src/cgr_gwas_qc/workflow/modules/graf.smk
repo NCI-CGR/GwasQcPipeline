@@ -1,3 +1,23 @@
+rule graf_extract_fingerprint_snps:
+    """Extract fingerprint SNPs from a PLINK data and convert to a GRAF."""
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+    output:
+        "{prefix}.fpg",
+    log:
+        "{prefix}.fpg.log",
+    conda:
+        cfg.conda("graf")
+    shell:
+        "graf "
+        "-exfp {wildcards.prefix} "
+        "-out {output[0]} "
+        "-type 4 "
+        "> {log} 2>&1 "
+        "|| exit_code=$?; if [ $exit_code -ne 1 ]; then exit $exit_code; fi" # GRAF returns an exit code of 1, this captures it so snakemake will actually run.
+
 
 rule graf_relatedness_png:
     input:
