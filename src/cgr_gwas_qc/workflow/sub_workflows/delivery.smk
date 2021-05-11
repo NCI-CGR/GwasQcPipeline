@@ -9,6 +9,10 @@ wildcard_constraints:
     deliver_suffix=".*",
 
 
+localrules:
+    all_delivery,
+
+
 ################################################################################
 # All Targets
 ################################################################################
@@ -60,6 +64,8 @@ rule lab_sample_level_qc_report:
         sample_qc("sample_level/sample_qc.csv"),
     output:
         "files_for_lab/{deliver_prefix}all_sample_qc{deliver_suffix}.csv",
+    group:
+        "delivery"
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -70,6 +76,8 @@ rule lab_lims_upload:
         sample_qc_csv=sample_qc("sample_level/sample_qc.csv"),
     output:
         "files_for_lab/{deliver_prefix}LimsUpload{deliver_suffix}.csv",
+    group:
+        "delivery"
     script:
         "../scripts/lab_lims_upload.py"
 
@@ -80,6 +88,8 @@ rule lab_identifiler_needed:
         sample_qc_csv=sample_qc("sample_level/sample_qc.csv"),
     output:
         "files_for_lab/{deliver_prefix}Identifiler{deliver_suffix}.csv",
+    group:
+        "delivery"
     script:
         "../scripts/lab_identifiler_needed.py"
 
@@ -89,6 +99,8 @@ rule lab_known_replicates:
         sample_qc("sample_level/concordance/KnownReplicates.csv"),
     output:
         "files_for_lab/{deliver_prefix}KnownReplicates{deliver_suffix}.csv",
+    group:
+        "delivery"
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -98,6 +110,8 @@ rule lab_unknown_replicates:
         sample_qc("sample_level/concordance/UnknownReplicates.csv"),
     output:
         "files_for_lab/{deliver_prefix}UnknownReplicates{deliver_suffix}.csv",
+    group:
+        "delivery"
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -110,6 +124,8 @@ rule deliver_manifest:
         cfg.sample_sheet_file.as_posix(),
     output:
         "delivery/{deliver_prefix}AnalysisManifest{deliver_suffix}.csv",
+    group:
+        "delivery"
     shell:
         "cp {input[0]} {output[0]}"
 
@@ -119,6 +135,8 @@ rule deliver_hwp:
         subject_qc("subject_level/.control_plots.done"),
     output:
         "delivery/HWP.zip",
+    group:
+        "delivery"
     shell:
         """
         ODIR=$(dirname {output[0]})
@@ -141,6 +159,8 @@ rule deliver_original_sample_data:
         bed="delivery/samples.bed",
         bim="delivery/samples.bim",
         fam="delivery/samples.fam",
+    group:
+        "delivery"
     shell:
         "cp {input.bed} {output.bed} && cp {input.bim} {output.bim} && cp {input.fam} {output.fam}"
 
@@ -154,6 +174,8 @@ rule deliver_subject_data:
         bed="delivery/subjects.bed",
         bim="delivery/subjects.bim",
         fam="delivery/subjects.fam",
+    group:
+        "delivery"
     shell:
         "cp {input.bed} {output.bed} && cp {input.bim} {output.bim} && cp {input.fam} {output.fam}"
 
@@ -163,6 +185,8 @@ rule deliver_subject_list:
         sample_qc("sample_level/sample_qc.csv"),
     output:
         "delivery/SampleUsedforSubject.csv",
+    group:
+        "delivery"
     run:
         import pandas as pd
 
@@ -207,6 +231,8 @@ rule qc_report:
         hwe_png_dir="subject_level/hwe_plots",
     output:
         "delivery/qc_report.md",
+    group:
+        "delivery"
     script:
         "../scripts/qc_report.py"
 
@@ -220,6 +246,8 @@ rule qc_report_docx:
         "delivery/{deliver_prefix}QC_Report{deliver_suffix}.docx",
     conda:
         cfg.conda("pandoc")
+    group:
+        "delivery"
     shell:
         "pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}"
 
@@ -235,5 +263,7 @@ rule qc_report_xlsx:
         graf=sample_qc("sample_level/ancestry/graf_populations.txt"),
     output:
         "delivery/{deliver_prefix}QC_Report{deliver_suffix}.xlsx",
+    group:
+        "delivery"
     script:
         "../scripts/qc_report_table.py"
