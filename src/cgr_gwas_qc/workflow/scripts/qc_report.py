@@ -92,8 +92,8 @@ def create_report(payload: Dict) -> Text:
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {}
-        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
-        defaults.update({k: v for k, v in snakemake.params.items()})  # type: ignore # noqa
+        defaults.update({k: Path(v) for k, v in snakemake.input.items() if not k.startswith("_")})  # type: ignore # noqa
+        defaults.update({k: Path(v) if k.endswith("_dir") else v for k, v in snakemake.params.items()})  # type: ignore # noqa
         defaults["outfile"] = Path(snakemake.output[0])  # type: ignore # noqa
         main(**defaults)
     else:
