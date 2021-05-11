@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 from pathlib import Path
-from typing import List
 
 import pandas as pd
 import typer
 
-from cgr_gwas_qc.parsers import plink, verifyidintensity
+from cgr_gwas_qc.parsers import plink
 from cgr_gwas_qc.typing import PathLike
 
 app = typer.Typer(add_completion=False)
@@ -25,7 +24,7 @@ def read(filename: PathLike):
 
 @app.command()
 def main(
-    contamination_files: List[Path],
+    contamination_file: Path,
     median_intensity_file: Path,
     imiss_file: Path,
     intensity_threshold: int,
@@ -34,7 +33,7 @@ def main(
 ) -> None:
 
     df = (
-        build(contamination_files, median_intensity_file, imiss_file)
+        build(contamination_file, median_intensity_file, imiss_file)
         .pipe(_mask_low_intensity, intensity_threshold)
         .pipe(_flag_contaminated, contam_threshold)
     )
@@ -42,13 +41,11 @@ def main(
     df.reindex(DTYPES.keys(), axis=1).to_csv(outfile, index=False)
 
 
-def build(
-    contamination_files: List[Path], median_intensity_file: Path, imiss_file: Path
-) -> pd.DataFrame:
+def build(contamination_file: Path, median_intensity_file: Path, imiss_file: Path) -> pd.DataFrame:
     return (
         pd.concat(
             [
-                _aggregate_contamination(contamination_files).set_index("Sample_ID"),
+                pd.read_csv(contamination_file).set_index("Sample_ID"),
                 pd.read_csv(median_intensity_file).set_index("Sample_ID"),
                 plink.read_imiss(imiss_file).rename_axis("Sample_ID"),
             ],
@@ -57,10 +54,6 @@ def build(
         .rename_axis("Sample_ID")
         .reset_index()
     )
-
-
-def _aggregate_contamination(filenames: List[Path]) -> pd.DataFrame:
-    return pd.concat([verifyidintensity.read(sample) for sample in filenames], ignore_index=True)
 
 
 def _mask_low_intensity(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
@@ -80,10 +73,7 @@ def _flag_contaminated(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {
-            **{
-                k: Path(v) if isinstance(v, str) else [Path(f) for f in v]
-                for k, v in snakemake.input.items()  # type: ignore # noqa
-            },
+            **{k: Path(v) for k, v in snakemake.input.items()},  # type: ignore # noqa
             **{k: v for k, v in snakemake.params.items()},  # type: ignore # noqa
             "outfile": Path(snakemake.output[0]),  # type: ignore # noqa
         }
