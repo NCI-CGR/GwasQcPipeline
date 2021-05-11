@@ -39,6 +39,13 @@ rule all_delivery:
 ################################################################################
 # Imports
 ################################################################################
+subworkflow entry_points:
+    snakefile:
+        cfg.subworkflow("entry_points")
+    workdir:
+        cfg.root.as_posix()
+
+
 subworkflow sample_qc:
     snakefile:
         cfg.subworkflow("sample_qc")
@@ -152,9 +159,9 @@ rule deliver_hwp:
 
 rule deliver_original_sample_data:
     input:
-        bed=sample_qc("sample_level/samples.bed"),
-        bim=sample_qc("sample_level/samples.bim"),
-        fam=sample_qc("sample_level/samples.fam"),
+        bed=entry_points("sample_level/samples.bed"),
+        bim=entry_points("sample_level/samples.bim"),
+        fam=entry_points("sample_level/samples.fam"),
     output:
         bed="delivery/samples.bed",
         bim="delivery/samples.bim",
