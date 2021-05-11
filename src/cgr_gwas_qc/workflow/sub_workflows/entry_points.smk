@@ -15,18 +15,16 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
-localrules:
-    all_entry_points,
-
-
 ################################################################################
-# All Targets
+# Entry Points Targets
 ################################################################################
 rule all_entry_points:
     input:
         "sample_level/samples.bed",
         "sample_level/samples.bim",
         "sample_level/samples.fam",
+    output:
+        touch("subworkflow_complete/entry_points"),
 
 
 ################################################################################

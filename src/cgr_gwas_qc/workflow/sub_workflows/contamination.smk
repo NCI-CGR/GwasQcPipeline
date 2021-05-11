@@ -6,12 +6,14 @@ cfg = load_config()
 
 
 ################################################################################
-# All Targets
+# Contamination Targets
 ################################################################################
 rule all_contamination:
     input:
         "sample_level/contamination/median_idat_intensity.csv",
         "sample_level/contamination/verifyIDintensity.csv",
+    output:
+        touch("subworkflow_complete/contamination"),
     group:
         "agg_contamination"
 

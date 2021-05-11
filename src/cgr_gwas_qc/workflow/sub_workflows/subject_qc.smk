@@ -5,10 +5,7 @@ from cgr_gwas_qc.workflow.scripts import subject_qc_table
 
 
 cfg = load_config()
-
-
-localrules:
-    all_subject_qc,
+_targets = []
 
 
 wildcard_constraints:
@@ -16,18 +13,7 @@ wildcard_constraints:
 
 
 ################################################################################
-# All Targets
-################################################################################
-rule all_subject_qc:
-    input:
-        "subject_level/concordance.csv",
-        "subject_level/population_qc.csv",
-        "subject_level/.population_plots.done",
-        "subject_level/.control_plots.done",
-
-
-################################################################################
-# Imports
+# Sub-workflows
 ################################################################################
 subworkflow sample_qc:
     snakefile:
@@ -36,6 +22,31 @@ subworkflow sample_qc:
         cfg.root.as_posix()
 
 
+_targets.append(sample_qc("subworkflow_complete/sample_qc"))
+
+################################################################################
+# Subject QC Targets
+################################################################################
+_targets.extend(
+    [
+        "subject_level/concordance.csv",
+        "subject_level/population_qc.csv",
+        "subject_level/.population_plots.done",
+        "subject_level/.control_plots.done",
+    ]
+)
+
+
+rule all_subject_qc:
+    input:
+        _targets,
+    output:
+        touch("subworkflow_complete/subject_qc"),
+
+
+################################################################################
+# Imports
+################################################################################
 module plink:
     snakefile:
         cfg.modules("plink")

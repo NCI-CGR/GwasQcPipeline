@@ -3,11 +3,16 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
-module delivery:
+################################################################################
+# All Targets
+################################################################################
+subworkflow delivery:
     snakefile:
         cfg.subworkflow("delivery")
-    config:
-        {}
+    workdir:
+        cfg.root.as_posix()
 
 
-use rule * from delivery
+rule run_all_subworkflows:
+    input:
+        delivery("subworkflow_complete/delivery"),

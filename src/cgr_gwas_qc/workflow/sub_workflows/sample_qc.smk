@@ -1,29 +1,43 @@
 from cgr_gwas_qc import load_config
 
 cfg = load_config()
-
-
-localrules:
-    all_sample_qc,
+_targets = []
 
 
 ################################################################################
-# All Targets
+# Sub-workflows
 ################################################################################
-def _contamination_output(wildcards):
-    """Only build contamination targets if we have IDAT & GTC & remove contam set"""
-    if (
-        cfg.config.user_files.idat_pattern
-        and cfg.config.user_files.gtc_pattern
-        and cfg.config.workflow_params.remove_contam
-    ):
-        return "sample_level/contamination/summary.csv"
-
-    return []
+subworkflow entry_points:
+    snakefile:
+        cfg.subworkflow("entry_points")
+    workdir:
+        cfg.root.as_posix()
 
 
-rule all_sample_qc:
-    input:
+_targets.append(entry_points("subworkflow_complete/entry_points"))
+
+
+subworkflow contamination:
+    snakefile:
+        cfg.subworkflow("contamination")
+    workdir:
+        cfg.root.as_posix()
+
+
+if (
+    cfg.config.user_files.idat_pattern
+    and cfg.config.user_files.gtc_pattern
+    and cfg.config.workflow_params.remove_contam
+):
+    _targets.append(contamination("subworkflow_complete/contamination"))
+    _targets.append("sample_level/contamination/summary.csv")
+
+
+################################################################################
+# Sample QC Targets
+################################################################################
+_targets.extend(
+    [
         "sample_level/sample_qc.csv",
         "sample_level/snp_qc.csv",
         "sample_level/concordance/KnownReplicates.csv",
@@ -39,32 +53,20 @@ rule all_sample_qc:
         "sample_level/call_rate.png",
         "sample_level/chrx_inbreeding.png",
         "sample_level/ancestry.png",
-        _contamination_output,
+    ]
+)
+
+
+rule all_sample_qc:
+    input:
+        _targets,
+    output:
+        touch("subworkflow_complete/sample_qc"),
 
 
 ################################################################################
 # Imports
 ################################################################################
-
-
-subworkflow entry_points:
-    snakefile:
-        cfg.subworkflow("entry_points")
-    workdir:
-        cfg.root.as_posix()
-
-
-if (
-    cfg.config.user_files.idat_pattern
-    and cfg.config.user_files.gtc_pattern
-    and cfg.config.workflow_params.remove_contam
-):
-
-    subworkflow contamination:
-        snakefile:
-            cfg.subworkflow("contamination")
-        workdir:
-            cfg.root.as_posix()
 
 
 module thousand_genomes:

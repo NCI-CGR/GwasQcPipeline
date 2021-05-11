@@ -2,6 +2,7 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 output_pattern = cfg.config.user_files.output_pattern
+_targets = []
 
 
 wildcard_constraints:
@@ -9,35 +10,8 @@ wildcard_constraints:
     deliver_suffix=".*",
 
 
-localrules:
-    all_delivery,
-
-
 ################################################################################
-# All Targets
-################################################################################
-rule all_delivery:
-    input:
-        "delivery/samples.bed",
-        "delivery/samples.bim",
-        "delivery/samples.fam",
-        "delivery/SampleUsedforSubject.csv",
-        "delivery/subjects.bed",
-        "delivery/subjects.bim",
-        "delivery/subjects.fam",
-        "delivery/HWP.zip",
-        output_pattern.format(prefix="files_for_lab", file_type="all_sample_qc", ext="csv"),
-        output_pattern.format(prefix="files_for_lab", file_type="LimsUpload", ext="csv"),
-        output_pattern.format(prefix="files_for_lab", file_type="Identifiler", ext="csv"),
-        output_pattern.format(prefix="files_for_lab", file_type="KnownReplicates", ext="csv"),
-        output_pattern.format(prefix="files_for_lab", file_type="UnknownReplicates", ext="csv"),
-        output_pattern.format(prefix="delivery", file_type="AnalysisManifest", ext="csv"),
-        output_pattern.format(prefix="delivery", file_type="QC_Report", ext="docx"),
-        output_pattern.format(prefix="delivery", file_type="QC_Report", ext="xlsx"),
-
-
-################################################################################
-# Imports
+# Sub-workflows
 ################################################################################
 subworkflow entry_points:
     snakefile:
@@ -58,6 +32,40 @@ subworkflow subject_qc:
         cfg.subworkflow("subject_qc")
     workdir:
         cfg.root.as_posix()
+
+
+_targets.append(subject_qc("subworkflow_complete/subject_qc"))
+
+################################################################################
+# Delivery Targets
+################################################################################
+_targets.extend(
+    [
+        "delivery/samples.bed",
+        "delivery/samples.bim",
+        "delivery/samples.fam",
+        "delivery/SampleUsedforSubject.csv",
+        "delivery/subjects.bed",
+        "delivery/subjects.bim",
+        "delivery/subjects.fam",
+        "delivery/HWP.zip",
+        output_pattern.format(prefix="files_for_lab", file_type="all_sample_qc", ext="csv"),
+        output_pattern.format(prefix="files_for_lab", file_type="LimsUpload", ext="csv"),
+        output_pattern.format(prefix="files_for_lab", file_type="Identifiler", ext="csv"),
+        output_pattern.format(prefix="files_for_lab", file_type="KnownReplicates", ext="csv"),
+        output_pattern.format(prefix="files_for_lab", file_type="UnknownReplicates", ext="csv"),
+        output_pattern.format(prefix="delivery", file_type="AnalysisManifest", ext="csv"),
+        output_pattern.format(prefix="delivery", file_type="QC_Report", ext="docx"),
+        output_pattern.format(prefix="delivery", file_type="QC_Report", ext="xlsx"),
+    ]
+)
+
+
+rule all_delivery:
+    input:
+        _targets,
+    output:
+        touch("subworkflow_complete/delivery"),
 
 
 ################################################################################
