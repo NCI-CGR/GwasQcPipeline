@@ -173,14 +173,39 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
         "call_rate_filters"
 
 
+use rule miss from plink as plink_miss_initial with:
+    input:
+        bed=entry_points("sample_level/samples.bed"),
+        bim=entry_points("sample_level/samples.bim"),
+        fam=entry_points("sample_level/samples.fam"),
+    params:
+        out_prefix="sample_level/samples",
+    output:
+        imiss="sample_level/samples.imiss",
+        lmiss="sample_level/samples.lmiss",
+    group:
+        "call_rate_filters"
+
+
+use rule miss from plink as plink_miss_cr with:
+    input:
+        bed="sample_level/call_rate_{cr}/samples.bed",
+        bim="sample_level/call_rate_{cr}/samples.bim",
+        fam="sample_level/call_rate_{cr}/samples.fam",
+    params:
+        out_prefix="sample_level/call_rate_{cr}/samples",
+    output:
+        imiss="sample_level/call_rate_{cr}/samples.imiss",
+        lmiss="sample_level/call_rate_{cr}/samples.lmiss",
+    wildcard_constraints:
+        cr="1|2",
+    group:
+        "call_rate_filters"
+
+
 # -------------------------------------------------------------------------------
 # Contamination
 # -------------------------------------------------------------------------------
-use rule miss from plink as plink_miss with:
-    group:
-        "sample_qc"
-
-
 rule sample_contamination_verifyIDintensity:
     """Aggregate sample contamination scores.
 
