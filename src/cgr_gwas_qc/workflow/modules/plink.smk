@@ -63,7 +63,7 @@ rule snp_call_rate_filter:
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
-        "--mind {params.geno} "
+        "--geno {params.geno} "
         "--make-bed "
         "--threads {threads} "
         "--memory {resources.mem_mb} "
