@@ -1,97 +1,13 @@
-from pathlib import Path
-
-from snakemake.rules import expand
-
 from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
 
-include: cfg.modules("common")
-include: cfg.modules("plink_stats")
-include: cfg.modules("plink_filters")
-include: cfg.modules("sample_level_qc")
-include: cfg.modules("sample_level_summary")
-include: cfg.modules("subject_level_summary")
-include: cfg.modules("population_level_summary")
-include: cfg.modules("delivery")
+module delivery:
+    snakefile:
+        cfg.subworkflow("delivery")
+    config:
+        {}
 
 
-localrules: # Always run these rules locally b/c they are quick
-    all,
-    concordance_table,
-    sample_concordance_plink,
-    sample_qc_table,
-    sample_qc_summary_stats,
-    sample_lists_from_qc_flags,
-    subject_qc_table,
-    subject_representative,
-    subjects_per_population,
-    per_population_qc_done,
-    per_population_controls_qc_done,
-
-
-if cfg.ss.shape[0] < 1_000:
-    # With a small number of samples, these steps take < 1 min, so just run
-    # them locally.
-
-    localrules:
-        plink_bed_to_ped, # common
-        eigensoft_config, # entry points
-        create_gtc_sample_merge_list, # plink_filters
-        maf_filter,
-        approx_ld,
-        ld_prune,
-        snps_only_filter,
-        autosome_only_filter,
-        cleaned_filter,
-        remove_contaminated, # plink_stats
-        plink_stats_call_rate,
-        plink_stats_sexcheck,
-        plink_stats_allele_freq,
-        plink_stats_hardy,
-        plink_stats_ibd,
-        plink_stats_het, # subject_level_summary
-        pull_subject_representative,
-        convert_Sample_ID_to_Subject_ID,
-        related_subjects,
-        remove_related_subjects, # population_level_summary
-        plink_split_population,
-        plink_split_controls,
-
-
-rule all:
-    input:
-        "sample_level/summary_stats.txt",
-        "deliver/samples.bed",
-        "deliver/samples.bim",
-        "deliver/samples.fam",
-        "deliver/SampleUsedforSubject.csv",
-        "deliver/subjects.bed",
-        "deliver/subjects.bim",
-        "deliver/subjects.fam",
-        "deliver/HWP.zip",
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="all_sample_qc", ext="csv"
-        ),
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="LimsUpload", ext="csv"
-        ),
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="Identifiler", ext="csv"
-        ),
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="KnownReplicates", ext="csv"
-        ),
-        cfg.config.user_files.output_pattern.format(
-            prefix="files_for_lab", file_type="UnknownReplicates", ext="csv"
-        ),
-        cfg.config.user_files.output_pattern.format(
-            prefix="deliver", file_type="AnalysisManifest", ext="csv"
-        ),
-        cfg.config.user_files.output_pattern.format(
-            prefix="deliver", file_type="QC_Report", ext="docx"
-        ),
-        cfg.config.user_files.output_pattern.format(
-            prefix="deliver", file_type="QC_Report", ext="xlsx"
-        ),
+use rule * from delivery

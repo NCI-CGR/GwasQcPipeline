@@ -27,6 +27,9 @@ def main(ctx: typer.Context):
 
     - entry_points
     - contamination
+    - sample_qc
+    - subject_qc
+    - delivery
 
     """
     args = ctx.args

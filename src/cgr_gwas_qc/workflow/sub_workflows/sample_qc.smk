@@ -3,20 +3,21 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
+localrules:
+    all_sample_qc,
+
+
 ################################################################################
 # All Targets
 ################################################################################
-def _contamination_outputs(wildcards):
+def _contamination_output(wildcards):
     """Only build contamination targets if we have IDAT & GTC & remove contam set"""
     if (
         cfg.config.user_files.idat_pattern
         and cfg.config.user_files.gtc_pattern
         and cfg.config.workflow_params.remove_contam
     ):
-        return [
-            "sample_level/median_idat_intensity.csv",
-            "sample_level/contamination.csv",
-        ]
+        return "sample_level/contamination/summary.csv"
 
     return []
 
@@ -38,30 +39,56 @@ rule all_sample_qc:
         "sample_level/call_rate.png",
         "sample_level/chrx_inbreeding.png",
         "sample_level/ancestry.png",
-        _contamination_outputs,
+        _contamination_output,
 
 
 ################################################################################
 # Imports
 ################################################################################
-include: cfg.modules("thousand_genomes")
-include: cfg.subworkflow("entry_points")
+
+
+subworkflow entry_points:
+    snakefile:
+        cfg.subworkflow("entry_points")
+    workdir:
+        cfg.root.as_posix()
+
+
+if (
+    cfg.config.user_files.idat_pattern
+    and cfg.config.user_files.gtc_pattern
+    and cfg.config.workflow_params.remove_contam
+):
+
+    subworkflow contamination:
+        snakefile:
+            cfg.subworkflow("contamination")
+        workdir:
+            cfg.root.as_posix()
+
+
+module thousand_genomes:
+    snakefile:
+        cfg.modules("thousand_genomes")
+    config:
+        {}
 
 
 module plink:
     snakefile:
         cfg.modules("plink")
-
-
-use rule maf_filter, ld_filter, keep_bfile, miss, genome, ld, sexcheck from plink as plink_*
+    config:
+        {}
 
 
 module graf:
     snakefile:
         cfg.modules("graf")
+    config:
+        {}
 
 
-use rule extract_fingerprint_snps from graf
+use rule update_snps_to_1kg_rsID from thousand_genomes
 
 
 ################################################################################
@@ -72,9 +99,9 @@ use rule extract_fingerprint_snps from graf
 # -------------------------------------------------------------------------------
 use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
     input:
-        bed="sample_level/samples.bed",
-        bim="sample_level/samples.bim",
-        fam="sample_level/samples.fam",
+        bed=entry_points("sample_level/samples.bed"),
+        bim=entry_points("sample_level/samples.bim"),
+        fam=entry_points("sample_level/samples.fam"),
     params:
         mind=1 - cfg.config.software_params.sample_call_rate_1,
         out_prefix="sample_level/call_rate_1/samples_p1",
@@ -85,6 +112,8 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
         nosex=temp("sample_level/call_rate_1/samples_p1.nosex"),
     log:
         "sample_level/call_rate_1/samples_p1.log",
+    group:
+        "call_rate_filters"
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
@@ -102,6 +131,8 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
         nosex="sample_level/call_rate_1/samples.nosex",
     log:
         "sample_level/call_rate_1/samples.log",
+    group:
+        "call_rate_filters"
 
 
 use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
@@ -119,6 +150,8 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
         nosex=temp("sample_level/call_rate_2/samples_p1.nosex"),
     log:
         "sample_level/call_rate_2/samples_p1.log",
+    group:
+        "call_rate_filters"
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
@@ -136,107 +169,19 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
         nosex="sample_level/call_rate_2/samples.nosex",
     log:
         "sample_level/call_rate_2/samples.log",
+    group:
+        "call_rate_filters"
 
 
 # -------------------------------------------------------------------------------
 # Contamination
 # -------------------------------------------------------------------------------
-rule per_sample_median_idat_intensity:
-    """Calculate median intensity of Red and Green channels."""
-    input:
-        red=lambda wc: cfg.expand(
-            cfg.config.user_files.idat_pattern.red,
-            query=f"Sample_ID == '{wc.Sample_ID}'",
-        ),
-        green=lambda wc: cfg.expand(
-            cfg.config.user_files.idat_pattern.green,
-            query=f"Sample_ID == '{wc.Sample_ID}'",
-        ),
-    output:
-        temp(
-            "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
-        ),
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
+use rule miss from plink as plink_miss with:
     group:
-        "per_sample_median_idat_intensity"
-    conda:
-        cfg.conda("illuminaio")
-    script:
-        "../scripts/median_idat_intensity.R"
+        "sample_qc"
 
 
-rule agg_median_idat_intensity:
-    input:
-        cfg.expand(rules.per_sample_median_idat_intensity.output[0]),
-    output:
-        "sample_level/median_idat_intensity.csv",
-    run:
-        import pandas as pd
-
-        pd.concat([pd.read_csv(file_name) for file_name in input]).to_csv(
-            output[0], index=False
-        )
-
-
-rule per_sample_gtc_to_adpc:
-    """Converts a sample's GTC/BPM to an Illumina ADPC.BIN.
-
-    This is the format required by ``verifyIDintensity``. The script also
-    runs some sanity checks (intensities and normalized intensities > 0;
-    genotypes are one of {0, 1, 2, 3}) while processing each file.
-
-    .. warning::
-        This is a submission hot spot creating 1 job per sample.
-    """
-    input:
-        gtc_file=lambda wc: cfg.expand(
-            cfg.config.user_files.gtc_pattern,
-            query=f"Sample_ID == '{wc.Sample_ID}'",
-        )[0],
-        bpm_file=cfg.config.reference_files.illumina_manifest_file,
-    output:
-        temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "per_sample_gtc_to_adpc"
-    script:
-        "../scripts/gtc2adpc.py"
-
-
-rule per_sample_verifyIDintensity_contamination:
-    """Find contaminated samples using allele intensities.
-
-    Uses ``verifyIDintensity`` to find samples with allele intensities that deviate from the
-    population.
-
-    .. warning::
-        This is a submission hot spot creating 1 job per sample.
-
-    .. note::
-        Here we are running ``verifyIDintensity`` in single sample mode. This software also has a
-        multi-sample mode which may be faster and give better estimates. The problem with
-        multi-sample mode is that it only works when you have a "large" number of samples.
-    """
-    input:
-        adpc=rules.per_sample_gtc_to_adpc.output[0],
-        abf=rules.pull_1KG_allele_b_freq.output.abf_file,
-    params:
-        snps=cfg.config.num_snps,
-    output:
-        temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "per_sample_verifyIDintensity_contamination"
-    conda:
-        cfg.conda("verifyidintensity")
-    shell:
-        "verifyIDintensity -m {params.snps} -n 1 -b {input.abf} -v -p -i {input.adpc} > {output}"
-
-
-rule agg_verifyIDintensity_contamination:
+rule sample_contamination_verifyIDintensity:
     """Aggregate sample contamination scores.
 
     Aggregates sample level contamination scores into a single file (each
@@ -244,16 +189,18 @@ rule agg_verifyIDintensity_contamination:
     is below the threshold and the file is not in the ``imiss`` file.
     """
     input:
-        contamination_files=cfg.expand(
-            rules.per_sample_verifyIDintensity_contamination.output
+        contamination_file=contamination("sample_level/contamination/verifyIDintensity.csv"),
+        median_intensity_file=contamination(
+            "sample_level/contamination/median_idat_intensity.csv"
         ),
-        median_intensity_file=rules.agg_median_idat_intensity.output[0],
         imiss_file="sample_level/call_rate_2/samples.imiss",
     params:
         intensity_threshold=cfg.config.software_params.intensity_threshold,
         contam_threshold=cfg.config.software_params.contam_threshold,
     output:
-        "sample_level/contamination.csv",
+        "sample_level/contamination/summary.csv",
+    group:
+        "sample_qc"
     script:
         "../scripts/agg_contamination.py"
 
@@ -261,6 +208,31 @@ rule agg_verifyIDintensity_contamination:
 # -------------------------------------------------------------------------------
 # Replicate Concordance
 # -------------------------------------------------------------------------------
+use rule maf_filter from plink as plink_* with:
+    group:
+        "replicate_concordance"
+
+
+use rule ld from plink as plink_* with:
+    group:
+        "replicate_concordance"
+
+
+use rule ld_filter from plink as plink_* with:
+    group:
+        "replicate_concordance"
+
+
+use rule keep_bfile from plink as plink_* with:
+    group:
+        "replicate_concordance"
+
+
+use rule genome from plink as plink_* with:
+    group:
+        "replicate_concordance"
+
+
 rule sample_concordance_plink:
     """Parse PLINK IBD file and calculate sample concordance.
 
@@ -276,8 +248,15 @@ rule sample_concordance_plink:
         pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
     output:
         "sample_level/concordance/plink.csv",
+    group:
+        "replicate_concordance"
     script:
         "../scripts/concordance_table.py"
+
+
+use rule extract_fingerprint_snps from graf as graf_extract_fpg with:
+    group:
+        "replicate_concordance"
 
 
 use rule relatedness from graf as sample_concordance_graf with:
@@ -287,6 +266,8 @@ use rule relatedness from graf as sample_concordance_graf with:
         "sample_level/concordance/graf.tsv",
     log:
         "sample_level/concordance/graf.log",
+    group:
+        "replicate_concordance"
 
 
 rule sample_concordance_king:
@@ -306,18 +287,20 @@ rule sample_concordance_king:
         cfg.conda("king")
     log:
         "sample_level/concordance/king.log",
+    group:
+        "replicate_concordance"
     threads: 8
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
         time_hr=lambda wildcards, attempt: 2 * attempt,
     shell:
+        # king does not always output all files so touch for snakemake
         "king -b {input.bed} --related --degree 3 --prefix {params.out_prefix} --cpu {threads} > {log} 2>&1 "
         "&& touch {output.within_family} "
         "&& touch {output.between_family} "
         "&& touch {output.within_family_X} "
         "&& touch {output.between_family_X} "
         "&& touch {output.segments} "
-        # king does not always output all files so touch for snakemake
 
 
 rule sample_concordance_summary:
@@ -331,6 +314,8 @@ rule sample_concordance_summary:
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * 2 * attempt,
         time_hr=lambda wildcards, attempt: 2 * attempt,
+    group:
+        "replicate_concordance"
     script:
         "../scripts/sample_concordance.py"
 
@@ -343,6 +328,8 @@ rule split_sample_concordance:
         known_qc_csv="sample_level/concordance/InternalQcKnown.csv",
         known_study_csv="sample_level/concordance/StudySampleKnown.csv",
         unknown_csv="sample_level/concordance/UnknownReplicates.csv",
+    group:
+        "replicate_concordance"
     script:
         "../scripts/split_sample_concordance.py"
 
@@ -357,6 +344,8 @@ use rule populations from graf as graf_populations with:
         "sample_level/ancestry/graf_populations.txt",
     log:
         "sample_level/ancestry/graf_populations.log",
+    group:
+        "ancestry"
 
 
 use rule ancestry from graf as graf_ancestry with:
@@ -364,6 +353,8 @@ use rule ancestry from graf as graf_ancestry with:
         rules.graf_populations.output[0],
     output:
         "sample_level/ancestry/graf_ancestry.txt",
+    group:
+        "ancestry"
 
 
 # -------------------------------------------------------------------------------
@@ -377,6 +368,8 @@ rule snp_qc_table:
         thousand_genomes="sample_level/call_rate_2/samples_1kg_rsID.csv",
     output:
         "sample_level/snp_qc.csv",
+    group:
+        "sample_qc"
     script:
         "../scripts/snp_qc_table.py"
 
@@ -384,17 +377,22 @@ rule snp_qc_table:
 # -------------------------------------------------------------------------------
 # Sample Summary Table
 # -------------------------------------------------------------------------------
+use rule sexcheck from plink as plink_sexcheck with:
+    group:
+        "sample_qc"
+
+
 def _contam(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
     if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:
-        return rules.agg_verifyIDintensity_contamination.output[0]
+        return rules.sample_contamination_verifyIDintensity.output[0]
     return []
 
 
 def _intensity(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
     if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:
-        return rules.agg_median_idat_intensity.output[0]
+        return contamination("sample_level/contamination/median_idat_intensity.csv")
     return []
 
 
@@ -414,6 +412,8 @@ rule sample_qc_table:
         remove_rep_discordant=cfg.config.workflow_params.remove_rep_discordant,
     output:
         "sample_level/sample_qc.csv",
+    group:
+        "sample_qc"
     script:
         "../scripts/sample_qc_table.py"
 
@@ -423,6 +423,8 @@ rule sample_qc_summary_stats:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/summary_stats.txt",
+    group:
+        "sample_qc"
     script:
         "../scripts/sample_qc_summary_stats.py"
 
@@ -436,6 +438,8 @@ rule sample_lists_from_qc_flags:
         sex="sample_level/qc_failures/sex_discordant.txt",
         rep="sample_level/qc_failures/replicate_discordant.txt",
         ctrl="sample_level/internal_controls.txt",
+    group:
+        "sample_qc"
     script:
         "../scripts/sample_lists_from_qc_flags.py"
 
@@ -454,6 +458,8 @@ rule plot_call_rate:
         snp_cr2=cfg.config.software_params.snp_call_rate_2,
     output:
         "sample_level/call_rate.png",
+    group:
+        "sample_qc"
     script:
         "../scripts/plot_call_rate.py"
 
@@ -463,6 +469,8 @@ rule plot_chrx_inbreeding:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/chrx_inbreeding.png",
+    group:
+        "sample_qc"
     script:
         "../scripts/plot_chrx_inbreeding.py"
 
@@ -472,5 +480,7 @@ rule plot_ancestry:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/ancestry.png",
+    group:
+        "sample_qc"
     script:
         "../scripts/plot_ancestry.py"
