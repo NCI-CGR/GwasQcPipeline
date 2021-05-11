@@ -26,6 +26,7 @@ rule sample_call_rate_filter:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
+        tim_hr=lambda wildcards, attempt: attempt ** 2,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -58,6 +59,7 @@ rule snp_call_rate_filter:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
+        tim_hr=lambda wildcards, attempt: attempt ** 2,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -469,7 +471,7 @@ rule sexcheck:
     params:
         out_prefix="{prefix}",
     output:
-        sexcheck="{prefix}.sexcheck",
+        "{prefix}.sexcheck",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -494,7 +496,7 @@ rule frq:
     params:
         out_prefix="{prefix}",
     output:
-        sexcheck="{prefix}.frq",
+        "{prefix}.frq",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -519,7 +521,7 @@ rule hwe:
     params:
         out_prefix="{prefix}",
     output:
-        sexcheck="{prefix}.hwe",
+        "{prefix}.hwe",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -552,7 +554,7 @@ rule genome:
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
         out_prefix="{prefix}",
     output:
-        genome="{prefix}.genome",
+        "{prefix}.genome",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
@@ -580,7 +582,7 @@ rule het:
     params:
         out_prefix="{prefix}",
     output:
-        het="{prefix}.het",
+        "{prefix}.het",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
