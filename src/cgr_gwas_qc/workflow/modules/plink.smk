@@ -453,7 +453,6 @@ rule miss:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
         "plink "
-        "--bfile {wildcards.prefix} "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
