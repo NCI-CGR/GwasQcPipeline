@@ -15,6 +15,10 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
+localrules:
+    all_entry_points,
+
+
 ################################################################################
 # All Targets
 ################################################################################
@@ -41,7 +45,8 @@ if cfg.config.user_files.gtc_pattern:
         """
         input:
             gtc=lambda wc: cfg.expand(
-                cfg.config.user_files.gtc_pattern, query=f"Sample_ID == '{wc.Sample_ID}'",
+                cfg.config.user_files.gtc_pattern,
+                query=f"Sample_ID == '{wc.Sample_ID}'",
             )[0],
             bpm=cfg.config.reference_files.illumina_manifest_file,
         params:
@@ -67,6 +72,8 @@ if cfg.config.user_files.gtc_pattern:
             map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
         output:
             temp("sample_level/initial_mergeList.txt"),
+        group:
+            "merge_entry_points"
         run:
             with open(output[0], "w") as fh:
                 for ped, map_ in zip(input.ped, input.map_):
@@ -91,8 +98,8 @@ if cfg.config.user_files.gtc_pattern:
             nosex="sample_level/samples.nosex",
         log:
             "sample_level/samples.log",
-        envmodules:
-            cfg.envmodules("plink2"),
+        group:
+            "merge_entry_points"
         conda:
             cfg.conda("plink2")
         threads: 8
@@ -127,8 +134,6 @@ elif cfg.config.user_files.ped and cfg.config.user_files.map:
             nosex="sample_level/samples.nosex",
         log:
             "sample_level/samples.log",
-        envmodules:
-            cfg.envmodules("plink2"),
         conda:
             cfg.conda("plink2")
         resources:
