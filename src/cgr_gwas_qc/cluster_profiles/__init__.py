@@ -163,7 +163,7 @@ def update_group_properties(
     n_unique_rules = len(unique_rulenames)
 
     rulename = ".".join(sorted(unique_rulenames))  # concatenate rulenames: rule1.rule2
-    options["rulename"] = f"GROUP.{rulename}"
+    options["rulename"] = f"GROUP.{rulename[:100]}".rstrip(".")
 
     # Adjust multi-sample group resources to sane values. NOTE: this only will
     # work well if the cluster correctly use resource masks to limit the number
