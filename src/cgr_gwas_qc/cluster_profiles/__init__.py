@@ -168,9 +168,8 @@ def update_group_properties(
     # Adjust multi-sample group resources to sane values. NOTE: this only will
     # work well if the cluster correctly use resource masks to limit the number
     # of CPUs.
-    if n_unique_rules == 1:
+    if (n_unique_rules == 1) & ((_rulename := rulenames[0]) in cluster_config["group_jobs"]):
         n_samples = n_rules
-        _rulename = rulenames[0]
 
         if n_samples < 1000:
             rule_options = cluster_config["group_jobs"][_rulename]["small"]
