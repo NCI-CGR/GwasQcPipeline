@@ -376,7 +376,6 @@ use rule ld from plink as population_level_unrelated_ld_estimate with:
         to_keep=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.prune.in"),
         # Markers in LD
         to_remove=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.prune.out"),
-        nosex=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.nosex"),
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
     group:

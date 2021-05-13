@@ -258,7 +258,6 @@ use rule ld from plink as sample_level_ld_estimate with:
     output:
         to_keep=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.in"),  # Markers in approx. linkage equilibrium
         to_remove=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.out"),  # Markers in LD
-        nosex=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex"),  # Markers in LD
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
     group:
