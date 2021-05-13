@@ -9,6 +9,12 @@ from cgr_gwas_qc.workflow.scripts import subject_qc_table
 cfg = load_config()
 
 
+localrules:
+    all_subject_qc,
+    agg_population_plots,
+    agg_control_plots,
+
+
 wildcard_constraints:
     population="[\w_]+",
 
@@ -328,8 +334,6 @@ rule agg_population_concordance:
         ibd_files=_population_concordance_files,
     output:
         "subject_level/concordance.csv",
-    group:
-        "subject_qc"
     script:
         "../scripts/agg_population_concordance.py"
 
@@ -560,8 +564,6 @@ rule agg_population_qc_tables:
         population_qc_tables=_population_qc_tables,
     output:
         "subject_level/population_qc.csv",
-    group:
-        "subject_qc"
     script:
         "../scripts/agg_population_qc_tables.py"
 
@@ -757,5 +759,3 @@ rule agg_control_plots:
         _control_plots,
     output:
         touch("subject_level/.control_plots.done"),
-    group:
-        "subject_qc"

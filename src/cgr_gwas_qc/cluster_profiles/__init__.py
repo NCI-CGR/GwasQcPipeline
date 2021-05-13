@@ -168,13 +168,14 @@ def update_group_properties(
     # Adjust multi-sample group resources to sane values. NOTE: this only will
     # work well if the cluster correctly use resource masks to limit the number
     # of CPUs.
-    if (n_unique_rules == 1) & ((_rulename := rulenames[0]) in cluster_config["group_jobs"]):
+    group_jobs = cluster_config.get("group_jobs", {})
+    if (n_unique_rules == 1) & ((_rulename := rulenames[0]) in group_jobs):
         n_samples = n_rules
 
         if n_samples < 1000:
-            rule_options = cluster_config["group_jobs"][_rulename]["small"]
+            rule_options = group_jobs[_rulename]["small"]
         else:
-            rule_options = cluster_config["group_jobs"][_rulename]["large"]
+            rule_options = group_jobs[_rulename]["large"]
 
         _update_cluster_options(options, rule_options)
 
@@ -190,7 +191,7 @@ def _get_rule_names(jobscript: str) -> List[str]:
     match = re.search(r"--allowed-rules (.*?) --", _jobscript)
 
     if match is None:
-        raise ValueError("Grouped jobscript missing `--allwed-rules`.")
+        raise ValueError(f"Grouped jobscript missing `--allowed-rules`.\n{_jobscript}")
 
     allowed_rules = match.group(1)
     return allowed_rules.strip().split()
