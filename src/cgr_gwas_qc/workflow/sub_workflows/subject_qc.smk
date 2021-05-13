@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from more_itertools import flatten
 
 from cgr_gwas_qc import load_config
@@ -5,6 +7,15 @@ from cgr_gwas_qc.workflow.scripts import subject_qc_table
 
 
 cfg = load_config()
+
+
+localrules:
+    all_subject_qc,
+    subject_qc_table,
+    select_subjects_for_analysis,
+    selected_Subject_IDs,
+    population_checkpoint,
+    population_controls_checkpoint,
 
 
 wildcard_constraints:
@@ -60,20 +71,16 @@ rule subject_qc_table:
         remove_unexpected_rep=cfg.config.workflow_params.remove_unexpected_rep,
     output:
         "subject_level/subject_qc.csv",
-    group:
-        "select_subjects"
     script:
         "../scripts/subject_qc_table.py"
 
 
-checkpoint select_subjects_for_analysis:
+rule select_subjects_for_analysis:
     """Pull out subjects that have no analytic exclusions."""
     input:
         rules.subject_qc_table.output[0],
     output:
         "subject_level/subjects_for_analysis.csv",
-    group:
-        "select_subjects"
     run:
         (
             subject_qc_table.read(input[0])
@@ -90,8 +97,6 @@ rule selected_Subject_IDs:
     output:
         selected=temp("subject_level/selected_Subject_IDs.txt"),
         sample2subject=temp("subject_level/sample_to_subject.txt"),
-    group:
-        "select_subjects"
     run:
         qc = subject_qc_table.read(input[0])
         qc.reindex(["Sample_ID", "Sample_ID"], axis=1).to_csv(
@@ -144,17 +149,36 @@ use rule rename_ids from plink as rename_Sample_ID_to_Subject_ID with:
 # -------------------------------------------------------------------------------
 # Population Level Analysis
 # -------------------------------------------------------------------------------
+checkpoint population_checkpoint:
+    input:
+        rules.select_subjects_for_analysis.output[0],
+    params:
+        min_num_subjects=cfg.config.workflow_params.minimum_pop_subjects,
+    output:
+        directory("subject_level/populations"),
+    run:
+        populations = (
+            subject_qc_table.read(input[0])
+            .groupby("Ancestry")
+            .size()
+            .pipe(lambda x: x[x >= params.min_num_subjects])
+            .index.tolist()
+        )
+
+        path = Path(output[0])
+        path.mkdir(exist_ok=True, parents=True)
+
+        for population in populations:
+            (path / population).touch()
+
+
 def _get_populations(wildcards):
-    """Use checkpoints to pull out a list of populations"""
-    filename = checkpoints.select_subjects_for_analysis.get(**wildcards).output[0]
-    min_num_subjects = cfg.config.workflow_params.minimum_pop_subjects
-    return (
-        subject_qc_table.read(filename)
-        .groupby("Ancestry")
-        .size()
-        .pipe(lambda x: x[x >= min_num_subjects])  # defaults to 50
-        .index.tolist()
-    )
+    checkpoint_output = checkpoints.population_checkpoint.get(**wildcards).output[0]
+    return [
+        x
+        for x in glob_wildcards(Path(checkpoint_output, "{population}")).population
+        if not x.startswith(".snakemake")
+    ]
 
 
 # Split Subjects by Populations
@@ -559,6 +583,39 @@ rule agg_population_plots:
 # -------------------------------------------------------------------------------
 # Control Analysis (HWE)
 # -------------------------------------------------------------------------------
+checkpoint population_controls_checkpoint:
+    input:
+        rules.select_subjects_for_analysis.output[0],
+    params:
+        min_num_subjects=cfg.config.workflow_params.control_hwp_threshold,
+    output:
+        directory("subject_level/controls"),
+    run:
+        populations = (
+            subject_qc_table.read(input[0])
+            .query("case_control == 'Control'")
+            .groupby("Ancestry")
+            .size()
+            .pipe(lambda x: x[x >= params.min_num_subjects])
+            .index.tolist()
+        )
+
+        path = Path(output[0])
+        path.mkdir(exist_ok=True, parents=True)
+
+        for population in populations:
+            (path / population).touch()
+
+
+def _get_controls(wildcards):
+    checkpoint_output = checkpoints.population_controls_checkpoint.get(**wildcards).output[0]
+    return [
+        x
+        for x in glob_wildcards(Path(checkpoint_output, "{population}")).population
+        if not x.startswith(".snakemake")
+    ]
+
+
 rule population_controls_Subject_IDs:
     input:
         rules.select_subjects_for_analysis.output[0],
@@ -680,16 +737,7 @@ rule plot_hwe:
 
 
 def _control_plots(wildcards):
-    filename = checkpoints.select_subjects_for_analysis.get(**wildcards).output[0]
-    min_num_subjects = cfg.config.workflow_params.control_hwp_threshold
-    populations = (
-        subject_qc_table.read(filename)
-        .query("case_control == 'Control'")
-        .groupby("Ancestry")
-        .size()
-        .pipe(lambda x: x[x >= min_num_subjects])  # defaults to 50
-        .index.tolist()
-    )
+    populations = _get_controls(wildcards)
 
     if not populations:
         return []
