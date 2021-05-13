@@ -258,24 +258,6 @@ use rule ld from plink as sample_level_ld_estimate with:
     output:
         to_keep=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.in"),  # Markers in approx. linkage equilibrium
         to_remove=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.out"),  # Markers in LD
-    log:
-        "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
-    group:
-        "replicate_concordance"
-
-
-use rule ld_filter from plink as sample_level_ld_prune with:
-    input:
-        bed=rules.sample_level_maf_filter.output.bed,
-        bim=rules.sample_level_maf_filter.output.bim,
-        fam=rules.sample_level_maf_filter.output.fam,
-        to_keep=rules.sample_level_ld_estimate.output.to_keep,
-    params:
-        out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
-    output:
-        bed="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.bed",
-        bim="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.bim",
-        fam="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.fam",
         nosex="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex",
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
@@ -283,11 +265,30 @@ use rule ld_filter from plink as sample_level_ld_prune with:
         "replicate_concordance"
 
 
+use rule ld_filter from plink as sample_level_ld_pruned with:
+    input:
+        bed=rules.sample_level_maf_filter.output.bed,
+        bim=rules.sample_level_maf_filter.output.bim,
+        fam=rules.sample_level_maf_filter.output.fam,
+        to_keep=rules.sample_level_ld_estimate.output.to_keep,
+    params:
+        out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned",
+    output:
+        bed="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.bed",
+        bim="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.bim",
+        fam="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.fam",
+        nosex="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.nosex",
+    log:
+        "sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.log",
+    group:
+        "replicate_concordance"
+
+
 use rule genome from plink as sample_level_ibd with:
     input:
-        bed=rules.sample_level_ld_prune.output.bed,
-        bim=rules.sample_level_ld_prune.output.bim,
-        fam=rules.sample_level_ld_prune.output.fam,
+        bed=rules.sample_level_ld_pruned.output.bed,
+        bim=rules.sample_level_ld_pruned.output.bim,
+        fam=rules.sample_level_ld_pruned.output.fam,
     params:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,

@@ -222,10 +222,11 @@ use rule ld from plink as population_level_ld_estimate with:
         r2="{ld}",  # r2 threshold: currently 0.1
         out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}",
     output:
-        to_keep=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.prune.in"),  # Markers in approx. linkage equilibrium
-        to_remove=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.prune.out"),
+        # Markers in approx. linkage equilibrium
+        to_keep=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.prune.in"),
         # Markers in LD
-        nosex=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.nosex"),  # Markers in LD
+        to_remove=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.prune.out"),
+        nosex=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.nosex"),
     log:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}.log",
     group:
@@ -239,14 +240,14 @@ use rule ld_filter from plink as population_level_ld_pruned with:
         fam=rules.population_level_maf_filter.output.fam,
         to_keep=rules.population_level_ld_estimate.output.to_keep,
     params:
-        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}",
+        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned",
     output:
-        bed="subject_level/{population}/subjects_maf{maf}_ld{ld}.bed",
-        bim="subject_level/{population}/subjects_maf{maf}_ld{ld}.bim",
-        fam="subject_level/{population}/subjects_maf{maf}_ld{ld}.fam",
-        nosex="subject_level/{population}/subjects_maf{maf}_ld{ld}.nosex",
+        bed="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.bed",
+        bim="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.bim",
+        fam="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.fam",
+        nosex="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.nosex",
     log:
-        "subject_level/{population}/subjects_maf{maf}_ld{ld}.log",
+        "subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.log",
     group:
         "{population}"
 
@@ -376,6 +377,7 @@ use rule ld from plink as population_level_unrelated_ld_estimate with:
         to_keep=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.prune.in"),
         # Markers in LD
         to_remove=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.prune.out"),
+        nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.nosex",
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
     group:
@@ -389,14 +391,14 @@ use rule ld_filter from plink as population_level_unrelated_ld_pruned with:
         fam=rules.population_level_unrelated_maf_filter.output.fam,
         to_keep=rules.population_level_unrelated_ld_estimate.output.to_keep,
     params:
-        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}",
+        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned",
     output:
-        bed="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.bed",
-        bim="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.bim",
-        fam="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.fam",
-        nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.nosex",
+        bed="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.bed",
+        bim="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.bim",
+        fam="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.fam",
+        nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.nosex",
     log:
-        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
+        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.log",
     group:
         "{population}"
 

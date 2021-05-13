@@ -409,6 +409,7 @@ rule ld:
     output:
         to_keep=temp("{prefix}_ld{ld}.prune.in"),  # Markers in approx. linkage equilibrium
         to_remove=temp("{prefix}_ld{ld}.prune.out"),  # Markers in LD
+        nosex=temp("{prefix}_ld{ld}.nosex"),
     log:
         "{prefix}_ld{ld}.log",
     wildcard_constraints:
