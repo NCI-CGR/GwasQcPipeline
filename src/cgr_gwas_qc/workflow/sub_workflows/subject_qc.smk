@@ -9,15 +9,6 @@ from cgr_gwas_qc.workflow.scripts import subject_qc_table
 cfg = load_config()
 
 
-localrules:
-    all_subject_qc,
-    subject_qc_table,
-    select_subjects_for_analysis,
-    selected_Subject_IDs,
-    population_checkpoint,
-    population_controls_checkpoint,
-
-
 wildcard_constraints:
     population="[\w_]+",
 
@@ -26,6 +17,12 @@ wildcard_constraints:
 # Subject QC Targets
 ################################################################################
 targets = [
+    "subject_level/samples.bed",
+    "subject_level/samples.bim",
+    "subject_level/samples.fam",
+    "subject_level/subjects.bed",
+    "subject_level/subjects.bim",
+    "subject_level/subjects.fam",
     "subject_level/concordance.csv",
     "subject_level/population_qc.csv",
     "subject_level/.population_plots.done",
@@ -71,6 +68,8 @@ rule subject_qc_table:
         remove_unexpected_rep=cfg.config.workflow_params.remove_unexpected_rep,
     output:
         "subject_level/subject_qc.csv",
+    group:
+        "select_subjects"
     script:
         "../scripts/subject_qc_table.py"
 
@@ -81,6 +80,8 @@ rule select_subjects_for_analysis:
         rules.subject_qc_table.output[0],
     output:
         "subject_level/subjects_for_analysis.csv",
+    group:
+        "select_subjects"
     run:
         (
             subject_qc_table.read(input[0])
@@ -97,6 +98,8 @@ rule selected_Subject_IDs:
     output:
         selected=temp("subject_level/selected_Subject_IDs.txt"),
         sample2subject=temp("subject_level/sample_to_subject.txt"),
+    group:
+        "select_subjects"
     run:
         qc = subject_qc_table.read(input[0])
         qc.reindex(["Sample_ID", "Sample_ID"], axis=1).to_csv(
@@ -244,15 +247,15 @@ use rule ld from plink as population_level_ld_estimate with:
         fam=rules.population_level_maf_filter.output.fam,
     params:
         r2="{ld}",  # r2 threshold: currently 0.1
-        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}",
+        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate",
     output:
         # Markers in approx. linkage equilibrium
-        to_keep=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.prune.in"),
+        to_keep=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate.prune.in"),
         # Markers in LD
-        to_remove=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.prune.out"),
-        nosex=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}.nosex"),
+        to_remove=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate.prune.out"),
+        nosex=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate.nosex"),
     log:
-        "subject_level/{population}/subjects_maf{maf}_ld{ld}.log",
+        "subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate.log",
     group:
         "{population}"
 
@@ -264,14 +267,14 @@ use rule ld_filter from plink as population_level_ld_pruned with:
         fam=rules.population_level_maf_filter.output.fam,
         to_keep=rules.population_level_ld_estimate.output.to_keep,
     params:
-        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned",
+        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}",
     output:
-        bed="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.bed",
-        bim="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.bim",
-        fam="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.fam",
-        nosex="subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.nosex",
+        bed="subject_level/{population}/subjects_maf{maf}_ld{ld}.bed",
+        bim="subject_level/{population}/subjects_maf{maf}_ld{ld}.bim",
+        fam="subject_level/{population}/subjects_maf{maf}_ld{ld}.fam",
+        nosex="subject_level/{population}/subjects_maf{maf}_ld{ld}.nosex",
     log:
-        "subject_level/{population}/subjects_maf{maf}_ld{ld}_pruned.log",
+        "subject_level/{population}/subjects_maf{maf}_ld{ld}.log",
     group:
         "{population}"
 
@@ -284,9 +287,9 @@ use rule genome from plink as population_level_ibd with:
     params:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
-        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}",
+        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd",
     output:
-        "subject_level/{population}/subjects_maf{maf}_ld{ld}.genome",
+        "subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd.genome",
     group:
         "{population}"
 
@@ -395,15 +398,19 @@ use rule ld from plink as population_level_unrelated_ld_estimate with:
         fam=rules.population_level_unrelated_maf_filter.output.fam,
     params:
         r2="{ld}",  # r2 threshold: currently 0.1
-        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}",
+        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate",
     output:
         # Markers in approx. linkage equilibrium
-        to_keep=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.prune.in"),
+        to_keep=temp(
+            "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.prune.in"
+        ),
         # Markers in LD
-        to_remove=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.prune.out"),
-        nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.nosex",
+        to_remove=temp(
+            "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.prune.out"
+        ),
+        nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.nosex",
     log:
-        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
+        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.log",
     group:
         "{population}"
 
@@ -415,14 +422,14 @@ use rule ld_filter from plink as population_level_unrelated_ld_pruned with:
         fam=rules.population_level_unrelated_maf_filter.output.fam,
         to_keep=rules.population_level_unrelated_ld_estimate.output.to_keep,
     params:
-        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned",
+        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}",
     output:
-        bed="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.bed",
-        bim="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.bim",
-        fam="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.fam",
-        nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.nosex",
+        bed="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.bed",
+        bim="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.bim",
+        fam="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.fam",
+        nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.nosex",
     log:
-        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_pruned.log",
+        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
     group:
         "{population}"
 
@@ -433,12 +440,12 @@ use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped with:
         bim=rules.population_level_unrelated_ld_pruned.output.bim,
         fam=rules.population_level_unrelated_ld_pruned.output.fam,
     output:
-        ped=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.ped"),
-        map_=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.map"),
+        ped=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed.ped"),
+        map_=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed.map"),
     params:
-        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}",
+        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed",
     log:
-        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
+        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed.log",
     group:
         "{population}"
 
@@ -622,7 +629,7 @@ rule population_controls_Subject_IDs:
     output:
         "subject_level/{population}/controls.txt",
     group:
-        "{population}"
+        "{population}_controls"
     run:
         (
             subject_qc_table.read(input[0])
@@ -646,7 +653,7 @@ use rule keep_ids from plink as pull_population_unrelated_controls with:
         fam="subject_level/{population}/controls_unrelated.fam",
         nosex="subject_level/{population}/controls_unrelated.nosex",
     group:
-        "{population}"
+        "{population}_controls"
     log:
         "subject_level/{population}/controls_unrelated.log",
 
@@ -667,7 +674,7 @@ use rule maf_filter from plink as population_level_unrelated_controls_maf_filter
     log:
         "subject_level/{population}/controls_unrelated_maf{maf}.log",
     group:
-        "{population}"
+        "{population}_controls"
 
 
 use rule snps_only_filter from plink as keep_only_snps with:
@@ -685,7 +692,7 @@ use rule snps_only_filter from plink as keep_only_snps with:
     log:
         "subject_level/{population}/controls_unrelated_maf{maf}_snps.log",
     group:
-        "{population}"
+        "{population}_controls"
 
 
 use rule autosome_only_filter from plink as keep_only_autosomal_variants with:
@@ -703,7 +710,7 @@ use rule autosome_only_filter from plink as keep_only_autosomal_variants with:
     log:
         "subject_level/{population}/controls_unrelated_maf{maf}_snps_autosome.log",
     group:
-        "{population}"
+        "{population}_controls"
 
 
 use rule hwe from plink as population_level_unrelated_controls_hwe with:
@@ -716,7 +723,7 @@ use rule hwe from plink as population_level_unrelated_controls_hwe with:
     output:
         "subject_level/{population}/controls_unrelated_maf{maf}_snps_autosome.hwe",
     group:
-        "{population}"
+        "{population}_controls"
 
 
 rule plot_hwe:
@@ -731,7 +738,7 @@ rule plot_hwe:
     output:
         "subject_level/hwe_plots/{population}.png",
     group:
-        "{population}"
+        "{population}_controls"
     script:
         "../scripts/plot_hwe.py"
 
