@@ -9,6 +9,8 @@ rule extract_fingerprint_snps:
         bed="{prefix}.bed",
         bim="{prefix}.bim",
         fam="{prefix}.fam",
+    params:
+        out_prefix="{prefix}",
     output:
         "{prefix}.fpg",
     log:
@@ -18,7 +20,7 @@ rule extract_fingerprint_snps:
     shell:
         # GRAF returns an exit code of 1, this captures it so snakemake will actually run.
         "graf "
-        "-exfp {wildcards.prefix} "
+        "-exfp {params.out_prefix} "
         "-out {output[0]} "
         "-type 4 "
         "> {log} 2>&1 "

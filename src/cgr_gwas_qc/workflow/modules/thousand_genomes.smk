@@ -3,7 +3,7 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
-rule pull_1KG_allele_b_freq:
+rule pull_b_allele_freq_from_1kg:
     """Pulls the population level allele frequencies from the 1KG project.
 
     ``verifyIDintensity`` requires population level allele frequencies

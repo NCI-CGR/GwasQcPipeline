@@ -12,10 +12,6 @@ rule all_contamination:
     input:
         "sample_level/contamination/median_idat_intensity.csv",
         "sample_level/contamination/verifyIDintensity.csv",
-    output:
-        touch("subworkflow_complete/contamination"),
-    group:
-        "agg_contamination"
 
 
 ################################################################################
@@ -28,7 +24,7 @@ module thousand_genomes:
         {}
 
 
-use rule pull_1KG_allele_b_freq from thousand_genomes
+use rule pull_b_allele_freq_from_1kg from thousand_genomes
 
 
 ################################################################################
@@ -70,8 +66,6 @@ rule agg_median_idat_intensity:
     resources:
         mem_gb=lambda wildcards, attempt: attempt * 4,
         tim_hr=lambda wildcards, attempt: attempt ** 2,
-    group:
-        "agg_contamination"
     run:
         pd.concat([pd.read_csv(file_name) for file_name in input]).to_csv(output[0], index=False)
 
@@ -108,7 +102,7 @@ rule per_sample_gtc_to_adpc:
 # -------------------------------------------------------------------------------
 # Estimate Contamination
 # -------------------------------------------------------------------------------
-rule per_sample_verifyIDintensity_contamination:
+rule per_sample_contamination_verifyIDintensity:
     """Find contaminated samples using allele intensities.
 
     Uses ``verifyIDintensity`` to find samples with allele intensities that deviate from the
@@ -124,7 +118,7 @@ rule per_sample_verifyIDintensity_contamination:
     """
     input:
         adpc=rules.per_sample_gtc_to_adpc.output[0],
-        abf=rules.pull_1KG_allele_b_freq.output.abf_file,
+        abf=rules.pull_b_allele_freq_from_1kg.output.abf_file,
     params:
         snps=cfg.config.num_snps,
     output:
@@ -132,23 +126,21 @@ rule per_sample_verifyIDintensity_contamination:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     group:
-        "per_sample_verifyIDintensity_contamination"
+        "per_sample_contamination_verifyIDintensity"
     conda:
         cfg.conda("verifyidintensity")
     shell:
         "verifyIDintensity -m {params.snps} -n 1 -b {input.abf} -v -p -i {input.adpc} > {output}"
 
 
-rule agg_verifyIDintensity_contamination:
+rule agg_contamination:
     input:
-        cfg.expand(rules.per_sample_verifyIDintensity_contamination.output),
+        cfg.expand(rules.per_sample_contamination_verifyIDintensity.output),
     output:
         "sample_level/contamination/verifyIDintensity.csv",
     resources:
         mem_gb=lambda wildcards, attempt: attempt * 4,
         tim_hr=lambda wildcards, attempt: attempt ** 2,
-    group:
-        "agg_contamination"
     run:
         from cgr_gwas_qc.parsers import verifyidintensity
 

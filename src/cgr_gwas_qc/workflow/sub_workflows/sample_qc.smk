@@ -1,74 +1,45 @@
 from cgr_gwas_qc import load_config
 
 cfg = load_config()
-_targets = []
 
-
-################################################################################
-# Sub-workflows
-################################################################################
-subworkflow entry_points:
-    snakefile:
-        cfg.subworkflow("entry_points")
-    workdir:
-        cfg.root.as_posix()
-
-
-_targets.append(entry_points("subworkflow_complete/entry_points"))
-
-
-subworkflow contamination:
-    snakefile:
-        cfg.subworkflow("contamination")
-    workdir:
-        cfg.root.as_posix()
-
-
-if (
+use_contamination = (
     cfg.config.user_files.idat_pattern
     and cfg.config.user_files.gtc_pattern
     and cfg.config.workflow_params.remove_contam
-):
-    _targets.append(contamination("subworkflow_complete/contamination"))
-    _targets.append("sample_level/contamination/summary.csv")
-
-
+)
 ################################################################################
 # Sample QC Targets
 ################################################################################
-_targets.extend(
-    [
-        "sample_level/sample_qc.csv",
-        "sample_level/snp_qc.csv",
-        "sample_level/concordance/KnownReplicates.csv",
-        "sample_level/concordance/InternalQcKnown.csv",
-        "sample_level/concordance/StudySampleKnown.csv",
-        "sample_level/concordance/UnknownReplicates.csv",
-        "sample_level/summary_stats.txt",
-        "sample_level/qc_failures/low_call_rate.txt",
-        "sample_level/qc_failures/contaminated.txt",
-        "sample_level/qc_failures/sex_discordant.txt",
-        "sample_level/qc_failures/replicate_discordant.txt",
-        "sample_level/internal_controls.txt",
-        "sample_level/call_rate.png",
-        "sample_level/chrx_inbreeding.png",
-        "sample_level/ancestry.png",
-    ]
-)
+targets = [
+    "sample_level/sample_qc.csv",
+    "sample_level/snp_qc.csv",
+    "sample_level/concordance/KnownReplicates.csv",
+    "sample_level/concordance/InternalQcKnown.csv",
+    "sample_level/concordance/StudySampleKnown.csv",
+    "sample_level/concordance/UnknownReplicates.csv",
+    "sample_level/summary_stats.txt",
+    "sample_level/qc_failures/low_call_rate.txt",
+    "sample_level/qc_failures/contaminated.txt",
+    "sample_level/qc_failures/sex_discordant.txt",
+    "sample_level/qc_failures/replicate_discordant.txt",
+    "sample_level/internal_controls.txt",
+    "sample_level/call_rate.png",
+    "sample_level/chrx_inbreeding.png",
+    "sample_level/ancestry.png",
+]
+
+if use_contamination:
+    targets.append("sample_level/contamination/summary.csv")
 
 
 rule all_sample_qc:
     input:
-        _targets,
-    output:
-        touch("subworkflow_complete/sample_qc"),
+        targets,
 
 
 ################################################################################
 # Imports
 ################################################################################
-
-
 module thousand_genomes:
     snakefile:
         cfg.modules("thousand_genomes")
@@ -79,21 +50,13 @@ module thousand_genomes:
 module plink:
     snakefile:
         cfg.modules("plink")
-    config:
-        {}
 
 
 module graf:
     snakefile:
         cfg.modules("graf")
-    config:
-        {}
 
 
-use rule update_snps_to_1kg_rsID from thousand_genomes
-
-
-################################################################################
 # Workflow Rules
 ################################################################################
 # -------------------------------------------------------------------------------
@@ -101,9 +64,9 @@ use rule update_snps_to_1kg_rsID from thousand_genomes
 # -------------------------------------------------------------------------------
 use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
     input:
-        bed=entry_points("sample_level/samples.bed"),
-        bim=entry_points("sample_level/samples.bim"),
-        fam=entry_points("sample_level/samples.fam"),
+        bed="sample_level/samples.bed",
+        bim="sample_level/samples.bim",
+        fam="sample_level/samples.fam",
     params:
         mind=1 - cfg.config.software_params.sample_call_rate_1,
         out_prefix="sample_level/call_rate_1/samples_p1",
@@ -175,34 +138,49 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
         "call_rate_filters"
 
 
-use rule miss from plink as plink_miss_initial with:
+# -------------------------------------------------------------------------------
+# Call Rate Statistics
+# -------------------------------------------------------------------------------
+use rule miss from plink as plink_call_rate_initial with:
     input:
-        bed=entry_points("sample_level/samples.bed"),
-        bim=entry_points("sample_level/samples.bim"),
-        fam=entry_points("sample_level/samples.fam"),
+        bed="sample_level/samples.bed",
+        bim="sample_level/samples.bim",
+        fam="sample_level/samples.fam",
     params:
         out_prefix="sample_level/samples",
     output:
         imiss="sample_level/samples.imiss",
         lmiss="sample_level/samples.lmiss",
     group:
-        "call_rate_filters"
+        "sample_qc"
 
 
-use rule miss from plink as plink_miss_cr with:
+use rule miss from plink as plink_call_rate_post1 with:
     input:
-        bed="sample_level/call_rate_{cr}/samples.bed",
-        bim="sample_level/call_rate_{cr}/samples.bim",
-        fam="sample_level/call_rate_{cr}/samples.fam",
+        bed=rules.snp_call_rate_filter_1.output.bed,
+        bim=rules.snp_call_rate_filter_1.output.bim,
+        fam=rules.snp_call_rate_filter_1.output.fam,
     params:
-        out_prefix="sample_level/call_rate_{cr}/samples",
+        out_prefix="sample_level/call_rate_1/samples",
     output:
-        imiss="sample_level/call_rate_{cr}/samples.imiss",
-        lmiss="sample_level/call_rate_{cr}/samples.lmiss",
-    wildcard_constraints:
-        cr="1|2",
+        imiss="sample_level/call_rate_1/samples.imiss",
+        lmiss="sample_level/call_rate_1/samples.lmiss",
     group:
-        "call_rate_filters"
+        "sample_qc"
+
+
+use rule miss from plink as plink_call_rate_post2 with:
+    input:
+        bed=rules.snp_call_rate_filter_2.output.bed,
+        bim=rules.snp_call_rate_filter_2.output.bim,
+        fam=rules.snp_call_rate_filter_2.output.fam,
+    params:
+        out_prefix="sample_level/call_rate_2/samples",
+    output:
+        imiss="sample_level/call_rate_2/samples.imiss",
+        lmiss="sample_level/call_rate_2/samples.lmiss",
+    group:
+        "sample_qc"
 
 
 # -------------------------------------------------------------------------------
@@ -216,11 +194,9 @@ rule sample_contamination_verifyIDintensity:
     is below the threshold and the file is not in the ``imiss`` file.
     """
     input:
-        contamination_file=contamination("sample_level/contamination/verifyIDintensity.csv"),
-        median_intensity_file=contamination(
-            "sample_level/contamination/median_idat_intensity.csv"
-        ),
-        imiss_file="sample_level/call_rate_2/samples.imiss",
+        contamination_file="sample_level/contamination/verifyIDintensity.csv",
+        median_intensity_file="sample_level/contamination/median_idat_intensity.csv",
+        imiss_file=rules.plink_call_rate_post2.output.imiss,
     params:
         intensity_threshold=cfg.config.software_params.intensity_threshold,
         contam_threshold=cfg.config.software_params.contam_threshold,
@@ -233,29 +209,91 @@ rule sample_contamination_verifyIDintensity:
 
 
 # -------------------------------------------------------------------------------
+# Update GSA to 1KG rsID
+# -------------------------------------------------------------------------------
+use rule update_snps_to_1kg_rsID from thousand_genomes as update_samples_to_1kg_rsIDs with:
+    input:
+        bed=rules.snp_call_rate_filter_2.output.bed,
+        bim=rules.snp_call_rate_filter_2.output.bim,
+        fam=rules.snp_call_rate_filter_2.output.fam,
+        vcf=cfg.config.reference_files.thousand_genome_vcf,
+    output:
+        bed="sample_level/call_rate_2/samples_1kg_rsID.bed",
+        bim="sample_level/call_rate_2/samples_1kg_rsID.bim",
+        fam="sample_level/call_rate_2/samples_1kg_rsID.fam",
+        id_map="sample_level/call_rate_2/samples_1kg_rsID.csv",
+
+
+# -------------------------------------------------------------------------------
 # Replicate Concordance
 # -------------------------------------------------------------------------------
-use rule maf_filter from plink as plink_* with:
+use rule maf_filter from plink as sample_level_maf_filter with:
+    input:
+        bed=rules.snp_call_rate_filter_2.output.bed,
+        bim=rules.snp_call_rate_filter_2.output.bim,
+        fam=rules.snp_call_rate_filter_2.output.fam,
+    params:
+        maf="{maf}",
+        out_prefix="sample_level/call_rate_2/samples_maf{maf}",
+    output:
+        bed=temp("sample_level/call_rate_2/samples_maf{maf}.bed"),
+        bim=temp("sample_level/call_rate_2/samples_maf{maf}.bim"),
+        fam=temp("sample_level/call_rate_2/samples_maf{maf}.fam"),
+        nosex=temp("sample_level/call_rate_2/samples_maf{maf}.nosex"),
+    log:
+        "sample_level/call_rate_2/samples_maf{maf}.log",
     group:
         "replicate_concordance"
 
 
-use rule ld from plink as plink_* with:
+use rule ld from plink as sample_level_ld_estimate with:
+    input:
+        bed=rules.sample_level_maf_filter.output.bed,
+        bim=rules.sample_level_maf_filter.output.bim,
+        fam=rules.sample_level_maf_filter.output.fam,
+    params:
+        r2="{ld}",  # r2 threshold: currently 0.1
+        out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
+    output:
+        to_keep=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.in"),  # Markers in approx. linkage equilibrium
+        to_remove=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.out"),  # Markers in LD
+        nosex=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex"),  # Markers in LD
+    log:
+        "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
     group:
         "replicate_concordance"
 
 
-use rule ld_filter from plink as plink_* with:
+use rule ld_filter from plink as sample_level_ld_prune with:
+    input:
+        bed=rules.sample_level_maf_filter.output.bed,
+        bim=rules.sample_level_maf_filter.output.bim,
+        fam=rules.sample_level_maf_filter.output.fam,
+        to_keep=rules.sample_level_ld_estimate.output.to_keep,
+    params:
+        out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
+    output:
+        bed="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.bed",
+        bim="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.bim",
+        fam="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.fam",
+        nosex="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex",
+    log:
+        "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
     group:
         "replicate_concordance"
 
 
-use rule keep_bfile from plink as plink_* with:
-    group:
-        "replicate_concordance"
-
-
-use rule genome from plink as plink_* with:
+use rule genome from plink as sample_level_ibd with:
+    input:
+        bed=rules.sample_level_ld_prune.output.bed,
+        bim=rules.sample_level_ld_prune.output.bim,
+        fam=rules.sample_level_ld_prune.output.fam,
+    params:
+        ibd_min=cfg.config.software_params.ibd_pi_hat_min,
+        ibd_max=cfg.config.software_params.ibd_pi_hat_max,
+        out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
+    output:
+        "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
     group:
         "replicate_concordance"
 
@@ -266,7 +304,7 @@ rule sample_concordance_plink:
     Where, sample concordance is `IBS2 / (IBS0 + IBS1 + IBS2)`.
     """
     input:
-        "sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.keep.genome".format(
+        rules.sample_level_ibd.output[0].format(
             maf=cfg.config.software_params.maf_for_ibd,
             ld=cfg.config.software_params.ld_prune_r2,
         ),
@@ -281,14 +319,24 @@ rule sample_concordance_plink:
         "../scripts/concordance_table.py"
 
 
-use rule extract_fingerprint_snps from graf as graf_extract_fpg with:
+use rule extract_fingerprint_snps from graf as graf_extract_fingerprint_snps with:
+    input:
+        bed=rules.update_samples_to_1kg_rsIDs.output.bed,
+        bim=rules.update_samples_to_1kg_rsIDs.output.bim,
+        fam=rules.update_samples_to_1kg_rsIDs.output.fam,
+    params:
+        out_prefix="sample_level/call_rate_2/samples_1kg_rsID",
+    output:
+        "sample_level/call_rate_2/samples_1kg_rsID.fpg",
+    log:
+        "sample_level/call_rate_2/samples_1kg_rsID.fpg.log",
     group:
         "replicate_concordance"
 
 
 use rule relatedness from graf as sample_concordance_graf with:
     input:
-        "sample_level/call_rate_2/samples_1kg_rsID.fpg",
+        rules.graf_extract_fingerprint_snps.output[0],
     output:
         "sample_level/concordance/graf.tsv",
     log:
@@ -299,9 +347,9 @@ use rule relatedness from graf as sample_concordance_graf with:
 
 rule sample_concordance_king:
     input:
-        bed="sample_level/call_rate_2/samples.bed",
-        bim="sample_level/call_rate_2/samples.bim",
-        fam="sample_level/call_rate_2/samples.fam",
+        bed=rules.snp_call_rate_filter_2.output.bed,
+        bim=rules.snp_call_rate_filter_2.output.bim,
+        fam=rules.snp_call_rate_filter_2.output.fam,
     output:
         within_family="sample_level/concordance/king.kin",
         between_family="sample_level/concordance/king.kin0",
@@ -366,7 +414,7 @@ rule split_sample_concordance:
 # -------------------------------------------------------------------------------
 use rule populations from graf as graf_populations with:
     input:
-        "sample_level/call_rate_2/samples_1kg_rsID.fpg",
+        rules.graf_extract_fingerprint_snps.output[0],
     output:
         "sample_level/ancestry/graf_populations.txt",
     log:
@@ -389,10 +437,10 @@ use rule ancestry from graf as graf_ancestry with:
 # -------------------------------------------------------------------------------
 rule snp_qc_table:
     input:
-        initial="sample_level/samples.lmiss",
-        cr1="sample_level/call_rate_1/samples.lmiss",
-        cr2="sample_level/call_rate_2/samples.lmiss",
-        thousand_genomes="sample_level/call_rate_2/samples_1kg_rsID.csv",
+        initial=rules.plink_call_rate_initial.output.lmiss,
+        cr1=rules.plink_call_rate_post1.output.lmiss,
+        cr2=rules.plink_call_rate_post2.output.lmiss,
+        thousand_genomes=rules.update_samples_to_1kg_rsIDs.output.id_map,
     output:
         "sample_level/snp_qc.csv",
     group:
@@ -404,32 +452,40 @@ rule snp_qc_table:
 # -------------------------------------------------------------------------------
 # Sample Summary Table
 # -------------------------------------------------------------------------------
-use rule sexcheck from plink as plink_sexcheck with:
+use rule sexcheck from plink as sample_level_sexcheck with:
+    input:
+        bed=rules.snp_call_rate_filter_1.output.bed,
+        bim=rules.snp_call_rate_filter_1.output.bim,
+        fam=rules.snp_call_rate_filter_1.output.fam,
+    params:
+        out_prefix="sample_level/call_rate_1/samples",
+    output:
+        "sample_level/call_rate_1/samples.sexcheck",
     group:
         "sample_qc"
 
 
 def _contam(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
-    if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:
+    if use_contamination:
         return rules.sample_contamination_verifyIDintensity.output[0]
     return []
 
 
 def _intensity(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
-    if uf.idat_pattern and uf.gtc_pattern and wf.remove_contam:
-        return contamination("sample_level/contamination/median_idat_intensity.csv")
+    if use_contamination:
+        return "sample_level/contamination/median_idat_intensity.csv"
     return []
 
 
 rule sample_qc_table:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
-        imiss_start="sample_level/samples.imiss",
-        imiss_cr1="sample_level/call_rate_1/samples.imiss",
-        imiss_cr2="sample_level/call_rate_2/samples.imiss",
-        sexcheck_cr1="sample_level/call_rate_1/samples.sexcheck",
+        imiss_start=rules.plink_call_rate_initial.output.imiss,
+        imiss_cr1=rules.plink_call_rate_post1.output.imiss,
+        imiss_cr2=rules.plink_call_rate_post2.output.imiss,
+        sexcheck_cr1=rules.sample_level_sexcheck.output[0],
         ancestry=rules.graf_ancestry.output[0],
         sample_concordance_csv=rules.sample_concordance_summary.output[0],
         contam=_contam,
