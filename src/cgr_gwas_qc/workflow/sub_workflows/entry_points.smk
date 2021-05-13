@@ -18,13 +18,16 @@ cfg = load_config()
 ################################################################################
 # Entry Points Targets
 ################################################################################
+targets = [
+    "sample_level/samples.bed",
+    "sample_level/samples.bim",
+    "sample_level/samples.fam",
+]
+
+
 rule all_entry_points:
     input:
-        "sample_level/samples.bed",
-        "sample_level/samples.bim",
-        "sample_level/samples.fam",
-    output:
-        touch("subworkflow_complete/entry_points"),
+        targets,
 
 
 ################################################################################

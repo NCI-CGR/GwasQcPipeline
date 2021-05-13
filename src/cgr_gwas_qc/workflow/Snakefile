@@ -6,13 +6,88 @@ cfg = load_config()
 ################################################################################
 # All Targets
 ################################################################################
-subworkflow delivery:
+rule all:
+    input:
+        "GwasQcPipeline.complete",
+
+
+################################################################################
+# Import All Sub-workflows
+################################################################################
+targets = []
+
+
+module entry_points:
+    snakefile:
+        cfg.subworkflow("entry_points")
+    config:
+        {}
+
+
+use rule * from entry_points
+
+
+targets.extend(entry_points.targets)
+
+
+module sample_qc:
+    snakefile:
+        cfg.subworkflow("sample_qc")
+    config:
+        {}
+
+
+use rule * from sample_qc
+
+
+targets.extend(sample_qc.targets)
+
+
+if sample_qc.use_contamination:
+
+    module contamination:
+        snakefile:
+            cfg.subworkflow("contamination")
+        config:
+            {}
+
+    use rule * from contamination
+
+
+    targets.extend(contamination.targets)
+
+
+module subject_qc:
+    snakefile:
+        cfg.subworkflow("subject_qc")
+    config:
+        {}
+
+
+use rule * from subject_qc
+
+
+targets.extend(subject_qc.targets)
+
+
+module delivery:
     snakefile:
         cfg.subworkflow("delivery")
-    workdir:
-        cfg.root.as_posix()
+    config:
+        {}
 
 
-rule run_all_subworkflows:
+use rule * from delivery
+
+
+targets.extend(delivery.targets)
+
+
+################################################################################
+# Aggregate Sub-workflow Results
+################################################################################
+rule agg_subworkflow_results:
     input:
-        delivery("subworkflow_complete/delivery"),
+        targets,
+    output:
+        touch("GwasQcPipeline.complete"),
