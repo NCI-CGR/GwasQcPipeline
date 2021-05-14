@@ -35,6 +35,8 @@ CLUSTER_JOB_ID=${SLURM_JOB_ID}
 
 shopt -s -o errexit pipefail nounset
 
+MAX_ATTEMPTS=5
+ATTEMPT=0
 CLUSTER_KILLED=0
 
 UNICORN="\360\237\246\204"
@@ -64,6 +66,7 @@ cgr_restart_message() {
     printf "\n"
     cgr_bar
     printf "# CGR SUBMIT: Re-Starting workflow to finish incomplete tasks\n"
+    printf "# ATTEMPT: %d\n" $1
     printf "# Start Time: %s\n# Date: %s\n" $(cgr_get_time)
     cgr_bar
     printf "\n"
@@ -95,6 +98,7 @@ cgr_cluster_killed() {
     CLUSTER_KILLED=1
     exit $exit_code
 }
+# capture cluster exit signals
 {% if cgems %}
 trap cgr_cluster_killed USR1
 trap cgr_cluster_killed USR2
@@ -103,28 +107,49 @@ trap cgr_cluster_killed USR2
 trap cgr_cluster_killed TERM
 {% endif %}
 
-# Make sure logs dir exists
-cd {{ working_dir }}
-[[ -d logs ]] || mkdir -p logs
-
-# Run the workflow
-cgr_start_message
 run_workflow() {
     {{ python_executable }} -m cgr_gwas_qc snakemake \
         --local-cores {{ local_tasks }} \
         --profile {{ profile }} \
         {{ added_options }}
 }
+
+# Make sure logs dir exists
+cd {{ working_dir }}
+[[ -d logs ]] || mkdir -p logs
+
+# Run the workflow
+cgr_start_message
 run_workflow
 
-# Check the log and make sure everything completed as expected i.e. "(100%) done"
-sleep 10 # in case of filesystem latency
-PCT_DONE=$(tail -n 5 gwas_qc_log.$CLUSTER_JOB_ID | sed -nr "s/.*[[:digit:]]+ of [[:digit:]]+ steps \((.*)\%\) done.*/\1/p")
+until [ $ATTEMPT -gt $MAX_ATTEMPTS ]; do
+    sleep 10 # in case of filesystem latency
 
-if [[ $PCT_DONE != "" && $PCT_DONE != 100 ]]; then
-    # The pipeline ran successfully but ended early so restart
-    cgr_restart_message
+    # NOTE: This will never happen if submitting subworkflows
+    if [ -e "GwasQcPipeline.complete" ]; then
+        exit 0
+    fi
+
+    # For subworkflows check log
+    if grep -q "subworkflow" <<< "{{ added_optiopns }}"; then
+        # Pull out snakemake percent done line
+        final_stage=$(grep -e "^[[:digit:]]\+ of [[:digit:]]\+ steps ([[:digit:]]\+%) done$" gwas_qc_log.${CLUSTER_JOB_ID} | tail -n1)
+        if [[ ! -z $final_stage ]]; then
+            num_done=$(echo $final_stage | sed -r "s/^([[:digit:]]+) of [[:digit:]]+ steps \([[:digit:]]+%\) done/\1/")
+            num_steps=$(echo $final_stage | sed -r "s/^[[:digit:]]+ of ([[:digit:]]+) steps \([[:digit:]]+%\) done/\1/")
+            if [[ $num_done == $num_steps]]; then
+                # Comparing number done vs number of steps b/c for large
+                # workflow snakemake will report 100% even when not all the
+                # steps are complete.
+                exit 0
+            if
+        if
+    fi
+
+    ((ATTEMPT++))
+    cgr_restart_message $ATTEMPT
     run_workflow
-fi
+done
 
-exit 0
+# Workflow never completed, probably needs intervention
+exit 1
