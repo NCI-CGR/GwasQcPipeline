@@ -125,14 +125,11 @@ run_workflow
 until [ $ATTEMPT -gt $MAX_ATTEMPTS ]; do
     sleep 10 # in case of filesystem latency
 
-    # NOTE: This will never happen if submitting subworkflows
     if [ -e "GwasQcPipeline.complete" ]; then
+        # NOTE: This will never happen if submitting subworkflows
         exit 0
-    fi
-
-    # For subworkflows check log
-    if grep -q "subworkflow" <<< "{{ added_options }}"; then
-        # Pull out snakemake percent done line
+    elif grep -q "subworkflow" <<< "{{ added_options }}"; then  # Subworkflow
+        # For subworkflows we will check the logs for snakemake to tell us that everything is complete
         final_stage=$(grep -e "^[[:digit:]]\+ of [[:digit:]]\+ steps ([[:digit:]]\+%) done$" gwas_qc_log.${CLUSTER_JOB_ID} | tail -n1)
         if [[ ! -z $final_stage ]]; then
             num_done=$(echo $final_stage | sed -r "s/^([[:digit:]]+) of [[:digit:]]+ steps \([[:digit:]]+%\) done/\1/")
@@ -142,8 +139,8 @@ until [ $ATTEMPT -gt $MAX_ATTEMPTS ]; do
                 # workflow snakemake will report 100% even when not all the
                 # steps are complete.
                 exit 0
-            if
-        if
+            fi
+        fi
     fi
 
     ((ATTEMPT++))
