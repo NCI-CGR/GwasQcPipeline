@@ -137,7 +137,7 @@ until [ $ATTEMPT -gt $MAX_ATTEMPTS ]; do
         if [[ ! -z $final_stage ]]; then
             num_done=$(echo $final_stage | sed -r "s/^([[:digit:]]+) of [[:digit:]]+ steps \([[:digit:]]+%\) done/\1/")
             num_steps=$(echo $final_stage | sed -r "s/^[[:digit:]]+ of ([[:digit:]]+) steps \([[:digit:]]+%\) done/\1/")
-            if [[ $num_done == $num_steps]]; then
+            if [[ $num_done == $num_steps ]]; then
                 # Comparing number done vs number of steps b/c for large
                 # workflow snakemake will report 100% even when not all the
                 # steps are complete.
