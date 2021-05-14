@@ -131,7 +131,7 @@ until [ $ATTEMPT -gt $MAX_ATTEMPTS ]; do
     fi
 
     # For subworkflows check log
-    if grep -q "subworkflow" <<< "{{ added_optiopns }}"; then
+    if grep -q "subworkflow" <<< "{{ added_options }}"; then
         # Pull out snakemake percent done line
         final_stage=$(grep -e "^[[:digit:]]\+ of [[:digit:]]\+ steps ([[:digit:]]\+%) done$" gwas_qc_log.${CLUSTER_JOB_ID} | tail -n1)
         if [[ ! -z $final_stage ]]; then
