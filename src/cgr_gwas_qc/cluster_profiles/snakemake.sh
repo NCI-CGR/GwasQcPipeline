@@ -35,8 +35,6 @@ CLUSTER_JOB_ID=${SLURM_JOB_ID}
 
 shopt -s -o errexit pipefail nounset
 
-DATE="$(date +'%Y-%m-%d')"
-TIME="$(date +'%H:%M:%S')"
 MAX_ATTEMPTS=5
 ATTEMPT=0
 CLUSTER_KILLED=0
@@ -45,7 +43,17 @@ LOG="gwas_qc_log.${CLUSTER_JOB_ID}"
 ################################################################################
 # Signal Traps
 ################################################################################
+cgr_get_date() {
+  "$(date +'%Y-%m-%d')"
+}
+
+cgr_get_time() {
+  "$(date +'%H:%M:%S')"
+}
+
 cgr_start_message() {
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
   printf "################################################################################\n"
   printf "# CGR SUBMIT: Starting GWAS QC Workflow\n"
   printf "# User: ${USER}\n"
@@ -53,24 +61,27 @@ cgr_start_message() {
   printf "# Profile: {{ profile }}\n"
   printf "# Snakefile: {{ snakefile }}\n"
   printf "# Cluster Job ID: ${CLUSTER_JOB_ID}\n"
-  printf "# Start Date: ${DATE}\n"
-  printf "# Start Time: ${TIME}\n"
+  printf "# Start Date: ${date}\n"
+  printf "# Start Time: ${time}\n"
   printf "################################################################################\n"
 }
 
 cgr_restart_message() {
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
   printf "\n"
   printf "################################################################################\n"
   printf "# CGR SUBMIT: Re-Starting workflow to finish incomplete tasks\n"
   printf "# ATTEMPT: %d\n" $1
-  printf "# Start Time: %s\n# Date: %s\n" $(cgr_get_time)
-  printf "# End Date: ${DATE}\n"
-  printf "# End Time: ${TIME}\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
   printf "################################################################################\n"
   printf "\n"
 }
 
 cgr_exit_success() {
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
   local unicorn="\360\237\246\204"
   local penguin="\xF0\x9F\x90\xA7"
   local dna="\xF0\x9F\xA7\xAC"
@@ -78,42 +89,48 @@ cgr_exit_success() {
   printf "\n"
   printf "################################################################################\n"
   printf "# CGR SUBMIT: Workflow complete ${unicorn}${penguin}${dna}\n"
-  printf "# End Date: ${DATE}\n"
-  printf "# End Time: ${TIME}\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
   printf "################################################################################\n"
 }
 
 cgr_exit_locked() {
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
   printf "\n"
   printf "################################################################################\n"
   printf "# CGR SUBMIT: Your working directory appears to be locked. You probably want to\n"
   printf "#             run: 'cgr snakemake -n --unlock'\n"
-  printf "# End Date: ${DATE}\n"
-  printf "# End Time: ${TIME}\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
   printf "################################################################################\n"
 }
 
 cgr_exit_failed() {
   local exit_code="$1"
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
   printf "\n"
   printf "################################################################################\n"
   printf "# CGR SUBMIT: There was a workflow error, check logs and re-run.\n"
   printf "# Exit Code: ${exit_code}\n"
-  printf "# End Date: ${DATE}\n"
-  printf "# End Time: ${TIME}\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
   printf "################################################################################\n"
 }
 
 cgr_exit_killed() {
   local exit_code="$1"
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
   printf "\n"
   printf "################################################################################\n"
   printf "# CGR SUBMIT: The workflow was KILLED by the cluster. Check resource limits and re-run.\n"
   printf "#             For example, try increasing the walltime using the '--time-hr' option\n"
   printf "#             'cgr submit --time-hr 300' \n"
   printf "# Exit Code: ${exit_code}\n"
-  printf "# End Date: ${DATE}\n"
-  printf "# End Time: ${TIME}\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
   printf "################################################################################\n"
 }
 
