@@ -52,7 +52,7 @@ cgr_start_message() {
   printf "# Version: {{ version }}\n"
   printf "# Profile: {{ profile }}\n"
   printf "# Snakefile: {{ snakefile }}\n"
-  printf "# Cluster Job ID: ${CLUSER_JOB_ID}\n"
+  printf "# Cluster Job ID: ${CLUSTER_JOB_ID}\n"
   printf "# Start Date: ${DATE}\n"
   printf "# Start Time: ${TIME}\n"
   printf "################################################################################\n"
