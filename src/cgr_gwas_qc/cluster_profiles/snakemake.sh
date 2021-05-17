@@ -77,7 +77,7 @@ cgr_exit_success() {
 
   printf "\n"
   printf "################################################################################\n"
-  printf "# CGR SUBMIT: Workflow complete ${unicorn}${penguiin}${dna}\n"
+  printf "# CGR SUBMIT: Workflow complete ${unicorn}${penguin}${dna}\n"
   printf "# End Date: ${DATE}\n"
   printf "# End Time: ${TIME}\n"
   printf "################################################################################\n"
