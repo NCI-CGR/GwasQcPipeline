@@ -44,11 +44,11 @@ LOG="gwas_qc_log.${CLUSTER_JOB_ID}"
 # Signal Traps
 ################################################################################
 cgr_get_date() {
-  "$(date +'%Y-%m-%d')"
+  echo "$(date +'%Y-%m-%d')"
 }
 
 cgr_get_time() {
-  "$(date +'%H:%M:%S')"
+  echo "$(date +'%H:%M:%S')"
 }
 
 cgr_start_message() {
