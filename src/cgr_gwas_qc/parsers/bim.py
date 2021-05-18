@@ -58,7 +58,7 @@ def _decode(chrom):
     return chrom_codes.get(chrom, chrom)
 
 
-@dataclass
+@dataclass(eq=False)
 class BimRecord(CgrBiAllelicVariantRecord):
     encoded_chrom: Optional[str] = None  # encoded chromosome
     morgans: Optional[int] = None  # position in morgans
@@ -87,3 +87,23 @@ class BimRecord(CgrBiAllelicVariantRecord):
 
     def __str__(self):
         return f"{self.encoded_chrom} {self.id} {self.morgans} {self.pos} {self.allele_1} {self.allele_2}"
+
+    def __eq__(self, other):
+        """Compare two BimRecords ignoring the allele order.
+
+        Allele order is not consistent when running PLINK, so I want to
+        consider two records equal even if the alleles are swapped.
+        """
+        return (
+            isinstance(self, BimRecord)
+            and isinstance(other, BimRecord)
+            and self.id == other.id
+            and self.chrom == other.chrom
+            and self.encoded_chrom == other.encoded_chrom
+            and self.morgans == other.morgans
+            and self.pos == other.pos
+            and (
+                (self.allele_1 == other.allele_1 and self.allele_2 == other.allele_2)
+                or (self.allele_1 == other.allele_2 and self.allele_2 == other.allele_1)
+            )
+        )
