@@ -39,7 +39,7 @@ def files_for_upload(tmp_path_factory, sample_qc_csv):
 
             cfg = load_config()
 
-            include: cfg.modules("delivery.smk")
+            include: cfg.modules("delivery")
 
             rule all:
                 input:
@@ -167,7 +167,7 @@ def files_for_deliver(tmp_path_factory, sample_qc_csv):
 
             cfg = load_config()
 
-            include: cfg.modules("delivery.smk")
+            include: cfg.modules("delivery")
 
             rule all:
                 input:
@@ -323,7 +323,7 @@ def test_qc_report_table(
 
             cfg = load_config()
 
-            include: cfg.modules("delivery.smk")
+            include: cfg.modules("delivery")
 
             rule all:
                 input:

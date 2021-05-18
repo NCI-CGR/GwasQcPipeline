@@ -30,7 +30,7 @@ def test_call_rate_filters(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("plink_filters.smk")
+            include: cfg.modules("plink_filters")
 
             rule all:
                 input: expand("sample_level/call_rate_2/samples.{ext}", ext=["bed", "bim", "fam"])
@@ -82,7 +82,7 @@ def maf_and_ld_outputs(tmp_path_factory, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("plink_filters.smk")
+            include: cfg.modules("plink_filters")
 
             rule all:
                 input:

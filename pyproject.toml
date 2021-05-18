@@ -35,9 +35,9 @@ tabulate = "^0.8.9"
 openpyxl = "^3.0.7"
 
 [tool.poetry.dev-dependencies]
-black = "^19.10b0"
+black = "20.8b1"
 flake8 = "^3.8.3"
-snakefmt = "^0.2.0"
+snakefmt = "^0.4.0"
 pytest = "^6.0.2"
 sphinx = "^3.2.1"
 mypy = "^0.782"

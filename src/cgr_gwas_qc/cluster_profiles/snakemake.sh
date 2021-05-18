@@ -35,66 +35,128 @@ CLUSTER_JOB_ID=${SLURM_JOB_ID}
 
 shopt -s -o errexit pipefail nounset
 
+MAX_ATTEMPTS=5
+ATTEMPT=0
 CLUSTER_KILLED=0
+LOG="gwas_qc_log.${CLUSTER_JOB_ID}"
 
-UNICORN="\360\237\246\204"
-PENGUIN="\xF0\x9F\x90\xA7"
-DNA="\xF0\x9F\xA7\xAC"
-
-cgr_bar(){
-    printf "################################################################################\n"
+################################################################################
+# Signal Traps
+################################################################################
+cgr_get_date() {
+  echo "$(date +'%Y-%m-%d')"
 }
 
 cgr_get_time() {
-    date +'%H:%M:%S %Y-%m-%d'
+  echo "$(date +'%H:%M:%S')"
 }
 
 cgr_start_message() {
-    cgr_bar
-    printf "# CGR SUBMIT: Starting GWAS QC Workflow\n"
-    printf "# User: %s\n" $USER
-    printf "# Version: {{ version }}\n"
-    printf "# Profile: {{ profile }}\n"
-    printf "# Snakefile: {{ snakefile }}\n"
-    printf "# Start Time: %s\n# Date: %s\n" $(cgr_get_time)
-    cgr_bar
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
+  printf "################################################################################\n"
+  printf "# CGR SUBMIT: Starting GWAS QC Workflow\n"
+  printf "# User: ${USER}\n"
+  printf "# Version: {{ version }}\n"
+  printf "# Profile: {{ profile }}\n"
+  printf "# Snakefile: {{ snakefile }}\n"
+  printf "# Cluster Job ID: ${CLUSTER_JOB_ID}\n"
+  printf "# Start Date: ${date}\n"
+  printf "# Start Time: ${time}\n"
+  printf "################################################################################\n"
 }
 
 cgr_restart_message() {
-    printf "\n"
-    cgr_bar
-    printf "# CGR SUBMIT: Re-Starting workflow to finish incomplete tasks\n"
-    printf "# Start Time: %s\n# Date: %s\n" $(cgr_get_time)
-    cgr_bar
-    printf "\n"
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
+  printf "\n"
+  printf "################################################################################\n"
+  printf "# CGR SUBMIT: Re-Starting workflow to finish incomplete tasks\n"
+  printf "# ATTEMPT: %d\n" $1
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
+  printf "################################################################################\n"
+  printf "\n"
+}
+
+cgr_exit_success() {
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
+  local unicorn="\360\237\246\204"
+  local penguin="\xF0\x9F\x90\xA7"
+  local dna="\xF0\x9F\xA7\xAC"
+
+  printf "\n"
+  printf "################################################################################\n"
+  printf "# CGR SUBMIT: Workflow complete ${unicorn}${penguin}${dna}\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
+  printf "################################################################################\n"
+}
+
+cgr_exit_locked() {
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
+  printf "\n"
+  printf "################################################################################\n"
+  printf "# CGR SUBMIT: Your working directory appears to be locked. You probably want to\n"
+  printf "#             run: 'cgr snakemake -n --unlock'\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
+  printf "################################################################################\n"
+}
+
+cgr_exit_failed() {
+  local exit_code="$1"
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
+  printf "\n"
+  printf "################################################################################\n"
+  printf "# CGR SUBMIT: There was a workflow error, check logs and re-run.\n"
+  printf "# Exit Code: ${exit_code}\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
+  printf "################################################################################\n"
+}
+
+cgr_exit_killed() {
+  local exit_code="$1"
+  local date="$(cgr_get_date)"
+  local time="$(cgr_get_time)"
+  printf "\n"
+  printf "################################################################################\n"
+  printf "# CGR SUBMIT: The workflow was KILLED by the cluster. Check resource limits and re-run.\n"
+  printf "#             For example, try increasing the walltime using the '--time-hr' option\n"
+  printf "#             'cgr submit --time-hr 300' \n"
+  printf "# Exit Code: ${exit_code}\n"
+  printf "# End Date: ${date}\n"
+  printf "# End Time: ${time}\n"
+  printf "################################################################################\n"
 }
 
 cgr_exit_message() {
-    exit_code=$?
-    printf "\n"
-    cgr_bar
-    if [[ $exit_code == 0 ]]; then
-        printf "# CGR SUBMIT: Workflow complete %b%b%b\n" $UNICORN $PENGUIN $DNA
-    elif [[ $CLUSTER_KILLED == 1 ]]; then
-        printf "# CGR SUBMIT: The workflow was KILLED by the cluster. Check resource limits and re-run.\n"
-        printf "#             For example, try increasing the walltime using the '--time-hr' option\n"
-        printf "#             'cgr submit --time-hr 300' \n"
-        printf "# Exit Code: %d\n" ${exit_code}
-    else
-        printf "# CGR SUBMIT: There was a workflow error, check logs and re-run.\n"
-        printf "# Exit Code: %d\n" ${exit_code}
-    fi
-    printf "# End Time: %s\n# Date: %s\n" $(cgr_get_time)
-    cgr_bar
-    exit $exit_code
+  exit_code=$?
+
+  if (( exit_code == 0 )); then
+    cgr_exit_success
+  elif (( exit_code == 42 )); then
+    cgr_exit_locked
+  elif (( CLUSTER_KILLED == 1 )); then
+    cgr_exit_killed "${exit_code}"
+  else
+    cgr_exit_failed "${exit_code}"
+  fi
+
+  exit ${exit_code}
 }
 trap cgr_exit_message EXIT # capture exit signal and print exit message
 
 cgr_cluster_killed() {
-    exit_code=$?
-    CLUSTER_KILLED=1
-    exit $exit_code
+  exit_code=$?
+  CLUSTER_KILLED=1
+  exit ${exit_code}
 }
+# capture cluster exit signals
 {% if cgems %}
 trap cgr_cluster_killed USR1
 trap cgr_cluster_killed USR2
@@ -103,28 +165,75 @@ trap cgr_cluster_killed USR2
 trap cgr_cluster_killed TERM
 {% endif %}
 
-# Make sure logs dir exists
-cd {{ working_dir }}
-[[ -d logs ]] || mkdir -p logs
-
-# Run the workflow
-cgr_start_message
+################################################################################
+# Running Functions
+################################################################################
 run_workflow() {
-    {{ python_executable }} -m cgr_gwas_qc snakemake \
-        --local-cores {{ local_tasks }} \
-        --profile {{ profile }} \
-        {{ added_options }}
+  local exit_status
+  {{ python_executable }} -m cgr_gwas_qc snakemake \
+    --local-cores {{ local_tasks }} \
+    --profile {{ profile }} \
+    {{ added_options }} || exit_status=$?  # Don't exit on failure, see why we exited
+
+  if (( exit_status != 0 )) && log_says_locked; then
+    exit 42
+  fi
+
 }
-run_workflow
 
-# Check the log and make sure everything completed as expected i.e. "(100%) done"
-sleep 10 # in case of filesystem latency
-PCT_DONE=$(tail -n 5 gwas_qc_log.$CLUSTER_JOB_ID | sed -nr "s/.*[[:digit:]]+ of [[:digit:]]+ steps \((.*)\%\) done.*/\1/p")
+log_says_complete() {
+  local final_stage="$(grep -e "^[[:digit:]]\+ of [[:digit:]]\+ steps ([[:digit:]]\+%) done$" "${LOG}" | tail -n1)"
 
-if [[ $PCT_DONE != "" && $PCT_DONE != 100 ]]; then
-    # The pipeline ran successfully but ended early so restart
-    cgr_restart_message
+  if [[ -n "${final_stage}" ]]; then
+    local num_done=$(echo "${final_stage}" | sed -r "s/^([[:digit:]]+) of [[:digit:]]+ steps \([[:digit:]]+%\) done/\1/")
+    local num_steps=$(echo "${final_stage}" | sed -r "s/^[[:digit:]]+ of ([[:digit:]]+) steps \([[:digit:]]+%\) done/\1/")
+    # Comparing number done vs number of steps b/c for large
+    # workflow snakemake will report 100% even when not all the
+    # steps are complete.
+    (( num_done == num_steps ))
+    return
+  fi
+
+  false
+}
+
+log_says_locked() {
+  $(grep -q "Error: Directory cannot be locked." "${LOG}")
+}
+
+running_subworkflow() {
+    $(grep -q "subworkflow" <<< "{{ added_options }}")
+}
+################################################################################
+# Main
+################################################################################
+main() {
+  # Make sure logs dir exists
+  cd {{ working_dir }}
+  [[ -d logs ]] || mkdir -p logs
+
+  # Run the workflow
+  cgr_start_message
+  run_workflow
+
+  until (( ATTEMPT > MAX_ATTEMPTS )); do
+    sleep 10 # in case of filesystem latency
+
+    if [[ -e "GwasQcPipeline.complete" ]]; then
+      # When running the entire workflow look for final output file
+      exit 0
+    elif running_subworkflow && log_says_complete; then  # Subworkflow
+      # For subworkflows check the logs and make sure snakemake says everything is complete
+      exit 0
+    fi
+
+    ATTEMPT=$(( ATTEMPT + 1 ))
+    cgr_restart_message $ATTEMPT
     run_workflow
-fi
+  done
 
-exit 0
+  # Workflow never completed, probably needs intervention
+  exit 1
+}
+
+main "$@"

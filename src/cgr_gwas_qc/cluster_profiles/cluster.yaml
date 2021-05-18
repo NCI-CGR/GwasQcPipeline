@@ -34,7 +34,7 @@ group_jobs:
       mem_gb: 4
       time_hr: 1
 
-  per_sample_verifyIDintensity_contamination:
+  per_sample_contamination_verifyIDintensity:
     small:
       threads: 4
       mem_gb: 1

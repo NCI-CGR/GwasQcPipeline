@@ -8,17 +8,17 @@ Output:
     ``population_level/{population}/autosomal_heterozygosity.png``
 
 """
-import os
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import typer
 
+from cgr_gwas_qc.parsers.plink import read_het
 from cgr_gwas_qc.reporting import CASE_CONTROL_COLORS
-from cgr_gwas_qc.workflow.scripts.agg_population_qc_tables import read_agg_population_qc_tables
+from cgr_gwas_qc.workflow.scripts import subject_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -30,43 +30,24 @@ COLORS = [
 
 
 @app.command()
-def main(population_qc: Path, threshold: float, outdir: Path):
-    outdir.mkdir(exist_ok=True, parents=True)
+def main(qc_table: Path, het: Path, population: str, threshold: float, outfile: Path):
 
-    df = load_population_data(population_qc)
-
-    ylim = df.F.agg(["min", "max"]).tolist()
-    for population, dd in df.groupby("population"):
-        outfile = outdir / f"{population}.png"
-        dd = add_x_label(dd)
-        plot(dd, population, threshold, ylim, outfile)
-
-
-def load_population_data(filename: Path) -> pd.DataFrame:
-    return (
-        read_agg_population_qc_tables(filename)
-        .query("case_control != 'QC'")
-        .transform(_update_categories)
-        .reindex(["population", "case_control", "F"], axis=1)
+    df = (
+        read_het(het)
+        .join(subject_qc_table.read(qc_table).set_index("Group_By_Subject_ID"), how="left")
+        .reindex(["case_control", "F"], axis=1)
+        .apply(_update_categories)
+        .sort_values("F")
+        .assign(x_label=lambda x: range(1, x.shape[0] + 1))
     )
 
+    g = plot(df, population, threshold)
 
-def add_x_label(df: pd.DataFrame) -> pd.DataFrame:
-    """Add X value.
-
-    I want to plot subjects ordered by ``F``. Here I sort by ``F`` and label
-    the Subjects from 1 to N.
-    """
-    return df.sort_values("F").assign(x_label=lambda x: range(1, x.shape[0] + 1))
+    if outfile:
+        g.savefig(outfile)
 
 
-def plot(
-    df: pd.DataFrame,
-    population: str,
-    threshold: float,
-    ylim: Sequence[float],
-    outfile: Optional[os.PathLike] = None,
-):
+def plot(df: pd.DataFrame, population: str, threshold: float):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
 
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -85,7 +66,7 @@ def plot(
     # Add labels
     ax.set_xlabel("Subjects sorted by F")
     ax.set_ylabel("F")
-    ax.set_ylim(ylim)
+    ax.set_ylim(_get_ylim(df.F, threshold))
     ax.set_title(f"{population} Homozygosity F Coefficient")
 
     # Move legend
@@ -99,8 +80,17 @@ def plot(
     # Remove outside edges for a cleaner plot
     sns.despine(ax=ax)
 
-    if outfile:
-        fig.savefig(outfile)
+    return fig
+
+
+def _get_ylim(F: pd.Series, threshold: float) -> Tuple[float, float]:
+    default_ylim = threshold + 0.15  # Looks nice when threshold +/- 0.1
+
+    # If there are extreme values outside of default_ylim, then make sure they get plotted
+    ylim_min = min(-default_ylim, F.min())
+    ylim_max = max(default_ylim, F.max())
+
+    return ylim_min, ylim_max
 
 
 def _update_categories(sr: pd.Series):
@@ -113,9 +103,9 @@ def _update_categories(sr: pd.Series):
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {}
-        defaults.update({"population_qc": Path(snakemake.input[0])})  # type: ignore # noqa
-        defaults.update({k: v for k, v in snakemake.params.items()})  # type: ignore # noqa
-        defaults.update({"outdir": Path(snakemake.output[0])})  # type: ignore # noqa
+        defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
+        defaults.update(dict(snakemake.params))  # type: ignore # noqa
+        defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
         main(**defaults)
     else:
         app()

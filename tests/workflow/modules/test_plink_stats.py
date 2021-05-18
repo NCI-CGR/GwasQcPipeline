@@ -34,7 +34,7 @@ def call_rate_2_stats(tmp_path_factory, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("plink_stats.smk")
+            include: cfg.modules("plink_stats")
 
             rule all:
                 input:
@@ -133,8 +133,8 @@ def test_plink_stats_ibd(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("plink_stats.smk")
-            include: cfg.modules("plink_filters.smk")
+            include: cfg.modules("plink_stats")
+            include: cfg.modules("plink_filters")
 
             rule all:
                 input:

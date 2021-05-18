@@ -18,6 +18,7 @@ def main(
     cgems: bool = typer.Option(False, help="Run using the CGEMs/CCAD cluster profile."),
     biowulf: bool = typer.Option(False, help="Run using the Biowulf cluster profile."),
     cluster_profile: Optional[Path] = typer.Option(None, help="Path to a custom cluster profile."),
+    subworkflow: Optional[str] = typer.Option(None, help="Name of a subworkflow to run."),
     time_hr: int = typer.Option(
         120, help="The walltime limit (in hours) for the main snakemake process."
     ),
@@ -46,8 +47,14 @@ def main(
         "time_hr": time_hr,
         "local_mem_mb": 1024,
         "local_tasks": 1,
-        "added_options": "--notemp " if notemp else "",
+        "added_options": "",
     }
+
+    if notemp:
+        payload["added_options"] += "--notemp "  # type: ignore
+
+    if subworkflow:
+        payload["added_options"] += f"--subworkflow {subworkflow} "  # type: ignore
 
     cfg = load_config()
     sample_size = cfg.ss.shape[0]

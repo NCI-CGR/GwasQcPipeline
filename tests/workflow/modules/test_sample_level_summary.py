@@ -77,7 +77,7 @@ def test_sample_qc_stats(tmp_path, sample_qc_csv):
 
             cfg = load_config()
 
-            include: cfg.modules("sample_level_summary.smk")
+            include: cfg.modules("sample_level_summary")
 
             rule all:
                 input:
@@ -111,7 +111,7 @@ def test_qc_failures(tmp_path, sample_qc_csv):
 
             cfg = load_config()
 
-            include: cfg.modules("sample_level_summary.smk")
+            include: cfg.modules("sample_level_summary")
 
             rule all:
                 input:
@@ -184,7 +184,7 @@ def test_remove_contaminated(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("sample_level_summary.smk")
+            include: cfg.modules("sample_level_summary")
 
             rule all:
                 input:
@@ -248,7 +248,7 @@ def test_remove_contaminated_add_contam_samples(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("sample_level_summary.smk")
+            include: cfg.modules("sample_level_summary")
 
             rule all:
                 input:

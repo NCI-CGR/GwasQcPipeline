@@ -1,9 +1,61 @@
-import pandas as pd
+from cgr_gwas_qc import load_config
+
+cfg = load_config()
+output_pattern = cfg.config.user_files.output_pattern
+
+
+localrules:
+    lab_sample_level_qc_report,
+    lab_lims_upload,
+    lab_identifiler_needed,
+    lab_known_replicates,
+    lab_unknown_replicates,
+    deliver_manifest,
+    deliver_hwp,
+    deliver_original_sample_data,
+    deliver_subject_data,
+    deliver_subject_list,
+
+
+wildcard_constraints:
+    deliver_prefix=".*",
+    deliver_suffix=".*",
 
 
 ################################################################################
+# Delivery Targets
+################################################################################
+targets = [
+    "delivery/samples.bed",
+    "delivery/samples.bim",
+    "delivery/samples.fam",
+    "delivery/SampleUsedforSubject.csv",
+    "delivery/subjects.bed",
+    "delivery/subjects.bim",
+    "delivery/subjects.fam",
+    "delivery/HWP.zip",
+    output_pattern.format(prefix="files_for_lab", file_type="all_sample_qc", ext="csv"),
+    output_pattern.format(prefix="files_for_lab", file_type="LimsUpload", ext="csv"),
+    output_pattern.format(prefix="files_for_lab", file_type="Identifiler", ext="csv"),
+    output_pattern.format(prefix="files_for_lab", file_type="KnownReplicates", ext="csv"),
+    output_pattern.format(prefix="files_for_lab", file_type="UnknownReplicates", ext="csv"),
+    output_pattern.format(prefix="delivery", file_type="AnalysisManifest", ext="csv"),
+    output_pattern.format(prefix="delivery", file_type="QC_Report", ext="docx"),
+    output_pattern.format(prefix="delivery", file_type="QC_Report", ext="xlsx"),
+]
+
+
+rule all_delivery:
+    input:
+        targets,
+
+
+################################################################################
+# Workflow Rules
+################################################################################
+# -------------------------------------------------------------------------------
 # Files For Lab
-################################################################################
+# -------------------------------------------------------------------------------
 rule lab_sample_level_qc_report:
     input:
         "sample_level/sample_qc.csv",
@@ -51,31 +103,33 @@ rule lab_unknown_replicates:
         "cp {input[0]} {output[0]}"
 
 
-################################################################################
+# -------------------------------------------------------------------------------
 # Deliverables
-################################################################################
+# -------------------------------------------------------------------------------
 rule deliver_manifest:
     input:
         cfg.sample_sheet_file.as_posix(),
     output:
-        "deliver/{deliver_prefix}AnalysisManifest{deliver_suffix}.csv",
+        "delivery/{deliver_prefix}AnalysisManifest{deliver_suffix}.csv",
     shell:
         "cp {input[0]} {output[0]}"
 
 
 rule deliver_hwp:
     input:
-        "population_level/per_population_controls_qc.done",
+        "subject_level/.control_plots.done",
     output:
-        "deliver/HWP.zip",
+        "delivery/HWP.zip",
     shell:
         """
         ODIR=$(dirname {output[0]})
-        mkdir -p $ODIR/HWP \
-        && for FILE in $(cat {input[0]}); do cp $FILE $ODIR/HWP/; done \
-        && cd $ODIR \
-        && zip -r $(basename {output[0]}) ./HWP \
-        && rm -r HWP
+        mkdir -p $ODIR/HWP
+        for FILE in $(find ./subject_level -type f -name '*.hwe'); do
+            cp $FILE $ODIR/HWP/
+        done
+        cd $ODIR
+        zip -r $(basename {output[0]}) ./HWP
+        rm -r HWP
         """
 
 
@@ -85,9 +139,9 @@ rule deliver_original_sample_data:
         bim="sample_level/samples.bim",
         fam="sample_level/samples.fam",
     output:
-        bed="deliver/samples.bed",
-        bim="deliver/samples.bim",
-        fam="deliver/samples.fam",
+        bed="delivery/samples.bed",
+        bim="delivery/samples.bim",
+        fam="delivery/samples.fam",
     shell:
         "cp {input.bed} {output.bed} && cp {input.bim} {output.bim} && cp {input.fam} {output.fam}"
 
@@ -98,9 +152,9 @@ rule deliver_subject_data:
         bim="subject_level/samples.bim",
         fam="subject_level/samples.fam",
     output:
-        bed="deliver/subjects.bed",
-        bim="deliver/subjects.bim",
-        fam="deliver/subjects.fam",
+        bed="delivery/subjects.bed",
+        bim="delivery/subjects.bim",
+        fam="delivery/subjects.fam",
     shell:
         "cp {input.bed} {output.bed} && cp {input.bim} {output.bim} && cp {input.fam} {output.fam}"
 
@@ -109,8 +163,10 @@ rule deliver_subject_list:
     input:
         "sample_level/sample_qc.csv",
     output:
-        "deliver/SampleUsedforSubject.csv",
+        "delivery/SampleUsedforSubject.csv",
     run:
+        import pandas as pd
+
         qc = pd.read_csv(input[0]).query("not is_internal_control")  # exclude internal controls
 
         (
@@ -127,29 +183,33 @@ rule deliver_subject_list:
         )
 
 
-################################################################################
+# -------------------------------------------------------------------------------
 # QC Report
-################################################################################
+# -------------------------------------------------------------------------------
 rule qc_report:
     input:
-        sample_sheet_csv=cfg.sample_sheet_file,
+        sample_sheet_csv="cgr_sample_sheet.csv",
         snp_qc_csv="sample_level/snp_qc.csv",
         sample_qc_csv="sample_level/sample_qc.csv",
         subject_qc_csv="subject_level/subject_qc.csv",
-        population_qc_csv="population_level/population_qc.csv",
+        population_qc_csv="subject_level/population_qc.csv",
         control_replicates_csv="sample_level/concordance/InternalQcKnown.csv",
         study_replicates_csv="sample_level/concordance/StudySampleKnown.csv",
         unexpected_replicates_csv="sample_level/concordance/UnknownReplicates.csv",
         call_rate_png="sample_level/call_rate.png",
         chrx_inbreeding_png="sample_level/chrx_inbreeding.png",
         ancestry_png="sample_level/ancestry.png",
-        autosomal_heterozygosity_png_dir="population_level/autosomal_heterozygosity_plots",
-        pca_png_dir="population_level/pca_plots",
-        hwe_png_dir="population_level/hwe_plots",
+        _population_plots="subject_level/.population_plots.done",
+        _control_plots="subject_level/.population_plots.done",
     params:
         config=cfg.config,
+        autosomal_heterozygosity_png_dir="subject_level/autosomal_heterozygosity_plots",
+        pca_png_dir="subject_level/pca_plots",
+        hwe_png_dir="subject_level/hwe_plots",
     output:
-        "deliver/qc_report.md",
+        "delivery/qc_report.md",
+    group:
+        "qc_report"
     script:
         "../scripts/qc_report.py"
 
@@ -160,9 +220,11 @@ rule qc_report_docx:
     params:
         template=cfg.docx_template,
     output:
-        "deliver/{deliver_prefix}QC_Report{deliver_suffix}.docx",
+        "delivery/{deliver_prefix}QC_Report{deliver_suffix}.docx",
     conda:
-        cfg.conda("pandoc.yml")
+        cfg.conda("pandoc")
+    group:
+        "qc_report"
     shell:
         "pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}"
 
@@ -173,10 +235,12 @@ rule qc_report_xlsx:
         sample_concordance_csv="sample_level/concordance/summary.csv",
         sample_qc_csv="sample_level/sample_qc.csv",
         subject_qc_csv="subject_level/subject_qc.csv",
-        population_concordance_csv="population_level/concordance.csv",
-        population_qc_csv="population_level/population_qc.csv",
+        population_concordance_csv="subject_level/concordance.csv",
+        population_qc_csv="subject_level/population_qc.csv",
         graf="sample_level/ancestry/graf_populations.txt",
     output:
-        "deliver/{deliver_prefix}QC_Report{deliver_suffix}.xlsx",
+        "delivery/{deliver_prefix}QC_Report{deliver_suffix}.xlsx",
+    group:
+        "qc_report"
     script:
         "../scripts/qc_report_table.py"

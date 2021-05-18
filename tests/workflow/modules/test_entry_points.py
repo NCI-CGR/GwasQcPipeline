@@ -35,7 +35,7 @@ def test_gtc_to_ped_conversion(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.modules("entry_points.smk")
+            include: cfg.subworkflow("entry_points")
 
             rule all:
                 input:
@@ -72,7 +72,7 @@ def test_create_gtc_merge_list(tmp_path):
 
             cfg = load_config()
 
-            include: cfg.modules("entry_points.smk")
+            include: cfg.subworkflow("entry_points")
 
             rule all:
                 input: "sample_level/initial_mergeList.txt"
@@ -106,7 +106,7 @@ def test_merge_gtc_sample_peds(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("entry_points.smk")
+            include: cfg.subworkflow("entry_points")
 
             rule all:
                 input:
@@ -153,7 +153,7 @@ def test_ped_entry(tmp_path, conda_envs):
 
             cfg = load_config()
 
-            include: cfg.modules("entry_points.smk")
+            include: cfg.subworkflow("entry_points")
 
             rule all:
                 input:
@@ -205,7 +205,7 @@ def test_bed_entry(tmp_path):
 
             cfg = load_config(pytest=True)
 
-            include: cfg.modules("entry_points.smk")
+            include: cfg.subworkflow("entry_points")
 
             rule all:
                 input:
