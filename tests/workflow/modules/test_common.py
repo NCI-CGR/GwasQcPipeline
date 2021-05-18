@@ -170,5 +170,6 @@ def test_eigensoft_smartpca(tmp_path, conda_envs):
 
     # THEN: the files exists
     file_hashes_equal(
-        tmp_path / "subjects.eigenvec", data_cache / "production_outputs/pca/EUR_subjects.eigenvec",
+        tmp_path / "subjects.eigenvec",
+        data_cache / "production_outputs/pca/EUR_subjects.eigenvec",
     )

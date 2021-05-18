@@ -155,7 +155,10 @@ def files_for_deliver(tmp_path_factory, sample_qc_csv):
         .copy("production_outputs/subject_level/samples.bim", "subject_level/samples.bim")
         .copy("production_outputs/subject_level/samples.fam", "subject_level/samples.fam")
         # Use CGR manifest naming scheme
-        .copy("original_data/manifest_full.csv", "SR001-001_00_AnalysisManifest_0000000.csv",)
+        .copy(
+            "original_data/manifest_full.csv",
+            "SR001-001_00_AnalysisManifest_0000000.csv",
+        )
         .make_cgr_sample_sheet()
         .make_config(
             sample_sheet="SR001-001_00_AnalysisManifest_0000000.csv",

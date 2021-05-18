@@ -138,9 +138,7 @@ def test_group_by_column_config_option(tmp_path):
 
 
 def test_group_by_column(tmp_path):
-    """Populate Group_By_Subject_ID column with config option.
-
-    """
+    """Populate Group_By_Subject_ID column with config option."""
     # GIVEN: Fake sample sheet and config
     FakeData(tmp_path).make_config(
         workflow_params=dict(subject_id_column="Group_By")

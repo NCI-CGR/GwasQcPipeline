@@ -115,7 +115,7 @@ def _add_unexpected_replicate_ids(df: pd.DataFrame, sample_concordance_csv: Path
     """Adds information about unexpected replicates.
 
     Adds ``is_unexpected_replicate`` and ``unexpected_replicate_ids``.
-   """
+    """
     concordance = sample_concordance.read(sample_concordance_csv)
     flags = (
         concordance.melt(

@@ -28,21 +28,26 @@ class UserFiles(BaseModel):
 
     # PED/MAP
     ped: Optional[Path] = Field(
-        None, description="Aggregated PED file if sample level GTC files are not available.",
+        None,
+        description="Aggregated PED file if sample level GTC files are not available.",
     )
     map: Optional[Path] = Field(
-        None, description="Aggregated MAP file if sample level GTC files are not available.",
+        None,
+        description="Aggregated MAP file if sample level GTC files are not available.",
     )
 
     # BED/BIM/FAM
     bed: Optional[Path] = Field(
-        None, description="Aggregated BED file if sample level GTC files are not available.",
+        None,
+        description="Aggregated BED file if sample level GTC files are not available.",
     )
     bim: Optional[Path] = Field(
-        None, description="Aggregated BIM file if sample level GTC files are not available.",
+        None,
+        description="Aggregated BIM file if sample level GTC files are not available.",
     )
     fam: Optional[Path] = Field(
-        None, description="Aggregated FAM file if sample level GTC files are not available.",
+        None,
+        description="Aggregated FAM file if sample level GTC files are not available.",
     )
 
     @validator("gtc_pattern")

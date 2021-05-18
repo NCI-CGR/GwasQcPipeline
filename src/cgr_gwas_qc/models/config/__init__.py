@@ -50,7 +50,9 @@ class Config(BaseModel):
     reference_files: ReferenceFiles
     user_files: UserFiles = UserFiles()  # Paths to user provided files.
     software_params: SoftwareParams = SoftwareParams()  # Various software parameters.
-    workflow_params: WorkflowParams = WorkflowParams()  # Parameters to control how the workflow is run.
+    workflow_params: WorkflowParams = (
+        WorkflowParams()
+    )  # Parameters to control how the workflow is run.
     env_modules: Optional[EnvModules]  # Use these HPC environmental modules."
     Sample_IDs_to_remove: Optional[Sequence[str]]
 

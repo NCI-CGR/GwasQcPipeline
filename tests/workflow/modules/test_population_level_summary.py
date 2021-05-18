@@ -75,9 +75,18 @@ def test_plink_split_population(tmp_path, conda_envs):
             "production_outputs/split_by_pop/EUR.keep.txt",
             "population_level/subject_lists/EUR.txt",
         )
-        .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
-        .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
-        .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
+        .copy(
+            "production_outputs/subject_level/subjects.bed",
+            "subject_level/subjects.bed",
+        )
+        .copy(
+            "production_outputs/subject_level/subjects.bim",
+            "subject_level/subjects.bim",
+        )
+        .copy(
+            "production_outputs/subject_level/subjects.fam",
+            "subject_level/subjects.fam",
+        )
         .make_config()
         .make_cgr_sample_sheet()
         .make_snakefile(
@@ -129,9 +138,18 @@ def test_per_population_qc_done(tmp_path, conda_envs, sample_qc_csv, software_pa
     conda_envs.copy_env("eigensoft", tmp_path)
     data_cache = (
         RealData(tmp_path)
-        .copy("production_outputs/subject_level/subjects.bed", "subject_level/subjects.bed",)
-        .copy("production_outputs/subject_level/subjects.bim", "subject_level/subjects.bim",)
-        .copy("production_outputs/subject_level/subjects.fam", "subject_level/subjects.fam",)
+        .copy(
+            "production_outputs/subject_level/subjects.bed",
+            "subject_level/subjects.bed",
+        )
+        .copy(
+            "production_outputs/subject_level/subjects.bim",
+            "subject_level/subjects.bim",
+        )
+        .copy(
+            "production_outputs/subject_level/subjects.fam",
+            "subject_level/subjects.fam",
+        )
         .make_config(workflow_params={"subject_id_column": "PI_Subject_ID"})
         .make_cgr_sample_sheet()
         .make_snakefile(
@@ -295,7 +313,10 @@ def test_plink_split_controls(tmp_path, conda_envs):
 
     data_cache = (
         RealData(tmp_path)
-        .copy("production_outputs/HWP/EUR_controls.txt", "population_level/controls_lists/EUR.txt",)
+        .copy(
+            "production_outputs/HWP/EUR_controls.txt",
+            "population_level/controls_lists/EUR.txt",
+        )
         .copy(
             "production_outputs/split_by_pop/EUR_subjects.bed",
             "population_level/EUR/subjects_unrelated.bed",
@@ -367,13 +388,16 @@ def test_per_population_controls_qc_done(tmp_path, conda_envs, sample_qc_csv, so
         RealData(tmp_path)
         .add_user_files(entry_point="gtc", copy=False)
         .copy(
-            "production_outputs/split_by_pop/EUR_subjects.bed", "population_level/EUR/subjects.bed",
+            "production_outputs/split_by_pop/EUR_subjects.bed",
+            "population_level/EUR/subjects.bed",
         )
         .copy(
-            "production_outputs/split_by_pop/EUR_subjects.bim", "population_level/EUR/subjects.bim",
+            "production_outputs/split_by_pop/EUR_subjects.bim",
+            "population_level/EUR/subjects.bim",
         )
         .copy(
-            "production_outputs/split_by_pop/EUR_subjects.fam", "population_level/EUR/subjects.fam",
+            "production_outputs/split_by_pop/EUR_subjects.fam",
+            "population_level/EUR/subjects.fam",
         )
         .make_config()
         .make_cgr_sample_sheet()

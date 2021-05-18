@@ -25,7 +25,8 @@ def test_gtc2adpc(gtc_file, bpm_file, tmp_path):
     # GIVEN: A fake GTC and BPM file
     # WHEN: I run the script and get adpc.bin and snp_counts as outputs.
     results = runner.invoke(
-        app, [gtc_file.as_posix(), bpm_file.as_posix(), (tmp_path / "adpc.bin").as_posix()],
+        app,
+        [gtc_file.as_posix(), bpm_file.as_posix(), (tmp_path / "adpc.bin").as_posix()],
     )
     assert results.exit_code == 0
 

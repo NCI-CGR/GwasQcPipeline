@@ -224,85 +224,85 @@ class GenotypeCalls:
 
     def get_num_snps(self):
         """Returns:
-            The number of SNPs in the file as an integer
+        The number of SNPs in the file as an integer
         """
         return self.toc_table[GenotypeCalls.__ID_NUM_SNPS]
 
     def get_ploidy(self):
         """Returns:
-            The ploidy of the sample
+        The ploidy of the sample
         """
         return self.toc_table[GenotypeCalls.__ID_PLOIDY]
 
     def get_ploidy_type(self):
         """Returns:
-            The ploidy type of the sample
+        The ploidy type of the sample
         """
         return self.toc_table[GenotypeCalls.__ID_PLOIDY_TYPE]
 
     def get_sample_name(self):
         """Returns:
-            The name of the sample as a string
+        The name of the sample as a string
         """
         return self.__get_generic(GenotypeCalls.__ID_SAMPLE_NAME, read_string)
 
     def get_slide_identifier(self):
         """Returns:
-            The name of the sample as a string
+        The name of the sample as a string
         """
         return self.__get_generic(GenotypeCalls.__ID_SLIDE_IDENTIFIER, read_string)
 
     def get_sample_plate(self):
         """Returns:
-            The name of the sample plate as a string
+        The name of the sample plate as a string
         """
         return self.__get_generic(GenotypeCalls.__ID_SAMPLE_PLATE, read_string)
 
     def get_sample_well(self):
         """Returns:
-            The name of the sample well as a string
+        The name of the sample well as a string
         """
         return self.__get_generic(GenotypeCalls.__ID_SAMPLE_WELL, read_string)
 
     def get_cluster_file(self):
         """Returns:
-            The name of the cluster file used for genotyping as a string
+        The name of the cluster file used for genotyping as a string
         """
         return self.__get_generic(GenotypeCalls.__ID_CLUSTER_FILE, read_string)
 
     def get_snp_manifest(self):
         """Returns:
-            The name of the manifest used for genotyping as a string
+        The name of the manifest used for genotyping as a string
         """
         return self.__get_generic(GenotypeCalls.__ID_SNP_MANIFEST, read_string)
 
     def get_imaging_date(self):
         """Returns:
-            The imaging date of scanning as a string
-            For example
-                Monday, December 01, 2014 4:51:47 PM
+        The imaging date of scanning as a string
+        For example
+            Monday, December 01, 2014 4:51:47 PM
         """
         return self.__get_generic(GenotypeCalls.__ID_IMAGING_DATE, read_string)
 
     def get_autocall_date(self):
         """Returns:
-            The imaging date of scanning as a string
-            For example
-                2/17/2015 1:47 PM
+        The imaging date of scanning as a string
+        For example
+            2/17/2015 1:47 PM
         """
         return self.__get_generic(GenotypeCalls.__ID_AUTOCALL_DATE, read_string)
 
     def get_autocall_version(self):
         """Returns:
-            The version of AutoCall used for genotyping as a string
-            For example
-                1.6.2.2
+        The version of AutoCall used for genotyping as a string
+        For example
+            1.6.2.2
         """
         return self.__get_generic(GenotypeCalls.__ID_AUTOCALL_VERSION, read_string)
 
     def get_genotypes(self):
-        """ Returns:
-            A byte list (string) of genotypes. See code2genotype for mapping
+        """Returns:
+        A byte list (string) of genotypes. See code2genotype for mapping
         """
         return self.__get_generic_array(GenotypeCalls.__ID_GENOTYPES, read_byte)
 
@@ -388,9 +388,9 @@ class GenotypeCalls:
 
     def get_base_calls(self) -> Generator[str, None, None]:
         """Yields:
-            The genotype basecalls as a string.
-            The characters are A, C, G, T, or - for a no-call/null.
-            The calls are relative to the top strand.
+        The genotype basecalls as a string.
+        The characters are A, C, G, T, or - for a no-call/null.
+        The calls are relative to the top strand.
         """
         try:
             ploidy_type = self.get_ploidy_type()
@@ -420,74 +420,74 @@ class GenotypeCalls:
 
     def get_genotype_scores(self):
         """Returns:
-            The genotype scores as a list of floats
+        The genotype scores as a list of floats
         """
         return self.__get_generic_array_numpy(GenotypeCalls.__ID_GENOTYPE_SCORES, float32)
 
     def get_scanner_data(self):
         """Returns:
-            Information about scanner as ScannerData object
+        Information about scanner as ScannerData object
         """
         return self.__get_generic(GenotypeCalls.__ID_SCANNER_DATA, read_scanner_data)
 
     def get_control_x_intensities(self):
         """Returns:
-            The x intensities of control bead types as a list of integers
+        The x intensities of control bead types as a list of integers
         """
         return self.__get_generic_array_numpy(GenotypeCalls.__ID_CONTROLS_X, uint16)
 
     def get_control_y_intensities(self):
         """Returns:
-            The y intensities of control bead types as a list of integers
+        The y intensities of control bead types as a list of integers
         """
         return self.__get_generic_array_numpy(GenotypeCalls.__ID_CONTROLS_Y, uint16)
 
     def get_raw_x_intensities(self):
         """Returns:
-            The raw x intensities of assay bead types as a list of integers
+        The raw x intensities of assay bead types as a list of integers
         """
         return self.__get_generic_array_numpy(GenotypeCalls.__ID_RAW_X, uint16)
 
     def get_raw_y_intensities(self):
         """Returns:
-            The raw y intensities of assay bead types as a list of integers
+        The raw y intensities of assay bead types as a list of integers
         """
         return self.__get_generic_array_numpy(GenotypeCalls.__ID_RAW_Y, uint16)
 
     def get_call_rate(self):
         """Returns:
-            The call rate as a float
+        The call rate as a float
         """
         return self.__get_generic(GenotypeCalls.__ID_CALL_RATE, read_float)
 
     def get_gender(self):
         """Returns:
-            The gender as a char
-            M - Male, F - Female, U-Unknown
+        The gender as a char
+        M - Male, F - Female, U-Unknown
         """
         return self.__get_generic(GenotypeCalls.__ID_GENDER, read_char)
 
     def get_logr_dev(self):
         """Returns:
-            The logR deviation as a float
+        The logR deviation as a float
         """
         return self.__get_generic(GenotypeCalls.__ID_LOGR_DEV, read_float)
 
     def get_gc10(self):
         """Returns:
-            The GC10 (GenCall score - 10th percentile) as a float
+        The GC10 (GenCall score - 10th percentile) as a float
         """
         return self.__get_generic(GenotypeCalls.__ID_GC10, read_float)
 
     def get_gc50(self):
         """Returns:
-            The GC50 (GenCall score - 50th percentile) as a float
+        The GC50 (GenCall score - 50th percentile) as a float
         """
         return self.__get_generic(GenotypeCalls.__ID_GC50, read_float)
 
     def get_num_calls(self):
         """Returns:
-            The number of calls as an integer
+        The number of calls as an integer
         """
         with open(self.filename, "rb") as gtc_handle:
             gtc_handle.seek(self.toc_table[GenotypeCalls.__ID_GC50] + 4)
@@ -495,7 +495,7 @@ class GenotypeCalls:
 
     def get_num_no_calls(self):
         """Returns:
-            The number of no calls as an integer
+        The number of no calls as an integer
         """
         with open(self.filename, "rb") as gtc_handle:
             gtc_handle.seek(self.toc_table[GenotypeCalls.__ID_GC50] + 8)
@@ -503,7 +503,7 @@ class GenotypeCalls:
 
     def get_num_intensity_only(self):
         """Returns:
-            The number of intensity only SNPs
+        The number of intensity only SNPs
         """
         with open(self.filename, "rb") as gtc_handle:
             gtc_handle.seek(self.toc_table[GenotypeCalls.__ID_GC50] + 12)
@@ -511,7 +511,7 @@ class GenotypeCalls:
 
     def get_ballele_freqs(self):
         """Returns:
-            The B allele frequencies as a list of floats
+        The B allele frequencies as a list of floats
         """
         if self.version < 4:
             raise Exception(
@@ -521,7 +521,7 @@ class GenotypeCalls:
 
     def get_logr_ratios(self):
         """Returns:
-            The logR ratios as a list of floats
+        The logR ratios as a list of floats
         """
         if self.version < 4:
             raise Exception(
@@ -531,8 +531,8 @@ class GenotypeCalls:
 
     def get_percentiles_x(self):
         """Returns:
-            An array of length three representing 5th, 50th and 95th percentiles for
-            x intensity
+        An array of length three representing 5th, 50th and 95th percentiles for
+        x intensity
         """
         if self.version < 5:
             raise Exception(
@@ -548,8 +548,8 @@ class GenotypeCalls:
 
     def get_percentiles_y(self):
         """Returns:
-            An array of length three representing 5th, 50th and 95th percentiles for
-            y intensity
+        An array of length three representing 5th, 50th and 95th percentiles for
+        y intensity
         """
         if self.version < 5:
             raise Exception(
@@ -582,7 +582,7 @@ class GenotypeCalls:
 
     def get_normalization_transforms(self):
         """Returns:
-            The normalization transforms used during genotyping (as a lit of NormalizationTransforms)
+        The normalization transforms used during genotyping (as a lit of NormalizationTransforms)
         """
         return self.__get_generic_array(
             GenotypeCalls.__ID_NORMALIZATION_TRANSFORMS,

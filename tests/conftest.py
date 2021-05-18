@@ -445,7 +445,11 @@ def subject_qc_csv(real_tmp_path, sample_qc_csv, sample_concordance_csv) -> Path
     outfile = real_tmp_path / "subject_level/subject_qc.csv"
 
     subject_qc_table.main(
-        sample_qc_csv, sample_concordance_csv, True, True, outfile,
+        sample_qc_csv,
+        sample_concordance_csv,
+        True,
+        True,
+        outfile,
     )
 
     return outfile
@@ -508,7 +512,9 @@ def agg_population_qc_csv(sample_qc_csv, population_qc_csv, real_tmp_path) -> Pa
     outfile = real_tmp_path / "population_level/population_qc.csv"
 
     agg_population_qc_tables.main(
-        sample_qc_table=sample_qc_csv, population_qc_tables=tables, outfile=outfile,
+        sample_qc_table=sample_qc_csv,
+        population_qc_tables=tables,
+        outfile=outfile,
     )
 
     return outfile

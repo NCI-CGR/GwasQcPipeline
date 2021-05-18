@@ -16,8 +16,7 @@ template = env.get_template("summary_stats.txt.j2")
 
 @app.command()
 def main(filename: Path, outfile: Path):
-    """Generate summary statistics from the sample qc table.
-    """
+    """Generate summary statistics from the sample qc table."""
     df = sample_qc_table.read(filename)
 
     payload = {
