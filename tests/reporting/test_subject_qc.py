@@ -10,20 +10,12 @@ import pytest
 
 
 @pytest.mark.real_data
-@pytest.fixture
-def unexpected_replicates_df(split_sample_concordance_tables, pytestconfig) -> pd.DataFrame:
-    if not pytestconfig.getoption("--real-data"):
-        pytest.skip("No real data")
-
-    return pd.read_csv(split_sample_concordance_tables / "UnknownReplicates.csv").rename(
-        {"Concordance": "concordance"}, axis=1
-    )
-
-
-@pytest.mark.real_data
-def test_UnExpectedReplicates(subject_qc_df, unexpected_replicates_df):
+def test_UnExpectedReplicates(real_data_cache, subject_qc_df):
     from cgr_gwas_qc.reporting.subject_qc import UnExpectedReplicates
 
+    unexpected_replicates_df = pd.read_csv(
+        real_data_cache / "dev_outputs/sample_level/concordance/UnknownReplicates.csv"
+    )
     unexpected = UnExpectedReplicates.construct(subject_qc_df, unexpected_replicates_df)
 
     assert 0 == unexpected.num_unexpected_replicates
@@ -48,10 +40,10 @@ def test_SexVerification(real_cfg, subject_qc_df):
 
 
 @pytest.mark.real_data
-def test_Relatedness(population_qc_df):
+def test_Relatedness(agg_population_qc_df):
     from cgr_gwas_qc.reporting.subject_qc import Relatedness
 
-    rl = Relatedness.construct(population_qc_df)
+    rl = Relatedness.construct(agg_population_qc_df)
 
     assert 0 == rl.num_related_subjects
     assert 0 == rl.num_qc_families
@@ -66,11 +58,11 @@ def num_and_png_dir(request, tmp_path, fake_image) -> Tuple[int, Path]:
 
 
 @pytest.mark.real_data
-def test_Autosomal(population_qc_df, num_and_png_dir):
+def test_Autosomal(agg_population_qc_df, num_and_png_dir):
     from cgr_gwas_qc.reporting.subject_qc import Autosomal
 
     num_pops, png_dir = num_and_png_dir
-    az = Autosomal.construct(population_qc_df, png_dir)
+    az = Autosomal.construct(agg_population_qc_df, png_dir)
 
     assert 1 == az.num_populations_analyzed
     assert 0 == az.num_subjects_excluded

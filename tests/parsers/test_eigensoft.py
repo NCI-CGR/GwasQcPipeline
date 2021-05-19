@@ -2,13 +2,12 @@ import numpy as np
 import pytest
 
 from cgr_gwas_qc.parsers.eigensoft import Eigenvec
-from cgr_gwas_qc.testing.data import RealData
 
 
 @pytest.mark.real_data
-@pytest.fixture(scope="module")
-def eigenvec():
-    filename = RealData() / "production_outputs/pca/EUR_subjects.eigenvec"
+@pytest.fixture
+def eigenvec(real_data_cache):
+    filename = real_data_cache / "legacy_outputs/pca/EUR_subjects.eigenvec"
     return Eigenvec(filename)
 
 

@@ -76,7 +76,7 @@ def test_copy_file_to_tmp_dir(tmp_path):
 def test_copy_folder_to_tmp_dir(tmp_path):
     # GIVEN: working dir with
     #   - a specific output folder
-    RealData(tmp_path).copy("production_outputs/all_contam", "all_contam")
+    RealData(tmp_path).copy("legacy_outputs/all_contam", "all_contam")
 
     # THEN:
     # The output folder is in the working directory

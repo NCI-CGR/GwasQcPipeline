@@ -103,10 +103,10 @@ def test_get_grouping_settings(sample_size, group_size):
 
     expected = (
         "--group-components "
+        f"per_sample_contamination_verifyIDintensity={group_size} "
         f"per_sample_gtc_to_adpc={group_size} "
         f"per_sample_gtc_to_ped={group_size} "
-        f"per_sample_median_idat_intensity={group_size} "
-        f"per_sample_verifyIDintensity_contamination={group_size}"
+        f"per_sample_median_idat_intensity={group_size}"
     )
     assert expected == get_grouping_settings(sample_size)
 

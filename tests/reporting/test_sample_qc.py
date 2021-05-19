@@ -50,13 +50,12 @@ def test_Contamination(sample_qc_df):
 
 @pytest.mark.real_data
 @pytest.fixture
-def control_replicates_df(split_sample_concordance_tables, pytestconfig) -> pd.DataFrame:
+def control_replicates_df(real_data_cache, pytestconfig) -> pd.DataFrame:
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
-    return pd.read_csv(split_sample_concordance_tables / "InternalQcKnown.csv").rename(
-        {"Concordance": "concordance"}, axis=1
-    )
+    filename = real_data_cache / "dev_outputs/sample_level/concordance/InternalQcKnown.csv"
+    return pd.read_csv(filename)
 
 
 @pytest.mark.real_data
@@ -73,13 +72,12 @@ def test_InternalControls(sample_qc_df, control_replicates_df):
 
 @pytest.mark.real_data
 @pytest.fixture
-def study_replicates_df(split_sample_concordance_tables, pytestconfig) -> pd.DataFrame:
+def study_replicates_df(real_data_cache, pytestconfig) -> pd.DataFrame:
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
-    return pd.read_csv(split_sample_concordance_tables / "StudySampleKnown.csv").rename(
-        {"Concordance": "concordance"}, axis=1
-    )
+    filename = real_data_cache / "dev_outputs/sample_level/concordance/StudySampleKnown.csv"
+    return pd.read_csv(filename)
 
 
 @pytest.mark.real_data
@@ -117,11 +115,11 @@ def test_Ancestry(sample_qc_df):
     expected = (
         "| Ancestry Group   |   Count |\n"
         "|:-----------------|--------:|\n"
-        "| ADMIXED_AFR      |       1 |\n"
-        "| AFR              |       8 |\n"
-        "| AFR_EUR          |       7 |\n"
-        "| ASN              |       5 |\n"
-        "| EUR              |     163 |"
+        "| African          |       1 |\n"
+        "| African_American |      15 |\n"
+        "| East_Asian       |       5 |\n"
+        "| European         |     161 |\n"
+        "| Hispanic1        |       2 |"
     )
 
     assert expected == ac.table

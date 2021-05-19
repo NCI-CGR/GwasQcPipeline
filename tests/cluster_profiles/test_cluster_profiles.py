@@ -103,7 +103,7 @@ def test_get_rule_names_multisample_group(multisample_group):
     "cluster_config,job_properties,expected",
     [
         pytest.param(
-            {},
+            {"group_jobs": {}},
             {"type": "group", "jobid": 1, "threads": 1},
             {"rulename": "GROUP.a.b", "job_id": 1, "threads": 1},
             id="basic group",
