@@ -52,6 +52,20 @@ def test_legacy_agg_contamination(real_data_cache):
     assert_series_equal(legacy[mask]["LLK0"], dev[mask]["LLK0"], atol=500)
 
 
+@pytest.mark.real_data
+@pytest.mark.regression
+def test_legacy_abf(real_data_cache):
+    legacy_abf = real_data_cache / "legacy_outputs/GSAMD-24v1-0_20011747_A1.AF.abf.txt"
+    dev_abf = real_data_cache / "dev_outputs/sample_level/GSAMD-24v1-0_20011747_A1.AF.abf.txt"
+
+    legacy = pd.read_csv(legacy_abf, sep="\t")
+    dev = pd.read_csv(dev_abf, sep="\t").fillna(0)  # legacy uses 0.0 instead of NA.
+
+    # There were some logic changes so these file are moderately different.
+    prop_very_different = (abs(legacy.ABF - dev.ABF) > 1e-6).mean()
+    assert 0.01 > prop_very_different  # less than 1% are more than 0.000001 different
+
+
 ################################################################################
 # Workflow Tests
 ################################################################################
