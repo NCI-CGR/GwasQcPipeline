@@ -6,29 +6,21 @@ from cgr_gwas_qc.workflow.scripts import agg_contamination
 
 
 @pytest.fixture
-def contam_files(tmp_path):
-    data = dedent(
-        """\
-        #
-        #
-        ID  %Mix  LLK  LKK0
-        -------------------
-        0  {}  -2  0.2
-        """
+def contam_csv(tmp_path):
+    outfile = tmp_path / "contam.csv"
+    outfile.write_text(
+        dedent(
+            """\
+            Sample_ID,%Mix,LLK,LKK0
+            SP00001,0.01,-2,0.2
+            SP00002,0.20,-2,0.2
+            SP00003,0.01,-2,0.2
+            SP00004,0.01,-2,0.2
+            """
+        )
     )
-    s1 = tmp_path / "SP00001.contam"
-    s1.write_text(data.format(0.01))
 
-    s2 = tmp_path / "SP00002.contam"
-    s2.write_text(data.format(0.20))
-
-    s3 = tmp_path / "SP00003.contam"
-    s3.write_text(data.format(0.01))
-
-    s4 = tmp_path / "SP00004.contam"
-    s4.write_text(data.format(0.01))
-
-    return s1, s2, s3
+    return outfile
 
 
 @pytest.fixture
@@ -65,8 +57,8 @@ def imiss_file(tmp_path):
 
 
 @pytest.fixture
-def agg_df(contam_files, intensity_csv, imiss_file):
-    return agg_contamination.build(contam_files, intensity_csv, imiss_file)
+def agg_df(contam_csv, intensity_csv, imiss_file):
+    return agg_contamination.build(contam_csv, intensity_csv, imiss_file)
 
 
 def test_mask_low_intensity(agg_df, software_params):

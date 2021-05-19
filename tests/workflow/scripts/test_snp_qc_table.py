@@ -4,7 +4,6 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_series_equal
 
-from cgr_gwas_qc.testing.data import RealData
 from cgr_gwas_qc.workflow.scripts.snp_qc_table import add_call_rate_flags, aggregate_snp_data
 
 
@@ -27,12 +26,11 @@ def thousand_genomes_fake(tmp_path):
 
 
 @pytest.mark.real_data
-def test_aggregate_snp_data(thousand_genomes_fake):
+def test_aggregate_snp_data(real_data_cache, thousand_genomes_fake):
     # GIVEN: SNP Call Rate file and a fake mapping of thousand genome rsIDs
-    data_cache = RealData()
-    initial = data_cache / "production_outputs/plink_start/samples_start.lmiss"
-    cr1 = data_cache / "production_outputs/plink_filter_call_rate_1/samples_filter1.lmiss"
-    cr2 = data_cache / "production_outputs/plink_filter_call_rate_2/samples_filter2.lmiss"
+    initial = real_data_cache / "legacy_outputs/plink_start/samples_start.lmiss"
+    cr1 = real_data_cache / "legacy_outputs/plink_filter_call_rate_1/samples_filter1.lmiss"
+    cr2 = real_data_cache / "legacy_outputs/plink_filter_call_rate_2/samples_filter2.lmiss"
 
     # WHEN: I aggregate and add call rate summaries
     df = aggregate_snp_data(initial, cr1, cr2, thousand_genomes_fake)
