@@ -16,7 +16,15 @@ from cgr_gwas_qc.cluster_profiles import (
 
 @dataclass
 class CgemsOptions(ClusterOptions):
-    queue: List[str] = field(default_factory=lambda: ["all.q"])
+    queue: List[str] = field(
+        default_factory=lambda: [
+            "all.q",
+            "seq-alignment.q",
+            "seq-calling.q",
+            "seq-calling2.q",
+            "seq-gvcf.q",
+        ]
+    )
     log: str = "logs/{rulename}_{job_id}.$JOB_ID"
 
     def __str__(self):
