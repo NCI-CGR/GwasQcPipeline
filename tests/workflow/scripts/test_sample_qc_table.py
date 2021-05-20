@@ -76,7 +76,7 @@ def test_read_sexcheck_cr1_w_missing(real_data_cache, ss_df):
     assert df.X_inbreeding_coefficient.dtype is np.dtype("float64")
 
 
-@pytest.mark.regresson
+@pytest.mark.regression
 @pytest.mark.real_data
 def test_sexcheck_cr1_legacy(real_data_cache, ss_df):
     # GIVEN: A test sample sheet, plink sexcheck file, and the expected sex
