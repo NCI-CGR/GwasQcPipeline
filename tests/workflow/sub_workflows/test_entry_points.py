@@ -128,21 +128,14 @@ def test_create_gtc_merge_list(gtc_entry):
 @pytest.mark.real_data
 @pytest.mark.workflow
 def test_merge_gtc_sample_peds(gtc_entry):
-    with chdir(gtc_entry):
-        cfg = load_config()
-
     # The merged samples files should exist.
     assert (gtc_entry / "sample_level/samples.bed").exists()
     assert (gtc_entry / "sample_level/samples.bim").exists()
     assert (gtc_entry / "sample_level/samples.fam").exists()
     assert (gtc_entry / "sample_level/samples.nosex").exists()
 
-    # The same number of samples should be reported in the log as passing
-    n_samples = cfg.config.num_samples
-    log = (gtc_entry / "sample_level/samples.log").read_text()
-    assert f"{n_samples} people pass filters and QC" in log
 
-
+@pytest.mark.workflow
 @pytest.fixture(scope="module")
 def ped_entry(tmp_path_factory, conda_envs):
     tmp_path = tmp_path_factory.mktemp("ped_entry")
@@ -198,6 +191,7 @@ def test_ped_entry(fake_data_cache, ped_entry):
     assert fake_fam == snake_fam
 
 
+@pytest.mark.workflow
 @pytest.fixture(scope="module")
 def bed_entry(tmp_path_factory, conda_envs):
     tmp_path = tmp_path_factory.mktemp("bed_entry")

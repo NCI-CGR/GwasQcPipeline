@@ -71,6 +71,7 @@ def test_legacy_abf(real_data_cache):
 ################################################################################
 @pytest.mark.slow
 @pytest.mark.real_data
+@pytest.mark.workflow
 @pytest.fixture(scope="module")
 def contamination(pytestconfig, tmp_path_factory, conda_envs):
     if not pytestconfig.getoption("--real-data"):

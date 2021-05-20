@@ -28,7 +28,7 @@ def test_check_exclusive_options_raises_error(cgems, biowulf, cluster_profile):
         check_exclusive_options(cgems, biowulf, cluster_profile)
 
 
-@pytest.mark.parametrize("cluster", ["cgems", pytest.param("biowulf", marks=pytest.mark.xfail)])
+@pytest.mark.parametrize("cluster", ["cgems", "biowulf"])
 def test_get_profile(cluster):
     from pathlib import Path
 
