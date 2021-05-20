@@ -277,12 +277,13 @@ def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
     # Update PLINK predicted_sex Calls
     # TODO: Decide if we want to keep this logic from the legacy workflow. See
     # http://10.133.130.114/jfear/GwasQcPipeline/issues/35
+    df.loc[df.X_inbreeding_coefficient.isnull(), "predicted_sex"] = "U"
     df.loc[df.X_inbreeding_coefficient < 0.5, "predicted_sex"] = "F"
     df.loc[df.X_inbreeding_coefficient >= 0.5, "predicted_sex"] = "M"
     df["is_sex_discordant"] = (df.predicted_sex != expected_sex).astype("boolean")
-    df.loc[
-        df.X_inbreeding_coefficient.isnull() | (df.predicted_sex == "U"), "is_sex_discordant"
-    ] = pd.NA  # If we could not predict sex then label as U
+
+    # If expected or predicted sex are unknown then set discordance to NA
+    df.loc[(expected_sex == "U") | (df.predicted_sex == "U"), "is_sex_discordant"] = pd.NA
 
     return df
 
