@@ -4,8 +4,6 @@ from textwrap import dedent
 import pandas as pd
 import pytest
 
-from cgr_gwas_qc.config import ConfigMgr
-from cgr_gwas_qc.testing.data import RealData
 from cgr_gwas_qc.workflow.scripts.population_qc_table import _expand_related, main
 
 
@@ -25,9 +23,9 @@ def test_expand_related():
 
 
 @pytest.mark.real_data
-def test_main(tmp_path, real_cfg: ConfigMgr):
-    pca = RealData() / "production_outputs/pca/EUR_subjects.eigenvec"
-    het = RealData() / "production_outputs/autosomal_heterozygosity/EUR_subjects_qc.het"
+def test_main(real_data_cache, software_params, tmp_path):
+    pca = real_data_cache / "legacy_outputs/pca/EUR_subjects.eigenvec"
+    het = real_data_cache / "legacy_outputs/autosomal_heterozygosity/EUR_subjects_qc.het"
     relatives = dedent(
         """
         QC_Family_ID,relatives
@@ -41,7 +39,7 @@ def test_main(tmp_path, real_cfg: ConfigMgr):
         pca,
         het,
         "test",
-        real_cfg.config.software_params.autosomal_het_threshold,
+        software_params.autosomal_het_threshold,
         tmp_path / "test.csv",
     )
 

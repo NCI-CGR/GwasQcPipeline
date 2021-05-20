@@ -7,7 +7,7 @@ from cgr_gwas_qc.workflow.scripts.agg_population_qc_tables import add_metadata, 
 
 
 @pytest.fixture(scope="module")
-def per_population_qc_done(tmp_path_factory):
+def population_qc_tables(tmp_path_factory):
     """Create a set of fake population level QC tables."""
     tmp_path = tmp_path_factory.mktemp("population_qc_tables")
     populations = {
@@ -30,22 +30,22 @@ def per_population_qc_done(tmp_path_factory):
             )
         )
 
-    (tmp_path / "per_population_qc.done").write_text("\n".join(population_filenames))
-
-    return tmp_path / "per_population_qc.done"
+    return population_filenames
 
 
-def test_aggregate_qc_tables(per_population_qc_done):
+def test_aggregate_qc_tables(population_qc_tables):
     """Test that fake population data is aggregated."""
-    df = aggregate_qc_tables(per_population_qc_done)
+    df = aggregate_qc_tables(population_qc_tables)
     assert all(df.population.value_counts() == 3)
     assert df.Subject_ID.unique().shape[0] == 9
 
 
 @pytest.mark.real_data
-def test_add_metadata(sample_qc_csv, per_population_qc_done):
+def test_add_metadata(real_data_cache, population_qc_tables):
     """Test adding sample level metadata"""
-    df = aggregate_qc_tables(per_population_qc_done).pipe(add_metadata, filename=sample_qc_csv)
+    sample_qc_csv = real_data_cache / "dev_outputs/subject_level/subjects_for_analysis.csv"
+
+    df = aggregate_qc_tables(population_qc_tables).pipe(add_metadata, filename=sample_qc_csv)
 
     assert all(df.population.value_counts() == 3)
     assert df.Subject_ID.unique().shape[0] == 9

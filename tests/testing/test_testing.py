@@ -2,7 +2,8 @@ import os
 from pathlib import Path
 from textwrap import dedent
 
-from cgr_gwas_qc.testing import chdir, file_hashes_equal, file_rows_almost_equal, make_snakefile
+from cgr_gwas_qc.testing import chdir, make_snakefile
+from cgr_gwas_qc.testing.comparison import file_hashes_equal, file_rows_almost_equal
 
 
 def test_chdir(tmp_path):

@@ -1,56 +1,41 @@
 import numpy as np
 import pytest
 from numpy import isclose
-from typer.testing import CliRunner
 
 from cgr_gwas_qc.parsers.illumina import AdpcReader
-from cgr_gwas_qc.testing.data import FakeData, RealData
-from cgr_gwas_qc.workflow.scripts.gtc2adpc import app
-
-runner = CliRunner()
-
-
-@pytest.fixture(scope="module")
-def gtc_file():
-    return FakeData._data_path / FakeData._test_gtc
-
-
-@pytest.fixture(scope="module")
-def bpm_file():
-    return FakeData._data_path / FakeData._illumina_manifest_file
+from cgr_gwas_qc.workflow.scripts import gtc2adpc
 
 
 @pytest.mark.regression
-def test_gtc2adpc(gtc_file, bpm_file, tmp_path):
+def test_gtc2adpc_fake_data(fake_data_cache, tmp_path):
     # GIVEN: A fake GTC and BPM file
-    # WHEN: I run the script and get adpc.bin and snp_counts as outputs.
-    results = runner.invoke(
-        app,
-        [gtc_file.as_posix(), bpm_file.as_posix(), (tmp_path / "adpc.bin").as_posix()],
+    obs_adpc = tmp_path / "test.adpc.bin"
+    gtc2adpc.main(
+        fake_data_cache / "illumina/gtc/small_genotype.gtc",
+        fake_data_cache / "illumina/bpm/small_manifest.bpm",
+        obs_adpc,
     )
-    assert results.exit_code == 0
 
     # THEN: The adpc.bin file is almost identical are about equal. The output
     # contains floats so we need to do fuzzy matching.
-    obs_adpc = tmp_path / "adpc.bin"
-    expected_adpc = "tests/data/small.adpc.bin"
-    with AdpcReader(obs_adpc) as obs, AdpcReader(expected_adpc) as expect:
-        for obs_row, exp_row in zip(obs, expect):
+    expected_adpc = fake_data_cache / "small.adpc.bin"
+    with AdpcReader(expected_adpc) as expected, AdpcReader(obs_adpc) as obs:
+        for exp_row, obs_row in zip(expected, obs):
             # Integers should be the exactly the same
-            assert obs_row.x_raw == exp_row.x_raw
-            assert obs_row.y_raw == exp_row.y_raw
-            assert obs_row.genotype == exp_row.genotype
+            assert exp_row.x_raw == obs_row.x_raw
+            assert exp_row.y_raw == obs_row.y_raw
+            assert exp_row.genotype == obs_row.genotype
 
             # Floats should be really close
-            assert isclose(obs_row.x_norm, exp_row.x_norm)
-            assert isclose(obs_row.y_norm, exp_row.y_norm)
-            assert isclose(obs_row.genotype_score, exp_row.genotype_score)
+            assert isclose(exp_row.x_norm, obs_row.x_norm)
+            assert isclose(exp_row.y_norm, obs_row.y_norm)
+            assert isclose(exp_row.genotype_score, obs_row.genotype_score)
 
 
 @pytest.mark.real_data
 @pytest.mark.regression
 @pytest.mark.slow
-def test_gtc2adpc_issue_31(tmp_path):
+def test_gtc2adpc_issue_31(real_data_cache, tmp_path):
     """Issue 31: Regression difference NA vs 0.0
 
     I found when using real data my version of the script returns `nan` and
@@ -63,21 +48,18 @@ def test_gtc2adpc_issue_31(tmp_path):
     values are 0, genotype score is 0, and the genotype call is 3 (Unknown).
     """
     # GIVEN: a real GTC and BPM file.
-    data_repo = RealData()
-    gtc_file = (data_repo / "original_data/202917110153_R02C02.gtc").as_posix()
-    bpm_file = (data_repo / "reference_data/GSAMD-24v1-0_20011747_A1.bpm").as_posix()
-
-    # WHEN: run the script
-    results = runner.invoke(app, [gtc_file, bpm_file, (tmp_path / "test.adpc.bin").as_posix()])
-    assert results.exit_code == 0
+    obs_adpc = tmp_path / "test.adpc.bin"
+    gtc2adpc.main(
+        real_data_cache / "original_data/202917110153_R02C02.gtc",
+        real_data_cache / "reference_data/GSAMD-24v1-0_20011747_A1.bpm",
+        obs_adpc,
+    )
 
     # THEN:
-    obs_adpc = tmp_path / "test.adpc.bin"
-    expected_adpc = data_repo / "production_outputs/contam/SB034327_PC26469_C09.adpc.bin"
-
-    with AdpcReader(obs_adpc) as obs, AdpcReader(expected_adpc) as expect:
+    expected_adpc = real_data_cache / "legacy_outputs/contam/SB034327_PC26469_C09.adpc.bin"
+    with AdpcReader(expected_adpc) as expected, AdpcReader(obs_adpc) as obs:
         na_count = 0
-        for obs_row, exp_row in zip(obs, expect):
+        for exp_row, obs_row in zip(expected, obs):
             if np.isnan(obs_row.x_norm) & np.isnan(obs_row.y_norm):
                 na_count += 1
                 # if nan then the raw values should be 0 in obs and expected
@@ -96,11 +78,11 @@ def test_gtc2adpc_issue_31(tmp_path):
                 assert exp_row.genotype == 3
             else:
                 # otherwise the norm values are similar between the two scripts
-                assert isclose(obs_row.x_norm, exp_row.x_norm)
-                assert isclose(obs_row.y_norm, exp_row.y_norm)
+                assert isclose(exp_row.x_norm, obs_row.x_norm)
+                assert isclose(exp_row.y_norm, obs_row.y_norm)
 
                 # genotypes scores are very close
-                assert isclose(obs_row.genotype_score, exp_row.genotype_score)
+                assert isclose(exp_row.genotype_score, obs_row.genotype_score)
 
         # The number of missing for this file is 236
         assert na_count == 236

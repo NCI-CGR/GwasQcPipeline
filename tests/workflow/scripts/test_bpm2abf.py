@@ -4,41 +4,34 @@ For contamination checking we need to have the population level allele
 frequencies. We pull these allele frequencies from the 1KG project for each
 SNP in the BPM.
 """
-from pathlib import Path
-
 import pandas as pd
 import pytest
 from typer.testing import CliRunner
 
 from cgr_gwas_qc.parsers import bpm, vcf
-from cgr_gwas_qc.testing.data import FakeData
-from cgr_gwas_qc.workflow.scripts.bpm2abf import app
+from cgr_gwas_qc.workflow.scripts import bpm2abf
 
 runner = CliRunner()
-
-
-@pytest.fixture(scope="module")
-def vcf_file():
-    return FakeData._data_path / FakeData._thousand_genome_vcf
-
-
-@pytest.fixture(scope="module")
-def bpm_file():
-    return FakeData._data_path / FakeData._illumina_manifest_file
 
 
 ################################################################################
 # Error if population is not in the VCF.
 ################################################################################
 @pytest.mark.regression
-def test_bpm2abf_unknown_population(bpm_file, vcf_file, tmpdir):
+def test_bpm2abf_unknown_population(fake_data_cache, tmp_path):
     """Check what happens if the given population is not in the VCF
 
     It will exit and return a list of possible populations.
     """
-    file_out = Path(tmpdir) / bpm_file.with_suffix(".abf.txt").name
+    test_abf = tmp_path / "small_manifest.abf.txt"
     results = runner.invoke(
-        app, [bpm_file.as_posix(), vcf_file.as_posix(), "ANY_STRING", file_out.as_posix()]
+        bpm2abf.app,
+        [
+            (fake_data_cache / "illumina/bpm/small_manifest.bpm").as_posix(),
+            (fake_data_cache / "1KG/small_1KG.vcf.gz").as_posix(),
+            "ANY_STRING",
+            test_abf.as_posix(),
+        ],
     )
     assert results.exit_code == 1
     assert "Population must be one of: " in results.stdout
@@ -101,23 +94,27 @@ bpm_vcf_records = [
 
 @pytest.mark.parametrize("bpm_record,vcf_records,AF", bpm_vcf_records)
 def test_get_abf_from_vcf(bpm_record, vcf_records, AF, vcf_mock):
-    from cgr_gwas_qc.workflow.scripts.bpm2abf import get_abf_from_vcf
-
-    assert AF == get_abf_from_vcf(bpm_record, vcf_mock(vcf_records), "AF")
+    assert AF == bpm2abf.get_abf_from_vcf(bpm_record, vcf_mock(vcf_records), "AF")
 
 
 ################################################################################
 # Compare to outputs from old script.
 ################################################################################
 @pytest.mark.regression
-def test_bpm2abf_AF(bpm_file, vcf_file, tmp_path):
-    file_out = tmp_path / bpm_file.with_suffix(".abf.txt").name
+def test_bpm2abf_AF(fake_data_cache, tmp_path):
+    test_abf = tmp_path / "small_manifest.abf.txt"
     results = runner.invoke(
-        app, [bpm_file.as_posix(), vcf_file.as_posix(), "AF", file_out.as_posix()]
+        bpm2abf.app,
+        [
+            (fake_data_cache / "illumina/bpm/small_manifest.bpm").as_posix(),
+            (fake_data_cache / "1KG/small_1KG.vcf.gz").as_posix(),
+            "AF",
+            test_abf.as_posix(),
+        ],
     )
     assert results.exit_code == 0
 
-    obs_df = pd.read_csv(file_out, sep="\t").fillna(0)  # legacy uses 0.0 instead of NA.
-    exp_df = pd.read_csv("tests/data/small_manifest.AF.abf.txt", sep="\t")
+    obs_df = pd.read_csv(test_abf, sep="\t").fillna(0)  # legacy uses 0.0 instead of NA.
+    exp_df = pd.read_csv(fake_data_cache / "small_manifest.AF.abf.txt", sep="\t")
     prop_very_different = (abs(obs_df.ABF - exp_df.ABF) > 1e-6).mean()
     assert 0.01 > prop_very_different  # less than 1% are more than 0.000001 different

@@ -28,7 +28,7 @@ def test_check_exclusive_options_raises_error(cgems, biowulf, cluster_profile):
         check_exclusive_options(cgems, biowulf, cluster_profile)
 
 
-@pytest.mark.parametrize("cluster", ["cgems", pytest.param("biowulf", marks=pytest.mark.xfail)])
+@pytest.mark.parametrize("cluster", ["cgems", "biowulf"])
 def test_get_profile(cluster):
     from pathlib import Path
 
@@ -103,10 +103,10 @@ def test_get_grouping_settings(sample_size, group_size):
 
     expected = (
         "--group-components "
+        f"per_sample_contamination_verifyIDintensity={group_size} "
         f"per_sample_gtc_to_adpc={group_size} "
         f"per_sample_gtc_to_ped={group_size} "
-        f"per_sample_median_idat_intensity={group_size} "
-        f"per_sample_verifyIDintensity_contamination={group_size}"
+        f"per_sample_median_idat_intensity={group_size}"
     )
     assert expected == get_grouping_settings(sample_size)
 

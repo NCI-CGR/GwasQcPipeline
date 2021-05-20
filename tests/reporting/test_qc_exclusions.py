@@ -22,9 +22,9 @@ def test_pop_qc(fake_cfg):
 
 @pytest.mark.real_data
 @pytest.fixture
-def exclusion_df(real_cfg, sample_qc_df, population_qc_df) -> pd.DataFrame:
+def exclusion_df(real_cfg, sample_qc_df, agg_population_qc_df) -> pd.DataFrame:
     pre_qc = ExclusionTables._pre_qc(real_cfg.config, real_cfg.ss)
-    pop_qc = ExclusionTables._pop_qc(population_qc_df)
+    pop_qc = ExclusionTables._pop_qc(agg_population_qc_df)
     return sample_qc_df.merge(pre_qc, how="outer").merge(pop_qc, how="left")
 
 

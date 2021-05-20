@@ -1,28 +1,12 @@
-import shutil
-from pathlib import Path
-
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from cgr_gwas_qc.testing.data import RealData
 from cgr_gwas_qc.workflow.scripts import qc_report_table
 
 
 @pytest.mark.real_data
-@pytest.fixture(scope="module")
-def qc_report_xlsx(tmp_path_factory) -> Path:
-    tmp_path = tmp_path_factory.mktemp("excel_table")
-    shutil.copy(
-        RealData()
-        / "production_outputs/word_doc/SR0446-001_12_QC_Report_1011201995419_casecontrol_20191011.xls",
-        tmp_path / "report.xlsx",
-    )
-    return tmp_path / "report.xlsx"
-
-
-@pytest.mark.real_data
-def test_sample_qc(real_sample_sheet_csv, sample_qc_csv, qc_report_xlsx):
+def test_sample_qc(real_data_cache):
     dtypes = {
         "Contaminated": bool,
         "Low Call Rate": bool,
@@ -30,8 +14,13 @@ def test_sample_qc(real_sample_sheet_csv, sample_qc_csv, qc_report_xlsx):
         "Unexpected Replicate": bool,
     }
 
-    exp_df = (
-        pd.read_excel(qc_report_xlsx, sheet_name="ALL_QC", engine="openpyxl")
+    legacy_file = (
+        real_data_cache
+        / "legacy_outputs/word_doc/SR0446-001_12_QC_Report_1011201995419_casecontrol_20191011.xlsx"
+    )
+
+    legacy_df = (
+        pd.read_excel(legacy_file, sheet_name="ALL_QC", engine="openpyxl")
         .set_index("Sample_ID")
         .sort_index()
         .reindex(dtypes.keys(), axis=1)
@@ -39,8 +28,11 @@ def test_sample_qc(real_sample_sheet_csv, sample_qc_csv, qc_report_xlsx):
         .astype(dtypes)
     )
 
-    obs_df = (
-        qc_report_table._sample_qc(real_sample_sheet_csv, sample_qc_csv)
+    dev_df = (
+        qc_report_table._sample_qc(
+            real_data_cache / "dev_outputs/cgr_sample_sheet.csv",
+            real_data_cache / "dev_outputs/sample_level/sample_qc.csv",
+        )
         .set_index("Sample_ID")
         .sort_index()
         .reindex(dtypes.keys(), axis=1)
@@ -48,7 +40,7 @@ def test_sample_qc(real_sample_sheet_csv, sample_qc_csv, qc_report_xlsx):
         .astype(dtypes)
     )
 
-    assert_frame_equal(exp_df, obs_df)
+    assert_frame_equal(legacy_df, dev_df)
 
 
 @pytest.fixture
@@ -75,33 +67,20 @@ def test_ancestry(sample_qc_df, graf_text, tmp_path):
 
 
 @pytest.mark.real_data
-def test_sample_concordance(sample_qc_csv, sample_concordance_csv):
+def test_sample_concordance(real_data_cache):
+    sample_qc_csv = real_data_cache / "dev_outputs/sample_level/sample_qc.csv"
+    sample_concordance_csv = real_data_cache / "dev_outputs/sample_level/concordance/summary.csv"
     obs_df = qc_report_table._sample_concordance(sample_qc_csv, sample_concordance_csv)
     assert qc_report_table._SAMPLE_CONCORDANCE_COLUMNS == obs_df.columns.tolist()
 
 
 @pytest.mark.real_data
-def test_population_concordance(agg_population_concordance_csv, tmp_path):
+def test_population_concordance(real_data_cache, tmp_path):
+    agg_population_concordance_csv = real_data_cache / "dev_outputs/subject_level/concordance.csv"
     test_file = tmp_path / "test.xlsx"
     with pd.ExcelWriter(test_file) as writer:
         qc_report_table._population_concordance(agg_population_concordance_csv, writer)
 
-    obs_df = pd.read_excel(test_file, "EUR_IBD", engine="openpyxl")
+    obs_df = pd.read_excel(test_file, "European_IBD", engine="openpyxl")
     assert qc_report_table._POPULATION_CONCORDANCE_COLUMNS == obs_df.columns.tolist()
-    assert obs_df.shape[0] == 273
-
-
-@pytest.fixture
-def pop_qc_w_relatives(population_qc_df, tmp_path):
-    fake_pop = population_qc_df.copy()
-
-    force_relatives = fake_pop.sample(n=4).Subject_ID
-    relative_ids = force_relatives.sort_values()
-    mask = fake_pop.Subject_ID.isin(relative_ids)
-
-    fake_pop.loc[mask, "relatives"] = "|".join(relative_ids)
-    fake_pop.loc[mask, "QC_Family_ID"] = "fam01"
-
-    outfile = tmp_path / "fake_population_qc.csv"
-    fake_pop.to_csv(outfile)
-    return outfile
+    assert obs_df.shape[0] == 45

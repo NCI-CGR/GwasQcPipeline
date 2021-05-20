@@ -12,7 +12,7 @@ rule sample_call_rate_filter:
         bim="{prefix}.bim",
         fam="{prefix}.fam",
     params:
-        mind=0.95,
+        mind=1 - 0.95,
         out_prefix="{prefix}.sample_cr_filtered",
     output:
         bed=temp("{prefix}.sample_cr_filtered.bed"),
@@ -45,7 +45,7 @@ rule snp_call_rate_filter:
         bim="{prefix}.bim",
         fam="{prefix}.fam",
     params:
-        geno=0.95,
+        geno=1 - 0.95,
         out_prefix="{prefix}.snp_cr_filtered",
     output:
         bed=temp("{prefix}.snp_cr_filtered.bed"),
