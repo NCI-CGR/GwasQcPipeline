@@ -3,7 +3,7 @@ from textwrap import dedent
 import numpy as np
 import pandas as pd
 import pytest
-from pandas.testing import assert_series_equal
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 from cgr_gwas_qc.workflow.scripts import sample_qc_table
 
@@ -16,13 +16,11 @@ def ss_df(real_cfg):
 
 @pytest.mark.real_data
 def test_read_imiss_start(real_data_cache, ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
-
     # GIVEN: the call rates from the initial starting point and a list of Sample IDs
     filename = real_data_cache / "legacy_outputs/plink_start/samples_start.imiss"
 
     # WHEN: I parse the imiss table.
-    sr = _read_imiss(filename, ss_df.index, "Call_Rate_Initial")
+    sr = sample_qc_table._read_imiss(filename, ss_df.index, "Call_Rate_Initial")
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -32,13 +30,11 @@ def test_read_imiss_start(real_data_cache, ss_df):
 
 @pytest.mark.real_data
 def test_read_imiss_cr1(real_data_cache, ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
-
     # GIVEN: the call rates after CR1 filters and a list of Sample IDs
     filename = real_data_cache / "legacy_outputs/plink_filter_call_rate_1/samples_filter1.imiss"
 
     # WHEN: I parse the imiss table.
-    sr = _read_imiss(filename, ss_df.index, "Call_Rate_1")
+    sr = sample_qc_table._read_imiss(filename, ss_df.index, "Call_Rate_1")
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -48,13 +44,11 @@ def test_read_imiss_cr1(real_data_cache, ss_df):
 
 @pytest.mark.real_data
 def test_read_imiss_cr2(real_data_cache, ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_imiss
-
     # GIVEN: the call rates after CR2 filters and a list of Sample IDs
     filename = real_data_cache / "legacy_outputs/plink_filter_call_rate_2/samples_filter2.imiss"
 
     # WHEN: I parse the imiss table.
-    sr = _read_imiss(filename, ss_df.index, "Call_Rate_2")
+    sr = sample_qc_table._read_imiss(filename, ss_df.index, "Call_Rate_2")
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -63,9 +57,7 @@ def test_read_imiss_cr2(real_data_cache, ss_df):
 
 
 @pytest.mark.real_data
-def test_read_sexcheck_cr1(real_data_cache, ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_sexcheck_cr1
-
+def test_read_sexcheck_cr1_w_missing(real_data_cache, ss_df):
     # GIVEN: A test sample sheet, plink sexcheck file, and the expected sex
     # calls from the sample table
     filename = real_data_cache / "legacy_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
@@ -75,19 +67,52 @@ def test_read_sexcheck_cr1(real_data_cache, ss_df):
     expected_sex_calls["SB_missing_sample"] = "F"
 
     # WHEN: read the sexcheck table
-    df = _read_sexcheck_cr1(filename, expected_sex_calls)
+    df = sample_qc_table._read_sexcheck_cr1(filename, expected_sex_calls)
 
     # THEN: Basic properties
     assert df.index.name == "Sample_ID"
-    assert df.predicted_sex.dtype == pd.CategoricalDtype(categories=["M", "F", "U"])
+    assert df.predicted_sex.dtype == sample_qc_table.SEX_DTYPE
     assert isinstance(df.is_sex_discordant.dtype, pd.BooleanDtype)
     assert df.X_inbreeding_coefficient.dtype is np.dtype("float64")
 
 
+@pytest.mark.regression
+@pytest.mark.real_data
+def test_sexcheck_cr1_legacy(real_data_cache, ss_df):
+    # GIVEN: A test sample sheet, plink sexcheck file, and the expected sex
+    # calls from the sample table
+    filename = real_data_cache / "legacy_outputs/plink_filter_call_rate_1/samples_filter1.sexcheck"
+    expected_sex_calls = ss_df["expected_sex"]
+
+    # THEN: Legacy should match
+    mapper = {
+        "Expected_Sex": "expected_sex",
+        "Predicted_Sex": "predicted_sex",
+        "Sex Discordant": "is_sex_discordant",
+        "ChrX_Inbreed_estimate": "X_inbreeding_coefficient",
+    }
+    dtypes = {k: v for k, v in sample_qc_table.DTYPES.items() if k in mapper.values()}
+
+    dev = (
+        sample_qc_table._read_sexcheck_cr1(filename, expected_sex_calls)
+        .assign(expected_sex=expected_sex_calls)
+        .sort_index()
+        .astype(dtypes)
+    )
+
+    legacy = (
+        pd.read_csv(real_data_cache / "legacy_outputs/all_sample_qc.csv", index_col="Sample_ID")
+        .rename(mapper, axis=1)
+        .reindex(dev.columns, axis=1)
+        .sort_index()
+        .astype(dtypes)
+    )
+
+    assert_frame_equal(legacy, dev)
+
+
 @pytest.mark.real_data
 def test_read_ancestry_GRAF(tmp_path):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_ancestry
-
     # GIVEN: A test sample sheet, example outputs from GRAF -pop, and a list of Sample_IDs
     filename = tmp_path / "graf.tsv"
     filename.write_text(
@@ -102,7 +127,7 @@ def test_read_ancestry_GRAF(tmp_path):
     sample_ids = pd.Index(["SB034307_PC26469_B09", "SB034327_PC26469_C09"], name="Sample_ID")
 
     # WHEN: Parse the GRAF output
-    df = _read_ancestry(filename, sample_ids)
+    df = sample_qc_table._read_ancestry(filename, sample_ids)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
@@ -122,12 +147,10 @@ def test_read_ancestry_GRAF(tmp_path):
 
 @pytest.mark.real_data
 def test_read_concordance(real_data_cache, ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_concordance
-
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
     # WHEN: Check for discordant replicates
     sample_concordance_csv = real_data_cache / "dev_outputs/sample_level/concordance/summary.csv"
-    df = _read_concordance(sample_concordance_csv, ss_df.index)
+    df = sample_qc_table._read_concordance(sample_concordance_csv, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
@@ -150,11 +173,9 @@ def updated_contam(real_data_cache, software_params, tmp_path):
 
 @pytest.mark.real_data
 def test_read_contam(ss_df, updated_contam):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_contam
-
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
     # WHEN: Parse the contamination table
-    df = _read_contam(updated_contam, ss_df.index)
+    df = sample_qc_table._read_contam(updated_contam, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
@@ -165,13 +186,11 @@ def test_read_contam(ss_df, updated_contam):
 
 @pytest.mark.real_data
 def test_read_contam_file_name_none(ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_contam
-
     # GIVEN: A test sample sheet, config, real production outputs, and a list of Sample_IDs
     filename = None
 
     # WHEN: Parse the contamination table.
-    df = _read_contam(filename, ss_df.index)
+    df = sample_qc_table._read_contam(filename, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(df, pd.DataFrame)
@@ -182,13 +201,11 @@ def test_read_contam_file_name_none(ss_df):
 
 @pytest.mark.real_data
 def test_read_intensity(real_data_cache, ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_intensity
-
     # GIVEN: A test sample sheet, real production outputs, and a list of Sample_IDs
     filename = real_data_cache / "legacy_outputs/all_sample_idat_intensity/idat_intensity.csv"
 
     # WHEN: Parse the read intensity table.
-    sr = _read_intensity(filename, ss_df.index)
+    sr = sample_qc_table._read_intensity(filename, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -199,13 +216,11 @@ def test_read_intensity(real_data_cache, ss_df):
 
 @pytest.mark.real_data
 def test_read_intensity_file_name_none(ss_df):
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _read_intensity
-
     # GIVEN: A test sample sheet, No production outputs, and a list of Sample_IDs
     filename = None
 
     # WHEN: Parse the read intensity table with file name of None
-    sr = _read_intensity(filename, ss_df.index)
+    sr = sample_qc_table._read_intensity(filename, ss_df.index)
 
     # THEN: Basic properties
     assert isinstance(sr, pd.Series)
@@ -214,8 +229,6 @@ def test_read_intensity_file_name_none(ss_df):
 
 
 def test_identifiler_reason():
-    from cgr_gwas_qc.workflow.scripts.sample_qc_table import _get_reason
-
     df = pd.DataFrame(
         {
             "identifiler_needed": [False, True, True, True],
@@ -225,7 +238,7 @@ def test_identifiler_reason():
         }
     )
     flags = {"one": "A", "two": "B", "three": "C"}
-    obs_ = _get_reason(df, flags)
+    obs_ = sample_qc_table._get_reason(df, flags)
     exp_ = pd.Series([pd.NA, "A|B", "B", "A|B|C"])
     assert_series_equal(obs_, exp_)
 
