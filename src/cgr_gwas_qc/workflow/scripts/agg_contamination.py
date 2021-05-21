@@ -58,7 +58,7 @@ def build(contamination_file: Path, median_intensity_file: Path, imiss_file: Pat
 
 def _mask_low_intensity(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
     """Set %Mix to NA if below intensity threshold or not in imiss file"""
-    mask = (df.median_intensity < threshold) | df.F_MISS.isna()
+    mask = (df.median_intensity < threshold) & df.F_MISS.isna()
     df.loc[mask, "%Mix"] = pd.NA
     return df
 
