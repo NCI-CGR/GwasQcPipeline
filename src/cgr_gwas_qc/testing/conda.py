@@ -27,82 +27,15 @@ class CondaEnv:
 
     def __init__(self, cache_path: Optional[Union[str, Path]] = None):
         self._cache_path = self._make_cache(cache_path)
-        self._build_conda_envs()
 
-    def _make_cache(self, user_path: Optional[Union[str, Path]]) -> Path:
-        """Create cache folder."""
-        suffix = "cgr_gwas_qc/conda"
-
-        if user_path:
-            _cache_path = Path(user_path) / suffix
-        elif os.environ.get("XDG_CACHE_HOME"):
-            _cache_path = Path(os.environ["XDG_CACHE_HOME"]) / suffix
-        else:
-            _cache_path = Path(__file__).absolute().parents[3] / ".cache" / suffix
-
-        _cache_path.mkdir(parents=True, exist_ok=True)
-        return _cache_path
-
-    def _build_conda_envs(self) -> None:
+    def build_all_conda_envs(self) -> None:
         """Build all conda envs.
 
         Iterate over conda envs in ``src/cgr_gwas_qc/workflow/conda`` and
         build them all into a cache directory.
         """
         for env in self.conda_env_path.glob("*.yml"):
-            build_path = self._get_env_cache_path(env)
-
-            if build_path.exists():
-                continue
-
-            self._create_conda_env(env.as_posix(), build_path.as_posix())
-
-    def _get_env_cache_path(self, env: Path) -> Path:
-        """Create cache path name based on env content.
-
-        Uses md5sum of the environment YAML file to create a path name in the
-        form of ``{env name}_{yaml hash}``.
-        """
-        md5 = hashlib.md5()
-        md5.update(env.read_bytes())
-        content_hash = md5.hexdigest()[:8]
-        return self._cache_path / f"{env.stem}_{content_hash}"
-
-    def _create_conda_env(self, env_file: str, build_path: str) -> None:
-        """Create the conda environment.
-
-        Uses conda (or mamba if present) to build the conda environment in
-        the build path.
-        """
-        conda_frontend = "mamba" if shutil.which("mamba") else "conda"
-        cmd = " ".join(
-            [
-                conda_frontend,
-                "env",
-                "create",
-                "--quiet",
-                "--file",
-                env_file,
-                "--prefix",
-                build_path,
-            ]
-        )
-        subprocess.run(cmd, shell=True, check=True, stderr=subprocess.STDOUT)
-
-    def _get_working_dir_env_path(self, env: Path, working_dir: Path) -> Path:
-        """Working directory env path.
-
-        For snakemake, the environment path should be the md5sum of the full
-        path to `{working_dir}/.snakemake/conda` as well as the content of
-        the YAML file. Snakemake uses the first 8 characters of this hash.
-        """
-        working_dir_conda = working_dir / ".snakemake/conda"
-
-        md5 = hashlib.md5()
-        md5.update(working_dir_conda.absolute().as_posix().encode())
-        md5.update(env.read_bytes())
-        updated_hash = md5.hexdigest()[:8]
-        return working_dir_conda / updated_hash
+            self._get_env_cache_path(env)
 
     def copy_env(self, env_name: str, working_dir: Union[str, Path]) -> None:
         """Copy a conda environment into a new working directory.
@@ -143,3 +76,69 @@ class CondaEnv:
         """
         for env_config in self.conda_env_path.glob("*.yml"):
             self.copy_env(env_config.stem, working_dir)
+
+    def _make_cache(self, user_path: Optional[Union[str, Path]]) -> Path:
+        """Create cache folder."""
+        suffix = "cgr_gwas_qc/conda"
+
+        if user_path:
+            _cache_path = Path(user_path) / suffix
+        elif os.environ.get("XDG_CACHE_HOME"):
+            _cache_path = Path(os.environ["XDG_CACHE_HOME"]) / suffix
+        else:
+            _cache_path = Path(__file__).absolute().parents[3] / ".cache" / suffix
+
+        _cache_path.mkdir(parents=True, exist_ok=True)
+        return _cache_path
+
+    def _get_env_cache_path(self, env: Path) -> Path:
+        """Create cache path name based on env content.
+
+        Uses md5sum of the environment YAML file to create a path name in the
+        form of ``{env name}_{yaml hash}``.
+        """
+        md5 = hashlib.md5()
+        md5.update(env.read_bytes())
+        content_hash = md5.hexdigest()[:8]
+        cache_path = self._cache_path / f"{env.stem}_{content_hash}"
+
+        if not cache_path.exists():
+            self._create_conda_env(env.as_posix(), cache_path.as_posix())
+
+        return cache_path
+
+    def _create_conda_env(self, env_file: str, build_path: str) -> None:
+        """Create the conda environment.
+
+        Uses conda (or mamba if present) to build the conda environment in
+        the build path.
+        """
+        conda_frontend = "mamba" if shutil.which("mamba") else "conda"
+        cmd = " ".join(
+            [
+                conda_frontend,
+                "env",
+                "create",
+                "--quiet",
+                "--file",
+                env_file,
+                "--prefix",
+                build_path,
+            ]
+        )
+        subprocess.run(cmd, shell=True, check=True, stderr=subprocess.STDOUT)
+
+    def _get_working_dir_env_path(self, env: Path, working_dir: Path) -> Path:
+        """Working directory env path.
+
+        For snakemake, the environment path should be the md5sum of the full
+        path to `{working_dir}/.snakemake/conda` as well as the content of
+        the YAML file. Snakemake uses the first 8 characters of this hash.
+        """
+        working_dir_conda = working_dir / ".snakemake/conda"
+
+        md5 = hashlib.md5()
+        md5.update(working_dir_conda.absolute().as_posix().encode())
+        md5.update(env.read_bytes())
+        updated_hash = md5.hexdigest()[:8]
+        return working_dir_conda / updated_hash
