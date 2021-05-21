@@ -84,3 +84,27 @@ def test_population_concordance(real_data_cache, tmp_path):
     obs_df = pd.read_excel(test_file, "European_IBD", engine="openpyxl")
     assert qc_report_table._POPULATION_CONCORDANCE_COLUMNS == obs_df.columns.tolist()
     assert obs_df.shape[0] == 45
+
+
+@pytest.mark.real_data
+def test_pca(real_data_cache, tmp_path):
+    filename = real_data_cache / "dev_outputs/subject_level/population_qc.csv"
+    test_file = tmp_path / "test.xlsx"
+    with pd.ExcelWriter(test_file) as writer:
+        qc_report_table._pca(filename, writer)
+
+    obs_df = pd.read_excel(test_file, "European_PCA", engine="openpyxl")
+    assert qc_report_table._PCA_COLUMNS == obs_df.columns.tolist()
+    assert not obs_df.isna().all(axis=0).any()  # no empty columns
+
+
+@pytest.mark.real_data
+def test_het(real_data_cache, tmp_path):
+    filename = real_data_cache / "dev_outputs/subject_level/population_qc.csv"
+    test_file = tmp_path / "test.xlsx"
+    with pd.ExcelWriter(test_file) as writer:
+        qc_report_table._het(filename, writer)
+
+    obs_df = pd.read_excel(test_file, "European_HET", engine="openpyxl")
+    assert qc_report_table._HET_COLUMNS == obs_df.columns.tolist()
+    assert not obs_df.isna().all(axis=0).any()  # no empty columns
