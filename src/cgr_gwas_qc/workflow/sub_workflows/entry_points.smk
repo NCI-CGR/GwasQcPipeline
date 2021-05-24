@@ -75,10 +75,8 @@ if cfg.config.user_files.gtc_pattern:
             temp("sample_level/initial_mergeList.txt"),
         group:
             "merge_entry_points"
-        run:
-            with open(output[0], "w") as fh:
-                for ped, map_ in zip(input.ped, input.map_):
-                    fh.write(f"{ped} {map_}\n")
+        script:
+            "../scripts/create_plink_merge_list.py"
 
     rule merge_gtc_sample_peds:
         """Merges multiple samples using ``plink --merge-list``.
