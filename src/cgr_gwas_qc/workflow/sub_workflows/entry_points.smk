@@ -91,7 +91,7 @@ if cfg.config.user_files.gtc_pattern:
             map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
             merge_list=rules.create_gtc_sample_merge_list.output[0],
         params:
-            prefix="sample_level/samples",
+            out_prefix="sample_level/samples",
         output:
             bed="sample_level/samples.bed",
             bim="sample_level/samples.bim",
@@ -107,13 +107,8 @@ if cfg.config.user_files.gtc_pattern:
         resources:
             mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
             time_hr=lambda wildcards, attempt: 4 * attempt,
-        shell:
-            "plink "
-            "--merge-list {input.merge_list} "
-            "--make-bed "
-            "--out {params.prefix} "
-            "--threads {threads} "
-            "--memory {resources.mem_mb}"
+        script:
+            "../scripts/plink_merge_peds.py"
 
 
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
