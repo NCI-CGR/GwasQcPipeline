@@ -60,13 +60,11 @@ def test_legacy_bim(real_data_cache, legacy, dev):
             "legacy_outputs/subject_level/samples.fam",
             "dev_outputs/subject_level/samples.fam",
             id="legacy-samples-fam",
-            marks=pytest.mark.xfail(reason="Different filter criteria."),
         ),
         pytest.param(
             "legacy_outputs/subject_level/subjects.fam",
             "dev_outputs/subject_level/subjects.fam",
             id="legacy-subjects-fam",
-            marks=pytest.mark.xfail(reason="Different filter criteria."),
         ),
     ],
 )
@@ -76,20 +74,19 @@ def test_legacy_fam(real_data_cache, legacy, dev):
     comparison.assert_plink_fam_equal(real_data_cache / legacy, real_data_cache / dev)
 
 
-@pytest.mark.xfail(reason="Different filter criteria")
 @pytest.mark.regression
 @pytest.mark.real_data
 def test_subject_representative(real_data_cache):
     legacy = (
         pd.read_csv(real_data_cache / "legacy_outputs/subject_level/SampleUsedforSubject.csv")
-        .dropna()
+        .dropna(subset=["Sample_ID"])
         .set_index("Sample_ID")
         .squeeze()
         .sort_index()
     )
     dev = (
-        pd.read_csv(real_data_cache / "dev_outputs/subject_level/subjects_for_analysis.csv")
-        .dropna()
+        pd.read_csv(real_data_cache / "dev_outputs/subject_level/subject_qc.csv")
+        .dropna(subset=["Sample_ID"])
         .set_index("Sample_ID")
         .Group_By_Subject_ID.sort_index()
     )
@@ -305,158 +302,4 @@ def test_subject_qc_file_hashes(real_data_cache, subject_qc_workflow, filename):
     assert comparison.file_hashes_equal(
         real_data_cache / "dev_outputs" / filename,
         subject_qc_workflow / filename,
-    )
-
-
-# -------------------------------------------------------------------------------
-# Don't remove Sex Discordant Subjects
-# -------------------------------------------------------------------------------
-@pytest.mark.real_data
-@pytest.mark.workflow
-@pytest.fixture(scope="module")
-def subject_qc_workflow_w_sex_discordant(pytestconfig, tmp_path_factory, conda_envs):
-    """Run the Subject QC workflow but don't remove Sex Discordant samples.
-
-    The legacy workflow does not remove Sex Discordant samples. So I want to run
-    and do more legacy comparisons.
-    """
-    if not pytestconfig.getoption("--real-data"):
-        pytest.skip("No real data")
-
-    tmp_path = tmp_path_factory.mktemp("subject_qc_workflow_w_sex_discordant")
-    conda_envs.copy_env("plink2", tmp_path)
-    conda_envs.copy_env("eigensoft", tmp_path)
-
-    (
-        RealData(tmp_path)
-        .make_snakefile(
-            """
-            from cgr_gwas_qc import load_config
-
-            cfg = load_config()
-            cfg.config.workflow_params.remove_sex_discordant = False
-
-            module subject_qc:
-                snakefile: cfg.subworkflow("subject_qc")
-                config: {}
-
-            use rule * from subject_qc
-            """
-        )
-        .make_cgr_sample_sheet()
-        .copy("dev_outputs/config.yml", "config.yml")
-        .copy("dev_outputs/sample_level/sample_qc.csv", "sample_level/sample_qc.csv")
-        .copy(
-            "dev_outputs/sample_level/concordance/summary.csv",
-            "sample_level/concordance/summary.csv",
-        )
-        .copy(
-            "dev_outputs/sample_level/call_rate_2/samples.bed",
-            "sample_level/call_rate_2/samples.bed",
-        )
-        .copy(
-            "dev_outputs/sample_level/call_rate_2/samples.bim",
-            "sample_level/call_rate_2/samples.bim",
-        )
-        .copy(
-            "dev_outputs/sample_level/call_rate_2/samples.fam",
-            "sample_level/call_rate_2/samples.fam",
-        )
-    )
-
-    run_snakemake(tmp_path, keep_temp=True)
-
-    return tmp_path
-
-
-@pytest.mark.real_data
-@pytest.mark.workflow
-@pytest.mark.regression
-def test_legacy_snake_no_sex_discordance(real_data_cache, subject_qc_workflow_w_sex_discordant):
-    legacy = (
-        pd.read_csv(real_data_cache / "legacy_outputs/subject_level/SampleUsedforSubject.csv")
-        .dropna()
-        .set_index("Sample_ID")
-        .squeeze()
-        .sort_index()
-    )
-    dev = (
-        pd.read_csv(
-            subject_qc_workflow_w_sex_discordant / "subject_level/subjects_for_analysis.csv"
-        )
-        .set_index("Sample_ID")
-        .Group_By_Subject_ID.sort_index()
-    )
-
-    assert_series_equal(legacy, dev, check_names=False)
-
-
-@pytest.mark.xfail(reason="I don't have a BED parser to do the comparisons.")
-@pytest.mark.parametrize(
-    "legacy,snake",
-    [
-        pytest.param(
-            "legacy_outputs/subject_level/samples.bed",
-            "subject_level/samples.bed",
-            id="legacy-snake-samples-bed",
-        ),
-        pytest.param(
-            "legacy_outputs/subject_level/subjects.bed",
-            "subject_level/subjects.bed",
-            id="legacy-snake-subjects-bed",
-        ),
-    ],
-)
-@pytest.mark.real_data
-@pytest.mark.regression
-def test_legacy_snake_bed(real_data_cache, subject_qc_workflow_w_sex_discordant, legacy, snake):
-    # TODO: Implement a BED comparisons.
-    comparison.assert_plink_bed_equal(
-        real_data_cache / legacy, subject_qc_workflow_w_sex_discordant / snake
-    )
-
-
-@pytest.mark.parametrize(
-    "legacy,snake",
-    [
-        pytest.param(
-            "legacy_outputs/subject_level/samples.bim",
-            "subject_level/samples.bim",
-            id="legacy-snake-samples-bim",
-        ),
-        pytest.param(
-            "legacy_outputs/subject_level/subjects.bim",
-            "subject_level/subjects.bim",
-            id="legacy-snake-subjects-bim",
-        ),
-    ],
-)
-@pytest.mark.real_data
-@pytest.mark.regression
-def test_legacy_snake_bim(real_data_cache, subject_qc_workflow_w_sex_discordant, legacy, snake):
-    comparison.assert_plink_bim_equal(
-        real_data_cache / legacy, subject_qc_workflow_w_sex_discordant / snake
-    )
-
-
-@pytest.mark.parametrize(
-    "legacy,snake",
-    [
-        pytest.param(
-            "legacy_outputs/subject_level/samples.fam",
-            "subject_level/samples.fam",
-            id="legacy-snake-samples-fam",
-        ),
-        pytest.param(
-            "legacy_outputs/subject_level/subjects.fam",
-            "subject_level/subjects.fam",
-            id="legacy-snake-subjects-fam",
-        ),
-    ],
-)
-@pytest.mark.real_data
-@pytest.mark.regression
-def test_legacy_snake_fam(real_data_cache, subject_qc_workflow_w_sex_discordant, legacy, snake):
-    comparison.assert_plink_fam_equal(
-        real_data_cache / legacy, subject_qc_workflow_w_sex_discordant / snake
     )

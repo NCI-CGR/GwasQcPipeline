@@ -83,7 +83,7 @@ def test_population_concordance(real_data_cache, tmp_path):
 
     obs_df = pd.read_excel(test_file, "European_IBD", engine="openpyxl")
     assert qc_report_table._POPULATION_CONCORDANCE_COLUMNS == obs_df.columns.tolist()
-    assert obs_df.shape[0] == 45
+    assert obs_df.shape[0] == pd.read_csv(agg_population_concordance_csv).shape[0]
 
 
 @pytest.mark.real_data

@@ -23,17 +23,9 @@ class WorkflowParams(BaseModel):
         True,
         description="Contaminated samples will be removed prior to sample to subject transformation.",
     )
-    remove_sex_discordant: bool = Field(
-        True,
-        description="Sex discordant samples will be removed prior to sample to subject transformation.",
-    )
     remove_rep_discordant: bool = Field(
         True,
         description="Discordant replicates will be pruned prior to sample to subject transformation.",
-    )
-    remove_unexpected_rep: bool = Field(
-        True,
-        description="Unexpected replicates will be pruned prior to sample to subject transformation.",
     )
 
     minimum_pop_subjects: int = Field(

@@ -10,9 +10,6 @@ Internal Subject QC Report
 
     Group_By_Subject_ID, string, The subject identifier used by the workflow
     Sample_ID, string, The sample identifier used by the workflow.
-    analytic_exclusion: boolean, True if the sample failed QC criteria.
-    num_analytic_exclusion: boolean, The number of QC criteria the sample failed.
-    analytic_exclusion_reason: string, A list of QC criteria the sample failed.
     subject_dropped_from_study, boolean, True if there are no samples passing QC for this subject.
     case_control, CASE_CONTROL_DTYPE, Phenotype status {Case, Control, QC, Unknown}
     is_unexpected_replicate, boolean, True if two subjects had high concordance.
@@ -43,9 +40,6 @@ app = typer.Typer(add_completion=False)
 DTYPES = {  # Header for main QC table
     "Group_By_Subject_ID": "string",
     "Sample_ID": "string",
-    "subject_analytic_exclusion": "boolean",
-    "num_subject_analytic_exclusion": "boolean",
-    "subject_analytic_exclusion_reason": "string",
     "case_control": CASE_CONTROL_DTYPE,
     "is_unexpected_replicate": "boolean",
     "unexpected_replicate_ids": "string",
@@ -67,9 +61,6 @@ def read(filename: PathLike) -> pd.DataFrame:
         pd.DataFrame:
         - Group_By_Subject_ID
         - Sample_ID
-        - subject_analytic_exclusion
-        - num_subject_analytic_exclusion
-        - subject_analytic_exclusion_reason
         - case_control
         - is_unexpected_replicate
         - unexpected_replicate_ids
@@ -89,15 +80,12 @@ def read(filename: PathLike) -> pd.DataFrame:
 def main(
     sample_qc_csv: Path,
     sample_concordance_csv: Path,
-    remove_sex_discordant: bool,
-    remove_unexpected_rep: bool,
     outfile: Path,
 ):
     (
         sample_qc_table.read(sample_qc_csv)
         .pipe(_sample_qc_to_subject_qc)
         .pipe(_add_unexpected_replicate_ids, sample_concordance_csv)
-        .pipe(_add_analytic_exclusion, remove_unexpected_rep, remove_sex_discordant)
         .reindex(DTYPES.keys(), axis=1)
         .to_csv(outfile, index=False)
     )
@@ -173,30 +161,6 @@ def _connected_ids(ids: Iterable[Tuple[str, str]]) -> pd.Series:
         groups.update(product(subgraph, [ids_string]))
 
     return pd.Series(groups, dtype="string")
-
-
-def _add_analytic_exclusion(
-    df: pd.DataFrame, remove_unexpected_rep: bool, remove_sex_discordant: bool
-) -> pd.DataFrame:
-    """Adds a flag to remove subjects based on provided conditions.
-
-    These conditions are user configurable.
-    """
-    exclusion_criteria = {}
-
-    if remove_unexpected_rep:
-        exclusion_criteria["is_unexpected_replicate"] = "Unexpected Replicate"
-
-    if remove_sex_discordant:
-        exclusion_criteria["is_sex_discordant"] = "Sex Discordance"
-
-    df["subject_analytic_exclusion"] = df.reindex(exclusion_criteria.keys(), axis=1).any(axis=1)
-    df["num_subject_analytic_exclusion"] = (
-        df.reindex(exclusion_criteria.keys(), axis=1).sum(axis=1).astype(int)
-    )
-    df["subject_analytic_exclusion_reason"] = sample_qc_table._get_reason(df, exclusion_criteria)
-
-    return df
 
 
 if __name__ == "__main__":

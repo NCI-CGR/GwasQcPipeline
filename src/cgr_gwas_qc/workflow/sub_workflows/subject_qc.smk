@@ -23,6 +23,7 @@ wildcard_constraints:
 # Subject QC Targets
 ################################################################################
 targets = [
+    "subject_level/subject_qc.csv",
     "subject_level/samples.bed",
     "subject_level/samples.bim",
     "subject_level/samples.fam",
@@ -69,9 +70,6 @@ rule subject_qc_table:
     input:
         sample_qc_csv="sample_level/sample_qc.csv",
         sample_concordance_csv="sample_level/concordance/summary.csv",
-    params:
-        remove_sex_discordant=cfg.config.workflow_params.remove_sex_discordant,
-        remove_unexpected_rep=cfg.config.workflow_params.remove_unexpected_rep,
     output:
         "subject_level/subject_qc.csv",
     group:
@@ -80,27 +78,11 @@ rule subject_qc_table:
         "../scripts/subject_qc_table.py"
 
 
-rule select_subjects_for_analysis:
-    """Pull out subjects that have no analytic exclusions."""
-    input:
-        rules.subject_qc_table.output[0],
-    output:
-        "subject_level/subjects_for_analysis.csv",
-    group:
-        "select_subjects"
-    run:
-        (
-            subject_qc_table.read(input[0])
-            .query("not subject_analytic_exclusion")
-            .to_csv(output[0], index=False)
-        )
-
-
 # Convert Sample Level data to Subject Level
 rule selected_Subject_IDs:
     """Create mapping file for plink to convert Sample_IDs to Subject_IDs."""
     input:
-        rules.select_subjects_for_analysis.output[0],
+        rules.subject_qc_table.output[0],
     output:
         selected=temp("subject_level/selected_Subject_IDs.txt"),
         sample2subject=temp("subject_level/sample_to_subject.txt"),
@@ -160,7 +142,7 @@ use rule rename_ids from plink as rename_Sample_ID_to_Subject_ID with:
 # -------------------------------------------------------------------------------
 checkpoint population_checkpoint:
     input:
-        rules.select_subjects_for_analysis.output[0],
+        rules.subject_qc_table.output[0],
     params:
         min_num_subjects=cfg.config.workflow_params.minimum_pop_subjects,
     output:
@@ -193,7 +175,7 @@ def _get_populations(wildcards):
 # Split Subjects by Populations
 rule population_Subject_IDs:
     input:
-        rules.select_subjects_for_analysis.output[0],
+        rules.subject_qc_table.output[0],
     output:
         "subject_level/{population}/subjects.txt",
     group:
@@ -481,7 +463,7 @@ use rule smartpca from eigensoft as population_level_unrelated_smartpca with:
 
 rule plot_pca:
     input:
-        qc_table=rules.select_subjects_for_analysis.output[0],
+        qc_table=rules.subject_qc_table.output[0],
         eigenvec=expand(
             rules.population_level_unrelated_smartpca.output.eigenvec,
             maf=cfg.config.software_params.maf_for_ibd,
@@ -514,7 +496,7 @@ use rule het from plink as population_level_autosomal_heterozygosity with:
 
 rule plot_autosomal_heterozygosity:
     input:
-        qc_table=rules.select_subjects_for_analysis.output[0],
+        qc_table=rules.subject_qc_table.output[0],
         het=rules.population_level_autosomal_heterozygosity.output[0],
     params:
         population="{population}",
@@ -560,7 +542,7 @@ def _population_qc_tables(wildcards):
 
 rule agg_population_qc_tables:
     input:
-        subject_qc_table=rules.select_subjects_for_analysis.output[0],
+        subject_qc_table=rules.subject_qc_table.output[0],
         population_qc_tables=_population_qc_tables,
     output:
         "subject_level/population_qc.csv",
@@ -594,7 +576,7 @@ rule agg_population_plots:
 # -------------------------------------------------------------------------------
 checkpoint population_controls_checkpoint:
     input:
-        rules.select_subjects_for_analysis.output[0],
+        rules.subject_qc_table.output[0],
     params:
         min_num_subjects=cfg.config.workflow_params.control_hwp_threshold,
     output:
@@ -627,7 +609,7 @@ def _get_controls(wildcards):
 
 rule population_controls_Subject_IDs:
     input:
-        rules.select_subjects_for_analysis.output[0],
+        rules.subject_qc_table.output[0],
     output:
         "subject_level/{population}/controls.txt",
     group:
