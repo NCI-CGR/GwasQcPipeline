@@ -43,9 +43,9 @@ def test_aggregate_qc_tables(population_qc_tables):
 @pytest.mark.real_data
 def test_add_metadata(real_data_cache, population_qc_tables):
     """Test adding sample level metadata"""
-    sample_qc_csv = real_data_cache / "dev_outputs/subject_level/subjects_for_analysis.csv"
+    subject_qc_csv = real_data_cache / "dev_outputs/subject_level/subject_qc.csv"
 
-    df = aggregate_qc_tables(population_qc_tables).pipe(add_metadata, filename=sample_qc_csv)
+    df = aggregate_qc_tables(population_qc_tables).pipe(add_metadata, filename=subject_qc_csv)
 
     assert all(df.population.value_counts() == 3)
     assert df.Subject_ID.unique().shape[0] == 9
