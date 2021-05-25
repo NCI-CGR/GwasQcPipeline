@@ -50,6 +50,11 @@ def main(ctx: typer.Context):
     if not is_arg(args, ["--profile"]):
         check_and_prepend_arg(args, ["-j", "--cores", "--jobs"], "1")
 
+    if "--notemp" in args:
+        # Adds config["notemp"] to help custom scripts know if they should
+        # delete temp files.
+        check_and_prepend_arg(args, ["--config"], "notemp=True")
+
     snakemake.main(args)
 
 

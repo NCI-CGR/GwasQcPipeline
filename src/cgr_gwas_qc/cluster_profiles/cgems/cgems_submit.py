@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from dataclasses import dataclass, field
-from typing import List
+from typing import Set
 
 from snakemake.utils import read_job_properties
 
@@ -16,20 +16,20 @@ from cgr_gwas_qc.cluster_profiles import (
 
 @dataclass
 class CgemsOptions(ClusterOptions):
-    queue: List[str] = field(
-        default_factory=lambda: [
+    queue: Set[str] = field(
+        default_factory=lambda: {
             "all.q",
             "seq-alignment.q",
             "seq-calling.q",
             "seq-calling2.q",
             "seq-gvcf.q",
-        ]
+        }
     )
     log: str = "logs/{rulename}_{job_id}.$JOB_ID"
 
     def __str__(self):
         # See cgems_jobscript.sh for default sge options
-        cmd = "qsub -q {queue} -N gqc.{job_id} -o {log}"
+        cmd = "qsub" " -q {queue}" " -N {rulename}.{job_id}" " -o {log}"
 
         if self.threads > 1:
             cmd += " -pe by_node {threads}"
@@ -39,6 +39,7 @@ class CgemsOptions(ClusterOptions):
             mem=self.mem_mb,
             time=str(self.time),
             threads=self.threads,
+            rulename=self.rulename,
             job_id=self.job_id,
             log=self.log.format(rulename=self.rulename, job_id=self.job_id),
         )
