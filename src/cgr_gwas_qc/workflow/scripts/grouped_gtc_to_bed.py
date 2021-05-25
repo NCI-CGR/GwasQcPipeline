@@ -30,11 +30,12 @@ def main(
     ped_map_files = convert_gtc_to_ped_map(
         sample_sheet_csv, bpm_file, grp, strand, tmp_path, gtc_pattern, threads
     )
-    plink_merge.main(ped_map_files, out_prefix, threads, mem_mb)
+    plink_merge.main(ped_map_files, out_prefix, notemp, threads, mem_mb)
 
     # Clean-up
     if not notemp:
         shutil.rmtree(tmp_path)  # remove per sample ped/map files and merge list
+        Path(out_prefix).with_suffix(".log").unlink()  # remove the merge log
 
 
 def setup_folders(out_prefix: str) -> Path:
