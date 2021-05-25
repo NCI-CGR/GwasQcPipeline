@@ -76,7 +76,7 @@ if cfg.config.user_files.gtc_pattern:
                 nosex="sample_level/samples.nosex",
             params:
                 out_prefix="sample_level/samples",
-                notemp=config["notemp"],
+                notemp=config.get("notemp", False),
             log:
                 "sample_level/samples.log",
             conda:
@@ -127,7 +127,7 @@ if cfg.config.user_files.gtc_pattern:
                 map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
             params:
                 out_prefix="sample_level/samples",
-                notemp=config["notemp"],
+                notemp=config.get("notemp", False),
             output:
                 bed="sample_level/samples.bed",
                 bim="sample_level/samples.bim",
