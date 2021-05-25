@@ -41,5 +41,12 @@ if (exists("snakemake")) {
     snakemake@output[[1]]
   )
 } else {
-  print("This script must be run using Snakemake.")
+  args = commandArgs(trailingOnly=TRUE)
+  calc_median_intensity(
+    args[1],  # sample_id
+    args[2],  # chip_id
+    args[3],  # red pattern
+    args[4],  # green pattern
+    args[5]  # outfile
+  )
 }

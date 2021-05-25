@@ -38,41 +38,93 @@ use rule pull_b_allele_freq_from_1kg from thousand_genomes
 # -------------------------------------------------------------------------------
 # Calculate Median Idat Intensity
 # -------------------------------------------------------------------------------
-rule per_sample_median_idat_intensity:
-    """Calculate median intensity of Red and Green channels."""
-    input:
-        red=lambda wc: cfg.expand(
-            cfg.config.user_files.idat_pattern.red,
-            query=f"Sample_ID == '{wc.Sample_ID}'",
-        ),
-        green=lambda wc: cfg.expand(
-            cfg.config.user_files.idat_pattern.green,
-            query=f"Sample_ID == '{wc.Sample_ID}'",
-        ),
-    output:
-        temp(
-            "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
-        ),
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    group:
-        "per_sample_median_idat_intensity"
-    conda:
-        cfg.conda("illuminaio")
-    script:
-        "../scripts/median_idat_intensity.R"
+if config.get("cluster_mode", False):
+
+    rule illuminaio_conda:
+        """Fake rule to ensure the illuminaio conda env is built.
+
+        The grouped median idat intensity requires this conda env, but uses it
+        internally. I want to make sure that snakemake builds the conda env.
+        """
+        output:
+            temp(".illuminaio_env_built"),
+        conda:
+            cfg.conda("illuminaio")
+        shell:
+            "touch {output[0]}"
+
+    rule grouped_median_idat_intensity:
+        """Calculate median intensity of Red and Green channels."""
+        input:
+            sample_sheet_csv="cgr_sample_sheet.csv",
+            _=rules.illuminaio_conda.output[0],
+        params:
+            grp="{grp}",
+            idat_red_pattern=lambda x: cfg.config.user_files.idat_pattern.red,
+            idat_green_pattern=lambda x: cfg.config.user_files.idat_pattern.green,
+            conda_env=cfg.conda("illuminaio"),
+            notemp=config.get("notemp", False),
+        output:
+            temp("sample_level/contamination/{grp}/median_idat_intensity.csv"),
+        threads: 12
+        resources:
+            mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
+            time_hr=lambda wildcards, attempt: 4 * attempt,
+        group:
+            "per_sample_median_idat_intensity"
+        script:
+            "../scripts/grouped_median_idat_intensity.py"
+
+    rule agg_median_idat_intensity:
+        input:
+            expand(rules.grouped_median_idat_intensity.output[0], grp=cfg.cluster_groups),
+        params:
+            notemp=config.get("notemp", False),
+        output:
+            "sample_level/contamination/median_idat_intensity.csv",
+        resources:
+            mem_gb=lambda wildcards, attempt: attempt * 4,
+            tim_hr=lambda wildcards, attempt: attempt ** 2,
+        script:
+            "../scripts/agg_median_idat_intensity.py"
 
 
-rule agg_median_idat_intensity:
-    input:
-        cfg.expand(rules.per_sample_median_idat_intensity.output[0]),
-    output:
-        "sample_level/contamination/median_idat_intensity.csv",
-    resources:
-        mem_gb=lambda wildcards, attempt: attempt * 4,
-        tim_hr=lambda wildcards, attempt: attempt ** 2,
-    run:
-        pd.concat([pd.read_csv(file_name) for file_name in input]).to_csv(output[0], index=False)
+else:
+
+    rule per_sample_median_idat_intensity:
+        """Calculate median intensity of Red and Green channels."""
+        input:
+            red=lambda wc: cfg.expand(
+                cfg.config.user_files.idat_pattern.red,
+                query=f"Sample_ID == '{wc.Sample_ID}'",
+            ),
+            green=lambda wc: cfg.expand(
+                cfg.config.user_files.idat_pattern.green,
+                query=f"Sample_ID == '{wc.Sample_ID}'",
+            ),
+        output:
+            temp(
+                "sample_level/per_sample_median_idat_intensity/{Sample_ID}.{SentrixBarcode_A}.{SentrixPosition_A}.csv"
+            ),
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+        group:
+            "per_sample_median_idat_intensity"
+        conda:
+            cfg.conda("illuminaio")
+        script:
+            "../scripts/median_idat_intensity.R"
+
+    rule agg_median_idat_intensity:
+        input:
+            cfg.expand(rules.per_sample_median_idat_intensity.output[0]),
+        output:
+            "sample_level/contamination/median_idat_intensity.csv",
+        resources:
+            mem_gb=lambda wildcards, attempt: attempt * 4,
+            tim_hr=lambda wildcards, attempt: attempt ** 2,
+        script:
+            "../scripts/agg_median_idat_intensity.py"
 
 
 # -------------------------------------------------------------------------------
