@@ -180,6 +180,7 @@ def updated_sample_sheet(fake_cfg, workflow_params) -> pd.DataFrame:
             pre_flight.ProblemFile("SP00005", "test", "test", "test"),
             pre_flight.ProblemFile("SP00003", "FileNotFound", "idat_green", "test"),
         ],
+        2,
     )
 
 

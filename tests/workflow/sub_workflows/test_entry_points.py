@@ -121,7 +121,7 @@ def test_gtc_to_ped_conversion(real_data_cache, gtc_entry):
 def test_create_gtc_merge_list(gtc_entry):
     # THEN: The merge should have one row for each sample
     with chdir(gtc_entry):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
 
     n_samples = cfg.config.num_samples
     merge_list = (gtc_entry / "sample_level/plink_merge_list.txt").read_text().strip().split("\n")
