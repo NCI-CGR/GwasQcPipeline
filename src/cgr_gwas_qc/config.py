@@ -32,6 +32,7 @@ class ConfigMgr:
 
         config : Workflow configuration settings.
         ss: User's sample sheet data.
+        cluster_groups: List of the cluster group names.
 
     Methods:
         expand: Uses columns from the user's sample sheet to expand a file pattern.
@@ -65,6 +66,7 @@ class ConfigMgr:
         data = yaml.load(self.user_config)
         self._config = Config.parse_obj(data)
         self._sample_sheet: pd.DataFrame = sample_sheet.read(self.sample_sheet_file)
+        self._cluster_groups = sorted(self.ss.cluster_group.unique())
 
     @classmethod
     def instance(cls, pytest=False):
@@ -91,6 +93,10 @@ class ConfigMgr:
     def ss(self) -> pd.DataFrame:
         """Access the sample sheet DataFrame."""
         return self._sample_sheet
+
+    @property
+    def cluster_groups(self) -> List[str]:
+        return self._cluster_groups
 
     ################################################################################
     # Helper functions for snakemake
