@@ -15,11 +15,12 @@ from cgr_gwas_qc.testing.data import RealData
 @pytest.mark.workflow
 @pytest.mark.real_data
 @pytest.fixture(scope="module")
-def delivery(pytestconfig, tmp_path_factory):
+def delivery(pytestconfig, tmp_path_factory, conda_envs):
     if not pytestconfig.getoption("--real-data"):
         pytest.skip("No real data")
 
     tmp_path = tmp_path_factory.mktemp("delivery")
+    conda_envs.copy_env("pandoc", tmp_path)
     (
         RealData(tmp_path, full_sample_sheet=False)
         .copy("dev_outputs/cgr_sample_sheet.csv", "cgr_sample_sheet.csv")
