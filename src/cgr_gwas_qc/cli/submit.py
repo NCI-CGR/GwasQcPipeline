@@ -58,7 +58,7 @@ def main(
         payload["added_options"] += f"--subworkflow {subworkflow} "  # type: ignore
 
     # add global config options only used in cluster mode.
-    payload["added_options"] += f"--config {0} ".format(  # type: ignore
+    payload["added_options"] += "--config {} ".format(  # type: ignore
         " ".join("=".join([k, str(v)]) for k, v in snake_config.items())
     )
 
