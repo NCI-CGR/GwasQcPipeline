@@ -87,8 +87,6 @@ if config.get("cluster_mode", False):
         resources:
             mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
             time_hr=lambda wildcards, attempt: 4 * attempt,
-        group:
-            "per_sample_median_idat_intensity"
         script:
             "../scripts/grouped_median_idat_intensity.py"
 
@@ -216,8 +214,6 @@ else:
             temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1024,
-        group:
-            "per_sample_gtc_to_adpc"
         script:
             "../scripts/gtc2adpc.py"
 
@@ -238,6 +234,7 @@ else:
         input:
             adpc=rules.per_sample_gtc_to_adpc.output[0],
             abf=rules.pull_b_allele_freq_from_1kg.output.abf_file,
+            _=rules.verifyidintensity_conda.output[0],
         params:
             snps=cfg.config.num_snps,
             conda_env=cfg.conda("verifyidintensity"),
@@ -245,10 +242,6 @@ else:
             temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
         resources:
             mem_mb=lambda wildcards, attempt: attempt * 1024,
-        group:
-            "per_sample_contamination_verifyIDintensity"
-        conda:
-            cfg.conda("verifyidintensity")
         script:
             "../scripts/verifyidintensity.py"
 

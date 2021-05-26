@@ -193,3 +193,13 @@ def test_grouped_median_idat_intensity(contamination, contamination_grouped):
         contamination / "sample_level/contamination/median_idat_intensity.csv",
         contamination_grouped / "sample_level/contamination/median_idat_intensity.csv",
     )
+
+
+@pytest.mark.slow
+@pytest.mark.workflow
+@pytest.mark.real_data
+def test_grouped_verifyidintensity(contamination, contamination_grouped):
+    assert file_hashes_equal(
+        contamination / "sample_level/contamination/verifyIDintensity.csv",
+        contamination_grouped / "sample_level/contamination/verifyIDintensity.csv",
+    )
