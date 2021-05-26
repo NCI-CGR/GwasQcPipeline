@@ -15,15 +15,9 @@ from cgr_gwas_qc.testing.data import RealData
 def test_legacy_agg_median_idat_intensity(real_data_cache):
     legacy = (
         pd.read_csv(real_data_cache / "legacy_outputs/all_sample_idat_intensity/idat_intensity.csv")
-        .rename(
-            {
-                "SampId": "Sample_ID",
-                "ChipId": "Chip_ID",
-                "MedianIntensity": "median_intensity",
-            },
-            axis=1,
-        )
+        .rename({"SampId": "Sample_ID", "MedianIntensity": "median_intensity"}, axis=1)
         .set_index("Sample_ID")
+        .drop("ChipId", axis=1)
     )
 
     dev = pd.read_csv(

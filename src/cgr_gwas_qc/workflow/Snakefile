@@ -21,7 +21,7 @@ module entry_points:
     snakefile:
         cfg.subworkflow("entry_points")
     config:
-        {}
+        config
 
 
 use rule * from entry_points
@@ -34,7 +34,7 @@ module sample_qc:
     snakefile:
         cfg.subworkflow("sample_qc")
     config:
-        {}
+        config
 
 
 use rule * from sample_qc
@@ -49,7 +49,7 @@ if sample_qc.use_contamination:
         snakefile:
             cfg.subworkflow("contamination")
         config:
-            {}
+            config
 
     use rule * from contamination
 
@@ -61,7 +61,7 @@ module subject_qc:
     snakefile:
         cfg.subworkflow("subject_qc")
     config:
-        {}
+        config
 
 
 use rule * from subject_qc
@@ -74,7 +74,7 @@ module delivery:
     snakefile:
         cfg.subworkflow("delivery")
     config:
-        {}
+        config
 
 
 use rule * from delivery
