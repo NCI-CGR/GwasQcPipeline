@@ -159,8 +159,6 @@ if cfg.config.user_files.gtc_pattern:
                 nosex="sample_level/samples.nosex",
             log:
                 "sample_level/samples.log",
-            group:
-                "merge_entry_points"
             threads: 8
             resources:
                 mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
