@@ -31,6 +31,28 @@ rule all_entry_points:
 
 
 ################################################################################
+# PHONY Rules
+################################################################################
+# NOTE: Because of job grouping it is cleaner to wrap the various CLI utilities in
+# their own python script. This makes using conda more complicated. Instead of
+# installing all of the python dependencies in each environment, I will just
+# pass the conda environment and activate it internal. However, we want to make
+# sure that snakemake creates the environments, so these PHONY rules will make
+# sure that the conda env exists.
+localrules:
+    plink_conda,
+
+
+rule plink_conda:
+    output:
+        temp(".plink_env_built"),
+    conda:
+        cfg.conda("plink2")
+    shell:
+        "touch {output[0]}"
+
+
+################################################################################
 # Workflow Rules
 ################################################################################
 if cfg.config.user_files.gtc_pattern:
@@ -44,19 +66,19 @@ if cfg.config.user_files.gtc_pattern:
             input:
                 sample_sheet_csv="cgr_sample_sheet.csv",
                 bpm_file=cfg.config.reference_files.illumina_manifest_file,
+                _=rules.plink_conda.output[0],
             params:
                 grp="{grp}",
                 gtc_pattern=lambda wc: cfg.config.user_files.gtc_pattern,
                 strand=cfg.config.software_params.strand,
                 out_prefix="sample_level/{grp}/samples",
-                notemp=config["notemp"],
+                conda_env=cfg.conda("plink2"),
+                notemp=config.get("notemp", False),
             output:
                 bed=temp("sample_level/{grp}/samples.bed"),
                 bim=temp("sample_level/{grp}/samples.bim"),
                 fam=temp("sample_level/{grp}/samples.fam"),
                 nosex=temp("sample_level/{grp}/samples.nosex"),
-            conda:
-                cfg.conda("plink2")
             threads: 12
             resources:
                 mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
@@ -69,18 +91,18 @@ if cfg.config.user_files.gtc_pattern:
                 bed=expand("sample_level/{grp}/samples.bed", grp=cfg.cluster_groups),
                 bim=expand("sample_level/{grp}/samples.bim", grp=cfg.cluster_groups),
                 fam=expand("sample_level/{grp}/samples.fam", grp=cfg.cluster_groups),
+                _=rules.plink_conda.output[0],
+            params:
+                out_prefix="sample_level/samples",
+                conda_env=cfg.conda("plink2"),
+                notemp=config.get("notemp", False),
             output:
                 bed="sample_level/samples.bed",
                 bim="sample_level/samples.bim",
                 fam="sample_level/samples.fam",
                 nosex="sample_level/samples.nosex",
-            params:
-                out_prefix="sample_level/samples",
-                notemp=config.get("notemp", False),
             log:
                 "sample_level/samples.log",
-            conda:
-                cfg.conda("plink2")
             threads: 8
             resources:
                 mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
@@ -125,8 +147,10 @@ if cfg.config.user_files.gtc_pattern:
             input:
                 ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
                 map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
+                _=rules.plink_conda.output[0],
             params:
                 out_prefix="sample_level/samples",
+                conda_env=cfg.conda("plink2"),
                 notemp=config.get("notemp", False),
             output:
                 bed="sample_level/samples.bed",
@@ -137,8 +161,6 @@ if cfg.config.user_files.gtc_pattern:
                 "sample_level/samples.log",
             group:
                 "merge_entry_points"
-            conda:
-                cfg.conda("plink2")
             threads: 8
             resources:
                 mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,

@@ -23,31 +23,32 @@ def main(
     threads: int = 8,
 ):
     ss = pd.read_csv(sample_sheet_csv).query(f"cluster_group == '{grp}'")
-    tmp_path = setup_folders(outfile)
+
+    # Make temp folders
+    outdir = Path(outfile).parent
+
+    tmp_adpc = outdir / "temp_adpc"
+    tmp_adpc.mkdir(exist_ok=True, parents=True)
+
+    tmp_contam = outdir / "temp_contam"
+    tmp_contam.mkdir(exist_ok=True, parents=True)
+
+    # Outfile patterns
+    adpc_pattern = (tmp_adpc / "{Sample_ID}.adpc.bin").as_posix()
+    contam_pattern = (tmp_contam / "{Sample_ID}.txt").as_posix()
 
     # Convert GTC to ADPC
-    (tmp_path / "adpc").mkdir(exist_ok=True, parents=True)
-    adpc_pattern = (tmp_path / "adpc/{Sample_ID}.adpc.bin").as_posix()
     convert_gtc_to_adpc(ss, bpm_file, gtc_pattern, adpc_pattern, threads)
 
     # Estimate Contamination
-    (tmp_path / "contam").mkdir(exist_ok=True, parents=True)
-    contam_pattern = (tmp_path / "contam/{Sample_ID}.txt").as_posix()
     contam_files = estimate_contamination(
         ss, adpc_pattern, abf_file, contam_pattern, snps, conda_env, threads
     )
     agg_verifyidintensity.main(contam_files, outfile)
 
     if not notemp:
-        shutil.rmtree(tmp_path)
-
-
-def setup_folders(outfile: PathLike) -> Path:
-    """Set-up my output folder"""
-    outdir = Path(outfile).parent
-    tmp_path = outdir / "temp"
-    tmp_path.mkdir(exist_ok=True, parents=True)
-    return tmp_path
+        shutil.rmtree(tmp_adpc)
+        shutil.rmtree(tmp_contam)
 
 
 def convert_gtc_to_adpc(ss, bpm_file, gtc_pattern, outfile_pattern, threads):

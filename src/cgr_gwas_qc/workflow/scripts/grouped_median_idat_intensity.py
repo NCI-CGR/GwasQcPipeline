@@ -22,30 +22,23 @@ def main(
     threads: int = 8,
 ):
     ss = pd.read_csv(sample_sheet_csv).query(f"cluster_group == '{grp}'")
-    tmp_path = setup_folders(outfile)
+    tmp_dir = Path(outfile).parent / "temp_median_idat"
+    tmp_dir.mkdir(exist_ok=True, parents=True)
 
     # Calculate median IDAT intensity
-    intensity_pattern = (tmp_path / "{Sample_ID}.csv").as_posix()
     intensity_files = calculate_median_idat_intensity(
-        ss, idat_red_pattern, idat_green_pattern, intensity_pattern, rscript, conda_env, threads
+        ss, idat_red_pattern, idat_green_pattern, tmp_dir, rscript, conda_env, threads
     )
     agg_median_idat_intensity.main(intensity_files, outfile)
 
     if not notemp:
-        shutil.rmtree(tmp_path)
-
-
-def setup_folders(outfile: PathLike) -> Path:
-    """Set-up my output folder"""
-    outdir = Path(outfile).parent
-    tmp_path = outdir / "temp/median_idat"
-    tmp_path.mkdir(exist_ok=True, parents=True)
-    return tmp_path
+        shutil.rmtree(tmp_dir)
 
 
 def calculate_median_idat_intensity(
-    ss, red_pattern, green_pattern, outfile_pattern, rscript, conda_env, threads
+    ss, red_pattern, green_pattern, outdir, rscript, conda_env, threads
 ) -> List[Path]:
+    outfile_pattern = (outdir / "{Sample_ID}.csv").as_posix()
     with ProcessPoolExecutor(threads) as executor:
         futures = [
             executor.submit(
