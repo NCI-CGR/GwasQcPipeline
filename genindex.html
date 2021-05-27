@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; GwasQcPipeline 1.0.0b3 documentation</title>
+  <title>Index &mdash; GwasQcPipeline 1.0.0-rc.1 documentation</title>
   
 
   
@@ -180,7 +180,6 @@
  <a href="#C"><strong>C</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
- | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
@@ -257,8 +256,6 @@
         <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.agg_population_qc_tables">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cgr_gwas_qc.workflow.scripts.concordance_table
 
@@ -266,6 +263,8 @@
         <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.concordance_table">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cgr_gwas_qc.workflow.scripts.population_qc_table
 
@@ -305,10 +304,16 @@
 </li>
       <li><a href="api/cli.html#cgr_gwas_qc.cli.pre_flight.check_user_files">check_user_files() (in module cgr_gwas_qc.cli.pre_flight)</a>
 </li>
+      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.cluster_groups">cluster_groups (cgr_gwas_qc.config.ConfigMgr attribute)</a>
+</li>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec.components">components (cgr_gwas_qc.parsers.eigensoft.Eigenvec attribute)</a>
 </li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.conda">conda() (cgr_gwas_qc.config.ConfigMgr method)</a>, <a href="api/config.html#id0">[1]</a>
+      <li><a href="api/config.html#id0">conda() (cgr_gwas_qc.config.ConfigMgr class method)</a>
+
+      <ul>
+        <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.conda">(cgr_gwas_qc.config.ConfigMgr method)</a>
 </li>
+      </ul></li>
       <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.config">config (cgr_gwas_qc.config.ConfigMgr attribute)</a>
 </li>
       <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.CONFIG_DIR">CONFIG_DIR (cgr_gwas_qc.config.ConfigMgr attribute)</a>
@@ -336,18 +341,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec.filename">filename (cgr_gwas_qc.parsers.eigensoft.Eigenvec attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="G">G</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/cli.html#cgr_gwas_qc.cli.submit.get_group_size">get_group_size() (in module cgr_gwas_qc.cli.submit)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/cli.html#cgr_gwas_qc.cli.submit.get_per_sample_rules">get_per_sample_rules() (in module cgr_gwas_qc.cli.submit)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -414,7 +407,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.modules">modules() (cgr_gwas_qc.config.ConfigMgr method)</a>
+      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.modules">modules() (cgr_gwas_qc.config.ConfigMgr class method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -440,10 +433,10 @@
 </li>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.plink.read_lmiss">read_lmiss() (in module cgr_gwas_qc.parsers.plink)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.king.read_related">read_related() (in module cgr_gwas_qc.parsers.king)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.graf.read_relatedness">read_relatedness() (in module cgr_gwas_qc.parsers.graf)</a>
 </li>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.plink.read_sexcheck">read_sexcheck() (in module cgr_gwas_qc.parsers.plink)</a>
@@ -452,16 +445,24 @@
 </li>
       <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.RULE_DIR">RULE_DIR (cgr_gwas_qc.config.ConfigMgr attribute)</a>
 </li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.rules">rules() (cgr_gwas_qc.config.ConfigMgr method)</a>, <a href="api/config.html#id3">[1]</a>
+      <li><a href="api/config.html#id3">rules() (cgr_gwas_qc.config.ConfigMgr class method)</a>
+
+      <ul>
+        <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.rules">(cgr_gwas_qc.config.ConfigMgr method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.scripts">scripts() (cgr_gwas_qc.config.ConfigMgr method)</a>, <a href="api/config.html#id4">[1]</a>
+      <li><a href="api/config.html#id4">scripts() (cgr_gwas_qc.config.ConfigMgr class method)</a>
+
+      <ul>
+        <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.scripts">(cgr_gwas_qc.config.ConfigMgr method)</a>
 </li>
+      </ul></li>
       <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.SCRIPTS_DIR">SCRIPTS_DIR (cgr_gwas_qc.config.ConfigMgr attribute)</a>
 </li>
       <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.SNAKEFILE">SNAKEFILE (cgr_gwas_qc.config.ConfigMgr attribute)</a>
@@ -473,6 +474,8 @@
       <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.ss">ss (cgr_gwas_qc.config.ConfigMgr attribute)</a>
 </li>
       <li><a href="api/config.html#id5">ss() (cgr_gwas_qc.config.ConfigMgr property)</a>
+</li>
+      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.subworkflow">subworkflow() (cgr_gwas_qc.config.ConfigMgr class method)</a>
 </li>
   </ul></td>
 </tr></table>

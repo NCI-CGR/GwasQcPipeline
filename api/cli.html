@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0b3 documentation</title>
+  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0-rc.1 documentation</title>
   
 
   
@@ -224,7 +224,7 @@ things up a bit we use parallel processing. This function spins up
 
 <dl class="py function">
 <dt id="cgr_gwas_qc.cli.pre_flight.main">
-<code class="sig-prename descclassname">cgr_gwas_qc.cli.pre_flight.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">config_file: pathlib.Path = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">reference_check: bool = True</em>, <em class="sig-param">user_files_check: bool = True</em>, <em class="sig-param">update_config: bool = True</em>, <em class="sig-param">threads: int = 4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/pre_flight.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.pre_flight.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">config_file: pathlib.Path = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">reference_check: bool = True</em>, <em class="sig-param">user_files_check: bool = True</em>, <em class="sig-param">update_config: bool = True</em>, <em class="sig-param">threads: int = 4</em>, <em class="sig-param">cluster_group_size: int = 1000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/pre_flight.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.pre_flight.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pre-flight checks to make sure user input files are readable and complete.</p>
 <p>Pre-flight checks include the Sample Sheet, reference files, Idat files,
 and GTC files. For Idat and GTC files, the user provided file name
@@ -257,26 +257,23 @@ pattern is extended using the columns in the sample sheet.</p>
 <div><p>snakemake -s /home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/Snakefile OPTIONS TARGETS</p>
 </div></blockquote>
 <p>This is how the user should run snakemake locally.</p>
+<p>You can run specific sub-workflows by using the <cite>–subworkflow WORKFLOW</cite> option.</p>
+<p>Where possible values of WORKFLOW are:</p>
+<ul class="simple">
+<li><p>entry_points</p></li>
+<li><p>contamination</p></li>
+<li><p>sample_qc</p></li>
+<li><p>subject_qc</p></li>
+<li><p>delivery</p></li>
+</ul>
 </dd></dl>
 
 </div>
 <div class="section" id="module-cgr_gwas_qc.cli.submit">
 <span id="submit"></span><h2>Submit<a class="headerlink" href="#module-cgr_gwas_qc.cli.submit" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="cgr_gwas_qc.cli.submit.get_group_size">
-<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">get_group_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_samples</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#get_group_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.get_group_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return how many samples to group together</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="cgr_gwas_qc.cli.submit.get_per_sample_rules">
-<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">get_per_sample_rules</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#get_per_sample_rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.get_per_sample_rules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pull list of rules to group from cluster.yml</p>
-</dd></dl>
-
-<dl class="py function">
 <dt id="cgr_gwas_qc.cli.submit.main">
-<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">biowulf: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cluster_profile: Optional[pathlib.Path] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">time_hr: int = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">queue: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">submission_cmd: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">dry_run: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">notemp: bool = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">biowulf: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cluster_profile: Optional[pathlib.Path] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">subworkflow: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">time_hr: int = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">queue: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">submission_cmd: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">dry_run: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">notemp: bool = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run CGR GwasQcPipeline on a cluster.</p>
 </dd></dl>
 

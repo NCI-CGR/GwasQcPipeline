@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.config &mdash; GwasQcPipeline 1.0.0b3 documentation</title>
+  <title>cgr_gwas_qc.config &mdash; GwasQcPipeline 1.0.0-rc.1 documentation</title>
   
 
   
@@ -208,6 +208,7 @@
 
 <span class="sd">        config : Workflow configuration settings.</span>
 <span class="sd">        ss: User&#39;s sample sheet data.</span>
+<span class="sd">        cluster_groups: List of the cluster group names.</span>
 
 <span class="sd">    Methods:</span>
 <span class="sd">        expand: Uses columns from the user&#39;s sample sheet to expand a file pattern.</span>
@@ -225,6 +226,7 @@
     <span class="n">RULE_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span>
     <span class="n">MODULE_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;modules&quot;</span>
     <span class="n">SCRIPTS_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;scripts&quot;</span>
+    <span class="n">SUBWORKFLOW_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;sub_workflows&quot;</span>
     <span class="n">SNAKEFILE</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;Snakefile&quot;</span>
 
     <span class="n">__instance</span> <span class="o">=</span> <span class="kc">None</span>
@@ -240,6 +242,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">parse_obj</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">sample_sheet</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_groups</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">cluster_group</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 
 <div class="viewcode-block" id="ConfigMgr.instance"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.instance">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pytest</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -266,6 +269,10 @@
     <span class="k">def</span> <span class="nf">ss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Access the sample sheet DataFrame.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cluster_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_groups</span>
 
     <span class="c1">################################################################################</span>
     <span class="c1"># Helper functions for snakemake</span>
@@ -297,33 +304,45 @@
         <span class="n">modules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env_modules&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">modules</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="ConfigMgr.conda"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.conda">[docs]</a>    <span class="k">def</span> <span class="nf">conda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="ConfigMgr.conda"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.conda">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">conda</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return path to a conda env file.</span>
 
 <span class="sd">        Given a conda env file_name, prepends the full path to that file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CONDA_DIR</span> <span class="o">/</span> <span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">CONDA_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.yml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConfigMgr.rules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.rules">[docs]</a>    <span class="k">def</span> <span class="nf">rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="ConfigMgr.rules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.rules">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">rules</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the path to a rule file.</span>
 
 <span class="sd">        Given a rule file_name, prepends the full path to that rule.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RULE_DIR</span> <span class="o">/</span> <span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">RULE_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.smk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConfigMgr.modules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.modules">[docs]</a>    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="ConfigMgr.modules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.modules">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the path to a module file.</span>
 
 <span class="sd">        Given a rule file_name, prepends the full path to that module.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MODULE_DIR</span> <span class="o">/</span> <span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">MODULE_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.smk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConfigMgr.scripts"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.scripts">[docs]</a>    <span class="k">def</span> <span class="nf">scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="ConfigMgr.scripts"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.scripts">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">scripts</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the path to an internal script.</span>
 
 <span class="sd">        Given a script file_name, prepends the full path to that script.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SCRIPTS_DIR</span> <span class="o">/</span> <span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">SCRIPTS_DIR</span> <span class="o">/</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConfigMgr.subworkflow"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.subworkflow">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">subworkflow</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">workflow</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the path to a sub-workflow.</span>
+
+<span class="sd">        Given a sub-workflow name, give the full path to the snakefile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">SUBWORKFLOW_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">workflow</span><span class="si">}</span><span class="s2">.smk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">docx_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

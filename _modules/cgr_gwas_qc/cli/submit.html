@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.cli.submit &mdash; GwasQcPipeline 1.0.0b3 documentation</title>
+  <title>cgr_gwas_qc.cli.submit &mdash; GwasQcPipeline 1.0.0-rc.1 documentation</title>
   
 
   
@@ -179,10 +179,9 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">wrap</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">typer</span>
-<span class="kn">from</span> <span class="nn">snakemake.io</span> <span class="kn">import</span> <span class="n">load_configfile</span>
 
 <span class="kn">from</span> <span class="nn">cgr_gwas_qc</span> <span class="kn">import</span> <span class="n">load_config</span>
 <span class="kn">from</span> <span class="nn">cgr_gwas_qc.cluster_profiles</span> <span class="kn">import</span> <span class="n">env</span>
@@ -194,6 +193,7 @@
     <span class="n">cgems</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run using the CGEMs/CCAD cluster profile.&quot;</span><span class="p">),</span>
     <span class="n">biowulf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run using the Biowulf cluster profile.&quot;</span><span class="p">),</span>
     <span class="n">cluster_profile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to a custom cluster profile.&quot;</span><span class="p">),</span>
+    <span class="n">subworkflow</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of a subworkflow to run.&quot;</span><span class="p">),</span>
     <span class="n">time_hr</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
         <span class="mi">120</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The walltime limit (in hours) for the main snakemake process.&quot;</span>
     <span class="p">),</span>
@@ -220,27 +220,36 @@
         <span class="s2">&quot;cgems&quot;</span><span class="p">:</span> <span class="n">cgems</span><span class="p">,</span>
         <span class="s2">&quot;biowulf&quot;</span><span class="p">:</span> <span class="n">biowulf</span><span class="p">,</span>
         <span class="s2">&quot;time_hr&quot;</span><span class="p">:</span> <span class="n">time_hr</span><span class="p">,</span>
-        <span class="s2">&quot;local_mem_mb&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-        <span class="s2">&quot;local_tasks&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;added_options&quot;</span><span class="p">:</span> <span class="s2">&quot;--notemp &quot;</span> <span class="k">if</span> <span class="n">notemp</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;local_mem_mb&quot;</span><span class="p">:</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;local_tasks&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;added_options&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">}</span>
+    <span class="n">snake_config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cluster_mode&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;notemp&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">notemp</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;added_options&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;--notemp &quot;</span>  <span class="c1"># type: ignore</span>
+        <span class="n">snake_config</span><span class="p">[</span><span class="s2">&quot;notemp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">subworkflow</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;added_options&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;--subworkflow </span><span class="si">{</span><span class="n">subworkflow</span><span class="si">}</span><span class="s2"> &quot;</span>  <span class="c1"># type: ignore</span>
+
+    <span class="c1"># add global config options only used in cluster mode.</span>
+    <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;added_options&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;--config </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+        <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">snake_config</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="p">)</span>
 
     <span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
     <span class="n">sample_size</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">sample_size</span> <span class="o">&lt;</span> <span class="mi">1_000</span><span class="p">:</span>  <span class="c1"># bump up local resources and run a bunch or rules there</span>
-        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;local_tasks&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
-        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;local_mem_mb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">4</span>
+    <span class="k">if</span> <span class="n">sample_size</span> <span class="o">&lt;</span> <span class="mi">1_000</span><span class="p">:</span>  <span class="c1"># need less walltime for smaller sample size</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;time_hr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
 
     <span class="k">if</span> <span class="n">cgems</span><span class="p">:</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_profile</span><span class="p">(</span><span class="s2">&quot;cgems&quot;</span><span class="p">)</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;queue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">queue</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;all.q&quot;</span> <span class="k">if</span> <span class="n">time_hr</span> <span class="o">&lt;=</span> <span class="mi">24</span> <span class="k">else</span> <span class="s2">&quot;long.q&quot;</span><span class="p">)</span>
-        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;added_options&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">get_grouping_settings</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
         <span class="n">submission_cmd</span> <span class="o">=</span> <span class="s2">&quot;qsub&quot;</span>
     <span class="k">elif</span> <span class="n">biowulf</span><span class="p">:</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_profile</span><span class="p">(</span><span class="s2">&quot;biowulf&quot;</span><span class="p">)</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;queue&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">queue</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;quick,norm&quot;</span> <span class="k">if</span> <span class="n">time_hr</span> <span class="o">&lt;=</span> <span class="mi">4</span> <span class="k">else</span> <span class="s2">&quot;norm&quot;</span><span class="p">)</span>
-        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;added_options&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">get_grouping_settings</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>
         <span class="n">submission_cmd</span> <span class="o">=</span> <span class="s2">&quot;sbatch&quot;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">check_custom_cluster_profile</span><span class="p">(</span><span class="n">cluster_profile</span><span class="p">,</span> <span class="n">queue</span><span class="p">,</span> <span class="n">submission_cmd</span><span class="p">)</span>
@@ -295,32 +304,6 @@
 
     <span class="k">if</span> <span class="n">cluster</span> <span class="o">==</span> <span class="s2">&quot;biowulf&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">cgr_profiles</span> <span class="o">/</span> <span class="s2">&quot;biowulf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
-
-
-<div class="viewcode-block" id="get_group_size"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.submit.get_group_size">[docs]</a><span class="k">def</span> <span class="nf">get_group_size</span><span class="p">(</span><span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return how many samples to group together&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="mi">500</span> <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&lt;=</span> <span class="mi">1000</span> <span class="k">else</span> <span class="mi">1000</span></div>
-
-
-<div class="viewcode-block" id="get_per_sample_rules"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.submit.get_per_sample_rules">[docs]</a><span class="k">def</span> <span class="nf">get_per_sample_rules</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Pull list of rules to group from cluster.yml&quot;&quot;&quot;</span>
-    <span class="n">cluster_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;cluster_profiles/cluster.yaml&quot;</span>
-    <span class="n">cluster_profile</span> <span class="o">=</span> <span class="n">load_configfile</span><span class="p">(</span><span class="n">cluster_file</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cluster_profile</span><span class="p">[</span><span class="s2">&quot;group_jobs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span></div>
-
-
-<span class="k">def</span> <span class="nf">get_grouping_settings</span><span class="p">(</span><span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-    <span class="n">group_size</span> <span class="o">=</span> <span class="n">get_group_size</span><span class="p">(</span><span class="n">sample_size</span><span class="p">)</span>  <span class="c1"># 1. Figure out the group size to use</span>
-    <span class="n">rules_to_group</span> <span class="o">=</span> <span class="n">get_per_sample_rules</span><span class="p">()</span>  <span class="c1"># 2. Get a list of per sample rules to group</span>
-
-    <span class="c1"># 3. Build group setting string</span>
-    <span class="n">group_options</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">rules_to_group</span><span class="p">:</span>
-        <span class="n">group_options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--group-components&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules_to_group</span><span class="p">:</span>
-            <span class="n">group_options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">group_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">group_options</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">create_submission_script</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

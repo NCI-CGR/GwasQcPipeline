@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.cli.pre_flight &mdash; GwasQcPipeline 1.0.0b3 documentation</title>
+  <title>cgr_gwas_qc.cli.pre_flight &mdash; GwasQcPipeline 1.0.0-rc.1 documentation</title>
   
 
   
@@ -174,16 +174,16 @@
            <div itemprop="articleBody">
             
   <h1>Source code for cgr_gwas_qc.cli.pre_flight</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span></span><span class="kn">import</span> <span class="nn">concurrent.futures</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">indent</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Set</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">typer</span>
+<span class="kn">from</span> <span class="nn">more_itertools</span> <span class="kn">import</span> <span class="n">chunked</span>
 <span class="kn">from</span> <span class="nn">pydantic.error_wrappers</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 
 <span class="kn">from</span> <span class="nn">cgr_gwas_qc</span> <span class="kn">import</span> <span class="n">parsers</span><span class="p">,</span> <span class="n">validators</span><span class="p">,</span> <span class="n">yaml</span>
@@ -210,6 +210,7 @@
     <span class="n">user_files_check</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">update_config</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">cluster_group_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Pre-flight checks to make sure user input files are readable and complete.</span>
 
@@ -249,6 +250,7 @@
         <span class="n">config</span><span class="o">.</span><span class="n">workflow_params</span><span class="o">.</span><span class="n">expected_sex_column</span><span class="p">,</span>
         <span class="n">config</span><span class="o">.</span><span class="n">workflow_params</span><span class="o">.</span><span class="n">case_control_column</span><span class="p">,</span>
         <span class="n">problem_samples</span><span class="p">,</span>
+        <span class="n">cluster_group_size</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;cgr_sample_sheet.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># Update the config file with some dynamic settings</span>
@@ -337,6 +339,97 @@
     <span class="k">return</span> <span class="n">df</span>
 
 
+<span class="k">def</span> <span class="nf">_filter_list</span><span class="p">(</span><span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">],</span> <span class="n">file_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">problem</span><span class="o">.</span><span class="n">filename</span> <span class="ow">and</span> <span class="n">problem</span><span class="o">.</span><span class="n">file_type</span> <span class="o">==</span> <span class="n">file_type</span><span class="p">:</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">problem</span><span class="o">.</span><span class="n">reason</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<span class="k">def</span> <span class="nf">_pretty_print_paths</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For each exception output a list of files nicely.&quot;&quot;&quot;</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indent</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="s1">&#39;    - &#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+
+<span class="k">def</span> <span class="nf">_pretty_print_user_problems</span><span class="p">(</span><span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">idat_red</span> <span class="o">:=</span> <span class="n">_filter_list</span><span class="p">(</span><span class="n">problems</span><span class="p">,</span> <span class="s2">&quot;idat_red&quot;</span><span class="p">):</span>
+        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span>
+            <span class="s2">&quot;IDAT RED ERROR: There was a problem with these files:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">_pretty_print_paths</span><span class="p">(</span><span class="n">idat_red</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">RED</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;IDAT RED Files OK.&quot;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">idat_green</span> <span class="o">:=</span> <span class="n">_filter_list</span><span class="p">(</span><span class="n">problems</span><span class="p">,</span> <span class="s2">&quot;idat_green&quot;</span><span class="p">):</span>
+        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span>
+            <span class="s2">&quot;IDAT GREEN ERROR: There was a problem with these files:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">_pretty_print_paths</span><span class="p">(</span><span class="n">idat_green</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">RED</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;IDAT GREEN Files OK.&quot;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">gtc</span> <span class="o">:=</span> <span class="n">_filter_list</span><span class="p">(</span><span class="n">problems</span><span class="p">,</span> <span class="s2">&quot;gtc&quot;</span><span class="p">):</span>
+        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span>
+            <span class="s2">&quot;GTC ERROR: There was a problem with these files:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_pretty_print_paths</span><span class="p">(</span><span class="n">gtc</span><span class="p">)),</span>
+            <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">RED</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;GTC Files OK.&quot;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_idat</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">validators</span><span class="o">.</span><span class="n">idat</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="s2">&quot;FileNotFound&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;idat_</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="s2">&quot;Permissions&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;idat_</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">GwasQcValidationError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;idat_</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># No problems</span>
+
+
+<span class="k">def</span> <span class="nf">_check_gtc</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">validators</span><span class="o">.</span><span class="n">gtc</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="s2">&quot;FileNotFound&quot;</span><span class="p">,</span> <span class="s2">&quot;gtc&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="s2">&quot;Permissions&quot;</span><span class="p">,</span> <span class="s2">&quot;gtc&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">GwasQcValidationError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;gtc&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># No problems</span>
+
+
+<span class="k">def</span> <span class="nf">_check_user_files</span><span class="p">(</span><span class="n">user_files</span><span class="p">:</span> <span class="n">UserFiles</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Check IDAT and GTC files for a given sample.&quot;&quot;&quot;</span>
+    <span class="n">sample_id</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;Sample_ID&quot;</span><span class="p">]</span>
+    <span class="n">problems</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">user_files</span><span class="o">.</span><span class="n">idat_pattern</span><span class="p">:</span>
+        <span class="n">red_file</span> <span class="o">=</span> <span class="n">user_files</span><span class="o">.</span><span class="n">idat_pattern</span><span class="o">.</span><span class="n">red</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">)</span>
+        <span class="n">problems</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_check_idat</span><span class="p">(</span><span class="n">red_file</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">))</span>
+
+        <span class="n">green_file</span> <span class="o">=</span> <span class="n">user_files</span><span class="o">.</span><span class="n">idat_pattern</span><span class="o">.</span><span class="n">green</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">)</span>
+        <span class="n">problems</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_check_idat</span><span class="p">(</span><span class="n">green_file</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">user_files</span><span class="o">.</span><span class="n">gtc_pattern</span><span class="p">:</span>
+        <span class="n">gtc_file</span> <span class="o">=</span> <span class="n">user_files</span><span class="o">.</span><span class="n">gtc_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">)</span>
+        <span class="n">problems</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_check_gtc</span><span class="p">(</span><span class="n">gtc_file</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">problems</span>
+
+
 <div class="viewcode-block" id="check_user_files"><a class="viewcode-back" href="../../../api/cli.html#cgr_gwas_qc.cli.pre_flight.check_user_files">[docs]</a><span class="k">def</span> <span class="nf">check_user_files</span><span class="p">(</span><span class="n">user_files</span><span class="p">:</span> <span class="n">UserFiles</span><span class="p">,</span> <span class="n">ss</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">threads</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Check user files (IDAT, GTC) using multiple threads.</span>
 
@@ -347,15 +440,17 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Sample_IDs that had a problem with either their IDAT or GTC files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span>  <span class="c1"># Create a pool of workers</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>  <span class="c1"># [(UserFiles, Dict[sample_sheet_column, sample_sheet_row1_value]), ...]</span>
-        <span class="n">product</span><span class="p">([</span><span class="n">user_files</span><span class="p">],</span> <span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">ss</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)])</span>
-    <span class="p">)</span>
-    <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;Checking user files for </span><span class="si">{:,}</span><span class="s2"> samples.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)))</span>
-    <span class="n">futures</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">_check_user_files</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>  <span class="c1"># Send work to pool of workers</span>
-    <span class="k">with</span> <span class="n">typer</span><span class="o">.</span><span class="n">progressbar</span><span class="p">(</span><span class="n">futures</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span> <span class="k">as</span> <span class="n">executer</span><span class="p">:</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">executer</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_check_user_files</span><span class="p">,</span> <span class="n">user_files</span><span class="p">,</span> <span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">ss</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+        <span class="p">]</span>
+
+    <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;Checking user files for </span><span class="si">{:,}</span><span class="s2"> samples.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">with</span> <span class="n">typer</span><span class="o">.</span><span class="n">progressbar</span><span class="p">(</span><span class="n">futures</span><span class="p">)</span> <span class="k">as</span> <span class="n">future_bar</span><span class="p">:</span>
         <span class="n">problem_user_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">results</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">:</span>  <span class="c1"># collect results (i.e., problem samples)</span>
+        <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">future_bar</span><span class="p">):</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
             <span class="n">problem_user_files</span> <span class="o">|=</span> <span class="p">{</span><span class="n">problem</span> <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">problem</span><span class="p">}</span>
         <span class="n">_pretty_print_user_problems</span><span class="p">(</span><span class="n">problem_user_files</span><span class="p">)</span>
 
@@ -378,24 +473,6 @@
         <span class="n">config</span><span class="o">.</span><span class="n">num_samples</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">config_to_yaml</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">update_sample_sheet</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">subject_id_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">expected_sex_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">case_control_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">problem_samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="n">_add_group_by_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">subject_id_column</span><span class="p">)</span>
-    <span class="n">_add_is_internal_control</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    <span class="n">_add_sample_exclusion</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
-    <span class="n">_add_user_exclusion</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
-    <span class="n">_add_missing_idats</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
-    <span class="n">_add_missing_gtc</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
-    <span class="n">_update_expected_sex</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">expected_sex_column</span><span class="p">)</span>
-    <span class="n">_update_case_control</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">case_control_column</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_add_replicate_info</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_add_group_by_column</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">subject_id_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Group_By&quot;</span><span class="p">):</span>
@@ -512,95 +589,17 @@
         <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="s2">&quot;is_sample_exclusion&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">_check_gtc</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">validators</span><span class="o">.</span><span class="n">gtc</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="s2">&quot;FileNotFound&quot;</span><span class="p">,</span> <span class="s2">&quot;gtc&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="s2">&quot;Permissions&quot;</span><span class="p">,</span> <span class="s2">&quot;gtc&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">GwasQcValidationError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;gtc&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-    <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># No problems</span>
-
-
-<span class="k">def</span> <span class="nf">_check_idat</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">validators</span><span class="o">.</span><span class="n">idat</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="s2">&quot;FileNotFound&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;idat_</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="s2">&quot;Permissions&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;idat_</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">GwasQcValidationError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ProblemFile</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;idat_</span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-    <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># No problems</span>
-
-
-<span class="k">def</span> <span class="nf">_check_user_files</span><span class="p">(</span><span class="n">user_files</span><span class="p">:</span> <span class="n">UserFiles</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]]:</span>
-    <span class="sd">&quot;&quot;&quot;Check IDAT and GTC files for a given sample.&quot;&quot;&quot;</span>
-    <span class="n">sample_id</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;Sample_ID&quot;</span><span class="p">]</span>
-    <span class="n">problems</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">user_files</span><span class="o">.</span><span class="n">idat_pattern</span><span class="p">:</span>
-        <span class="n">red_file</span> <span class="o">=</span> <span class="n">user_files</span><span class="o">.</span><span class="n">idat_pattern</span><span class="o">.</span><span class="n">red</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">)</span>
-        <span class="n">problems</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_check_idat</span><span class="p">(</span><span class="n">red_file</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">))</span>
-
-        <span class="n">green_file</span> <span class="o">=</span> <span class="n">user_files</span><span class="o">.</span><span class="n">idat_pattern</span><span class="o">.</span><span class="n">green</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">)</span>
-        <span class="n">problems</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_check_idat</span><span class="p">(</span><span class="n">green_file</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">))</span>
-
-    <span class="k">if</span> <span class="n">user_files</span><span class="o">.</span><span class="n">gtc_pattern</span><span class="p">:</span>
-        <span class="n">gtc_file</span> <span class="o">=</span> <span class="n">user_files</span><span class="o">.</span><span class="n">gtc_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">)</span>
-        <span class="n">problems</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_check_gtc</span><span class="p">(</span><span class="n">gtc_file</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="n">problems</span>
-
-
-<span class="k">def</span> <span class="nf">_filter_list</span><span class="p">(</span><span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">],</span> <span class="n">file_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">problems</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">problem</span><span class="o">.</span><span class="n">filename</span> <span class="ow">and</span> <span class="n">problem</span><span class="o">.</span><span class="n">file_type</span> <span class="o">==</span> <span class="n">file_type</span><span class="p">:</span>
-            <span class="n">res</span><span class="p">[</span><span class="n">problem</span><span class="o">.</span><span class="n">reason</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span>
-
-
-<span class="k">def</span> <span class="nf">_pretty_print_paths</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;For each exception output a list of files nicely.&quot;&quot;&quot;</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-        <span class="n">output</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indent</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="s1">&#39;    - &#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="n">output</span>
-
-
-<span class="k">def</span> <span class="nf">_pretty_print_user_problems</span><span class="p">(</span><span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">]):</span>
-    <span class="k">if</span> <span class="n">idat_red</span> <span class="o">:=</span> <span class="n">_filter_list</span><span class="p">(</span><span class="n">problems</span><span class="p">,</span> <span class="s2">&quot;idat_red&quot;</span><span class="p">):</span>
-        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span>
-            <span class="s2">&quot;IDAT RED ERROR: There was a problem with these files:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">_pretty_print_paths</span><span class="p">(</span><span class="n">idat_red</span><span class="p">)</span>
-            <span class="p">),</span>
-            <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">RED</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;IDAT RED Files OK.&quot;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">idat_green</span> <span class="o">:=</span> <span class="n">_filter_list</span><span class="p">(</span><span class="n">problems</span><span class="p">,</span> <span class="s2">&quot;idat_green&quot;</span><span class="p">):</span>
-        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span>
-            <span class="s2">&quot;IDAT GREEN ERROR: There was a problem with these files:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">_pretty_print_paths</span><span class="p">(</span><span class="n">idat_green</span><span class="p">)</span>
-            <span class="p">),</span>
-            <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">RED</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;IDAT GREEN Files OK.&quot;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">gtc</span> <span class="o">:=</span> <span class="n">_filter_list</span><span class="p">(</span><span class="n">problems</span><span class="p">,</span> <span class="s2">&quot;gtc&quot;</span><span class="p">):</span>
-        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span>
-            <span class="s2">&quot;GTC ERROR: There was a problem with these files:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_pretty_print_paths</span><span class="p">(</span><span class="n">gtc</span><span class="p">)),</span>
-            <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">RED</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;GTC Files OK.&quot;</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="n">typer</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">GREEN</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_add_cluster_group</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cluster_group_size</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Add column for grouping when running in cluster mode.&quot;&quot;&quot;</span>
+    <span class="n">cluster_group</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="n">v</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;cgroup</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">grp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunked</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Sample_ID</span><span class="p">,</span> <span class="n">cluster_group_size</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">grp</span>
+        <span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cluster_group&quot;</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s2">&quot;Sample_ID&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">cluster_group</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;Sample_ID&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_update_case_control</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">case_control_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Case/Control_Status&quot;</span><span class="p">):</span>
@@ -643,6 +642,26 @@
         <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">is_internal_control</span><span class="p">,</span> <span class="s2">&quot;expected_sex&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
             <span class="n">df</span><span class="o">.</span><span class="n">is_internal_control</span><span class="p">,</span> <span class="s2">&quot;Identifiler_Sex&quot;</span>
         <span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">update_sample_sheet</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">subject_id_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">expected_sex_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">case_control_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">problem_samples</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemFile</span><span class="p">],</span>
+    <span class="n">cluster_group_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">_add_group_by_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">subject_id_column</span><span class="p">)</span>
+    <span class="n">_add_is_internal_control</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">_add_sample_exclusion</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
+    <span class="n">_add_user_exclusion</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
+    <span class="n">_add_missing_idats</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
+    <span class="n">_add_missing_gtc</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">problem_samples</span><span class="p">)</span>
+    <span class="n">_update_expected_sex</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">expected_sex_column</span><span class="p">)</span>
+    <span class="n">_update_case_control</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">case_control_column</span><span class="p">)</span>
+    <span class="n">_add_replicate_info</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_add_replicate_info</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">_add_cluster_group</span><span class="p">,</span> <span class="n">cluster_group_size</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>

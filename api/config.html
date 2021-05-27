@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration &mdash; GwasQcPipeline 1.0.0b3 documentation</title>
+  <title>Configuration &mdash; GwasQcPipeline 1.0.0-rc.1 documentation</title>
   
 
   
@@ -229,7 +229,7 @@ schema and implementing data validation.</p>
 <td colspan="2"><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>v1.0.0-beta.3</p></td>
+<td colspan="2"><p>v1.0.0-rc.1</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
 <li><p>project_name</p></li>
@@ -334,7 +334,7 @@ schema and implementing data validation.</p>
 <td colspan="3"><p><em>Workflow Params</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>OrderedDict([(‘subject_id_column’, ‘Group_By’), (‘expected_sex_column’, ‘Expected_Sex’), (‘case_control_column’, ‘Case/Control_Status’), (‘remove_contam’, True), (‘remove_sex_discordant’, True), (‘remove_rep_discordant’, True), (‘remove_unexpected_rep’, True), (‘minimum_pop_subjects’, 50), (‘control_hwp_threshold’, 50)])</p></td>
+<td colspan="2"><p>OrderedDict([(‘subject_id_column’, ‘Group_By’), (‘expected_sex_column’, ‘Expected_Sex’), (‘case_control_column’, ‘Case/Control_Status’), (‘remove_contam’, True), (‘remove_rep_discordant’, True), (‘minimum_pop_subjects’, 50), (‘control_hwp_threshold’, 50)])</p></td>
 </tr>
 <tr class="row-even"><td><p>allOf</p></td>
 <td><ul class="simple">
@@ -919,7 +919,7 @@ schema and implementing data validation.</p>
 <tr class="row-even"><td><p>default</p></td>
 <td><p>top</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="42"><ul class="simple">
+<tr class="row-odd"><td rowspan="34"><ul class="simple">
 <li><p>WorkflowParams</p></li>
 </ul>
 </td>
@@ -989,40 +989,12 @@ schema and implementing data validation.</p>
 <td><p>True</p></td>
 </tr>
 <tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>remove_sex_discordant</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Remove Sex Discordant</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Sex discordant samples will be removed prior to sample to subject transformation.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>True</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
 <li><p>remove_rep_discordant</p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Remove Rep Discordant</em></p></td>
 </tr>
 <tr class="row-even"><td colspan="2"><p>Discordant replicates will be pruned prior to sample to subject transformation.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>True</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>remove_unexpected_rep</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Remove Unexpected Rep</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Unexpected replicates will be pruned prior to sample to subject transformation.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
@@ -1557,6 +1529,12 @@ schema and implementing data validation.</p>
 <dd><p>User’s sample sheet data.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.config.ConfigMgr.cluster_groups">
+<code class="sig-name descname">cluster_groups</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.cluster_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the cluster group names.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="cgr_gwas_qc.config.ConfigMgr.expand">
 <code class="sig-name descname">expand</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.expand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.expand" title="Permalink to this definition">¶</a></dt>
@@ -1589,7 +1567,7 @@ schema and implementing data validation.</p>
 
 <dl class="py method">
 <dt id="id0">
-<code class="sig-name descname">conda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">conda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return path to a conda env file.</p>
 <p>Given a conda env file_name, prepends the full path to that file.</p>
 </dd></dl>
@@ -1631,21 +1609,21 @@ expansion. Defaults to None.</p></li>
 
 <dl class="py method">
 <dt id="cgr_gwas_qc.config.ConfigMgr.modules">
-<code class="sig-name descname">modules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.modules" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">modules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.modules" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the path to a module file.</p>
 <p>Given a rule file_name, prepends the full path to that module.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="id3">
-<code class="sig-name descname">rules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">rules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the path to a rule file.</p>
 <p>Given a rule file_name, prepends the full path to that rule.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="id4">
-<code class="sig-name descname">scripts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">scripts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the path to an internal script.</p>
 <p>Given a script file_name, prepends the full path to that script.</p>
 </dd></dl>
@@ -1654,6 +1632,13 @@ expansion. Defaults to None.</p></li>
 <dt id="id5">
 <em class="property">property </em><code class="sig-name descname">ss</code><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
 <dd><p>Access the sample sheet DataFrame.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.config.ConfigMgr.subworkflow">
+<em class="property">classmethod </em><code class="sig-name descname">subworkflow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">workflow</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.subworkflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.subworkflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the path to a sub-workflow.</p>
+<p>Given a sub-workflow name, give the full path to the snakefile.</p>
 </dd></dl>
 
 </dd></dl>
