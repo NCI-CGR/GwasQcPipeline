@@ -1,7 +1,6 @@
-import multiprocessing as mp
+import concurrent.futures
 from collections import defaultdict
 from dataclasses import dataclass
-from itertools import product
 from pathlib import Path
 from textwrap import indent
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set
@@ -164,6 +163,97 @@ def check_sample_sheet(
     return df
 
 
+def _filter_list(problems: Iterable[ProblemFile], file_type: str) -> Dict[str, List[str]]:
+    res = defaultdict(list)
+    for problem in problems:
+        if problem.filename and problem.file_type == file_type:
+            res[problem.reason].append(problem.filename)
+    return res
+
+
+def _pretty_print_paths(data: Mapping[str, Sequence[str]]) -> str:
+    """For each exception output a list of files nicely."""
+    output = ""
+    for k, v in data.items():
+        output += f"  {k}:\n"
+        files = "\n".join(sorted(v))
+        output += f"{indent(files, '    - ')}\n"
+    return output
+
+
+def _pretty_print_user_problems(problems: Iterable[ProblemFile]):
+    if idat_red := _filter_list(problems, "idat_red"):
+        typer.secho(
+            "IDAT RED ERROR: There was a problem with these files:\n{}".format(
+                _pretty_print_paths(idat_red)
+            ),
+            fg=typer.colors.RED,
+        )
+    else:
+        typer.secho("IDAT RED Files OK.", fg=typer.colors.GREEN)
+
+    if idat_green := _filter_list(problems, "idat_green"):
+        typer.secho(
+            "IDAT GREEN ERROR: There was a problem with these files:\n{}".format(
+                _pretty_print_paths(idat_green)
+            ),
+            fg=typer.colors.RED,
+        )
+    else:
+        typer.secho("IDAT GREEN Files OK.", fg=typer.colors.GREEN)
+
+    if gtc := _filter_list(problems, "gtc"):
+        typer.secho(
+            "GTC ERROR: There was a problem with these files:\n{}".format(_pretty_print_paths(gtc)),
+            fg=typer.colors.RED,
+        )
+    else:
+        typer.secho("GTC Files OK.", fg=typer.colors.GREEN)
+
+
+def _check_idat(filename: str, color: str, sample_id: str) -> Optional[ProblemFile]:
+    try:
+        validators.idat.validate(Path(filename))
+    except FileNotFoundError:
+        return ProblemFile(sample_id, "FileNotFound", f"idat_{color}", filename)
+    except PermissionError:
+        return ProblemFile(sample_id, "Permissions", f"idat_{color}", filename)
+    except GwasQcValidationError as err:
+        return ProblemFile(sample_id, err.args[0], f"idat_{color}", filename)
+    return None  # No problems
+
+
+def _check_gtc(filename: str, sample_id: str) -> Optional[ProblemFile]:
+    try:
+        validators.gtc.validate(Path(filename))
+    except FileNotFoundError:
+        return ProblemFile(sample_id, "FileNotFound", "gtc", filename)
+    except PermissionError:
+        return ProblemFile(sample_id, "Permissions", "gtc", filename)
+    except GwasQcValidationError as err:
+        return ProblemFile(sample_id, err.args[0], "gtc", filename)
+    return None  # No problems
+
+
+def _check_user_files(user_files: UserFiles, record: Mapping) -> Set[Optional[ProblemFile]]:
+    """Check IDAT and GTC files for a given sample."""
+    sample_id = record["Sample_ID"]
+    problems = set()
+
+    if user_files.idat_pattern:
+        red_file = user_files.idat_pattern.red.format(**record)
+        problems.add(_check_idat(red_file, "red", sample_id))
+
+        green_file = user_files.idat_pattern.green.format(**record)
+        problems.add(_check_idat(green_file, "green", sample_id))
+
+    if user_files.gtc_pattern:
+        gtc_file = user_files.gtc_pattern.format(**record)
+        problems.add(_check_gtc(gtc_file, sample_id))
+
+    return problems
+
+
 def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> Set[ProblemFile]:
     """Check user files (IDAT, GTC) using multiple threads.
 
@@ -174,15 +264,17 @@ def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> S
     Returns:
         Sample_IDs that had a problem with either their IDAT or GTC files.
     """
-    pool = mp.Pool(threads)  # Create a pool of workers
-    args = list(  # [(UserFiles, Dict[sample_sheet_column, sample_sheet_row1_value]), ...]
-        product([user_files], [record._asdict() for record in ss.itertuples(index=False)])
-    )
-    typer.secho("Checking user files for {:,} samples.".format(len(args)))
-    futures = pool.starmap(_check_user_files, args)  # Send work to pool of workers
-    with typer.progressbar(futures, length=len(args)) as bar:
+    with concurrent.futures.ProcessPoolExecutor(threads) as executer:
+        futures = [
+            executer.submit(_check_user_files, user_files, record.to_dict())
+            for _, record in ss.iterrows()
+        ]
+
+    typer.secho("Checking user files for {:,} samples.".format(ss.shape[0]))
+    with typer.progressbar(futures) as future_bar:
         problem_user_files = set()
-        for results in bar:  # collect results (i.e., problem samples)
+        for future in concurrent.futures.as_completed(future_bar):
+            results = future.result()
             problem_user_files |= {problem for problem in results if problem}
         _pretty_print_user_problems(problem_user_files)
 
@@ -205,26 +297,6 @@ def update_config_file(config: Config, ss: pd.DataFrame):
         config.num_samples = ss.shape[0]
 
     config_to_yaml(config)
-
-
-def update_sample_sheet(
-    df: pd.DataFrame,
-    subject_id_column: str,
-    expected_sex_column: str,
-    case_control_column: str,
-    problem_samples: Iterable[ProblemFile],
-    cluster_group_size: int,
-) -> pd.DataFrame:
-    _add_group_by_column(df, subject_id_column)
-    _add_is_internal_control(df)
-    _add_sample_exclusion(df, problem_samples)
-    _add_user_exclusion(df, problem_samples)
-    _add_missing_idats(df, problem_samples)
-    _add_missing_gtc(df, problem_samples)
-    _update_expected_sex(df, expected_sex_column)
-    _update_case_control(df, case_control_column)
-    _add_replicate_info(df)
-    return _add_replicate_info(df).pipe(_add_cluster_group, cluster_group_size)
 
 
 def _add_group_by_column(df: pd.DataFrame, subject_id_column: str = "Group_By"):
@@ -354,97 +426,6 @@ def _add_cluster_group(df, cluster_group_size) -> pd.DataFrame:
     return df.merge(cluster_group, on="Sample_ID")
 
 
-def _check_gtc(filename: str, sample_id: str) -> Optional[ProblemFile]:
-    try:
-        validators.gtc.validate(Path(filename))
-    except FileNotFoundError:
-        return ProblemFile(sample_id, "FileNotFound", "gtc", filename)
-    except PermissionError:
-        return ProblemFile(sample_id, "Permissions", "gtc", filename)
-    except GwasQcValidationError as err:
-        return ProblemFile(sample_id, err.args[0], "gtc", filename)
-    return None  # No problems
-
-
-def _check_idat(filename: str, color: str, sample_id: str) -> Optional[ProblemFile]:
-    try:
-        validators.idat.validate(Path(filename))
-    except FileNotFoundError:
-        return ProblemFile(sample_id, "FileNotFound", f"idat_{color}", filename)
-    except PermissionError:
-        return ProblemFile(sample_id, "Permissions", f"idat_{color}", filename)
-    except GwasQcValidationError as err:
-        return ProblemFile(sample_id, err.args[0], f"idat_{color}", filename)
-    return None  # No problems
-
-
-def _check_user_files(user_files: UserFiles, record: Mapping) -> Set[Optional[ProblemFile]]:
-    """Check IDAT and GTC files for a given sample."""
-    sample_id = record["Sample_ID"]
-    problems = set()
-
-    if user_files.idat_pattern:
-        red_file = user_files.idat_pattern.red.format(**record)
-        problems.add(_check_idat(red_file, "red", sample_id))
-
-        green_file = user_files.idat_pattern.green.format(**record)
-        problems.add(_check_idat(green_file, "green", sample_id))
-
-    if user_files.gtc_pattern:
-        gtc_file = user_files.gtc_pattern.format(**record)
-        problems.add(_check_gtc(gtc_file, sample_id))
-
-    return problems
-
-
-def _filter_list(problems: Iterable[ProblemFile], file_type: str) -> Dict[str, List[str]]:
-    res = defaultdict(list)
-    for problem in problems:
-        if problem.filename and problem.file_type == file_type:
-            res[problem.reason].append(problem.filename)
-    return res
-
-
-def _pretty_print_paths(data: Mapping[str, Sequence[str]]) -> str:
-    """For each exception output a list of files nicely."""
-    output = ""
-    for k, v in data.items():
-        output += f"  {k}:\n"
-        files = "\n".join(sorted(v))
-        output += f"{indent(files, '    - ')}\n"
-    return output
-
-
-def _pretty_print_user_problems(problems: Iterable[ProblemFile]):
-    if idat_red := _filter_list(problems, "idat_red"):
-        typer.secho(
-            "IDAT RED ERROR: There was a problem with these files:\n{}".format(
-                _pretty_print_paths(idat_red)
-            ),
-            fg=typer.colors.RED,
-        )
-    else:
-        typer.secho("IDAT RED Files OK.", fg=typer.colors.GREEN)
-
-    if idat_green := _filter_list(problems, "idat_green"):
-        typer.secho(
-            "IDAT GREEN ERROR: There was a problem with these files:\n{}".format(
-                _pretty_print_paths(idat_green)
-            ),
-            fg=typer.colors.RED,
-        )
-    else:
-        typer.secho("IDAT GREEN Files OK.", fg=typer.colors.GREEN)
-
-    if gtc := _filter_list(problems, "gtc"):
-        typer.secho(
-            "GTC ERROR: There was a problem with these files:\n{}".format(_pretty_print_paths(gtc)),
-            fg=typer.colors.RED,
-        )
-    else:
-        typer.secho("GTC Files OK.", fg=typer.colors.GREEN)
-
-
 def _update_case_control(df: pd.DataFrame, case_control_column: str = "Case/Control_Status"):
     """Normalize Case/Control annotations.
 
@@ -485,6 +466,26 @@ def _update_expected_sex(df: pd.DataFrame, expected_sex_column: str = "Expected_
         df.loc[df.is_internal_control, "expected_sex"] = df.loc[
             df.is_internal_control, "Identifiler_Sex"
         ]
+
+
+def update_sample_sheet(
+    df: pd.DataFrame,
+    subject_id_column: str,
+    expected_sex_column: str,
+    case_control_column: str,
+    problem_samples: Iterable[ProblemFile],
+    cluster_group_size: int,
+) -> pd.DataFrame:
+    _add_group_by_column(df, subject_id_column)
+    _add_is_internal_control(df)
+    _add_sample_exclusion(df, problem_samples)
+    _add_user_exclusion(df, problem_samples)
+    _add_missing_idats(df, problem_samples)
+    _add_missing_gtc(df, problem_samples)
+    _update_expected_sex(df, expected_sex_column)
+    _update_case_control(df, case_control_column)
+    _add_replicate_info(df)
+    return _add_replicate_info(df).pipe(_add_cluster_group, cluster_group_size)
 
 
 if __name__ == "__main__":
