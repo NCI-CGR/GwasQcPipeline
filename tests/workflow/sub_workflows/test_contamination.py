@@ -3,6 +3,7 @@ import pytest
 from pandas.testing import assert_frame_equal, assert_series_equal
 
 from cgr_gwas_qc.testing import run_snakemake
+from cgr_gwas_qc.testing.comparison import file_hashes_equal
 from cgr_gwas_qc.testing.data import RealData
 
 
@@ -14,15 +15,9 @@ from cgr_gwas_qc.testing.data import RealData
 def test_legacy_agg_median_idat_intensity(real_data_cache):
     legacy = (
         pd.read_csv(real_data_cache / "legacy_outputs/all_sample_idat_intensity/idat_intensity.csv")
-        .rename(
-            {
-                "SampId": "Sample_ID",
-                "ChipId": "Chip_ID",
-                "MedianIntensity": "median_intensity",
-            },
-            axis=1,
-        )
+        .rename({"SampId": "Sample_ID", "MedianIntensity": "median_intensity"}, axis=1)
         .set_index("Sample_ID")
+        .drop("ChipId", axis=1)
     )
 
     dev = pd.read_csv(
@@ -94,7 +89,7 @@ def contamination(pytestconfig, tmp_path_factory, conda_envs):
 
             module contam:
                 snakefile: cfg.subworkflow("contamination")
-                config: {}
+                config: {"notemp": True}
 
             use rule * from contam
             """
@@ -142,3 +137,69 @@ def test_agg_contamination_test(real_data_cache, contamination):
     ).set_index("Sample_ID")
 
     assert_frame_equal(dev.reindex(snake.index), snake)
+
+
+# -------------------------------------------------------------------------------
+# Grouped Contamination
+# -------------------------------------------------------------------------------
+@pytest.mark.slow
+@pytest.mark.real_data
+@pytest.mark.workflow
+@pytest.fixture(scope="module")
+def contamination_grouped(pytestconfig, tmp_path_factory, conda_envs):
+    if not pytestconfig.getoption("--real-data"):
+        pytest.skip("No real data")
+
+    tmp_path = tmp_path_factory.mktemp("contamination_grouped")
+    conda_envs.copy_env("illuminaio", tmp_path)
+    conda_envs.copy_env("verifyidintensity", tmp_path)
+
+    data_cache = (
+        RealData(tmp_path, full_sample_sheet=False)
+        .add_user_files(entry_point="gtc", copy=False)
+        .make_config(num_snps=700078)
+        .make_cgr_sample_sheet()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            module contam:
+                snakefile: cfg.subworkflow("contamination")
+                config: {"cluster_mode": True, "notemp": True}
+
+            use rule * from contam
+            """
+        )
+    )
+
+    # Copy ABF file b/c it takes a long time to create
+    data_cache.copy(
+        "dev_outputs/sample_level/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
+        "sample_level/GSAMD-24v1-0_20011747_A1.AF.abf.txt",
+    )
+
+    run_snakemake(tmp_path, keep_temp=True)
+
+    return tmp_path
+
+
+@pytest.mark.slow
+@pytest.mark.workflow
+@pytest.mark.real_data
+def test_grouped_median_idat_intensity(contamination, contamination_grouped):
+    assert file_hashes_equal(
+        contamination / "sample_level/contamination/median_idat_intensity.csv",
+        contamination_grouped / "sample_level/contamination/median_idat_intensity.csv",
+    )
+
+
+@pytest.mark.slow
+@pytest.mark.workflow
+@pytest.mark.real_data
+def test_grouped_verifyidintensity(contamination, contamination_grouped):
+    assert file_hashes_equal(
+        contamination / "sample_level/contamination/verifyIDintensity.csv",
+        contamination_grouped / "sample_level/contamination/verifyIDintensity.csv",
+    )

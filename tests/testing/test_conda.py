@@ -1,3 +1,4 @@
+from cgr_gwas_qc.conda import get_snakemake_conda_env
 from cgr_gwas_qc.testing import make_snakefile, run_snakemake
 from cgr_gwas_qc.testing.conda import CondaEnv
 
@@ -12,7 +13,7 @@ def test_copy_conda_env(tmp_path):
     conda_env = CondaEnv()
     # and we get the correct renamed version of the environment
     env_file_name = conda_env.conda_env_path / "plink2.yml"
-    local_copy = conda_env._get_working_dir_env_path(env_file_name, tmp_path)
+    local_copy = get_snakemake_conda_env(env_file_name, tmp_path)
 
     # WHEN: we copy an environment into a temporary directory
     conda_env.copy_env("plink2", tmp_path)

@@ -3,10 +3,9 @@ import subprocess as sp
 import sys
 from pathlib import Path
 from textwrap import wrap
-from typing import List, Optional
+from typing import Optional
 
 import typer
-from snakemake.io import load_configfile
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.cluster_profiles import env
@@ -45,33 +44,36 @@ def main(
         "cgems": cgems,
         "biowulf": biowulf,
         "time_hr": time_hr,
-        "local_mem_mb": 1024,
-        "local_tasks": 1,
+        "local_mem_mb": 1024 * 8,
+        "local_tasks": 4,
         "added_options": "",
     }
+    snake_config = {"cluster_mode": True, "notemp": False}
 
     if notemp:
         payload["added_options"] += "--notemp "  # type: ignore
+        snake_config["notemp"] = True
 
     if subworkflow:
         payload["added_options"] += f"--subworkflow {subworkflow} "  # type: ignore
 
+    # add global config options only used in cluster mode.
+    payload["added_options"] += "--config {} ".format(  # type: ignore
+        " ".join("=".join([k, str(v)]) for k, v in snake_config.items())
+    )
+
     cfg = load_config()
     sample_size = cfg.ss.shape[0]
-    if sample_size < 1_000:  # bump up local resources and run a bunch or rules there
-        payload["local_tasks"] = 4
-        payload["local_mem_mb"] = 1024 * 4
+    if sample_size < 1_000:  # need less walltime for smaller sample size
         payload["time_hr"] = 8
 
     if cgems:
         payload["profile"] = get_profile("cgems")
         payload["queue"] = queue or ("all.q" if time_hr <= 24 else "long.q")
-        payload["added_options"] += get_grouping_settings(sample_size)
         submission_cmd = "qsub"
     elif biowulf:
         payload["profile"] = get_profile("biowulf")
         payload["queue"] = queue or ("quick,norm" if time_hr <= 4 else "norm")
-        payload["added_options"] += get_grouping_settings(sample_size)
         submission_cmd = "sbatch"
     else:
         payload["profile"] = check_custom_cluster_profile(cluster_profile, queue, submission_cmd)
@@ -126,32 +128,6 @@ def get_profile(cluster: str):
 
     if cluster == "biowulf":
         return (cgr_profiles / "biowulf").as_posix()
-
-
-def get_group_size(n_samples: int) -> int:
-    """Return how many samples to group together"""
-    return 500 if n_samples <= 1000 else 1000
-
-
-def get_per_sample_rules() -> List[str]:
-    """Pull list of rules to group from cluster.yml"""
-    cluster_file = Path(__file__).parents[1].resolve() / "cluster_profiles/cluster.yaml"
-    cluster_profile = load_configfile(cluster_file)
-    return sorted([key for key in cluster_profile["group_jobs"].keys()])
-
-
-def get_grouping_settings(sample_size: int):
-    group_size = get_group_size(sample_size)  # 1. Figure out the group size to use
-    rules_to_group = get_per_sample_rules()  # 2. Get a list of per sample rules to group
-
-    # 3. Build group setting string
-    group_options = []
-    if rules_to_group:
-        group_options.append("--group-components")
-        for rule in rules_to_group:
-            group_options.append(f"{rule}={group_size}")
-
-    return " ".join(group_options)
 
 
 def create_submission_script(payload) -> str:

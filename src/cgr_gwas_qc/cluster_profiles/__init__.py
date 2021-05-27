@@ -127,6 +127,23 @@ def update_properties(options: Dict, cluster_config: Dict, job_properties: Dict)
     return None
 
 
+def update_group_properties(
+    options: Dict, cluster_config: Dict, job_properties: Dict, jobscript: str
+):
+    update_properties(options, cluster_config, job_properties)
+    rulenames = _get_rule_names(jobscript)
+    unique_rulenames = set(rulenames)
+
+    rulename = ".".join(sorted(unique_rulenames))  # concatenate rulenames: rule1.rule2
+    options["rulename"] = f"GROUP.{rulename[:100]}".rstrip(".")
+
+    return None
+
+
+def submit_job(cmd: List[str]):
+    return sp.check_output(cmd).decode().rstrip()
+
+
 def _remove_time(options: Dict):
     keys = list(options.keys())
     for key in keys:
@@ -150,40 +167,6 @@ def _update_cluster_options(options: Dict, new_options: Dict):
             _remove_mem(options)
 
         options[key] = value
-
-
-def update_group_properties(
-    options: Dict, cluster_config: Dict, job_properties: Dict, jobscript: str
-):
-    update_properties(options, cluster_config, job_properties)
-    rulenames = _get_rule_names(jobscript)
-    n_rules = len(rulenames)
-
-    unique_rulenames = set(rulenames)
-    n_unique_rules = len(unique_rulenames)
-
-    rulename = ".".join(sorted(unique_rulenames))  # concatenate rulenames: rule1.rule2
-    options["rulename"] = f"GROUP.{rulename[:100]}".rstrip(".")
-
-    # Adjust multi-sample group resources to sane values. NOTE: this only will
-    # work well if the cluster correctly use resource masks to limit the number
-    # of CPUs.
-    group_jobs = cluster_config.get("group_jobs", {})
-    if (n_unique_rules == 1) & ((_rulename := rulenames[0]) in group_jobs):
-        n_samples = n_rules
-
-        if n_samples < 1000:
-            rule_options = group_jobs[_rulename]["small"]
-        else:
-            rule_options = group_jobs[_rulename]["large"]
-
-        _update_cluster_options(options, rule_options)
-
-    return None
-
-
-def submit_job(cmd: List[str]):
-    return sp.check_output(cmd).decode().rstrip()
 
 
 def _get_rule_names(jobscript: str) -> List[str]:

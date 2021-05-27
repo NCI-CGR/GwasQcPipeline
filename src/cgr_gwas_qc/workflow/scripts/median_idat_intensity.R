@@ -3,7 +3,6 @@ require(illuminaio)
 
 calc_median_intensity <- function(
                                   sample_id,
-                                  chip_id,
                                   red_idat,
                                   green_idat,
                                   output) {
@@ -18,7 +17,6 @@ calc_median_intensity <- function(
   # Save a csv "Sample_ID,Chip_ID,median_intensity"
   df <- data.frame(
     Sample_ID = sample_id,
-    Chip_ID = chip_id,
     median_intensity = med_intensity
   )
 
@@ -27,19 +25,22 @@ calc_median_intensity <- function(
 
 if (exists("snakemake")) {
   sample_id <- snakemake@wildcards[["Sample_ID"]]
-  chip_id <- paste(
-    snakemake@wildcards[["SentrixBarcode_A"]],
-    snakemake@wildcards[["SentrixPosition_A"]],
-    sep = "_"
-  )
 
   calc_median_intensity(
     sample_id,
-    chip_id,
     snakemake@input[["red"]],
     snakemake@input[["green"]],
     snakemake@output[[1]]
   )
+
 } else {
-  print("This script must be run using Snakemake.")
+
+  args = commandArgs(trailingOnly=TRUE)
+  calc_median_intensity(
+    args[1],  # sample_id
+    args[2],  # red pattern
+    args[3],  # green pattern
+    args[4]  # outfile
+  )
+
 }

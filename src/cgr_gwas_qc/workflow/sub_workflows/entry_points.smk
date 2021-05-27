@@ -31,6 +31,28 @@ rule all_entry_points:
 
 
 ################################################################################
+# PHONY Rules
+################################################################################
+# NOTE: Because of job grouping it is cleaner to wrap the various CLI utilities in
+# their own python script. This makes using conda more complicated. Instead of
+# installing all of the python dependencies in each environment, I will just
+# pass the conda environment and activate it internal. However, we want to make
+# sure that snakemake creates the environments, so these PHONY rules will make
+# sure that the conda env exists.
+localrules:
+    plink_conda,
+
+
+rule plink_conda:
+    output:
+        temp(".plink_env_built"),
+    conda:
+        cfg.conda("plink2")
+    shell:
+        "touch {output[0]}"
+
+
+################################################################################
 # Workflow Rules
 ################################################################################
 if cfg.config.user_files.gtc_pattern:
@@ -38,82 +60,111 @@ if cfg.config.user_files.gtc_pattern:
     ################################################################################
     # GTC To Plink
     ################################################################################
-    rule per_sample_gtc_to_ped:
-        """Converts a sample's GTC/BPM to PED/MAP.
+    if config.get("cluster_mode", False):
 
-        .. warning::
-            This is a submission hot spot creating 1 job per sample.
-        """
-        input:
-            gtc=lambda wc: cfg.expand(
+        rule grouped_gtc_to_bed:
+            input:
+                sample_sheet_csv="cgr_sample_sheet.csv",
+                bpm_file=cfg.config.reference_files.illumina_manifest_file,
+                _=rules.plink_conda.output[0],
+            params:
+                grp="{grp}",
+                gtc_pattern=lambda wc: cfg.config.user_files.gtc_pattern,
+                strand=cfg.config.software_params.strand,
+                out_prefix="sample_level/{grp}/samples",
+                conda_env=cfg.conda("plink2"),
+                notemp=config.get("notemp", False),
+            output:
+                bed=temp("sample_level/{grp}/samples.bed"),
+                bim=temp("sample_level/{grp}/samples.bim"),
+                fam=temp("sample_level/{grp}/samples.fam"),
+                nosex=temp("sample_level/{grp}/samples.nosex"),
+            threads: 12
+            resources:
+                mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
+                time_hr=lambda wildcards, attempt: 4 * attempt,
+            script:
+                "../scripts/grouped_gtc_to_bed.py"
+
+        rule merge_grouped_beds:
+            input:
+                bed=expand("sample_level/{grp}/samples.bed", grp=cfg.cluster_groups),
+                bim=expand("sample_level/{grp}/samples.bim", grp=cfg.cluster_groups),
+                fam=expand("sample_level/{grp}/samples.fam", grp=cfg.cluster_groups),
+                _=rules.plink_conda.output[0],
+            params:
+                out_prefix="sample_level/samples",
+                conda_env=cfg.conda("plink2"),
+                notemp=config.get("notemp", False),
+            output:
+                bed="sample_level/samples.bed",
+                bim="sample_level/samples.bim",
+                fam="sample_level/samples.fam",
+                nosex="sample_level/samples.nosex",
+            log:
+                "sample_level/samples.log",
+            threads: 8
+            resources:
+                mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+                time_hr=lambda wildcards, attempt: 4 * attempt,
+            script:
+                "../scripts/plink_merge.py"
+
+
+    else:
+
+        def _get_gtc(wildcards):
+            return cfg.expand(
                 cfg.config.user_files.gtc_pattern,
-                query=f"Sample_ID == '{wc.Sample_ID}'",
-            )[0],
-            bpm=cfg.config.reference_files.illumina_manifest_file,
-        params:
-            strand=cfg.config.software_params.strand,
-        output:
-            ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
-            map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
-        resources:
-            mem_mb=lambda wildcards, attempt: attempt * 1024,
-        group:
-            "per_sample_gtc_to_ped"
-        script:
-            "../scripts/gtc2plink.py"
+                query=f"Sample_ID == '{wildcards.Sample_ID}'",
+            )[0]
 
-    rule create_gtc_sample_merge_list:
-        """Makes a list of samples to merge together.
+        rule per_sample_gtc_to_ped:
+            """Converts a sample's GTC/BPM to PED/MAP.
 
-        Plink needs a list of samples (PEDs, MAPs) to merge together. This is
-        a simple space delimited file where each sample is on it's own row.
-        """
-        input:
-            ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
-            map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
-        output:
-            temp("sample_level/initial_mergeList.txt"),
-        group:
-            "merge_entry_points"
-        run:
-            with open(output[0], "w") as fh:
-                for ped, map_ in zip(input.ped, input.map_):
-                    fh.write(f"{ped} {map_}\n")
+            .. warning::
+                This is a submission hot spot creating 1 job per sample.
+            """
+            input:
+                gtc=_get_gtc,
+                bpm=cfg.config.reference_files.illumina_manifest_file,
+            params:
+                strand=cfg.config.software_params.strand,
+            output:
+                ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
+                map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
+            resources:
+                mem_mb=lambda wildcards, attempt: attempt * 1024,
+            script:
+                "../scripts/gtc2plink.py"
 
-    rule merge_gtc_sample_peds:
-        """Merges multiple samples using ``plink --merge-list``.
+        rule merge_gtc_sample_peds:
+            """Merges multiple samples using ``plink --merge-list``.
 
-        Merge and convert sample(s) into an aggregated binary ``plink``
-        format.
-        """
-        input:
-            ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
-            map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
-            merge_list=rules.create_gtc_sample_merge_list.output[0],
-        params:
-            prefix="sample_level/samples",
-        output:
-            bed="sample_level/samples.bed",
-            bim="sample_level/samples.bim",
-            fam="sample_level/samples.fam",
-            nosex="sample_level/samples.nosex",
-        log:
-            "sample_level/samples.log",
-        group:
-            "merge_entry_points"
-        conda:
-            cfg.conda("plink2")
-        threads: 8
-        resources:
-            mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
-            time_hr=lambda wildcards, attempt: 4 * attempt,
-        shell:
-            "plink "
-            "--merge-list {input.merge_list} "
-            "--make-bed "
-            "--out {params.prefix} "
-            "--threads {threads} "
-            "--memory {resources.mem_mb}"
+            Merge and convert sample(s) into an aggregated binary ``plink``
+            format.
+            """
+            input:
+                ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
+                map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
+                _=rules.plink_conda.output[0],
+            params:
+                out_prefix="sample_level/samples",
+                conda_env=cfg.conda("plink2"),
+                notemp=config.get("notemp", False),
+            output:
+                bed="sample_level/samples.bed",
+                bim="sample_level/samples.bim",
+                fam="sample_level/samples.fam",
+                nosex="sample_level/samples.nosex",
+            log:
+                "sample_level/samples.log",
+            threads: 8
+            resources:
+                mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+                time_hr=lambda wildcards, attempt: 4 * attempt,
+            script:
+                "../scripts/plink_merge.py"
 
 
 elif cfg.config.user_files.ped and cfg.config.user_files.map:

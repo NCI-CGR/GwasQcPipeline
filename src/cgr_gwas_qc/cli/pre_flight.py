@@ -8,6 +8,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set
 
 import pandas as pd
 import typer
+from more_itertools import chunked
 from pydantic.error_wrappers import ValidationError
 
 from cgr_gwas_qc import parsers, validators, yaml
@@ -34,6 +35,7 @@ def main(
     user_files_check: bool = True,
     update_config: bool = True,
     threads: int = 4,
+    cluster_group_size: int = 1000,
 ):
     """Pre-flight checks to make sure user input files are readable and complete.
 
@@ -73,6 +75,7 @@ def main(
         config.workflow_params.expected_sex_column,
         config.workflow_params.case_control_column,
         problem_samples,
+        cluster_group_size,
     ).to_csv("cgr_sample_sheet.csv", index=False)
 
     # Update the config file with some dynamic settings
@@ -210,6 +213,7 @@ def update_sample_sheet(
     expected_sex_column: str,
     case_control_column: str,
     problem_samples: Iterable[ProblemFile],
+    cluster_group_size: int,
 ) -> pd.DataFrame:
     _add_group_by_column(df, subject_id_column)
     _add_is_internal_control(df)
@@ -219,7 +223,8 @@ def update_sample_sheet(
     _add_missing_gtc(df, problem_samples)
     _update_expected_sex(df, expected_sex_column)
     _update_case_control(df, case_control_column)
-    return _add_replicate_info(df)
+    _add_replicate_info(df)
+    return _add_replicate_info(df).pipe(_add_cluster_group, cluster_group_size)
 
 
 def _add_group_by_column(df: pd.DataFrame, subject_id_column: str = "Group_By"):
@@ -334,6 +339,19 @@ def _add_sample_exclusion(df, problem_samples: Optional[Iterable[ProblemFile]]):
         problem_sample_ids = {problem.Sample_ID for problem in problem_samples}
         mask = df.Sample_ID.isin(problem_sample_ids)
         df.loc[mask, "is_sample_exclusion"] = True
+
+
+def _add_cluster_group(df, cluster_group_size) -> pd.DataFrame:
+    """Add column for grouping when running in cluster mode."""
+    cluster_group = pd.Series(
+        {
+            v: f"cgroup{i}"
+            for i, grp in enumerate(chunked(df.Sample_ID, cluster_group_size), start=1)
+            for v in grp
+        },
+        name="cluster_group",
+    ).rename_axis("Sample_ID")
+    return df.merge(cluster_group, on="Sample_ID")
 
 
 def _check_gtc(filename: str, sample_id: str) -> Optional[ProblemFile]:

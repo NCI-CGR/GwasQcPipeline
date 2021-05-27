@@ -20,6 +20,8 @@ import subprocess
 from pathlib import Path
 from typing import Optional, Union
 
+from cgr_gwas_qc.conda import get_snakemake_conda_env
+
 
 class CondaEnv:
 
@@ -54,7 +56,7 @@ class CondaEnv:
         """
         env_file_name = self.conda_env_path / f"{env_name}.yml"
         cache_path = self._get_env_cache_path(env_file_name)
-        new_path = self._get_working_dir_env_path(env_file_name, Path(working_dir))
+        new_path = get_snakemake_conda_env(env_file_name, Path(working_dir))
 
         shutil.copytree(cache_path, new_path)
         shutil.copyfile(env_file_name, new_path.as_posix() + ".yaml")
@@ -127,18 +129,3 @@ class CondaEnv:
             ]
         )
         subprocess.run(cmd, shell=True, check=True, stderr=subprocess.STDOUT)
-
-    def _get_working_dir_env_path(self, env: Path, working_dir: Path) -> Path:
-        """Working directory env path.
-
-        For snakemake, the environment path should be the md5sum of the full
-        path to `{working_dir}/.snakemake/conda` as well as the content of
-        the YAML file. Snakemake uses the first 8 characters of this hash.
-        """
-        working_dir_conda = working_dir / ".snakemake/conda"
-
-        md5 = hashlib.md5()
-        md5.update(working_dir_conda.absolute().as_posix().encode())
-        md5.update(env.read_bytes())
-        updated_hash = md5.hexdigest()[:8]
-        return working_dir_conda / updated_hash

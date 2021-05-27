@@ -233,6 +233,7 @@ def sample_qc_workflow(pytestconfig, tmp_path_factory, conda_envs):
     tmp_path = tmp_path_factory.mktemp("sample_qc_workflow")
     conda_envs.copy_env("plink2", tmp_path)
     conda_envs.copy_env("graf", tmp_path)
+    conda_envs.copy_env("king", tmp_path)
 
     (
         RealData(tmp_path)

@@ -148,6 +148,7 @@ class DataRepo(ABC):
                 params.expected_sex_column,
                 params.case_control_column,
                 [],
+                2,
             ).to_csv(self.working_dir / "cgr_sample_sheet.csv", index=False)
             return self
         else:

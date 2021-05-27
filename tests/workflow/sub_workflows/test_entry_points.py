@@ -59,6 +59,9 @@ def test_samples_fam(real_data_cache):
 ################################################################################
 # Workflow Tests
 ################################################################################
+# -------------------------------------------------------------------------------
+# GTC Entry Point
+# -------------------------------------------------------------------------------
 @pytest.mark.real_data
 @pytest.fixture(scope="module")
 def gtc_entry(pytestconfig, tmp_path_factory, conda_envs):
@@ -80,7 +83,7 @@ def gtc_entry(pytestconfig, tmp_path_factory, conda_envs):
 
             module entry_points:
                 snakefile: cfg.subworkflow("entry_points")
-                config: {}
+                config: {"notemp": True}
 
             use rule * from entry_points
             """
@@ -118,10 +121,10 @@ def test_gtc_to_ped_conversion(real_data_cache, gtc_entry):
 def test_create_gtc_merge_list(gtc_entry):
     # THEN: The merge should have one row for each sample
     with chdir(gtc_entry):
-        cfg = load_config()
+        cfg = load_config(pytest=True)
 
     n_samples = cfg.config.num_samples
-    merge_list = (gtc_entry / "sample_level/initial_mergeList.txt").read_text().strip().split("\n")
+    merge_list = (gtc_entry / "sample_level/plink_merge_list.txt").read_text().strip().split("\n")
     assert n_samples == len(merge_list)
 
 
@@ -135,6 +138,60 @@ def test_merge_gtc_sample_peds(gtc_entry):
     assert (gtc_entry / "sample_level/samples.nosex").exists()
 
 
+@pytest.mark.real_data
+@pytest.fixture(scope="module")
+def gtc_grouped_entry(pytestconfig, tmp_path_factory, conda_envs):
+    if not pytestconfig.getoption("--real-data"):
+        pytest.skip("No real data")
+
+    tmp_path = tmp_path_factory.mktemp("gtc_grouped_entry")
+    conda_envs.copy_env("plink2", tmp_path)
+    (
+        RealData(tmp_path, full_sample_sheet=False)
+        .make_cgr_sample_sheet()
+        .add_user_files(entry_point="gtc", copy=False)
+        .make_config()
+        .make_snakefile(
+            """
+            from cgr_gwas_qc import load_config
+
+            cfg = load_config()
+
+            module entry_points:
+                snakefile: cfg.subworkflow("entry_points")
+                config: {"cluster_mode": True, "notemp": True}
+
+            use rule * from entry_points
+            """
+        )
+    )
+
+    run_snakemake(tmp_path, keep_temp=True)
+
+    return tmp_path
+
+
+@pytest.mark.real_data
+@pytest.mark.workflow
+def test_gtc_grouped_entry(gtc_entry, gtc_grouped_entry):
+    # The merged samples files should exist.
+    assert file_hashes_equal(
+        gtc_entry / "sample_level/samples.bed",
+        gtc_grouped_entry / "sample_level/samples.bed",
+    )
+    assert file_hashes_equal(
+        gtc_entry / "sample_level/samples.bim",
+        gtc_grouped_entry / "sample_level/samples.bim",
+    )
+    assert file_hashes_equal(
+        gtc_entry / "sample_level/samples.fam",
+        gtc_grouped_entry / "sample_level/samples.fam",
+    )
+
+
+# -------------------------------------------------------------------------------
+# PED/MAP Entry Point
+# -------------------------------------------------------------------------------
 @pytest.mark.workflow
 @pytest.fixture(scope="module")
 def ped_entry(tmp_path_factory, conda_envs):
@@ -191,6 +248,9 @@ def test_ped_entry(fake_data_cache, ped_entry):
     assert fake_fam == snake_fam
 
 
+# -------------------------------------------------------------------------------
+# BED/BIM/FAM Entry Point
+# -------------------------------------------------------------------------------
 @pytest.mark.workflow
 @pytest.fixture(scope="module")
 def bed_entry(tmp_path_factory, conda_envs):

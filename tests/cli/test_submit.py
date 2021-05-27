@@ -82,35 +82,6 @@ def test_check_custom_cluster_profile_no_cmd(tmp_path):
         check_custom_cluster_profile(cluster_profile, queue, cmd)
 
 
-@pytest.mark.parametrize("sample_size,group_size", [(10, 500), (101, 500), (10_000, 1000)])
-def test_get_group_size_mocks(sample_size, group_size):
-    from cgr_gwas_qc.cli.submit import get_group_size
-
-    assert group_size == get_group_size(sample_size)
-
-
-def test_get_per_sample_rules():
-    from cgr_gwas_qc.cli.submit import get_per_sample_rules
-
-    per_sample_rules = get_per_sample_rules()
-    assert all(x.startswith("per_sample_") for x in per_sample_rules)
-    assert 4 == len(per_sample_rules)
-
-
-@pytest.mark.parametrize("sample_size,group_size", [(10, 500), (101, 500), (10_000, 1000)])
-def test_get_grouping_settings(sample_size, group_size):
-    from cgr_gwas_qc.cli.submit import get_grouping_settings
-
-    expected = (
-        "--group-components "
-        f"per_sample_contamination_verifyIDintensity={group_size} "
-        f"per_sample_gtc_to_adpc={group_size} "
-        f"per_sample_gtc_to_ped={group_size} "
-        f"per_sample_median_idat_intensity={group_size}"
-    )
-    assert expected == get_grouping_settings(sample_size)
-
-
 def test_create_submission_script_cgems(tmp_path):
     import os
 
