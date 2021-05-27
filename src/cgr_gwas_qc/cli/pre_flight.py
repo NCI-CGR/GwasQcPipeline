@@ -1,7 +1,6 @@
-import multiprocessing as mp
+import concurrent.futures
 from collections import defaultdict
 from dataclasses import dataclass
-from itertools import product
 from pathlib import Path
 from textwrap import indent
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set
@@ -265,15 +264,17 @@ def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> S
     Returns:
         Sample_IDs that had a problem with either their IDAT or GTC files.
     """
-    pool = mp.Pool(threads)  # Create a pool of workers
-    args = list(  # [(UserFiles, Dict[sample_sheet_column, sample_sheet_row1_value]), ...]
-        product([user_files], [record._asdict() for record in ss.itertuples(index=False)])
-    )
-    typer.secho("Checking user files for {:,} samples.".format(len(args)))
-    futures = pool.starmap(_check_user_files, args)  # Send work to pool of workers
-    with typer.progressbar(futures, length=len(args)) as bar:
+    with concurrent.futures.ProcessPoolExecutor(threads) as executer:
+        futures = [
+            executer.submit(_check_user_files, user_files, record.to_dict())
+            for _, record in ss.iterrows()
+        ]
+
+    typer.secho("Checking user files for {:,} samples.".format(ss.shape[0]))
+    with typer.progressbar(futures) as future_bar:
         problem_user_files = set()
-        for results in bar:  # collect results (i.e., problem samples)
+        for future in concurrent.futures.as_completed(future_bar):
+            results = future.result()
             problem_user_files |= {problem for problem in results if problem}
         _pretty_print_user_problems(problem_user_files)
 
