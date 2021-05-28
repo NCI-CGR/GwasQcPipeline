@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.cli.pre_flight &mdash; GwasQcPipeline 1.0.0rc1 documentation</title>
+  <title>cgr_gwas_qc.cli.pre_flight &mdash; GwasQcPipeline 1.0.0rc2 documentation</title>
   
 
   
@@ -440,20 +440,21 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        Sample_IDs that had a problem with either their IDAT or GTC files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;Checking user files for </span><span class="si">{:,}</span><span class="s2"> samples.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span> <span class="k">as</span> <span class="n">executer</span><span class="p">:</span>
-        <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">executer</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_check_user_files</span><span class="p">,</span> <span class="n">user_files</span><span class="p">,</span> <span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">ss</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
-        <span class="p">]</span>
+        <span class="p">}</span>
 
-    <span class="n">typer</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s2">&quot;Checking user files for </span><span class="si">{:,}</span><span class="s2"> samples.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-    <span class="k">with</span> <span class="n">typer</span><span class="o">.</span><span class="n">progressbar</span><span class="p">(</span><span class="n">futures</span><span class="p">)</span> <span class="k">as</span> <span class="n">future_bar</span><span class="p">:</span>
-        <span class="n">problem_user_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">future_bar</span><span class="p">):</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-            <span class="n">problem_user_files</span> <span class="o">|=</span> <span class="p">{</span><span class="n">problem</span> <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">problem</span><span class="p">}</span>
-        <span class="n">_pretty_print_user_problems</span><span class="p">(</span><span class="n">problem_user_files</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">typer</span><span class="o">.</span><span class="n">progressbar</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">futures</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Progress:&quot;</span><span class="p">,</span> <span class="n">show_pos</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
+            <span class="n">problem_user_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                <span class="n">problem_user_files</span> <span class="o">|=</span> <span class="p">{</span><span class="n">problem</span> <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">problem</span><span class="p">}</span>
+                <span class="n">bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
+    <span class="n">_pretty_print_user_problems</span><span class="p">(</span><span class="n">problem_user_files</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">problem_user_files</span></div>
 
 
