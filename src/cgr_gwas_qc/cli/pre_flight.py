@@ -264,20 +264,21 @@ def check_user_files(user_files: UserFiles, ss: pd.DataFrame, threads: int) -> S
     Returns:
         Sample_IDs that had a problem with either their IDAT or GTC files.
     """
+    typer.secho("Checking user files for {:,} samples.".format(ss.shape[0]))
     with concurrent.futures.ProcessPoolExecutor(threads) as executer:
-        futures = [
+        futures = {
             executer.submit(_check_user_files, user_files, record.to_dict())
             for _, record in ss.iterrows()
-        ]
+        }
 
-    typer.secho("Checking user files for {:,} samples.".format(ss.shape[0]))
-    with typer.progressbar(futures) as future_bar:
-        problem_user_files = set()
-        for future in concurrent.futures.as_completed(future_bar):
-            results = future.result()
-            problem_user_files |= {problem for problem in results if problem}
-        _pretty_print_user_problems(problem_user_files)
+        with typer.progressbar(length=len(futures), label="Progress:", show_pos=True) as bar:
+            problem_user_files = set()
+            for future in concurrent.futures.as_completed(futures):
+                results = future.result()
+                problem_user_files |= {problem for problem in results if problem}
+                bar.update(1)
 
+    _pretty_print_user_problems(problem_user_files)
     return problem_user_files
 
 
