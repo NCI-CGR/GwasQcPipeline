@@ -1,6 +1,7 @@
 import subprocess as sp
+from pathlib import Path
 
-from cgr_gwas_qc.conda import conda_activate
+from cgr_gwas_qc.conda import get_snakemake_conda_env
 from cgr_gwas_qc.typing import PathLike
 
 
@@ -12,15 +13,8 @@ def main(
     conda_env: PathLike,
     outfile: PathLike,
 ):
-    cmd = (
-        f"{conda_activate(conda_env)}"
-        "&& Rscript --vanilla"
-        f" {rscript}"
-        f" {sample_id}"
-        f" {red}"
-        f" {green}"
-        f" {outfile}"
-    )
+    Rscript = Path(get_snakemake_conda_env(conda_env)) / "bin/Rscript"
+    cmd = f"{Rscript} --vanilla {rscript} {sample_id} {red} {green} {outfile}"
     sp.check_output(cmd, shell=True)
 
 
