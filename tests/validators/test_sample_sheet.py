@@ -8,7 +8,7 @@ from cgr_gwas_qc.validators.sample_sheet import (
     SampleSheetMissingValueRequiredColumnsError,
     SampleSheetNullRowError,
     SampleSheetTruncatedFileError,
-    _check_file_truncation,
+    _check_data_section_truncation,
     _check_manifest_null_rows,
     _check_missing_values_required_columns,
     _check_required_columns,
@@ -69,27 +69,39 @@ def test_missing_sections(data: str):
 # Error if file appears truncated (TruncatedFileError)
 ################################################################################
 
-truncated_files = [
-    # Missing field separator on last row
-    (
-        "[Header],,,\n"
-        ",,,\n"
-        "[Manifests],,,\n"
-        ",,,\n"
-        "[Data],,,\n"
-        "Sample_ID,col2,col3,col4\n"
-        "SP00001,001,002"
-    ),
-]
 
-
-@pytest.mark.parametrize("data", truncated_files)
+@pytest.mark.parametrize(
+    "data",
+    [
+        pytest.param(
+            "[Header],,,\n"
+            ",,,\n"
+            "[Manifests],,,\n"
+            ",,,\n"
+            "[Data],,,\n"
+            "Sample_ID,col2,col3,col4\n"
+            "SP00001,002,003",
+            id="Missing last field",
+        ),
+        pytest.param(
+            "[Header],,,\n"
+            ",,,\n"
+            "[Manifests],,,\n"
+            ",,,\n"
+            "[Data],,,\n"
+            "Sample_ID,col2,col3,col4\n"
+            "SP00001,002,003,004",
+            id="No missing data",
+            marks=pytest.mark.xfail(reason="No missing data", strict=True),
+        ),
+    ],
+)
 def test_truncated_file(data):
     # GIVEN: a sample sheet with a partial last row (missing \n)
     # WHEN-THEN: we validate_manifest it raises a truncation error
     """If file appears truncated should raise an error."""
     with pytest.raises(SampleSheetTruncatedFileError):
-        _check_file_truncation(data)
+        _check_data_section_truncation(data)
 
 
 ################################################################################

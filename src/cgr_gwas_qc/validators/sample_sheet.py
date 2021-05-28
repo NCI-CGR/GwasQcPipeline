@@ -16,7 +16,7 @@ from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 def validate_manifest(filename: Path, *args):
     data = filename.read_text()
     _check_section_headers(data)
-    _check_file_truncation(data)
+    _check_data_section_truncation(data)
     df = SampleManifest(filename).data
     _validate(df, *args)
     _check_manifest_null_rows(filename.read_text())
@@ -51,14 +51,19 @@ def _check_section_headers(data: str):
         raise SampleSheetMissingSectionHeaderError(missing_headers)
 
 
-def _check_file_truncation(data: str):
-    """Checks for truncated files.
+def _check_data_section_truncation(data: str):
+    """Checks for truncated data section.
 
-    Makes sure the first and last row have the same number of field
-    delimiters (",") and last row as an line termination (\\n)
+    Makes sure the first and last row has the same number of field
+    delimiters (",") as the header row of the data section.
     """
     rows = data.splitlines()
-    if rows[0].count(",") != rows[-1].count(","):
+    for i, row in enumerate(rows):
+        if row.startswith("[Data]"):
+            break
+
+    data_section_header = i + 1
+    if rows[data_section_header].count(",") != rows[-1].count(","):
         raise SampleSheetTruncatedFileError
 
 
