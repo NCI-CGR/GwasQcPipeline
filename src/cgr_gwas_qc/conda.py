@@ -29,5 +29,7 @@ def get_snakemake_conda_env(env: PathLike, working_dir: Optional[PathLike] = Non
     md5 = hashlib.md5()
     md5.update(snakemake_conda_path.as_posix().encode())
     md5.update(env_path.read_bytes())
-    updated_hash = md5.hexdigest()[:8]
-    return snakemake_conda_path / updated_hash
+    full_hash = md5.hexdigest()
+    full_hash_path = snakemake_conda_path / full_hash
+    short_hash_path = snakemake_conda_path / full_hash[:8]  # for envs pre snakemake 6.0.3
+    return short_hash_path if short_hash_path.exists() else full_hash_path
