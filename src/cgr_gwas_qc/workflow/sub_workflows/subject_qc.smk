@@ -436,10 +436,28 @@ use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped with:
         "{population}"
 
 
-use rule convert from eigensoft as population_level_unrelated_convert_to_eigensoft with:
+rule trim_ids:
+    """EIGENSOFT convert requires sample/snp IDs are <39 characters."""
     input:
         ped=rules.population_level_unrelated_bed_to_ped.output.ped,
         map_=rules.population_level_unrelated_bed_to_ped.output.map_,
+    output:
+        ped=temp(
+            "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_trimmed.ped"
+        ),
+        map_=temp(
+            "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_trimmed.map"
+        ),
+    group:
+        "{population}"
+    script:
+        "../scripts/trim_ped_map_ids.py"
+
+
+use rule convert from eigensoft as population_level_unrelated_convert_to_eigensoft with:
+    input:
+        ped=rules.trim_ids.output.ped,
+        map_=rules.trim_ids.output.map_,
     output:
         par=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.convert.par"),
         gen=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.gen"),
