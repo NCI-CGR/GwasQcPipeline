@@ -6,10 +6,12 @@ from cgr_gwas_qc.typing import PathLike
 
 def main(ped: PathLike, map_: PathLike, out_ped: PathLike, out_map: PathLike, id_length: int = 39):
     with open(out_ped, "w") as fh:
-        (fh.write(row) for row in trim_ped_ids(ped, id_length))
+        for row in trim_ped_ids(ped, id_length):
+            fh.write(row)
 
     with open(out_map, "w") as fh:
-        (fh.write(row) for row in trim_map_ids(map_, id_length))
+        for row in trim_map_ids(map_, id_length):
+            fh.write(row)
 
 
 def trim_ped_ids(filename: PathLike, id_length: int) -> Generator[str, None, None]:
