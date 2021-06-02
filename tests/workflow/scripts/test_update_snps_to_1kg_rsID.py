@@ -45,7 +45,7 @@ records_for_update = [
     pytest.param(
         bim.BimRecord("rs123", "1", 100, "A", "G"),
         [vcf.VcfRecord("kg123", "1", 100, "A", ("G",))],
-        "kg123",
+        "rs123",
         id="Update-Even_Not_RsID",
     ),
 ]

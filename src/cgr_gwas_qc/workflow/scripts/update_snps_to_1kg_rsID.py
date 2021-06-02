@@ -86,7 +86,7 @@ def update_record_id(b_record: bim.BimRecord, vcf_fh: vcf.VcfFile):
         if v_record.is_multiallelic() or not v_record.is_snp():
             continue
 
-        if v_record.id is None:
+        if v_record.id is None or not v_record.id.startswith("rs"):
             # No ID to update with
             continue
 
