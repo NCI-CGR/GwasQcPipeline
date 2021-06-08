@@ -55,7 +55,7 @@ def main(
                 "Only ran config comparison. Remove --config-only to run full comparison.",
                 fg=YELLOW,
             )
-            typer.Exit(0)
+            raise typer.Exit()
 
         typer.secho("\n# Check Sample Level Results", fg=BRIGHT_CYAN)
         compare_initial_plink(legacy_dir)
