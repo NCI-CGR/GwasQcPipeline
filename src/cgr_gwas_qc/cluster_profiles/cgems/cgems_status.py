@@ -37,11 +37,11 @@ def check_queue(job_id: int) -> Optional[str]:
         logger.info(f"{job_id} no in queue")
         return None
 
-    if job_status == "Eqw":  # Delete jobs in Eqw b/c they just sit there
-        qdel(job_id)
+    if job_status == "E":
         return "failed"
 
-    if job_status == "E":
+    if job_status.startswith("E") or job_status.startswith("d"):  # Error or Deletion state
+        qdel(job_id)
         return "failed"
 
     return "running"
