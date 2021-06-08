@@ -30,6 +30,7 @@ def main(
     ignored_config: bool = typer.Option(
         False, help="True to show which legacy config options are ignored for comparisons."
     ),
+    config_only: bool = typer.Option(False, help="Only compare the config."),
     mix_atol: float = typer.Argument(
         0.001, help="The absolute tolerance level when comparing verifyIDintensities %Mix column."
     ),
@@ -48,6 +49,13 @@ def main(
         cfg = load_config()
         typer.secho("# Check Configuration", fg=BRIGHT_CYAN)
         compare_config(cfg.config, legacy_dir, ignored_config)
+
+        if config_only:
+            typer.secho(
+                "Only ran config comparison. Remove --config-only to run full comparison.",
+                fg=YELLOW,
+            )
+            typer.Exit(0)
 
         typer.secho("\n# Check Sample Level Results", fg=BRIGHT_CYAN)
         compare_initial_plink(legacy_dir)
