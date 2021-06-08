@@ -101,7 +101,7 @@ def compare_config(config: Config, legacy_dir: Path, ignored_config: bool):
     options = [
         (
             Path(legacy_config["sample_sheet"]).resolve(),
-            config.sample_sheet,
+            Path(config.sample_sheet).resolve(),
             "Sample Sheet",
         ),
         (
@@ -467,10 +467,11 @@ def _count_differences_major_groups(legacy, dev):
             Difference=lambda x: (x.iloc[:, 0] - x.iloc[:, 1]).abs()
         )
 
-        if table.Difference.max() <= 10:
+        try:
+            assert_series_equal(legacy_counts, dev_counts, check_names=False, rtol=0.05)
             typer.secho("Please carefully check the table for small differences", fg=YELLOW)
             color = WHITE
-        else:
+        except AssertionError:
             typer.secho("Please check the table for large differences", fg=RED)
             color = RED
 
