@@ -21,7 +21,7 @@ def main(
     notemp: bool = False,
     threads: int = 8,
 ):
-    ss = pd.read_csv(sample_sheet_csv).query(f"cluster_group == '{grp}'")
+    ss = pd.read_csv(sample_sheet_csv).query(f"not is_missing_idats and cluster_group == '{grp}'")
     tmp_dir = Path(outfile).parent / "temp_median_idat"
     tmp_dir.mkdir(exist_ok=True, parents=True)
 

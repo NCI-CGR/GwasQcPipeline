@@ -185,7 +185,10 @@ else:
 
     rule agg_median_idat_intensity:
         input:
-            cfg.expand(rules.per_sample_median_idat_intensity.output[0]),
+            cfg.expand(
+                rules.per_sample_median_idat_intensity.output[0],
+                query="not is_missing_idats",
+            ),
         output:
             "sample_level/contamination/median_idat_intensity.csv",
         resources:
@@ -247,7 +250,10 @@ else:
 
     rule agg_verifyidintensity:
         input:
-            cfg.expand(rules.per_sample_contamination_verifyIDintensity.output[0]),
+            cfg.expand(
+                rules.per_sample_contamination_verifyIDintensity.output[0],
+                query="not is_missing_gtc",
+            ),
         output:
             "sample_level/contamination/verifyIDintensity.csv",
         resources:
