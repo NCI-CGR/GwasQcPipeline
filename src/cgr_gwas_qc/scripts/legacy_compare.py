@@ -578,7 +578,7 @@ def compare_selected_subjects(legacy_dir: Path):
     legacy = _legacy_selected_subjects(legacy_dir / "subject_level/SampleUsedforSubject.csv")
     dev = _selected_subjects("sample_level/sample_qc.csv")
     try:
-        assert_series_equal(legacy, dev, check_names=False)
+        assert_series_equal(legacy, dev, check_names=False, check_dtype=False)
         typer.secho("Selected Subjects Match", fg=GREEN)
     except AssertionError:
         typer.secho("Selected Subjects Different", fg=RED)
