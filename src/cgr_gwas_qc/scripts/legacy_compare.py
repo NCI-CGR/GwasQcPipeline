@@ -14,6 +14,7 @@ from typer.colors import BLUE, BRIGHT_CYAN, GREEN, MAGENTA, RED, WHITE, YELLOW
 from cgr_gwas_qc import load_config, yaml
 from cgr_gwas_qc.models.config import Config
 from cgr_gwas_qc.testing import chdir, comparison
+from cgr_gwas_qc.workflow.scripts import sample_qc_table, subject_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -412,7 +413,7 @@ def compare_contamination(legacy_dir: Path, mix_atol: float, llk_atol: float, ll
 
 def _parse_snpweights(filename):
     return (
-        pd.read_csv(filename)
+        pd.read_csv(filename, dtype={"ID": str})
         .rename(
             {
                 "ID": "Sample_ID",
@@ -436,7 +437,7 @@ def _parse_snpweights(filename):
 
 def _parse_graf(filename):
     return (
-        pd.read_csv(filename, sep="\t")
+        pd.read_csv(filename, sep="\t", dtype={"Subject": str})
         .rename(
             {
                 "Subject": "Sample_ID",
@@ -518,24 +519,23 @@ def _legacy_sample_level_exclusions(filename):
     }
 
     return (
-        pd.read_csv(filename)
+        pd.read_csv(filename, dtype={"Sample_ID": str, "IdatsInProjectDir": bool})
         .set_index("Sample_ID")
-        .sort_index()
         .replace({"N": False, "Y": True})
-        .assign(is_missing_idats=lambda x: ~x.IdatsInProjectDir.astype(bool))
+        .assign(is_missing_idats=lambda x: ~x.IdatsInProjectDir)
         .astype({**{k: bool for k in exclusion_criteria.keys()}})
         .assign(Call_Rate_2_filter=lambda x: x.Call_Rate_2_filter ^ x.Call_Rate_1_filter)
         .assign(Legacy_Exclusions=lambda x: _get_reason(x, exclusion_criteria))
-        .Legacy_Exclusions
+        .Legacy_Exclusions.sort_index()
     )
 
 
 def _sample_level_exclusions(filename):
     return (
-        pd.read_csv(filename)
+        sample_qc_table.read(filename)
         .set_index("Sample_ID")
-        .sort_index()
         .analytic_exclusion_reason.rename("Production_Exclusions")
+        .sort_index()
     )
 
 
@@ -553,12 +553,18 @@ def compare_sample_analytic_exclusions(legacy_dir: Path):
 
 
 def _legacy_selected_subjects(filename):
-    return pd.read_csv(filename).set_index("Subject_ID").sort_index().squeeze().rename("Legacy")
+    return (
+        pd.read_csv(filename, dtype={"Subject_ID": str, "Sample_ID": str})
+        .set_index("Subject_ID")
+        .sort_index()
+        .squeeze()
+        .rename("Legacy")
+    )
 
 
 def _selected_subjects(filename):
     df = (
-        pd.read_csv(filename)
+        sample_qc_table.read(filename)
         .set_index("Group_By_Subject_ID")
         .rename_axis("Subject_ID")
         .query("not is_internal_control")
@@ -591,13 +597,12 @@ def _legacy_subject_level_exclusions(filename):
     }
 
     return (
-        pd.read_csv(filename)
+        pd.read_csv(filename, dtype={"Sample_ID": str})
         .set_index("Sample_ID")
-        .sort_index()
         .replace({"N": False, "Y": True})
         .astype({**{k: bool for k in exclusion_criteria.keys()}})
         .assign(Legacy_Exclusions=lambda x: _get_reason(x, exclusion_criteria))
-        .Legacy_Exclusions
+        .Legacy_Exclusions.sort_index()
     )
 
 
@@ -610,12 +615,10 @@ def _subject_level_exclusions(filename):
     }
 
     return (
-        pd.read_csv(filename)
+        subject_qc_table.read(filename)
         .set_index("Sample_ID")
-        .sort_index()
-        .astype({**{k: bool for k in exclusion_criteria.keys()}})
         .assign(Production_Exclusions=lambda x: _get_reason(x, exclusion_criteria))
-        .Production_Exclusions
+        .Production_Exclusions.sort_index()
     )
 
 
