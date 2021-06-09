@@ -519,10 +519,10 @@ def _legacy_sample_level_exclusions(filename):
     }
 
     return (
-        pd.read_csv(filename, dtype={"Sample_ID": str, "IdatsInProjectDir": bool})
+        pd.read_csv(filename, dtype={"Sample_ID": str})
         .set_index("Sample_ID")
         .replace({"N": False, "Y": True})
-        .assign(is_missing_idats=lambda x: ~x.IdatsInProjectDir)
+        .assign(is_missing_idats=lambda x: ~x.IdatsInProjectDir.astype(bool))
         .astype({**{k: bool for k in exclusion_criteria.keys()}})
         .assign(Call_Rate_2_filter=lambda x: x.Call_Rate_2_filter ^ x.Call_Rate_1_filter)
         .assign(Legacy_Exclusions=lambda x: _get_reason(x, exclusion_criteria))
