@@ -544,7 +544,7 @@ def compare_sample_analytic_exclusions(legacy_dir: Path):
     legacy = _legacy_sample_level_exclusions(legacy_dir / "all_sample_qc.csv")
     dev = _sample_level_exclusions("sample_level/sample_qc.csv")
     try:
-        assert_series_equal(legacy, dev, check_names=False)
+        assert_series_equal(legacy, dev, check_names=False, check_dtype=False)
         typer.secho("Sample Analytic Exclusions Match", fg=GREEN)
     except AssertionError:
         typer.secho("Please carefully check this table\n", fg=YELLOW)
