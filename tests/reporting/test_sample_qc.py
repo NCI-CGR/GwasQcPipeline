@@ -15,6 +15,20 @@ def test_ArrayProcessing(real_cfg):
 
 
 @pytest.mark.real_data
+def test_ArrayProcessing_with_failure(real_cfg):
+    from cgr_gwas_qc.reporting.sample_qc import ArrayProcessing
+
+    ss = real_cfg.ss.copy()
+    ss.loc[0, "is_sample_exclusion"] = True
+    ss.loc[0, "is_missing_gtc"] = True
+    ap = ArrayProcessing.construct(ss)
+
+    assert 219 == ap.num_samples_qc_processed
+    assert 1 == ap.num_samples_excluded
+    assert 1 == ap.num_array_processing_failure
+
+
+@pytest.mark.real_data
 def test_CompletionRate(snp_qc_df, sample_qc_df):
     from cgr_gwas_qc.reporting.sample_qc import CompletionRate
 
