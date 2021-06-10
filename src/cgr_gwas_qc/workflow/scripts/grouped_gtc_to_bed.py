@@ -23,7 +23,9 @@ def main(
     mem_mb: int = 1024 * 8,
 ):
     """Grouped version of GTC to BED/BIM/FAM conversion."""
-    ss = pd.read_csv(sample_sheet_csv).query(f"not is_missing_gtc and cluster_group == '{grp}'")
+    ss = pd.read_csv(sample_sheet_csv).query(
+        f"not is_sample_exclusion and cluster_group == '{grp}'"
+    )
     tmp_dir = Path(out_prefix).parent / "temp_gtc2bed"
     tmp_dir.mkdir(exist_ok=True, parents=True)
 

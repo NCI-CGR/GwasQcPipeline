@@ -187,7 +187,7 @@ else:
         input:
             cfg.expand(
                 rules.per_sample_median_idat_intensity.output[0],
-                query="not is_missing_idats",
+                query="not is_sample_exclusion",
             ),
         output:
             "sample_level/contamination/median_idat_intensity.csv",

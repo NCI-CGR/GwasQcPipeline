@@ -22,7 +22,9 @@ def main(
     notemp: bool = False,
     threads: int = 8,
 ):
-    ss = pd.read_csv(sample_sheet_csv).query(f"not is_missing_gtc and cluster_group == '{grp}'")
+    ss = pd.read_csv(sample_sheet_csv).query(
+        f"not is_sample_exclusions and cluster_group == '{grp}'"
+    )
 
     # Make temp folders
     outdir = Path(outfile).parent

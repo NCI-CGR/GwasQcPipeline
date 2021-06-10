@@ -145,9 +145,13 @@ if cfg.config.user_files.gtc_pattern:
             format.
             """
             input:
-                ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped, query="not is_missing_gtc"),
+                ped=cfg.expand(
+                    rules.per_sample_gtc_to_ped.output.ped,
+                    query="not is_sample_exclusion",
+                ),
                 map_=cfg.expand(
-                    rules.per_sample_gtc_to_ped.output.map_, query="not is_missing_gtc"
+                    rules.per_sample_gtc_to_ped.output.map_,
+                    query="not is_sample_exclusion",
                 ),
                 _=rules.plink_conda.output[0],
             params:
