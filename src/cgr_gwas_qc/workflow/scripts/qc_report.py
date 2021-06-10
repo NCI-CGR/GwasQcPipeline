@@ -37,7 +37,7 @@ def main(
     hwe_png_dir: Path,
     outfile: Path,
 ):
-    ss = sample_sheet.read(sample_sheet_csv)
+    ss = sample_sheet.read(sample_sheet_csv, remove_exclusions=False)
     snp_qc = snp_qc_table.read(snp_qc_csv)
     sample_qc = sample_qc_table.read(sample_qc_csv)
     subject_qc = subject_qc_table.read(subject_qc_csv)
