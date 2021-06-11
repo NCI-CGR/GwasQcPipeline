@@ -11,9 +11,6 @@ use_contamination = (
 
 localrules:
     all_sample_qc,
-    plink_call_rate_initial,
-    plink_call_rate_post1,
-    plink_call_rate_post2,
     sample_concordance_plink,
     sample_concordance_summary,
     split_sample_concordance,
@@ -261,7 +258,7 @@ use rule maf_filter from plink as sample_level_maf_filter with:
     log:
         "sample_level/call_rate_2/samples_maf{maf}.log",
     group:
-        "replicate_concordance"
+        "plink_concordance"
 
 
 use rule ld from plink as sample_level_ld_estimate with:
@@ -279,7 +276,7 @@ use rule ld from plink as sample_level_ld_estimate with:
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
     group:
-        "replicate_concordance"
+        "plink_concordance"
 
 
 use rule ld_filter from plink as sample_level_ld_pruned with:
@@ -298,7 +295,7 @@ use rule ld_filter from plink as sample_level_ld_pruned with:
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.log",
     group:
-        "replicate_concordance"
+        "plink_concordance"
 
 
 use rule genome from plink as sample_level_ibd with:
@@ -313,7 +310,7 @@ use rule genome from plink as sample_level_ibd with:
     output:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
     group:
-        "replicate_concordance"
+        "plink_concordance"
 
 
 rule sample_concordance_plink:
@@ -347,7 +344,7 @@ use rule extract_fingerprint_snps from graf as graf_extract_fingerprint_snps wit
     log:
         "sample_level/call_rate_2/samples_1kg_rsID.fpg.log",
     group:
-        "replicate_concordance"
+        "graf_concordance"
 
 
 use rule relatedness from graf as sample_concordance_graf with:
@@ -358,7 +355,7 @@ use rule relatedness from graf as sample_concordance_graf with:
     log:
         "sample_level/concordance/graf.log",
     group:
-        "replicate_concordance"
+        "graf_concordance"
 
 
 rule sample_concordance_king:
@@ -378,8 +375,6 @@ rule sample_concordance_king:
         cfg.conda("king")
     log:
         "sample_level/concordance/king.log",
-    group:
-        "replicate_concordance"
     threads: 8
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
@@ -432,7 +427,7 @@ use rule populations from graf as graf_populations with:
     log:
         "sample_level/ancestry/graf_populations.log",
     group:
-        "ancestry"
+        "graf_ancestry"
 
 
 use rule ancestry from graf as graf_ancestry with:
@@ -441,7 +436,7 @@ use rule ancestry from graf as graf_ancestry with:
     output:
         "sample_level/ancestry/graf_ancestry.txt",
     group:
-        "ancestry"
+        "graf_ancestry"
 
 
 # -------------------------------------------------------------------------------
