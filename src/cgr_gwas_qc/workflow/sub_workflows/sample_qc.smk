@@ -14,6 +14,7 @@ localrules:
     plink_call_rate_initial,
     plink_call_rate_post1,
     plink_call_rate_post2,
+    sample_concordance_plink,
     sample_concordance_summary,
     split_sample_concordance,
     snp_qc_table,
@@ -330,8 +331,6 @@ rule sample_concordance_plink:
         pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
     output:
         "sample_level/concordance/plink.csv",
-    group:
-        "replicate_concordance"
     script:
         "../scripts/concordance_table.py"
 

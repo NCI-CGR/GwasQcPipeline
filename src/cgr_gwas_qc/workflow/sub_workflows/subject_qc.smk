@@ -15,6 +15,7 @@ localrules:
     selected_Subject_IDs,
     population_checkpoint,
     population_Subject_IDs,
+    population_level_concordance_plink,
     agg_population_concordance,
     per_population_qc_table,
     agg_population_qc_tables,
@@ -293,8 +294,6 @@ rule population_level_concordance_plink:
         pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}.concordance.csv",
-    group:
-        "{population}_concordance"
     script:
         "../scripts/concordance_table.py"
 
