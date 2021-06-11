@@ -1,3 +1,4 @@
+from enum import Enum
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
 
@@ -222,6 +223,8 @@ def config_to_yaml(cfg: Config, yaml_file: str = "config.yml", exclude_none=True
                 cleaned[k] = serialize(v)
             elif isinstance(v, Path):
                 cleaned[k] = v.as_posix()
+            elif isinstance(v, Enum):
+                cleaned[k] = v.value
             else:
                 cleaned[k] = v
         return cleaned

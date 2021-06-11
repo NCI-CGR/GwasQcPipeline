@@ -1,4 +1,5 @@
 """Configuration system data models."""
+from enum import Enum
 from logging import getLogger
 from pathlib import Path
 from typing import Optional, Sequence
@@ -26,6 +27,11 @@ __all__ = [
 logger = getLogger(__name__)
 
 
+class GenomeBuild(str, Enum):
+    hg37 = "hg37"
+    hg38 = "hg38"
+
+
 class Config(BaseModel):
     """Data model for config.yml
 
@@ -39,6 +45,7 @@ class Config(BaseModel):
     sample_sheet: Path = Field(
         Path("sample_sheet.csv"), description="Path to the sample manifest from LIMs."
     )
+    genome_build: GenomeBuild = Field(GenomeBuild.hg37, help="The human genome build.")
     snp_array: str = Field(..., help="Which SNP array was used. Only used for reporting.")
     num_samples: int = Field(
         ..., help="Number of samples, automatically calculated from the sample sheet."
