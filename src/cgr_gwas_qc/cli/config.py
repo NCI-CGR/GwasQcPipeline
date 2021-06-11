@@ -109,9 +109,6 @@ def cgems_config(
             ),
             gtc_pattern="/DCEG/CGF/Infinium/ScanData/CGF/ByProject/{Project}/{SentrixBarcode_A}/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
         ),
-        env_modules=dict(
-            plink2="plink2/1.90b5", eigensoft="eigensoft/7.2.1", r="R/3.4.0", graf="graf/2.3.1"
-        ),
     )
 
 
