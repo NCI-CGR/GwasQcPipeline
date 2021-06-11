@@ -34,7 +34,7 @@ from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.testing import make_snakefile, make_test_config
 
 DEFAULT_TEST_DATA_SERVER = "cgemsiii.nci.nih.gov"
-DEFAULT_TEST_DATA_PATH = "/DCEG/CGF/Bioinformatics/Production/fearjm/gwas_test_data"
+DEFAULT_TEST_DATA_PATH = "/DCEG/CGF/Bioinformatics/Production/data/cgr_gwas_qc/test_data"
 
 # This is a trick to add a type annotation that says that the method is
 # returning the class itself. This will magically update to the subclass too.
@@ -484,7 +484,10 @@ class RealData(DataRepo):
         cmd = " ".join(
             [
                 "rsync",
-                "-a",
+                "-aL",
+                "--exclude=.snakemake",
+                "--exclude=logs",
+                "--exclude=gwas_qc_log.*",
                 f"{user}@{server}:{remote_path.as_posix()}/",
                 f"{self._data_path.as_posix()}/",
             ]
