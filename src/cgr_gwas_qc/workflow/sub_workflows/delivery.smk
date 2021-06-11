@@ -200,7 +200,7 @@ rule qc_report:
         chrx_inbreeding_png="sample_level/chrx_inbreeding.png",
         ancestry_png="sample_level/ancestry.png",
         _population_plots="subject_level/.population_plots.done",
-        _control_plots="subject_level/.population_plots.done",
+        _control_plots="subject_level/.control_plots.done",
     params:
         config=cfg.config,
         autosomal_heterozygosity_png_dir="subject_level/autosomal_heterozygosity_plots",
