@@ -64,6 +64,7 @@ def calculate_median_idat_intensity(
 
 if __name__ == "__main__" and "snakemake" in locals():
     main(
+        sample_sheet_csv=snakemake.input.sample_sheet_csv,  # type: ignore # noqa
         **{k: v for k, v in snakemake.params.items()},  # type: ignore # noqa
         outfile=snakemake.output[0],  # type: ignore # noqa
         threads=snakemake.threads or 2,  # type: ignore # noqa
