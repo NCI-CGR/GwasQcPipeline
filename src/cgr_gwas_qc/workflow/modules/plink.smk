@@ -420,7 +420,7 @@ rule ld:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
+        "sleep 10 && plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
@@ -452,7 +452,7 @@ rule miss:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
+        "sleep 10 && plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
@@ -477,7 +477,7 @@ rule sexcheck:
     conda:
         cfg.conda("plink2")
     shell:
-        "plink "
+        "sleep 10 && plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
@@ -502,7 +502,7 @@ rule frq:
     conda:
         cfg.conda("plink2")
     shell:
-        "plink "
+        "sleep 10 && plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
@@ -527,7 +527,7 @@ rule hwe:
     conda:
         cfg.conda("plink2")
     shell:
-        "plink "
+        "sleep 10 && plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
@@ -560,7 +560,7 @@ rule genome:
     conda:
         cfg.conda("plink2")
     shell:
-        "plink "
+        "sleep 10 && plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
@@ -588,7 +588,7 @@ rule het:
     conda:
         cfg.conda("plink2")
     shell:
-        "plink "
+        "sleep 10 && plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
