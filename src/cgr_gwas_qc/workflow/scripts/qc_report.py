@@ -77,7 +77,7 @@ def main(
             pca_png_dir,
             hwe_png_dir,
         ),
-        "exclusion_tables": ExclusionTables.construct(config, ss, sample_qc, population_qc),
+        "exclusion_tables": ExclusionTables.construct(sample_qc, subject_qc, population_qc),
     }
 
     report = create_report(payload)
