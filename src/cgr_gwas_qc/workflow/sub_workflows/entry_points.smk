@@ -204,6 +204,9 @@ elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user
     ################################################################################
     # Aggregated BED/BIM/FAM
     ################################################################################
+    localrules:
+        link_binary_plink_to_expected_location,
+
     rule link_binary_plink_to_expected_location:
         """Creates symbolic links BED/BIM/FAM.
 

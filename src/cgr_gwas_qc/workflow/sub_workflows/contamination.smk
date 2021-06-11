@@ -69,6 +69,10 @@ rule verifyidintensity_conda:
 ################################################################################
 if config.get("cluster_mode", False):
 
+    localrules:
+        agg_median_idat_intensity,
+        agg_verifyidintensity,
+
     rule grouped_median_idat_intensity:
         """Calculate median intensity of Red and Green channels."""
         input:

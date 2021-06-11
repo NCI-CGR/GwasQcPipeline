@@ -7,6 +7,25 @@ use_contamination = (
     and cfg.config.user_files.gtc_pattern
     and cfg.config.workflow_params.remove_contam
 )
+
+
+localrules:
+    all_sample_qc,
+    plink_call_rate_initial,
+    plink_call_rate_post1,
+    plink_call_rate_post2,
+    sample_concordance_summary,
+    split_sample_concordance,
+    snp_qc_table,
+    sample_level_sexcheck,
+    sample_qc_table,
+    sample_qc_summary_stats,
+    sample_lists_from_qc_flags,
+    plot_call_rate,
+    plot_chrx_inbreeding,
+    plot_ancestry,
+
+
 ################################################################################
 # Sample QC Targets
 ################################################################################
@@ -152,8 +171,6 @@ use rule miss from plink as plink_call_rate_initial with:
     output:
         imiss="sample_level/samples.imiss",
         lmiss="sample_level/samples.lmiss",
-    group:
-        "sample_qc"
 
 
 use rule miss from plink as plink_call_rate_post1 with:
@@ -166,8 +183,6 @@ use rule miss from plink as plink_call_rate_post1 with:
     output:
         imiss="sample_level/call_rate_1/samples.imiss",
         lmiss="sample_level/call_rate_1/samples.lmiss",
-    group:
-        "sample_qc"
 
 
 use rule miss from plink as plink_call_rate_post2 with:
@@ -180,33 +195,34 @@ use rule miss from plink as plink_call_rate_post2 with:
     output:
         imiss="sample_level/call_rate_2/samples.imiss",
         lmiss="sample_level/call_rate_2/samples.lmiss",
-    group:
-        "sample_qc"
 
 
 # -------------------------------------------------------------------------------
 # Contamination
 # -------------------------------------------------------------------------------
-rule sample_contamination_verifyIDintensity:
-    """Aggregate sample contamination scores.
+if use_contamination:
 
-    Aggregates sample level contamination scores into a single file (each
-    row is a sample). The script sets ``%Mix`` to ``NA`` if the intensity
-    is below the threshold and the file is not in the ``imiss`` file.
-    """
-    input:
-        contamination_file="sample_level/contamination/verifyIDintensity.csv",
-        median_intensity_file="sample_level/contamination/median_idat_intensity.csv",
-        imiss_file=rules.plink_call_rate_post2.output.imiss,
-    params:
-        intensity_threshold=cfg.config.software_params.intensity_threshold,
-        contam_threshold=cfg.config.software_params.contam_threshold,
-    output:
-        "sample_level/contamination/summary.csv",
-    group:
-        "sample_qc"
-    script:
-        "../scripts/agg_contamination.py"
+    localrules:
+        sample_contamination_verifyIDintensity,
+
+    rule sample_contamination_verifyIDintensity:
+        """Aggregate sample contamination scores.
+
+        Aggregates sample level contamination scores into a single file (each
+        row is a sample). The script sets ``%Mix`` to ``NA`` if the intensity
+        is below the threshold and the file is not in the ``imiss`` file.
+        """
+        input:
+            contamination_file="sample_level/contamination/verifyIDintensity.csv",
+            median_intensity_file="sample_level/contamination/median_idat_intensity.csv",
+            imiss_file=rules.plink_call_rate_post2.output.imiss,
+        params:
+            intensity_threshold=cfg.config.software_params.intensity_threshold,
+            contam_threshold=cfg.config.software_params.contam_threshold,
+        output:
+            "sample_level/contamination/summary.csv",
+        script:
+            "../scripts/agg_contamination.py"
 
 
 # -------------------------------------------------------------------------------
@@ -390,8 +406,6 @@ rule sample_concordance_summary:
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * 2 * attempt,
         time_hr=lambda wildcards, attempt: 2 * attempt,
-    group:
-        "replicate_concordance"
     script:
         "../scripts/sample_concordance.py"
 
@@ -404,8 +418,6 @@ rule split_sample_concordance:
         known_qc_csv="sample_level/concordance/InternalQcKnown.csv",
         known_study_csv="sample_level/concordance/StudySampleKnown.csv",
         unknown_csv="sample_level/concordance/UnknownReplicates.csv",
-    group:
-        "replicate_concordance"
     script:
         "../scripts/split_sample_concordance.py"
 
@@ -444,8 +456,6 @@ rule snp_qc_table:
         thousand_genomes=rules.update_samples_to_1kg_rsIDs.output.id_map,
     output:
         "sample_level/snp_qc.csv",
-    group:
-        "sample_qc"
     script:
         "../scripts/snp_qc_table.py"
 
@@ -462,8 +472,6 @@ use rule sexcheck from plink as sample_level_sexcheck with:
         out_prefix="sample_level/call_rate_1/samples",
     output:
         "sample_level/call_rate_1/samples.sexcheck",
-    group:
-        "sample_qc"
 
 
 def _contam(wildcards):
@@ -496,8 +504,6 @@ rule sample_qc_table:
         remove_rep_discordant=cfg.config.workflow_params.remove_rep_discordant,
     output:
         "sample_level/sample_qc.csv",
-    group:
-        "sample_qc"
     script:
         "../scripts/sample_qc_table.py"
 
@@ -507,8 +513,6 @@ rule sample_qc_summary_stats:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/summary_stats.txt",
-    group:
-        "sample_qc"
     script:
         "../scripts/sample_qc_summary_stats.py"
 
@@ -522,8 +526,6 @@ rule sample_lists_from_qc_flags:
         sex="sample_level/qc_failures/sex_discordant.txt",
         rep="sample_level/qc_failures/replicate_discordant.txt",
         ctrl="sample_level/internal_controls.txt",
-    group:
-        "sample_qc"
     script:
         "../scripts/sample_lists_from_qc_flags.py"
 
@@ -542,8 +544,6 @@ rule plot_call_rate:
         snp_cr2=cfg.config.software_params.snp_call_rate_2,
     output:
         "sample_level/call_rate.png",
-    group:
-        "sample_qc"
     script:
         "../scripts/plot_call_rate.py"
 
@@ -553,8 +553,6 @@ rule plot_chrx_inbreeding:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/chrx_inbreeding.png",
-    group:
-        "sample_qc"
     script:
         "../scripts/plot_chrx_inbreeding.py"
 
@@ -564,7 +562,5 @@ rule plot_ancestry:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/ancestry.png",
-    group:
-        "sample_qc"
     script:
         "../scripts/plot_ancestry.py"

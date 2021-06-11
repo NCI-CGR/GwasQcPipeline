@@ -5,6 +5,7 @@ output_pattern = cfg.config.user_files.output_pattern
 
 
 localrules:
+    all_delivery,
     lab_sample_level_qc_report,
     lab_lims_upload,
     lab_identifiler_needed,
@@ -15,6 +16,9 @@ localrules:
     deliver_original_sample_data,
     deliver_subject_data,
     deliver_subject_list,
+    qc_report,
+    qc_report_docx,
+    qc_report_xlsx,
 
 
 wildcard_constraints:
@@ -208,8 +212,6 @@ rule qc_report:
         hwe_png_dir="subject_level/hwe_plots",
     output:
         "delivery/qc_report.md",
-    group:
-        "qc_report"
     script:
         "../scripts/qc_report.py"
 
@@ -223,8 +225,6 @@ rule qc_report_docx:
         "delivery/{deliver_prefix}QC_Report{deliver_suffix}.docx",
     conda:
         cfg.conda("pandoc")
-    group:
-        "qc_report"
     shell:
         "pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}"
 
@@ -240,7 +240,5 @@ rule qc_report_xlsx:
         graf="sample_level/ancestry/graf_populations.txt",
     output:
         "delivery/{deliver_prefix}QC_Report{deliver_suffix}.xlsx",
-    group:
-        "qc_report"
     script:
         "../scripts/qc_report_table.py"
