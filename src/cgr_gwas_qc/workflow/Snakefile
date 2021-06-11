@@ -3,6 +3,11 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 
+localrules:
+    all,
+    agg_subworkflow_results,
+
+
 ################################################################################
 # All Targets
 ################################################################################
