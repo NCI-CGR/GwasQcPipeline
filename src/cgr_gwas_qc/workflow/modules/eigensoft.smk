@@ -44,6 +44,6 @@ rule smartpca:
         && echo 'snpname: {input.snp}' >> {output.par} \
         && echo 'indivname: {input.ind}' >> {output.par} \
         && echo 'evecoutname: {output.eigenvec}' >> {output.par} \
-        && echo 'fastmode: YES >> {output.par}' \
+        && echo 'fastmode: YES' >> {output.par} \
         && smartpca -p {output.par}
         """

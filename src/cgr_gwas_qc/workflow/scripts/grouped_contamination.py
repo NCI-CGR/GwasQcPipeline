@@ -3,9 +3,9 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import List
 
-import pandas as pd
 from snakemake.rules import expand
 
+from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.typing import PathLike
 from cgr_gwas_qc.workflow.scripts import agg_verifyidintensity, gtc2adpc, verifyidintensity
 
@@ -22,7 +22,7 @@ def main(
     notemp: bool = False,
     threads: int = 8,
 ):
-    ss = pd.read_csv(sample_sheet_csv).query(f"cluster_group == '{grp}'")
+    ss = sample_sheet.read(sample_sheet_csv).query(f"cluster_group == '{grp}'")
 
     # Make temp folders
     outdir = Path(outfile).parent

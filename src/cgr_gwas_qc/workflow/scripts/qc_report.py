@@ -37,7 +37,7 @@ def main(
     hwe_png_dir: Path,
     outfile: Path,
 ):
-    ss = sample_sheet.read(sample_sheet_csv)
+    ss = sample_sheet.read(sample_sheet_csv, remove_exclusions=False)
     snp_qc = snp_qc_table.read(snp_qc_csv)
     sample_qc = sample_qc_table.read(sample_qc_csv)
     subject_qc = subject_qc_table.read(subject_qc_csv)
@@ -77,7 +77,7 @@ def main(
             pca_png_dir,
             hwe_png_dir,
         ),
-        "exclusion_tables": ExclusionTables.construct(config, ss, sample_qc, population_qc),
+        "exclusion_tables": ExclusionTables.construct(sample_qc, subject_qc, population_qc),
     }
 
     report = create_report(payload)

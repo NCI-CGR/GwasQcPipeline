@@ -86,12 +86,14 @@ _SAMPLE_QC_COLUMNS = [
 
 
 def _sample_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame:
-    ss = sample_sheet.read(sample_sheet_csv).rename(REPORT_NAME_MAPPER, axis=1)
+    ss = sample_sheet.read(sample_sheet_csv, remove_exclusions=False).rename(
+        REPORT_NAME_MAPPER, axis=1
+    )
     _additional_columns = [x for x in ss.columns if x not in _SAMPLE_QC_COLUMNS]
     return (
         sample_qc_table.read(sample_qc_csv)
         .rename(REPORT_NAME_MAPPER, axis=1)
-        .merge(ss, on="Sample_ID", suffixes=["", "_DROP"])
+        .merge(ss, on="Sample_ID", suffixes=["", "_DROP"], how="outer")
         .filter(regex="^(?!.*_DROP)")
         .reindex(_SAMPLE_QC_COLUMNS + _additional_columns, axis=1)
     )

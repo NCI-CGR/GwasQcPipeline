@@ -3,9 +3,9 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import List
 
-import pandas as pd
 from snakemake.rules import expand
 
+from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.typing import PathLike
 from cgr_gwas_qc.workflow.scripts import gtc2plink, plink_merge
 
@@ -23,7 +23,7 @@ def main(
     mem_mb: int = 1024 * 8,
 ):
     """Grouped version of GTC to BED/BIM/FAM conversion."""
-    ss = pd.read_csv(sample_sheet_csv).query(f"cluster_group == '{grp}'")
+    ss = sample_sheet.read(sample_sheet_csv).query(f"cluster_group == '{grp}'")
     tmp_dir = Path(out_prefix).parent / "temp_gtc2bed"
     tmp_dir.mkdir(exist_ok=True, parents=True)
 
