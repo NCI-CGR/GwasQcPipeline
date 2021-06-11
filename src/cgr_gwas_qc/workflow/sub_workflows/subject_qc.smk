@@ -11,7 +11,16 @@ cfg = load_config()
 
 localrules:
     all_subject_qc,
+    subject_qc_table,
+    selected_Subject_IDs,
+    population_checkpoint,
+    population_Subject_IDs,
+    agg_population_concordance,
+    per_population_qc_table,
+    agg_population_qc_tables,
     agg_population_plots,
+    population_controls_checkpoint,
+    population_controls_Subject_IDs,
     agg_control_plots,
 
 
@@ -72,8 +81,6 @@ rule subject_qc_table:
         sample_concordance_csv="sample_level/concordance/summary.csv",
     output:
         "subject_level/subject_qc.csv",
-    group:
-        "select_subjects"
     script:
         "../scripts/subject_qc_table.py"
 
@@ -86,8 +93,6 @@ rule selected_Subject_IDs:
     output:
         selected=temp("subject_level/selected_Subject_IDs.txt"),
         sample2subject=temp("subject_level/sample_to_subject.txt"),
-    group:
-        "select_subjects"
     run:
         qc = subject_qc_table.read(input[0])
         qc.reindex(["Sample_ID", "Sample_ID"], axis=1).to_csv(
@@ -178,8 +183,6 @@ rule population_Subject_IDs:
         rules.subject_qc_table.output[0],
     output:
         "subject_level/{population}/subjects.txt",
-    group:
-        "{population}"
     run:
         (
             subject_qc_table.read(input[0])
@@ -206,7 +209,7 @@ use rule keep_ids from plink as pull_population_level_subjects with:
     log:
         "subject_level/{population}/subjects.log",
     group:
-        "{population}"
+        "{population}_concordance"
 
 
 use rule maf_filter from plink as population_level_maf_filter with:
@@ -225,7 +228,7 @@ use rule maf_filter from plink as population_level_maf_filter with:
     log:
         "subject_level/{population}/subjects_maf{maf}.log",
     group:
-        "{population}"
+        "{population}_concordance"
 
 
 use rule ld from plink as population_level_ld_estimate with:
@@ -245,7 +248,7 @@ use rule ld from plink as population_level_ld_estimate with:
     log:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate.log",
     group:
-        "{population}"
+        "{population}_concordance"
 
 
 use rule ld_filter from plink as population_level_ld_pruned with:
@@ -264,7 +267,7 @@ use rule ld_filter from plink as population_level_ld_pruned with:
     log:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}.log",
     group:
-        "{population}"
+        "{population}_concordance"
 
 
 use rule genome from plink as population_level_ibd with:
@@ -279,7 +282,7 @@ use rule genome from plink as population_level_ibd with:
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd.genome",
     group:
-        "{population}"
+        "{population}_concordance"
 
 
 rule population_level_concordance_plink:
@@ -291,7 +294,7 @@ rule population_level_concordance_plink:
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}.concordance.csv",
     group:
-        "{population}"
+        "{population}_concordance"
     script:
         "../scripts/concordance_table.py"
 
@@ -333,7 +336,7 @@ rule population_level_related_subjects:
         relatives="subject_level/{population}/relatives.csv",
         to_remove="subject_level/{population}/related_subjects_to_remove.txt",
     group:
-        "{population}"
+        "{population}_relatives"
     script:
         "../scripts/related_subjects.py"
 
@@ -354,7 +357,7 @@ use rule remove_ids from plink as population_level_remove_related_subjects with:
     log:
         "subject_level/{population}/subjects_unrelated.log",
     group:
-        "{population}"
+        "{population}_relatives"
 
 
 # PCA
@@ -374,7 +377,7 @@ use rule maf_filter from plink as population_level_unrelated_maf_filter with:
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}.log",
     group:
-        "{population}"
+        "{population}_pca"
 
 
 use rule ld from plink as population_level_unrelated_ld_estimate with:
@@ -398,7 +401,7 @@ use rule ld from plink as population_level_unrelated_ld_estimate with:
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.log",
     group:
-        "{population}"
+        "{population}_pca"
 
 
 use rule ld_filter from plink as population_level_unrelated_ld_pruned with:
@@ -417,7 +420,7 @@ use rule ld_filter from plink as population_level_unrelated_ld_pruned with:
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
     group:
-        "{population}"
+        "{population}_pca"
 
 
 use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped with:
@@ -433,7 +436,7 @@ use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped with:
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed.log",
     group:
-        "{population}"
+        "{population}_pca"
 
 
 rule trim_ids:
@@ -449,7 +452,7 @@ rule trim_ids:
             "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_trimmed.map"
         ),
     group:
-        "{population}"
+        "{population}_pca"
     script:
         "../scripts/trim_ped_map_ids.py"
 
@@ -464,7 +467,7 @@ use rule convert from eigensoft as population_level_unrelated_convert_to_eigenso
         snp=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.snp"),
         ind=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.ind"),
     group:
-        "{population}"
+        "{population}_pca"
 
 
 use rule smartpca from eigensoft as population_level_unrelated_smartpca with:
@@ -476,7 +479,7 @@ use rule smartpca from eigensoft as population_level_unrelated_smartpca with:
         par=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.pca.par"),
         eigenvec="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.eigenvec",
     group:
-        "{population}"
+        "{population}_pca"
 
 
 rule plot_pca:
@@ -493,7 +496,7 @@ rule plot_pca:
     output:
         "subject_level/pca_plots/{population}.png",
     group:
-        "{population}"
+        "{population}_pca"
     script:
         "../scripts/plot_pca.py"
 
@@ -509,7 +512,7 @@ use rule het from plink as population_level_autosomal_heterozygosity with:
     output:
         "subject_level/{population}/subjects.het",
     group:
-        "{population}"
+        "{population}_het"
 
 
 rule plot_autosomal_heterozygosity:
@@ -522,7 +525,7 @@ rule plot_autosomal_heterozygosity:
     output:
         "subject_level/autosomal_heterozygosity_plots/{population}.png",
     group:
-        "{population}"
+        "{population}_het"
     script:
         "../scripts/plot_autosomal_heterozygosity.py"
 
@@ -543,8 +546,6 @@ rule per_population_qc_table:
         threshold=cfg.config.software_params.autosomal_het_threshold,
     output:
         "subject_level/{population}/qc.csv",
-    group:
-        "{population}"
     script:
         "../scripts/population_qc_table.py"
 
@@ -630,8 +631,6 @@ rule population_controls_Subject_IDs:
         rules.subject_qc_table.output[0],
     output:
         "subject_level/{population}/controls.txt",
-    group:
-        "{population}_controls"
     run:
         (
             subject_qc_table.read(input[0])
