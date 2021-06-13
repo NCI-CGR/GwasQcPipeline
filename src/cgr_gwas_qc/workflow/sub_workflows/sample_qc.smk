@@ -96,7 +96,7 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
     log:
         "sample_level/call_rate_1/samples_p1.log",
     group:
-        "call_rate_filters"
+        "call_rate_filter_1"
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
@@ -115,7 +115,7 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
     log:
         "sample_level/call_rate_1/samples.log",
     group:
-        "call_rate_filters"
+        "call_rate_filter_1"
 
 
 use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
@@ -134,7 +134,7 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
     log:
         "sample_level/call_rate_2/samples_p1.log",
     group:
-        "call_rate_filters"
+        "call_rate_filter_2"
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
@@ -153,7 +153,7 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
     log:
         "sample_level/call_rate_2/samples.log",
     group:
-        "call_rate_filters"
+        "call_rate_filter_2"
 
 
 # -------------------------------------------------------------------------------
@@ -258,7 +258,7 @@ use rule maf_filter from plink as sample_level_maf_filter with:
     log:
         "sample_level/call_rate_2/samples_maf{maf}.log",
     group:
-        "plink_concordance"
+        "plink_concordance_filter"
 
 
 use rule ld from plink as sample_level_ld_estimate with:
@@ -272,11 +272,11 @@ use rule ld from plink as sample_level_ld_estimate with:
     output:
         to_keep=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.in"),  # Markers in approx. linkage equilibrium
         to_remove=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.out"),  # Markers in LD
-        nosex="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex",
+        nosex=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex"),
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
     group:
-        "plink_concordance"
+        "plink_concordance_filter"
 
 
 use rule ld_filter from plink as sample_level_ld_pruned with:
@@ -295,7 +295,7 @@ use rule ld_filter from plink as sample_level_ld_pruned with:
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.log",
     group:
-        "plink_concordance"
+        "plink_concordance_filter"
 
 
 use rule genome from plink as sample_level_ibd with:
@@ -309,8 +309,6 @@ use rule genome from plink as sample_level_ibd with:
         out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
     output:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
-    group:
-        "plink_concordance"
 
 
 rule sample_concordance_plink:
@@ -343,8 +341,6 @@ use rule extract_fingerprint_snps from graf as graf_extract_fingerprint_snps wit
         "sample_level/call_rate_2/samples_1kg_rsID.fpg",
     log:
         "sample_level/call_rate_2/samples_1kg_rsID.fpg.log",
-    group:
-        "graf_concordance"
 
 
 use rule relatedness from graf as sample_concordance_graf with:
@@ -354,8 +350,6 @@ use rule relatedness from graf as sample_concordance_graf with:
         "sample_level/concordance/graf.tsv",
     log:
         "sample_level/concordance/graf.log",
-    group:
-        "graf_concordance"
 
 
 rule sample_concordance_king:
@@ -426,8 +420,6 @@ use rule populations from graf as graf_populations with:
         "sample_level/ancestry/graf_populations.txt",
     log:
         "sample_level/ancestry/graf_populations.log",
-    group:
-        "graf_ancestry"
 
 
 use rule ancestry from graf as graf_ancestry with:
@@ -435,8 +427,6 @@ use rule ancestry from graf as graf_ancestry with:
         rules.graf_populations.output[0],
     output:
         "sample_level/ancestry/graf_ancestry.txt",
-    group:
-        "graf_ancestry"
 
 
 # -------------------------------------------------------------------------------

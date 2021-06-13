@@ -19,9 +19,12 @@ localrules:
     agg_population_concordance,
     per_population_qc_table,
     agg_population_qc_tables,
+    plot_pca,
+    plot_autosomal_heterozygosity,
     agg_population_plots,
     population_controls_checkpoint,
     population_controls_Subject_IDs,
+    plot_hwe,
     agg_control_plots,
 
 
@@ -120,8 +123,6 @@ use rule keep_ids from plink as pull_selected_subjects with:
         nosex="subject_level/samples.nosex",
     log:
         "subject_level/samples.log",
-    group:
-        "select_subjects"
 
 
 use rule rename_ids from plink as rename_Sample_ID_to_Subject_ID with:
@@ -139,8 +140,6 @@ use rule rename_ids from plink as rename_Sample_ID_to_Subject_ID with:
         nosex="subject_level/subjects.nosex",
     log:
         "subject_level/subjects.log",
-    group:
-        "select_subjects"
 
 
 # -------------------------------------------------------------------------------
@@ -209,8 +208,6 @@ use rule keep_ids from plink as pull_population_level_subjects with:
         nosex="subject_level/{population}/subjects.nosex",
     log:
         "subject_level/{population}/subjects.log",
-    group:
-        "{population}_concordance"
 
 
 use rule maf_filter from plink as population_level_maf_filter with:
@@ -229,7 +226,7 @@ use rule maf_filter from plink as population_level_maf_filter with:
     log:
         "subject_level/{population}/subjects_maf{maf}.log",
     group:
-        "{population}_concordance"
+        "{population}_concordance_filter"
 
 
 use rule ld from plink as population_level_ld_estimate with:
@@ -249,7 +246,7 @@ use rule ld from plink as population_level_ld_estimate with:
     log:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate.log",
     group:
-        "{population}_concordance"
+        "{population}_concordance_filter"
 
 
 use rule ld_filter from plink as population_level_ld_pruned with:
@@ -268,7 +265,7 @@ use rule ld_filter from plink as population_level_ld_pruned with:
     log:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}.log",
     group:
-        "{population}_concordance"
+        "{population}_concordance_filter"
 
 
 use rule genome from plink as population_level_ibd with:
@@ -282,8 +279,6 @@ use rule genome from plink as population_level_ibd with:
         out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd",
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd.genome",
-    group:
-        "{population}_concordance"
 
 
 rule population_level_concordance_plink:
@@ -334,8 +329,6 @@ rule population_level_related_subjects:
     output:
         relatives="subject_level/{population}/relatives.csv",
         to_remove="subject_level/{population}/related_subjects_to_remove.txt",
-    group:
-        "{population}_relatives"
     script:
         "../scripts/related_subjects.py"
 
@@ -355,8 +348,6 @@ use rule remove_ids from plink as population_level_remove_related_subjects with:
         nosex="subject_level/{population}/subjects_unrelated.nosex",
     log:
         "subject_level/{population}/subjects_unrelated.log",
-    group:
-        "{population}_relatives"
 
 
 # PCA
@@ -376,7 +367,7 @@ use rule maf_filter from plink as population_level_unrelated_maf_filter with:
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}.log",
     group:
-        "{population}_pca"
+        "{population}_pca_filter"
 
 
 use rule ld from plink as population_level_unrelated_ld_estimate with:
@@ -396,11 +387,11 @@ use rule ld from plink as population_level_unrelated_ld_estimate with:
         to_remove=temp(
             "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.prune.out"
         ),
-        nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.nosex",
+        nosex=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.nosex"),
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.log",
     group:
-        "{population}_pca"
+        "{population}_pca_filter"
 
 
 use rule ld_filter from plink as population_level_unrelated_ld_pruned with:
@@ -419,7 +410,7 @@ use rule ld_filter from plink as population_level_unrelated_ld_pruned with:
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
     group:
-        "{population}_pca"
+        "{population}_pca_filter"
 
 
 use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped with:
@@ -494,8 +485,6 @@ rule plot_pca:
         population="{population}",
     output:
         "subject_level/pca_plots/{population}.png",
-    group:
-        "{population}_pca"
     script:
         "../scripts/plot_pca.py"
 
@@ -510,8 +499,6 @@ use rule het from plink as population_level_autosomal_heterozygosity with:
         out_prefix="subject_level/{population}/subjects",
     output:
         "subject_level/{population}/subjects.het",
-    group:
-        "{population}_het"
 
 
 rule plot_autosomal_heterozygosity:
@@ -523,8 +510,6 @@ rule plot_autosomal_heterozygosity:
         threshold=cfg.config.software_params.autosomal_het_threshold,
     output:
         "subject_level/autosomal_heterozygosity_plots/{population}.png",
-    group:
-        "{population}_het"
     script:
         "../scripts/plot_autosomal_heterozygosity.py"
 
@@ -652,8 +637,6 @@ use rule keep_ids from plink as pull_population_unrelated_controls with:
         bim="subject_level/{population}/controls_unrelated.bim",
         fam="subject_level/{population}/controls_unrelated.fam",
         nosex="subject_level/{population}/controls_unrelated.nosex",
-    group:
-        "{population}_controls"
     log:
         "subject_level/{population}/controls_unrelated.log",
 
@@ -674,7 +657,7 @@ use rule maf_filter from plink as population_level_unrelated_controls_maf_filter
     log:
         "subject_level/{population}/controls_unrelated_maf{maf}.log",
     group:
-        "{population}_controls"
+        "{population}_controls_filter"
 
 
 use rule snps_only_filter from plink as keep_only_snps with:
@@ -692,7 +675,7 @@ use rule snps_only_filter from plink as keep_only_snps with:
     log:
         "subject_level/{population}/controls_unrelated_maf{maf}_snps.log",
     group:
-        "{population}_controls"
+        "{population}_controls_filter"
 
 
 use rule autosome_only_filter from plink as keep_only_autosomal_variants with:
@@ -710,7 +693,7 @@ use rule autosome_only_filter from plink as keep_only_autosomal_variants with:
     log:
         "subject_level/{population}/controls_unrelated_maf{maf}_snps_autosome.log",
     group:
-        "{population}_controls"
+        "{population}_controls_filter"
 
 
 use rule hwe from plink as population_level_unrelated_controls_hwe with:
@@ -723,7 +706,7 @@ use rule hwe from plink as population_level_unrelated_controls_hwe with:
     output:
         "subject_level/{population}/controls_unrelated_maf{maf}_snps_autosome.hwe",
     group:
-        "{population}_controls"
+        "{population}_controls_filter"
 
 
 rule plot_hwe:
@@ -737,8 +720,6 @@ rule plot_hwe:
         population="{population}",
     output:
         "subject_level/hwe_plots/{population}.png",
-    group:
-        "{population}_controls"
     script:
         "../scripts/plot_hwe.py"
 
