@@ -225,8 +225,6 @@ use rule maf_filter from plink as population_level_maf_filter with:
         nosex=temp("subject_level/{population}/subjects_maf{maf}.nosex"),
     log:
         "subject_level/{population}/subjects_maf{maf}.log",
-    group:
-        "{population}_concordance_filter"
 
 
 use rule ld from plink as population_level_ld_estimate with:
@@ -245,8 +243,6 @@ use rule ld from plink as population_level_ld_estimate with:
         nosex=temp("subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate.nosex"),
     log:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate.log",
-    group:
-        "{population}_concordance_filter"
 
 
 use rule ld_filter from plink as population_level_ld_pruned with:
@@ -264,8 +260,6 @@ use rule ld_filter from plink as population_level_ld_pruned with:
         nosex="subject_level/{population}/subjects_maf{maf}_ld{ld}.nosex",
     log:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}.log",
-    group:
-        "{population}_concordance_filter"
 
 
 use rule genome from plink as population_level_ibd with:
@@ -366,8 +360,6 @@ use rule maf_filter from plink as population_level_unrelated_maf_filter with:
         nosex=temp("subject_level/{population}/subjects_unrelated_maf{maf}.nosex"),
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}.log",
-    group:
-        "{population}_pca_filter"
 
 
 use rule ld from plink as population_level_unrelated_ld_estimate with:
@@ -390,8 +382,6 @@ use rule ld from plink as population_level_unrelated_ld_estimate with:
         nosex=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.nosex"),
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_estimate.log",
-    group:
-        "{population}_pca_filter"
 
 
 use rule ld_filter from plink as population_level_unrelated_ld_pruned with:
@@ -409,8 +399,6 @@ use rule ld_filter from plink as population_level_unrelated_ld_pruned with:
         nosex="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.nosex",
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.log",
-    group:
-        "{population}_pca_filter"
 
 
 use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped with:
@@ -425,8 +413,6 @@ use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped with:
         out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed",
     log:
         "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed.log",
-    group:
-        "{population}_pca"
 
 
 rule trim_ids:
@@ -441,8 +427,6 @@ rule trim_ids:
         map_=temp(
             "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_trimmed.map"
         ),
-    group:
-        "{population}_pca"
     script:
         "../scripts/trim_ped_map_ids.py"
 
@@ -456,8 +440,6 @@ use rule convert from eigensoft as population_level_unrelated_convert_to_eigenso
         gen=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.gen"),
         snp=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.snp"),
         ind=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.ind"),
-    group:
-        "{population}_pca"
 
 
 use rule smartpca from eigensoft as population_level_unrelated_smartpca with:
@@ -468,8 +450,6 @@ use rule smartpca from eigensoft as population_level_unrelated_smartpca with:
     output:
         par=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.pca.par"),
         eigenvec="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}.eigenvec",
-    group:
-        "{population}_pca"
 
 
 rule plot_pca:

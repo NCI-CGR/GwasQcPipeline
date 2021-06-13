@@ -95,8 +95,6 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
         nosex=temp("sample_level/call_rate_1/samples_p1.nosex"),
     log:
         "sample_level/call_rate_1/samples_p1.log",
-    group:
-        "call_rate_filter_1"
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
@@ -114,8 +112,6 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
         nosex="sample_level/call_rate_1/samples.nosex",
     log:
         "sample_level/call_rate_1/samples.log",
-    group:
-        "call_rate_filter_1"
 
 
 use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
@@ -133,8 +129,6 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
         nosex=temp("sample_level/call_rate_2/samples_p1.nosex"),
     log:
         "sample_level/call_rate_2/samples_p1.log",
-    group:
-        "call_rate_filter_2"
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
@@ -152,8 +146,6 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
         nosex="sample_level/call_rate_2/samples.nosex",
     log:
         "sample_level/call_rate_2/samples.log",
-    group:
-        "call_rate_filter_2"
 
 
 # -------------------------------------------------------------------------------
@@ -257,8 +249,6 @@ use rule maf_filter from plink as sample_level_maf_filter with:
         nosex=temp("sample_level/call_rate_2/samples_maf{maf}.nosex"),
     log:
         "sample_level/call_rate_2/samples_maf{maf}.log",
-    group:
-        "plink_concordance_filter"
 
 
 use rule ld from plink as sample_level_ld_estimate with:
@@ -275,8 +265,6 @@ use rule ld from plink as sample_level_ld_estimate with:
         nosex=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex"),
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
-    group:
-        "plink_concordance_filter"
 
 
 use rule ld_filter from plink as sample_level_ld_pruned with:
@@ -294,8 +282,6 @@ use rule ld_filter from plink as sample_level_ld_pruned with:
         nosex="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.nosex",
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.log",
-    group:
-        "plink_concordance_filter"
 
 
 use rule genome from plink as sample_level_ibd with:
