@@ -126,19 +126,29 @@ class InternalControls:
 
     @classmethod
     def construct(cls, sample_qc: pd.DataFrame, replicates: pd.DataFrame):
+        # List of internal controls that passed QC steps.
+        ic_pass = sample_qc.query(  # type: ignore # noqa
+            "is_internal_control"
+            " & not is_sample_exclusion"
+            " & not is_call_rate_filtered"
+            " & not is_contaminated"
+        ).Sample_ID.tolist()
+
         return cls(
             sample_qc.is_internal_control.sum(),
+            sample_qc.query("Sample_ID == @ic_pass").shape[0],
             sample_qc.query(
-                "is_internal_control"
-                " & not is_sample_exclusion"
+                "not is_sample_exclusion"
                 " & not is_call_rate_filtered"
                 " & not is_contaminated"
+                " & not is_internal_control"
             ).shape[0],
-            sample_qc.query(
-                "not is_call_rate_filtered " "& not is_contaminated " "& not is_internal_control"
-            ).shape[0],
-            replicates.PLINK_concordance.min(),
-            replicates.PLINK_concordance.mean(),
+            replicates.query(
+                "Sample_ID1 == @is_pass & Sample_ID2 == @ic_pass"
+            ).PLINK_concordance.min(),
+            replicates.query(
+                "Sample_ID1 == @is_pass & Sample_ID2 == @ic_pass"
+            ).PLINK_concordance.mean(),
         )
 
 
