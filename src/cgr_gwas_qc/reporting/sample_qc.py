@@ -119,6 +119,7 @@ class Contamination:
 @dataclass
 class InternalControls:
     num_internal_controls: int
+    num_internal_controls_pass: int
     num_remaining: int
     min_concordance: float
     mean_concordance: float
@@ -127,6 +128,12 @@ class InternalControls:
     def construct(cls, sample_qc: pd.DataFrame, replicates: pd.DataFrame):
         return cls(
             sample_qc.is_internal_control.sum(),
+            sample_qc.query(
+                "is_internal_control"
+                " & not is_sample_exclusion"
+                " & not is_call_rate_filtered"
+                " & not is_contaminated"
+            ).shape[0],
             sample_qc.query(
                 "not is_call_rate_filtered " "& not is_contaminated " "& not is_internal_control"
             ).shape[0],

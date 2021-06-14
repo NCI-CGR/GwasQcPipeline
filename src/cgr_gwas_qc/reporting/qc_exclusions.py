@@ -47,8 +47,8 @@ def _create_sample_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
         "is_array_processing_failure": "Array Processing Failure",  # added below
         "is_cr1_filtered": "Completion Rate 1st Filter",
         "is_cr2_filtered": "Completion Rate 2nd Filter",
-        "is_contaminated": "Contaminated",
-        "is_internal_control": "Internal QC Samples Removed",
+        "contam_pass_cr": "Contaminated",
+        "internal_control_pass": "Internal QC Samples Removed",
         "samples_remaining": "Samples Remaining for Analysis",  # added below
         "dropped_replicate": "Expected Duplicates Removed",  # added below
         "is_subject_representative": "Subjects Remaining",
@@ -66,6 +66,13 @@ def _create_sample_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
         df.assign(is_array_processing_failure=lambda x: x.is_missing_idats | x.is_missing_gtc)
         .assign(samples_remaining=lambda x: ~x.analytic_exclusion & ~x.is_internal_control)
         .assign(dropped_replicate=lambda x: x.samples_remaining & ~x.is_subject_representative)
+        .assign(contam_pass_cr=lambda x: x.is_contaminated & ~x.is_call_rate_filtered)
+        .assign(
+            internal_qc_pass=lambda x: x.is_internal_control
+            & ~x.is_sample_exclusion
+            & ~x.is_contaminated
+            & ~x.is_call_rate_filtered
+        )
         .reindex(["case_control", *row_names.keys()], axis=1)  # pull out desired columns
         .groupby("case_control")
         .sum()  # Count the number True
