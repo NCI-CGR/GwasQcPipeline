@@ -31,6 +31,12 @@ def main(
     ),
     dry_run: bool = typer.Option(False, help="Perform a dry-run but don't submit."),
     notemp: bool = typer.Option(False, help="Turn off temporary file deletion."),
+    local_mem_mb: int = typer.Option(
+        1024 ** 8, help="The amount of memory to use for main snakemake process and local rules."
+    ),
+    local_tasks: int = typer.Option(
+        4, help="The number of threads for the main snakemake process and local rules."
+    ),
 ):
     """Run CGR GwasQcPipeline on a cluster."""
 
@@ -44,8 +50,8 @@ def main(
         "cgems": cgems,
         "biowulf": biowulf,
         "time_hr": time_hr,
-        "local_mem_mb": 1024 * 8,
-        "local_tasks": 4,
+        "local_mem_mb": local_mem_mb,
+        "local_tasks": local_tasks,
         "added_options": "",
     }
     snake_config = {"cluster_mode": True, "notemp": False}

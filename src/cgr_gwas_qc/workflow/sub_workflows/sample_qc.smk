@@ -7,6 +7,23 @@ use_contamination = (
     and cfg.config.user_files.gtc_pattern
     and cfg.config.workflow_params.remove_contam
 )
+
+
+localrules:
+    all_sample_qc,
+    sample_concordance_plink,
+    sample_concordance_summary,
+    split_sample_concordance,
+    snp_qc_table,
+    sample_level_sexcheck,
+    sample_qc_table,
+    sample_qc_summary_stats,
+    sample_lists_from_qc_flags,
+    plot_call_rate,
+    plot_chrx_inbreeding,
+    plot_ancestry,
+
+
 ################################################################################
 # Sample QC Targets
 ################################################################################
@@ -78,8 +95,6 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
         nosex=temp("sample_level/call_rate_1/samples_p1.nosex"),
     log:
         "sample_level/call_rate_1/samples_p1.log",
-    group:
-        "call_rate_filters"
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
@@ -97,8 +112,6 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
         nosex="sample_level/call_rate_1/samples.nosex",
     log:
         "sample_level/call_rate_1/samples.log",
-    group:
-        "call_rate_filters"
 
 
 use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
@@ -116,8 +129,6 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
         nosex=temp("sample_level/call_rate_2/samples_p1.nosex"),
     log:
         "sample_level/call_rate_2/samples_p1.log",
-    group:
-        "call_rate_filters"
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
@@ -135,8 +146,6 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
         nosex="sample_level/call_rate_2/samples.nosex",
     log:
         "sample_level/call_rate_2/samples.log",
-    group:
-        "call_rate_filters"
 
 
 # -------------------------------------------------------------------------------
@@ -152,8 +161,6 @@ use rule miss from plink as plink_call_rate_initial with:
     output:
         imiss="sample_level/samples.imiss",
         lmiss="sample_level/samples.lmiss",
-    group:
-        "sample_qc"
 
 
 use rule miss from plink as plink_call_rate_post1 with:
@@ -166,8 +173,6 @@ use rule miss from plink as plink_call_rate_post1 with:
     output:
         imiss="sample_level/call_rate_1/samples.imiss",
         lmiss="sample_level/call_rate_1/samples.lmiss",
-    group:
-        "sample_qc"
 
 
 use rule miss from plink as plink_call_rate_post2 with:
@@ -180,33 +185,34 @@ use rule miss from plink as plink_call_rate_post2 with:
     output:
         imiss="sample_level/call_rate_2/samples.imiss",
         lmiss="sample_level/call_rate_2/samples.lmiss",
-    group:
-        "sample_qc"
 
 
 # -------------------------------------------------------------------------------
 # Contamination
 # -------------------------------------------------------------------------------
-rule sample_contamination_verifyIDintensity:
-    """Aggregate sample contamination scores.
+if use_contamination:
 
-    Aggregates sample level contamination scores into a single file (each
-    row is a sample). The script sets ``%Mix`` to ``NA`` if the intensity
-    is below the threshold and the file is not in the ``imiss`` file.
-    """
-    input:
-        contamination_file="sample_level/contamination/verifyIDintensity.csv",
-        median_intensity_file="sample_level/contamination/median_idat_intensity.csv",
-        imiss_file=rules.plink_call_rate_post2.output.imiss,
-    params:
-        intensity_threshold=cfg.config.software_params.intensity_threshold,
-        contam_threshold=cfg.config.software_params.contam_threshold,
-    output:
-        "sample_level/contamination/summary.csv",
-    group:
-        "sample_qc"
-    script:
-        "../scripts/agg_contamination.py"
+    localrules:
+        sample_contamination_verifyIDintensity,
+
+    rule sample_contamination_verifyIDintensity:
+        """Aggregate sample contamination scores.
+
+        Aggregates sample level contamination scores into a single file (each
+        row is a sample). The script sets ``%Mix`` to ``NA`` if the intensity
+        is below the threshold and the file is not in the ``imiss`` file.
+        """
+        input:
+            contamination_file="sample_level/contamination/verifyIDintensity.csv",
+            median_intensity_file="sample_level/contamination/median_idat_intensity.csv",
+            imiss_file=rules.plink_call_rate_post2.output.imiss,
+        params:
+            intensity_threshold=cfg.config.software_params.intensity_threshold,
+            contam_threshold=cfg.config.software_params.contam_threshold,
+        output:
+            "sample_level/contamination/summary.csv",
+        script:
+            "../scripts/agg_contamination.py"
 
 
 # -------------------------------------------------------------------------------
@@ -243,8 +249,6 @@ use rule maf_filter from plink as sample_level_maf_filter with:
         nosex=temp("sample_level/call_rate_2/samples_maf{maf}.nosex"),
     log:
         "sample_level/call_rate_2/samples_maf{maf}.log",
-    group:
-        "replicate_concordance"
 
 
 use rule ld from plink as sample_level_ld_estimate with:
@@ -258,11 +262,9 @@ use rule ld from plink as sample_level_ld_estimate with:
     output:
         to_keep=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.in"),  # Markers in approx. linkage equilibrium
         to_remove=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.prune.out"),  # Markers in LD
-        nosex="sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex",
+        nosex=temp("sample_level/call_rate_2/samples_maf{maf}_ld{ld}.nosex"),
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.log",
-    group:
-        "replicate_concordance"
 
 
 use rule ld_filter from plink as sample_level_ld_pruned with:
@@ -280,8 +282,6 @@ use rule ld_filter from plink as sample_level_ld_pruned with:
         nosex="sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.nosex",
     log:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}_pruned.log",
-    group:
-        "replicate_concordance"
 
 
 use rule genome from plink as sample_level_ibd with:
@@ -295,8 +295,6 @@ use rule genome from plink as sample_level_ibd with:
         out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
     output:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
-    group:
-        "replicate_concordance"
 
 
 rule sample_concordance_plink:
@@ -314,8 +312,6 @@ rule sample_concordance_plink:
         pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
     output:
         "sample_level/concordance/plink.csv",
-    group:
-        "replicate_concordance"
     script:
         "../scripts/concordance_table.py"
 
@@ -331,8 +327,6 @@ use rule extract_fingerprint_snps from graf as graf_extract_fingerprint_snps wit
         "sample_level/call_rate_2/samples_1kg_rsID.fpg",
     log:
         "sample_level/call_rate_2/samples_1kg_rsID.fpg.log",
-    group:
-        "replicate_concordance"
 
 
 use rule relatedness from graf as sample_concordance_graf with:
@@ -342,8 +336,6 @@ use rule relatedness from graf as sample_concordance_graf with:
         "sample_level/concordance/graf.tsv",
     log:
         "sample_level/concordance/graf.log",
-    group:
-        "replicate_concordance"
 
 
 rule sample_concordance_king:
@@ -363,8 +355,6 @@ rule sample_concordance_king:
         cfg.conda("king")
     log:
         "sample_level/concordance/king.log",
-    group:
-        "replicate_concordance"
     threads: 8
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
@@ -390,8 +380,6 @@ rule sample_concordance_summary:
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * 2 * attempt,
         time_hr=lambda wildcards, attempt: 2 * attempt,
-    group:
-        "replicate_concordance"
     script:
         "../scripts/sample_concordance.py"
 
@@ -404,8 +392,6 @@ rule split_sample_concordance:
         known_qc_csv="sample_level/concordance/InternalQcKnown.csv",
         known_study_csv="sample_level/concordance/StudySampleKnown.csv",
         unknown_csv="sample_level/concordance/UnknownReplicates.csv",
-    group:
-        "replicate_concordance"
     script:
         "../scripts/split_sample_concordance.py"
 
@@ -420,8 +406,6 @@ use rule populations from graf as graf_populations with:
         "sample_level/ancestry/graf_populations.txt",
     log:
         "sample_level/ancestry/graf_populations.log",
-    group:
-        "ancestry"
 
 
 use rule ancestry from graf as graf_ancestry with:
@@ -429,8 +413,6 @@ use rule ancestry from graf as graf_ancestry with:
         rules.graf_populations.output[0],
     output:
         "sample_level/ancestry/graf_ancestry.txt",
-    group:
-        "ancestry"
 
 
 # -------------------------------------------------------------------------------
@@ -444,8 +426,6 @@ rule snp_qc_table:
         thousand_genomes=rules.update_samples_to_1kg_rsIDs.output.id_map,
     output:
         "sample_level/snp_qc.csv",
-    group:
-        "sample_qc"
     script:
         "../scripts/snp_qc_table.py"
 
@@ -462,8 +442,6 @@ use rule sexcheck from plink as sample_level_sexcheck with:
         out_prefix="sample_level/call_rate_1/samples",
     output:
         "sample_level/call_rate_1/samples.sexcheck",
-    group:
-        "sample_qc"
 
 
 def _contam(wildcards):
@@ -496,8 +474,6 @@ rule sample_qc_table:
         remove_rep_discordant=cfg.config.workflow_params.remove_rep_discordant,
     output:
         "sample_level/sample_qc.csv",
-    group:
-        "sample_qc"
     script:
         "../scripts/sample_qc_table.py"
 
@@ -507,8 +483,6 @@ rule sample_qc_summary_stats:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/summary_stats.txt",
-    group:
-        "sample_qc"
     script:
         "../scripts/sample_qc_summary_stats.py"
 
@@ -522,8 +496,6 @@ rule sample_lists_from_qc_flags:
         sex="sample_level/qc_failures/sex_discordant.txt",
         rep="sample_level/qc_failures/replicate_discordant.txt",
         ctrl="sample_level/internal_controls.txt",
-    group:
-        "sample_qc"
     script:
         "../scripts/sample_lists_from_qc_flags.py"
 
@@ -542,8 +514,6 @@ rule plot_call_rate:
         snp_cr2=cfg.config.software_params.snp_call_rate_2,
     output:
         "sample_level/call_rate.png",
-    group:
-        "sample_qc"
     script:
         "../scripts/plot_call_rate.py"
 
@@ -553,8 +523,6 @@ rule plot_chrx_inbreeding:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/chrx_inbreeding.png",
-    group:
-        "sample_qc"
     script:
         "../scripts/plot_chrx_inbreeding.py"
 
@@ -564,7 +532,5 @@ rule plot_ancestry:
         rules.sample_qc_table.output[0],
     output:
         "sample_level/ancestry.png",
-    group:
-        "sample_qc"
     script:
         "../scripts/plot_ancestry.py"
