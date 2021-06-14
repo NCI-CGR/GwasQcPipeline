@@ -556,6 +556,7 @@ def compare_sample_analytic_exclusions(legacy_dir: Path):
         typer.secho("Please carefully check this table\n", fg=YELLOW)
         mask = legacy != dev
         typer.secho(pd.concat([legacy[mask], dev[mask]], axis=1).to_string())
+        typer.secho(f"Number of differences {mask.sum():,}")
 
 
 def _legacy_selected_subjects(filename):
@@ -642,6 +643,7 @@ def compare_subject_analytic_exclusions(legacy_dir: Path):
         typer.secho("Please carefully check this table\n", fg=YELLOW)
         mask = legacy != dev
         typer.secho(pd.concat([legacy[mask], dev[mask]], axis=1).to_string())
+        typer.secho(f"Number of differences {mask.sum():,}")
 
 
 def _legacy_table_4a(exclusions, remaining):
