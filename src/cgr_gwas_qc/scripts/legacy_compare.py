@@ -7,7 +7,7 @@ from typing import Any, Set
 
 import pandas as pd
 import typer
-from pandas.testing import assert_series_equal
+from pandas.testing import assert_frame_equal, assert_series_equal
 from scipy.stats import pearsonr
 from typer.colors import BLUE, BRIGHT_CYAN, GREEN, MAGENTA, RED, WHITE, YELLOW
 
@@ -74,6 +74,12 @@ def main(
         typer.secho("\n# Check Subject Level Results", fg=BRIGHT_CYAN)
         compare_selected_subjects(legacy_dir)
         compare_subject_analytic_exclusions(legacy_dir)
+
+        typer.secho("\n# Compared Table 4a", fg=BRIGHT_CYAN)
+        compare_4a(legacy_dir)
+
+        typer.secho("\n# Compared Table 4b", fg=BRIGHT_CYAN)
+        compare_4b(legacy_dir)
 
 
 def _compare_config_values(legacy, current, name, problems):
@@ -540,16 +546,16 @@ def _sample_level_exclusions(filename):
 
 
 def compare_sample_analytic_exclusions(legacy_dir: Path):
-    typer.secho("\n## Sample Exclusion Summary", fg=MAGENTA)
+    typer.secho("\n## Exclusion Summary By Sample", fg=MAGENTA)
     legacy = _legacy_sample_level_exclusions(legacy_dir / "all_sample_qc.csv")
     dev = _sample_level_exclusions("sample_level/sample_qc.csv")
     try:
         assert_series_equal(legacy, dev, check_names=False, check_dtype=False)
-        typer.secho("Sample Analytic Exclusions Match", fg=GREEN)
+        typer.secho("Per Sample Analytic Exclusions Match", fg=GREEN)
     except AssertionError:
         typer.secho("Please carefully check this table\n", fg=YELLOW)
-        table = pd.crosstab(legacy, dev, margins=True, margins_name="Total").to_string()
-        typer.secho(table)
+        mask = legacy != dev
+        typer.secho(pd.concat([legacy[mask], dev[mask]], axis=1).to_string())
 
 
 def _legacy_selected_subjects(filename):
@@ -603,6 +609,7 @@ def _legacy_subject_level_exclusions(filename):
         .astype({**{k: bool for k in exclusion_criteria.keys()}})
         .assign(Legacy_Exclusions=lambda x: _get_reason(x, exclusion_criteria))
         .Legacy_Exclusions.sort_index()
+        .fillna("")
     )
 
 
@@ -619,22 +626,107 @@ def _subject_level_exclusions(filename):
         .set_index("Sample_ID")
         .assign(Production_Exclusions=lambda x: _get_reason(x, exclusion_criteria))
         .Production_Exclusions.sort_index()
+        .fillna("")
     )
 
 
 def compare_subject_analytic_exclusions(legacy_dir: Path):
-    typer.secho("\n## Subject Exclusion Summary", fg=MAGENTA)
+    typer.secho("\n## Exclusion Summary By Subject", fg=MAGENTA)
     legacy = _legacy_subject_level_exclusions(legacy_dir / "all_sample_qc.csv")
     dev = _subject_level_exclusions("subject_level/subject_qc.csv")
+    legacy = legacy.reindex(dev.index)  # drop samples that are  not subjects
     try:
-        assert_series_equal(legacy.reindex(dev.index), dev, check_names=False)
-        typer.secho("Subject Analytic Exclusions Match", fg=GREEN)
+        assert_series_equal(legacy, dev, check_names=False)
+        typer.secho("Per Subject Analytic Exclusions Match", fg=GREEN)
     except AssertionError:
         typer.secho("Please carefully check this table\n", fg=YELLOW)
-        table = pd.crosstab(
-            legacy.reindex(dev), dev, margins=True, margins_name="Total"
-        ).to_string()
-        typer.secho(table)
+        mask = legacy != dev
+        typer.secho(pd.concat([legacy[mask], dev[mask]], axis=1).to_string())
+
+
+def _legacy_table_4a(exclusions, remaining):
+    counts = (
+        pd.read_csv(exclusions)
+        .set_index("Reason")
+        .rename_axis("Filter Reason/Description")
+        .drop(["SexDiscordant", "UnexpectedReplicates", "AutosomalHet"])
+        .rename({"Total": "All Samples"}, axis=1)
+    )
+
+    totals = (
+        pd.read_csv(remaining)
+        .set_index("ExlusionPriorToCounts")
+        .rename_axis("Filter Reason/Description")
+        .reindex(["InternalQC", "SubjectLevel"])
+        .rename(
+            index={
+                "InternalQC": "Samples Remaining for Analysis",
+                "SubjectLevel": "Subjects Remaining",
+            },
+            columns={"Total": "All Samples"},
+        )
+    )
+
+    return counts.append(totals)
+
+
+def _table_4a(sample_qc_csv):
+    from cgr_gwas_qc.reporting.qc_exclusions import sample_exclusion_counts
+
+    return sample_exclusion_counts(sample_qc_csv).drop("User Excluded")
+
+
+def compare_4a(legacy_dir: Path):
+    legacy = _legacy_table_4a(
+        legacy_dir / "counts/exclusion_counts.csv", legacy_dir / "counts/remaining_counts.csv"
+    )
+    dev = _table_4a("sample_level/sample_qc.csv")
+    try:
+        assert_frame_equal(legacy.reindex(dev.index), dev, check_dtype=False)
+        typer.secho("Table 4a Matches Exactly", fg=GREEN)
+    except AssertionError:
+        typer.secho("Please carefully check this table\n", fg=YELLOW)
+        typer.secho("\n## Legacy\n", fg=MAGENTA)
+        typer.secho(legacy.reindex(dev.index).to_string())
+        typer.secho("\n## DEV\n", fg=MAGENTA)
+        typer.secho(dev.to_string())
+
+
+def _legacy_table_4b(exclusions):
+    return (
+        pd.read_csv(exclusions)
+        .set_index("Reason")
+        .rename_axis("Filter Reason/Description")
+        .reindex(["SexDiscordant", "UnexpectedReplicates", "AutosomalHet"])
+        .rename(
+            index={
+                "SexDiscordant": "Sex Discordant",
+                "UnexpectedReplicates": "Unexpected Replicates",
+                "AutosomalHet": "Autosomal Het",
+            },
+            columns={"Total": "All Subjects"},
+        )
+    )
+
+
+def _table_4b(subject_qc_csv, population_qc_csv):
+    from cgr_gwas_qc.reporting.qc_exclusions import subject_exclusion_counts
+
+    return subject_exclusion_counts(subject_qc_csv, population_qc_csv)
+
+
+def compare_4b(legacy_dir: Path):
+    legacy = _legacy_table_4b(legacy_dir / "counts/exclusion_counts.csv")
+    dev = _table_4b("subject_level/subject_qc.csv", "subject_level/population_qc.csv")
+    try:
+        assert_frame_equal(legacy.reindex(dev.index), dev, check_dtype=False)
+        typer.secho("Table 4b Matches Exactly", fg=GREEN)
+    except AssertionError:
+        typer.secho("Please carefully check this table\n", fg=YELLOW)
+        typer.secho("\n## Legacy\n", fg=MAGENTA)
+        typer.secho(legacy.reindex(dev.index).to_string())
+        typer.secho("\n## DEV\n", fg=MAGENTA)
+        typer.secho(dev.to_string())
 
 
 if __name__ == "__main__":
