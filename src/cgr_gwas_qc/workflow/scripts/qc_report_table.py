@@ -132,6 +132,11 @@ def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLik
     )
     return (
         sample_concordance.read(sample_concordance_csv)
+        .pipe(
+            lambda x: x[
+                x.PLINK_PI_HAT.notna() | (x.GRAF_relationship.notna() & x.KING_relationship.notna())
+            ]
+        )  # Keep if we have results from plink or both GRAF and KING. This will limit the number of rows.
         .merge(ancestry.rename_axis("Sample_ID1").rename("Ancestry1"), on="Sample_ID1", how="left")
         .merge(ancestry.rename_axis("Sample_ID2").rename("Ancestry2"), on="Sample_ID2", how="left")
         .merge(
