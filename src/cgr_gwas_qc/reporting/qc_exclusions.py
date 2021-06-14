@@ -68,7 +68,7 @@ def _create_sample_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
         .assign(dropped_replicate=lambda x: x.samples_remaining & ~x.is_subject_representative)
         .assign(contam_pass_cr=lambda x: x.is_contaminated & ~x.is_call_rate_filtered)
         .assign(
-            internal_qc_pass=lambda x: x.is_internal_control
+            internal_control_pass=lambda x: x.is_internal_control
             & ~x.is_sample_exclusion
             & ~x.is_contaminated
             & ~x.is_call_rate_filtered
