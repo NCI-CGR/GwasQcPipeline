@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0rc3 documentation</title>
+  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0rc4 documentation</title>
   
 
   
@@ -196,7 +196,7 @@
 <span id="config"></span><h2>Config<a class="headerlink" href="#module-cgr_gwas_qc.cli.config" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="cgr_gwas_qc.cli.config.main">
-<code class="sig-prename descclassname">cgr_gwas_qc.cli.config.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">sample_sheet: pathlib.Path = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">project_name: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/config.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.config.main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.config.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">sample_sheet: pathlib.Path = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">project_name: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">bpm_file: Optional[pathlib.Path] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">genome_build: cgr_gwas_qc.models.config.GenomeBuild = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/config.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.config.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Gwas Qc Pipeline config file in the current working directory.</p>
 </dd></dl>
 
@@ -273,7 +273,7 @@ pattern is extended using the columns in the sample sheet.</p>
 <span id="submit"></span><h2>Submit<a class="headerlink" href="#module-cgr_gwas_qc.cli.submit" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="cgr_gwas_qc.cli.submit.main">
-<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">biowulf: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cluster_profile: Optional[pathlib.Path] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">subworkflow: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">time_hr: int = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">queue: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">submission_cmd: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">dry_run: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">notemp: bool = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.submit.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">biowulf: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cluster_profile: Optional[pathlib.Path] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">subworkflow: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">time_hr: int = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">queue: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">submission_cmd: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">dry_run: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">notemp: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">local_mem_mb: int = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">local_tasks: int = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/submit.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.submit.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run CGR GwasQcPipeline on a cluster.</p>
 </dd></dl>
 

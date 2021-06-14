@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.cli.submit &mdash; GwasQcPipeline 1.0.0rc3 documentation</title>
+  <title>cgr_gwas_qc.cli.submit &mdash; GwasQcPipeline 1.0.0rc4 documentation</title>
   
 
   
@@ -207,6 +207,12 @@
     <span class="p">),</span>
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Perform a dry-run but don&#39;t submit.&quot;</span><span class="p">),</span>
     <span class="n">notemp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Turn off temporary file deletion.&quot;</span><span class="p">),</span>
+    <span class="n">local_mem_mb</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="mi">1024</span> <span class="o">**</span> <span class="mi">8</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The amount of memory to use for main snakemake process and local rules.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">local_tasks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Option</span><span class="p">(</span>
+        <span class="mi">4</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The number of threads for the main snakemake process and local rules.&quot;</span>
+    <span class="p">),</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Run CGR GwasQcPipeline on a cluster.&quot;&quot;&quot;</span>
 
@@ -220,8 +226,8 @@
         <span class="s2">&quot;cgems&quot;</span><span class="p">:</span> <span class="n">cgems</span><span class="p">,</span>
         <span class="s2">&quot;biowulf&quot;</span><span class="p">:</span> <span class="n">biowulf</span><span class="p">,</span>
         <span class="s2">&quot;time_hr&quot;</span><span class="p">:</span> <span class="n">time_hr</span><span class="p">,</span>
-        <span class="s2">&quot;local_mem_mb&quot;</span><span class="p">:</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
-        <span class="s2">&quot;local_tasks&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;local_mem_mb&quot;</span><span class="p">:</span> <span class="n">local_mem_mb</span><span class="p">,</span>
+        <span class="s2">&quot;local_tasks&quot;</span><span class="p">:</span> <span class="n">local_tasks</span><span class="p">,</span>
         <span class="s2">&quot;added_options&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">snake_config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cluster_mode&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;notemp&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>

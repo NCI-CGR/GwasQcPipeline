@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration &mdash; GwasQcPipeline 1.0.0rc3 documentation</title>
+  <title>Configuration &mdash; GwasQcPipeline 1.0.0rc4 documentation</title>
   
 
   
@@ -229,7 +229,7 @@ schema and implementing data validation.</p>
 <td colspan="2"><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>v1.0.0-rc.3</p></td>
+<td colspan="2"><p>v1.0.0-rc.4</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
 <li><p>project_name</p></li>
@@ -261,6 +261,20 @@ schema and implementing data validation.</p>
 </tr>
 <tr class="row-even"><td><p>format</p></td>
 <td colspan="2"><p>path</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>genome_build</p></li>
+</ul>
+</td>
+<td><p>default</p></td>
+<td colspan="2"><p>hg37</p></td>
+</tr>
+<tr class="row-even"><td><p>allOf</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p><span class="xref std std-ref">#/definitions/GenomeBuild</span></p></td>
 </tr>
 <tr class="row-odd"><td rowspan="2"><ul class="simple">
 <li><p><strong>snp_array</strong></p></li>
@@ -368,6 +382,20 @@ schema and implementing data validation.</p>
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-even"><td colspan="4"><p>definitions</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>GenomeBuild</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>GenomeBuild</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>An enumeration.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>enum</p></td>
+<td colspan="2"><p>hg37, hg38</p></td>
 </tr>
 <tr class="row-odd"><td rowspan="20"><ul class="simple">
 <li><p>ReferenceFiles</p></li>
