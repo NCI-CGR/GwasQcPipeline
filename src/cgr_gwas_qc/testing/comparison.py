@@ -188,3 +188,24 @@ def assert_legacy_dev_sample_qc_equal(legacy_file: PathLike, dev_file: PathLike)
     # This is different and not sure why. Probably b/c I am counting based on
     # PI_Subject_ID here and not SR_Subject_ID
     # assert_series_equal(legacy["Count_of_SR_SubjectID"], dev["num_samples_per_subject"])
+
+
+def assert_verifyIDintensity_equal(
+    legacy_file: PathLike, dev_file: PathLike, mix_atol=0.001, llk_atol=500, llk0_atol=500
+):
+    legacy = (
+        pd.read_csv(legacy_file)
+        .rename({"ID": "Sample_ID"}, axis=1)
+        .set_index("Sample_ID")
+        .sort_index()
+    )
+    dev = pd.read_csv(dev_file).set_index("Sample_ID").sort_index()
+    non_missing = legacy.notna().all(axis=1) & dev.notna().all(axis=1)
+
+    assert_series_equal(
+        legacy.loc[non_missing, "%Mix"], dev.loc[non_missing, "%Mix"], atol=mix_atol
+    )
+    assert_series_equal(legacy.loc[non_missing, "LLK"], dev.loc[non_missing, "LLK"], atol=llk_atol)
+    assert_series_equal(
+        legacy.loc[non_missing, "LLK0"], dev.loc[non_missing, "LLK0"], atol=llk0_atol
+    )

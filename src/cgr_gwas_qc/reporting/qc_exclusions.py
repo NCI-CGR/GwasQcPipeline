@@ -55,8 +55,8 @@ def _create_sample_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     col_names = {
-        "Control": "Controls",
-        "Case": "Cases",
+        "Control": "Control",
+        "Case": "Case",
         "QC": "QC",
         "Unknown": "Other",
         "total": "All Samples",  # added below
@@ -98,8 +98,8 @@ def _create_subject_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     col_names = {
-        "Control": "Controls",
-        "Case": "Cases",
+        "Control": "Control",
+        "Case": "Case",
         "QC": "QC",
         "Unknown": "Other",
         "total": "All Subjects",
@@ -119,8 +119,8 @@ def _create_population_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     col_names = {
-        "Control": "Controls",
-        "Case": "Cases",
+        "Control": "Control",
+        "Case": "Case",
         "QC": "QC",
         "Unknown": "Other",
         "total": "All Subjects",

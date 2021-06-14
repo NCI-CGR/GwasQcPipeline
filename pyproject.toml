@@ -59,6 +59,7 @@ Sphinx-Substitution-Extensions = "^2020.9.30"
 
 [tool.poetry.scripts]
 cgr = "cgr_gwas_qc.cli:app"
+legacy_compare = "cgr_gwas_qc.scripts.legacy_compare:app"
 
 [tool.isort]
 profile = "black"
