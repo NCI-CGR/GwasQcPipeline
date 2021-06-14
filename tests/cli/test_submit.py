@@ -159,10 +159,14 @@ def test_run_submit_with_right_command(cluster, cmd, tmp_path, mocker: MockerFix
             cgems=cgems,
             biowulf=biowulf,
             cluster_profile=cluster_profile,
+            subworkflow=None,
+            time_hr=12,
             queue=queue,
             submission_cmd=submission_cmd,
-            time_hr=12,
             dry_run=False,
+            notemp=False,
+            local_mem_mb=1024,
+            local_tasks=1,
         )
 
     spy.assert_called_once_with([cmd, ".snakemake/GwasQcPipeline_submission.sh"])
