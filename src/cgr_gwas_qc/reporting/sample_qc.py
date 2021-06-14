@@ -144,10 +144,10 @@ class InternalControls:
                 " & not is_internal_control"
             ).shape[0],
             replicates.query(
-                "Sample_ID1 == @is_pass & Sample_ID2 == @ic_pass"
+                "Sample_ID1 == @ic_pass & Sample_ID2 == @ic_pass"
             ).PLINK_concordance.min(),
             replicates.query(
-                "Sample_ID1 == @is_pass & Sample_ID2 == @ic_pass"
+                "Sample_ID1 == @ic_pass & Sample_ID2 == @ic_pass"
             ).PLINK_concordance.mean(),
         )
 
