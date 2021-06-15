@@ -24,7 +24,7 @@ DTYPES = {
 def read(
     filename: PathLike, remove_exclusions: bool = True, all_user_column: bool = True
 ) -> pd.DataFrame:
-    df = pd.read_csv(filename, dtype=DTYPES)
+    df = pd.read_csv(filename, dtype=DTYPES, low_memory=False)
 
     if not all_user_column:
         df = df.reindex(DTYPES.keys(), axis=1)
