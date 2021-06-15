@@ -3,6 +3,7 @@
 from collections import namedtuple
 from functools import partial
 from pathlib import Path
+from textwrap import dedent
 from typing import Any, Set
 
 import pandas as pd
@@ -212,6 +213,20 @@ def compare_config(config: Config, legacy_dir: Path, ignored_config: bool):
         _ignored_legacy_options(legacy_config)
 
 
+def _file_comparison(cmp):
+    try:
+        match = "File Hashes Match" if cmp.func.__name__ == "file_hashes_equal" else "File Match"
+        cmp.func(cmp.legacy, cmp.current)
+        typer.secho(f"{cmp.message} {match}", fg=GREEN)
+    except AssertionError:
+        typer.secho(f"{cmp.message} did not match ({cmp.legacy} vs {cmp.current}).", fg=RED)
+    except NotImplementedError:
+        typer.secho(
+            f"Cannot currently compare {cmp.message}",
+            fg=YELLOW,
+        )
+
+
 def compare_initial_plink(legacy_dir: Path):
     typer.secho("\n## Comparing Initial PLINK Files", fg=MAGENTA)
 
@@ -247,17 +262,7 @@ def compare_initial_plink(legacy_dir: Path):
             comparison.file_hashes_equal,
         ),
     ]
-    for cmp in files:
-        try:
-            cmp.func(cmp.legacy, cmp.current)
-            typer.secho(f"{cmp.message} Files Match", fg=GREEN)
-        except AssertionError:
-            typer.secho(f"{cmp.message} did not match ({cmp.legacy} vs {cmp.current}).", fg=RED)
-        except NotImplementedError:
-            typer.secho(
-                f"Cannot currently compare {cmp.message}",
-                fg=YELLOW,
-            )
+    [_file_comparison(cmp) for cmp in files]
 
 
 def compare_cr1_plink(legacy_dir: Path):
@@ -301,17 +306,7 @@ def compare_cr1_plink(legacy_dir: Path):
             comparison.file_hashes_equal,
         ),
     ]
-    for cmp in files:
-        try:
-            cmp.func(cmp.legacy, cmp.current)
-            typer.secho(f"{cmp.message} Files Match", fg=GREEN)
-        except AssertionError:
-            typer.secho(f"{cmp.message} did not match ({cmp.legacy} vs {cmp.current}).", fg=RED)
-        except NotImplementedError:
-            typer.secho(
-                f"Cannot currently compare {cmp.message}",
-                fg=YELLOW,
-            )
+    [_file_comparison(cmp) for cmp in files]
 
 
 def compare_cr2_plink(legacy_dir: Path):
@@ -349,72 +344,106 @@ def compare_cr2_plink(legacy_dir: Path):
             comparison.file_hashes_equal,
         ),
     ]
-    for cmp in files:
-        try:
-            cmp.func(cmp.legacy, cmp.current)
-            typer.secho(f"{cmp.message} Files Match", fg=GREEN)
-        except AssertionError:
-            typer.secho(f"{cmp.message} did not match ({cmp.legacy} vs {cmp.current}).", fg=RED)
-        except NotImplementedError:
-            typer.secho(
-                f"Cannot currently compare {cmp.message}",
-                fg=YELLOW,
-            )
+    [_file_comparison(cmp) for cmp in files]
 
 
 def compare_concordance(legacy_dir: Path, maf: float, ld: float):
     typer.secho("\n## Comparing Sample Concordance", fg=MAGENTA)
-
-    files = [
+    _file_comparison(
         Comparison(
             legacy_dir / "ibd/samples.genome",
             f"sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
             "Sample Level IBD",
             comparison.file_hashes_equal,
-        ),
-    ]
-    for cmp in files:
-        try:
-            cmp.func(cmp.legacy, cmp.current)
-            typer.secho(f"{cmp.message} Files Match", fg=GREEN)
-        except AssertionError:
-            typer.secho(f"{cmp.message} did not match ({cmp.legacy} vs {cmp.current}).", fg=RED)
+        )
+    )
+
+
+def _contamination_differences(cmp: Comparison, mix_atol, llk_atol, llk0_atol) -> str:
+    legacy = pd.read_csv(cmp.legacy, index_col="ID").rename_axis("Sample_ID")
+    dev = pd.read_csv(cmp.current, index_col="Sample_ID").drop(
+        "is_contaminated", axis=1, errors="ignore"
+    )
+
+    # If median IDAT intensity is <6000 and call rate is low then the workflows
+    # should set %Mix to NA. To indicate no difference between workflows, I am
+    # setting NA to 0 when both workflows have %Mix == NA.
+    both_na = legacy["%Mix"].isna() & dev["%Mix"].isna()
+    legacy.loc[both_na, "%Mix"] = 0
+    dev.loc[both_na, "%Mix"] = 0
+
+    df = pd.concat(
+        [
+            (legacy["%Mix"] - dev["%Mix"]).abs().rename("Mix_diff"),
+            (legacy.LLK - dev.LLK).abs().rename("LLK_diff"),
+            (legacy.LLK0 - dev.LLK0).abs().rename("LLK0_diff"),
+        ],
+        axis=1,
+    )
+
+    num_missing = df["Mix_diff"].isna().sum()
+    suffix = ""
+    if num_missing > 0:
+        suffix = dedent(
+            f"""
+            There are {num_missing:,} rows where %Mix was set to NA in one
+            workflow but not the other. Both workflows should set %Mix to NA if
+            IDAT intensity is less than the given threshold and the call rate
+            was low.
+            """
+        )
+
+    return (
+        "\n"
+        + df.query(
+            "Mix_diff.isna() | Mix_diff > @mix_atol | "
+            "LLK_diff.isna() | LLK_diff > @llk_atol | "
+            "LLK0_diff.isna() | LLK0_diff > @llk0_atol"
+        )
+        .sort_values(["Mix_diff", "LLK_diff", "LLK0_diff"])
+        .to_string(max_rows=20, show_dimensions=True)
+        + "\n\n"
+        + df.agg(["min", "max"]).to_string()
+        + "\n\n"
+        + suffix
+    )
 
 
 def compare_contamination(legacy_dir: Path, mix_atol: float, llk_atol: float, llk0_atol: float):
     typer.secho("\n## Comparing Contamination (Fuzzy Match)", fg=MAGENTA)
-    files = [
-        Comparison(
-            legacy_dir / "all_contam/contam.csv",
-            "sample_level/contamination/verifyIDintensity.csv",
-            "verifyIDintensity Results",
-            partial(
-                comparison.assert_verifyIDintensity_equal,
-                mix_atol=mix_atol,
-                llk_atol=llk_atol,
-                llk0_atol=llk0_atol,
-            ),
-        ),
-    ]
-    for cmp in files:
-        try:
-            cmp.func(cmp.legacy, cmp.current)
-            typer.secho(f"{cmp.message} Files Fuzzy Match", fg=GREEN)
-        except AssertionError:
-            typer.secho(
-                f"{cmp.message} did not match at current tolerance rates ({cmp.legacy} vs {cmp.current}).",
-                fg=RED,
-            )
-
     typer.secho(
         (
             "Fuzzy match thresholds:\n"
             f"  - %Mix +/- {mix_atol}\n"
             f"  - LLK +/- {llk_atol}\n"
-            f"  - LLK0 +/- {llk0_atol}"
+            f"  - LLK0 +/- {llk0_atol}\n"
         ),
         fg=YELLOW,
     )
+
+    cmp = Comparison(
+        legacy_dir / "all_contam/contam.csv",
+        "sample_level/contamination/summary.csv",
+        "verifyIDintensity Results",
+        partial(
+            comparison.assert_verifyIDintensity_equal,
+            mix_atol=mix_atol,
+            llk_atol=llk_atol,
+            llk0_atol=llk0_atol,
+        ),
+    )
+
+    try:
+        cmp.func(cmp.legacy, cmp.current)
+        typer.secho(f"{cmp.message} Fuzzy Match", fg=GREEN)
+    except AssertionError:
+        typer.secho(
+            f"{cmp.message} did not match at current tolerance rates ({cmp.legacy} vs {cmp.current}). "
+            "You may want to adjust the tolerance rates using `--mix-atol`, `--llk-atol`, or "
+            "`--llk0-atol`. Below is summary of the absolute differences.",
+            fg=RED,
+        )
+        typer.secho(_contamination_differences(cmp, mix_atol, llk_atol, llk0_atol))
 
 
 def _parse_snpweights(filename):
@@ -478,8 +507,11 @@ def _count_differences_major_groups(legacy, dev):
     except AssertionError:
         legacy_counts = legacy_major.value_counts().sort_index().rename("Legacy")
         dev_counts = dev_major.value_counts().sort_index().rename("Production")
-        table = pd.concat([legacy_counts, dev_counts], axis=1).assign(
-            Difference=lambda x: (x.iloc[:, 0] - x.iloc[:, 1]).abs()
+        table = (
+            pd.concat([legacy_counts, dev_counts], axis=1)
+            .fillna(0)
+            .astype(int)
+            .assign(Difference=lambda x: (x.iloc[:, 0] - x.iloc[:, 1]).abs())
         )
 
         try:
@@ -533,6 +565,7 @@ def _legacy_sample_level_exclusions(filename):
         .assign(Call_Rate_2_filter=lambda x: x.Call_Rate_2_filter ^ x.Call_Rate_1_filter)
         .assign(Legacy_Exclusions=lambda x: _get_reason(x, exclusion_criteria))
         .Legacy_Exclusions.sort_index()
+        .fillna("")
     )
 
 
@@ -542,11 +575,12 @@ def _sample_level_exclusions(filename):
         .set_index("Sample_ID")
         .analytic_exclusion_reason.rename("Production_Exclusions")
         .sort_index()
+        .fillna("")
     )
 
 
 def compare_sample_analytic_exclusions(legacy_dir: Path):
-    typer.secho("\n## Exclusion Summary By Sample", fg=MAGENTA)
+    typer.secho("\n## Exclusion Reason By Sample", fg=MAGENTA)
     legacy = _legacy_sample_level_exclusions(legacy_dir / "all_sample_qc.csv")
     dev = _sample_level_exclusions("sample_level/sample_qc.csv")
     try:
@@ -555,8 +589,12 @@ def compare_sample_analytic_exclusions(legacy_dir: Path):
     except AssertionError:
         typer.secho("Please carefully check this table\n", fg=YELLOW)
         mask = legacy != dev
-        typer.secho(pd.concat([legacy[mask], dev[mask]], axis=1).to_string())
-        typer.secho(f"Number of differences {mask.sum():,}")
+        df = pd.concat([legacy[mask], dev[mask]], axis=1)
+        typer.secho("Differences in Exclusion Reason", fg=RED)
+        typer.secho(df.to_string(max_rows=20, show_dimensions=True))
+        typer.secho("Summary of differences", fg=RED)
+        typer.secho(df.value_counts().to_string())
+        typer.secho(f"Total number of differences {mask.sum():,}", fg=RED)
 
 
 def _legacy_selected_subjects(filename):
@@ -632,7 +670,7 @@ def _subject_level_exclusions(filename):
 
 
 def compare_subject_analytic_exclusions(legacy_dir: Path):
-    typer.secho("\n## Exclusion Summary By Subject", fg=MAGENTA)
+    typer.secho("\n## Exclusion Reason By Subject", fg=MAGENTA)
     legacy = _legacy_subject_level_exclusions(legacy_dir / "all_sample_qc.csv")
     dev = _subject_level_exclusions("subject_level/subject_qc.csv")
     legacy = legacy.reindex(dev.index)  # drop samples that are  not subjects
@@ -642,8 +680,12 @@ def compare_subject_analytic_exclusions(legacy_dir: Path):
     except AssertionError:
         typer.secho("Please carefully check this table\n", fg=YELLOW)
         mask = legacy != dev
-        typer.secho(pd.concat([legacy[mask], dev[mask]], axis=1).to_string())
-        typer.secho(f"Number of differences {mask.sum():,}")
+        df = pd.concat([legacy[mask], dev[mask]], axis=1)
+        typer.secho("Differences in Exclusion Reason", fg=RED)
+        typer.secho(df.to_string(max_rows=20, show_dimensions=True))
+        typer.secho("Summary of differences", fg=RED)
+        typer.secho(df.value_counts().to_string())
+        typer.secho(f"Total number of differences {mask.sum():,}", fg=RED)
 
 
 def _legacy_table_4a(exclusions, remaining):
