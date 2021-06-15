@@ -199,13 +199,13 @@ def assert_verifyIDintensity_equal(
         .set_index("Sample_ID")
         .sort_index()
     )
-    dev = pd.read_csv(dev_file).set_index("Sample_ID").sort_index()
-    non_missing = legacy.notna().all(axis=1) & dev.notna().all(axis=1)
+    dev = (
+        pd.read_csv(dev_file)
+        .set_index("Sample_ID")
+        .sort_index()
+        .drop("is_contaminated", axis=1, errors="ignore")
+    )
 
-    assert_series_equal(
-        legacy.loc[non_missing, "%Mix"], dev.loc[non_missing, "%Mix"], atol=mix_atol
-    )
-    assert_series_equal(legacy.loc[non_missing, "LLK"], dev.loc[non_missing, "LLK"], atol=llk_atol)
-    assert_series_equal(
-        legacy.loc[non_missing, "LLK0"], dev.loc[non_missing, "LLK0"], atol=llk0_atol
-    )
+    assert_series_equal(legacy["%Mix"], dev["%Mix"], atol=mix_atol)
+    assert_series_equal(legacy.LLK, dev.LLK, atol=llk_atol)
+    assert_series_equal(legacy.LLK0, dev.LLK0, atol=llk0_atol)
