@@ -32,13 +32,13 @@ def main(
         False, help="True to show which legacy config options are ignored for comparisons."
     ),
     config_only: bool = typer.Option(False, help="Only compare the config."),
-    mix_atol: float = typer.Argument(
+    mix_atol: float = typer.Option(
         0.001, help="The absolute tolerance level when comparing verifyIDintensities %Mix column."
     ),
-    llk_atol: float = typer.Argument(
+    llk_atol: float = typer.Option(
         500.0, help="The absolute tolerance level when comparing verifyIDintensities LLK column."
     ),
-    llk0_atol: float = typer.Argument(
+    llk0_atol: float = typer.Option(
         500.0, help="The absolute tolerance level when comparing verifyIDintensities LLK0 column."
     ),
 ):
