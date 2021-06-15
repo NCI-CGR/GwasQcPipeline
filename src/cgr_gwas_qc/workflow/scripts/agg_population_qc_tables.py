@@ -47,7 +47,7 @@ import pandas as pd
 import typer
 
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE
-from cgr_gwas_qc.workflow.scripts import population_qc_table
+from cgr_gwas_qc.workflow.scripts import population_qc_table, subject_qc_table
 
 app = typer.Typer(add_completion=False)
 
@@ -101,7 +101,7 @@ def aggregate_qc_tables(population_files: List[Path]) -> pd.DataFrame:
 
 def add_metadata(df: pd.DataFrame, filename: Path):
     metadata = (
-        pd.read_csv(filename)
+        subject_qc_table.read(filename)
         .reindex(["Group_By_Subject_ID", "Sample_ID", "case_control"], axis=1)
         .rename({"Group_By_Subject_ID": "Subject_ID"}, axis=1)
     )
