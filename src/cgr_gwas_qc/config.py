@@ -8,6 +8,7 @@ from snakemake.rules import expand
 import cgr_gwas_qc.yaml as yaml
 from cgr_gwas_qc.models.config import Config
 from cgr_gwas_qc.parsers import sample_sheet
+from cgr_gwas_qc.typing import PathLike
 
 
 class CgrGwasQcConfigError(Exception):
@@ -214,7 +215,9 @@ def find_cgr_files() -> Tuple[Path, Path, Path]:
     return root, user_config, sample_sheet_file
 
 
-def config_to_yaml(cfg: Config, yaml_file: str = "config.yml", exclude_none=True, **kwargs) -> None:
+def config_to_yaml(
+    cfg: Config, yaml_file: PathLike = "config.yml", exclude_none=True, **kwargs
+) -> None:
     def serialize(data):
         """Scan for path objects and convert to strings."""
         cleaned = {}
@@ -229,4 +232,4 @@ def config_to_yaml(cfg: Config, yaml_file: str = "config.yml", exclude_none=True
                 cleaned[k] = v
         return cleaned
 
-    yaml.write(serialize(cfg.dict(exclude_none=exclude_none, **kwargs)), yaml_file)
+    yaml.write(serialize(cfg.dict(exclude_none=exclude_none, **kwargs)), Path(yaml_file))
