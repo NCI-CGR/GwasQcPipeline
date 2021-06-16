@@ -89,7 +89,7 @@ def initialize_config(
     place holders that are not valid values.
     """
     return Config.construct(
-        project_name=project_name,
+        project_name=project_name or "TestProject",
         sample_sheet=sample_sheet.resolve(),
         genome_build=genome_build,
         num_snps=0,
