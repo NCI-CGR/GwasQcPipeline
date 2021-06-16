@@ -48,6 +48,12 @@ targets = [
     output_pattern.format(prefix="delivery", file_type="QC_Report", ext="xlsx"),
 ]
 
+if cfg.config.workflow_params.lims_upload:
+    # The CGEMs/CCAD cluster has a cron job running that looks for this file in
+    # the root run directory. If it is there then it will automatically upload
+    # to the LIMs system. This is only useful on CGEMs/CCAD.
+    targets.append(output_pattern.format(prefix=".", file_type="LimsUpload", ext="csv"))
+
 
 rule all_delivery:
     input:
@@ -77,6 +83,19 @@ rule lab_lims_upload:
         "files_for_lab/{deliver_prefix}LimsUpload{deliver_suffix}.csv",
     script:
         "../scripts/lab_lims_upload.py"
+
+
+if cfg.config.workflow_params.lims_upload:
+
+    ruleorder: lab_lims_upload > lims_upload
+
+    rule lims_upload:
+        input:
+            rules.lab_lims_upload.output[0],
+        output:
+            "{deliver_prefix}LimsUpload{deliver_suffix}.csv",
+        shell:
+            "cp {input[0]} {output[0]}"
 
 
 rule lab_identifiler_needed:

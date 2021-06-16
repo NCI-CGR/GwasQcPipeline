@@ -36,3 +36,8 @@ class WorkflowParams(BaseModel):
         description="Minimum number of controls (in a population) required for HWE estimation",
         gt=0,
     )
+
+    lims_upload: bool = Field(
+        False,
+        description="Create summary file for automatic upload to the CGEMs/CCAD LIMs system.",
+    )
