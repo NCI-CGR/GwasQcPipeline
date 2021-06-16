@@ -2,6 +2,8 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
+PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
+
 
 ################################################################################
 # Filters
@@ -498,7 +500,7 @@ rule frq:
         "{prefix}.frq",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
     conda:
         cfg.conda("plink2")
     shell:
@@ -523,7 +525,7 @@ rule hwe:
         "{prefix}.hwe",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
     conda:
         cfg.conda("plink2")
     shell:
@@ -556,7 +558,7 @@ rule genome:
         "{prefix}.genome",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
     conda:
         cfg.conda("plink2")
     shell:
@@ -584,7 +586,7 @@ rule het:
         "{prefix}.het",
     threads: lambda wildcards, attempt: attempt * 2
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
+        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
     conda:
         cfg.conda("plink2")
     shell:
