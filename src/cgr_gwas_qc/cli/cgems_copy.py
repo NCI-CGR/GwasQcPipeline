@@ -27,7 +27,7 @@ def main(
     This command is only meant to be used on CGEMs/CCAD. It copies the
     config.yml and cgr_sample_sheet.csv to a new run directory.
     """
-    project_name = _get_project_name(project_dir)
+    project_name = _get_project_name(project_dir.resolve())
     previous_run_dir = _get_previous_cgems_production_run_dir(project_name)
     run_dir = _get_cgems_production_run_dir(project_name)
     if not _create_cgems_production_run_dir(run_dir, no_prompt=True):
