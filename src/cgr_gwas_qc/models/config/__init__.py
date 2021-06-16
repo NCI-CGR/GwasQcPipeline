@@ -46,7 +46,9 @@ class Config(BaseModel):
         Path("sample_sheet.csv"), description="Path to the sample manifest from LIMs."
     )
     genome_build: GenomeBuild = Field(GenomeBuild.hg37, help="The human genome build.")
-    snp_array: str = Field(..., help="Which SNP array was used. Only used for reporting.")
+    snp_array: Optional[str] = Field(
+        None, help="Which SNP array was used. Only used for reporting."
+    )
     num_samples: int = Field(
         ..., help="Number of samples, automatically calculated from the sample sheet."
     )

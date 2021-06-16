@@ -1,24 +1,18 @@
-import pytest
-
-from cgr_gwas_qc.cli.config import get_number_snps, get_output_pattern
-from cgr_gwas_qc.testing.data import FakeData
+from cgr_gwas_qc.cli.config import CGEMS_QC_DIR, _get_cgems_production_run_dir
 
 
-def test_get_number_snps():
-    bpm_file = FakeData._data_path / FakeData._illumina_manifest_file
-    assert 2000 == get_number_snps(bpm_file)
+def test_get_cgems_production_run_dir(monkeypatch):
+    monkeypatch.setattr("cgr_gwas_qc.cli.config.TODAY", "01012021")
+    test_path = _get_cgems_production_run_dir("TestProject")
+    assert CGEMS_QC_DIR / "TestProject/builds/QC_v1_01012021" == test_path
 
 
-@pytest.mark.parametrize(
-    "sample_sheet_stem,output_pattern",
-    [
-        (
-            "SR0001-001_1_AnalysisManifest_0000000000000",
-            "{prefix}/SR0001-001_1_{file_type}_0000000000000.{ext}",
-        ),
-        ("test_AnalysisManifest_0123", "{prefix}/test_{file_type}_0123.{ext}"),
-        ("test_0123", "{prefix}/{file_type}.{ext}"),
-    ],
-)
-def test_get_output_pattern(sample_sheet_stem, output_pattern):
-    assert output_pattern == get_output_pattern(sample_sheet_stem)
+def test_get_cgems_production_run_dir_increment_if_previous_runs(monkeypatch):
+    def glob(*args, **kwargs):
+        """Return 2 previous runs"""
+        return ["QC_v1", "QC_v2"]
+
+    monkeypatch.setattr("cgr_gwas_qc.cli.config.Path.glob", glob)
+    monkeypatch.setattr("cgr_gwas_qc.cli.config.TODAY", "01012021")
+    test_path = _get_cgems_production_run_dir("TestProject")
+    assert CGEMS_QC_DIR / "TestProject/builds/QC_v3_01012021" == test_path
