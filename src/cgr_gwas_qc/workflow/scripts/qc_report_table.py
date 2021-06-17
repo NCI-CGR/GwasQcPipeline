@@ -125,11 +125,25 @@ _SAMPLE_CONCORDANCE_COLUMNS = [
 ]
 
 
+def _excel_limit_filter(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove extra rows if larger than the excel limit."""
+    max_excel_rows = 1_048_576
+    if df.shape[0] < max_excel_rows:
+        return df
+
+    return (
+        df.sort_values("PLINK_PI_HAT", ascending=False)
+        .head(max_excel_rows)
+        .sort_values(["Sample_ID1", "Sample_ID2"])
+    )
+
+
 def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLike) -> pd.DataFrame:
     ancestry = sample_qc_table.read(sample_qc_csv).set_index("Sample_ID").Ancestry
     representative = (
         sample_qc_table.read(sample_qc_csv).set_index("Sample_ID").is_subject_representative
     )
+
     return (
         sample_concordance.read(sample_concordance_csv)
         .pipe(
@@ -158,6 +172,7 @@ def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLik
             axis=1,
         )
         .reindex(_SAMPLE_CONCORDANCE_COLUMNS, axis=1)
+        .pipe(_excel_limit_filter)
     )
 
 
