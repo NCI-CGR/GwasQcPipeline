@@ -1,25 +1,25 @@
 Setting-up the Development Environment
 ======================================
 
-The GwasQcPipeline is a python based workflow that uses snakemake for orchestration. There are a number of ways to setup the development environment, but bellow is our recommend method.
-
 Download GwasQcPipeline
 -----------------------
 
-First we need to download the development version of GwasQcPipeline. Major development is occurring on the ``restructure`` branch::
+First we need to download the development version of GwasQcPipeline.::
 
-    $ git clone -b restructure --recursive http://10.133.130.114/jfear/GwasQcPipeline.git
+    $ git clone --recursive https://github.com/NCI-CGR/GwasQcPipeline.git
     $ cd GwasQcPipeline
 
 .. note::
 
-    Our test data (``tests/data``) is stored in a separate git repository. This repository is embedded as a git submodule. The ``--recursive`` tells git to go ahead and download ``tests/data``.
+    Our test data (``tests/data``) is stored in a separate git repository.
+    This repository is embedded as a git submodule. The ``--recursive`` tells git to go ahead and download ``tests/data``.
 
 
 Create a virtual environment (``conda``)
 ----------------------------------------
 
-We recommend you to use virtual environments. There are a number of ways to do this, but since ``conda`` is needed to run the workflow we suggest you just use a ``conda`` environment. If you need to install ``conda`` see the `Miniconda website`_.
+We are going to create a ``conda`` virtual environment to store the development environment.
+If you need to install ``conda`` see the `Miniconda website`_.
 
 Next you need to setup three channels in your conda config by running the following::
 
@@ -29,42 +29,48 @@ Next you need to setup three channels in your conda config by running the follow
 
 Next, To create our ``conda`` environment run::
 
-    $ conda create -n GwasQcPipeline python=3.8 poetry psutil pysam make -y
-    $ conda activate GwasQcPipeline        # Activates virtual environment
+    $ conda create -n cgr-dev python=3.8 poetry make -y
+    $ conda activate cgr-dev  # This activates the virtual environment
 
 .. _Miniconda website: https://docs.conda.io/en/latest/miniconda.html
 
 .. note::
 
-    ``psutil`` and ``pysam`` are runtime requirements. You can install both using poetry/pip (below), but then ``psutil`` requires ``gcc`` to be installed. Similarly, ``pysam`` is sometimes problematic so it is best just to use the ``conda`` version.
+    ``psutil`` and ``pysam`` are also runtime requirements.
+    If you have ``gcc`` installed, they should be automatically built during the installation step below.
+    However, if you have problems you may want to install them with ``conda activate cgr-dev && conda install psutil pysam``.
 
 Install dependencies and GwasQcPipeline (``poetry``)
 ----------------------------------------------------
 
-This project uses poetry_ as a package manager and build tool. Poetry is a modern python build tool that uses the ``pyproject.toml`` format to track dependencies and build settings.
+This project uses poetry_ as a package manager and build tool.
+Poetry is a modern python build tool that uses the ``pyproject.toml`` format to track dependencies and build settings.
 
 .. _poetry: https://python-poetry.org/
 
 To install all runtime/development dependencies and GwasQcPipeline itself run::
 
-    $ conda activate GwasQcPipeline    # Make sure we are in our conda environment
-    $ poetry install                   # Install development and runtime dependencies
+    $ conda activate cgr-dev      # Make sure we are in our conda environment
+    $ poetry install              # Install development and runtime dependencies
 
 Now lets make sure everything is working::
 
-    $ make -C docs html                   # This will build documentation into docs/_build/html
-    $ pytest -v                           # This will run the test suite
-    $ mypy                                # This will run type checking
-    $ gtc2plink --help                    # Is one of this projects command line tools
+    $ cgr --help                  # This is our main entry point to running the workflow
+    $ make -C docs html           # This will build documentation into docs/_build/html
+    $ pytest -v                   # This will run the test suite
 
-The main reason we are using poetry is because it makes building python packages easy. This won't be useful until we are ready to deploy. However, if you wanted to build a python package that you could push to pypi or email someone you would run::
+The main reason we are using poetry is because it makes building python packages easy::
 
-    $ poetry build                        # Build artifacts are in ./dist
+    $ poetry build                # Build artifacts are in ./dist
 
 Install pre-commit hooks for consistent development
 ---------------------------------------------------
 
-There are a number of tools out there to make coding cleaner and more consistent. For example, there are code formatters (i.e., ``black``, ``isort``, ``snakefmt``), code linters (i.e., ``flake8``, ``rstcheck``), type checkers (i.e., ``mypy``). These tools also help catch small mistakes. This repository has a set of git pre-commit hooks (``.pre-commit-config.yaml``) that will run a suite of tools at each commit. This helps keeps issues from making it into the code base.
+There are a number of tools out there to make coding cleaner and more consistent.
+For example, there are code formatters (i.e., ``black``, ``isort``, ``snakefmt``), code linters (i.e., ``flake8``, ``rstcheck``), type checkers (i.e., ``mypy``).
+These tools also help catch small mistakes.
+This repository has a set of git pre-commit hooks (``.pre-commit-config.yaml``) that will run a suite of tools at each commit.
+This helps keeps issues from making it into the code base.
 
 There is a one-time install that you need to setup in your local version of GwasQcPipeline::
 
@@ -73,14 +79,22 @@ There is a one-time install that you need to setup in your local version of Gwas
 
 .. note::
 
-    The first time you run pre-commit it needs to download and setup virtual environments for each tool. This may take a few minutes.
+    The first time you run pre-commit it needs to download and setup virtual environments for each tool.
+    This may take a few minutes.
 
 .. note::
 
     Tools are only run on files with changes, if this is a fresh clone of the repository then all tools will be skipped.
 
+.. note::
+
+    Now every time you commit files it will run the required set of tools for the staged files.
+    If an auto formatter detects a problem it will make the changes, but you will have to re-stage that file.
+    This will slow down making commits, but I find the benefits out weight the inconvenience.
+
 .. warning::
 
-    Now every time you commit files it will run the required set of tools for the staged files. If an auto formatter detects a problem it will make the changes, but you will have to re-stage that file.
-
-    This will slow down making commits, but I find the benefits out weight the inconvenience. If you want to force something and ignore the pre-commit hooks you can always run ``git commit --no-verify``. However, make sure it is absolutely necessary!
+    Sometimes pre-commit will keep calling something a problem that you want to ignore.
+    For example, ``codespell`` tends to interpret this ``"\nNumber "`` as a spelling error even thought it is really a formatting thing.
+    You can skip running al  pre-commit hooks using ``git commit --no-verify``.
+    However, make sure it is absolutely necessary!

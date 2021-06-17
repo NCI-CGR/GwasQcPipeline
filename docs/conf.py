@@ -39,6 +39,7 @@ exclude_patterns = ["_build", "api/cgr_gwas_qc.parsers.illumina.IlluminaBeadArra
 
 rst_prolog = f"""
 .. |pkgurl| replace:: https://storage.googleapis.com/gwasqc/releases/{pkg}
+.. |cgr| replace:: *CGR GwasQcPipeline*
 """
 
 # -- Extension Settings -------------------------------------------------
@@ -65,6 +66,7 @@ todo_include_todos = True
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+numfig = True
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
