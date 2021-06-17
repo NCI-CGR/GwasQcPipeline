@@ -143,7 +143,7 @@ class AdpcWriter(AdpcBase):
             file_name: Path to save an adpc file.
 
         Example:
-            >>> with AdpcReader(file_name) as fh:
+            >>> with AdpcWriter(file_name) as fh:
             ...    fh.write(record)
         """
         self.file_name = Path(file_name)

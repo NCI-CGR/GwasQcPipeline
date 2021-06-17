@@ -24,7 +24,6 @@ class ConfigMgr:
         SRC_DIR (Path): The absolute path to ``cgr_gwas_qc`` source code.
         WORKFLOW_DIR (Path): The absolute path to the ``workflow`` source code.
         CONFIG_DIR (Path): The absolute path to the ``workflow/config``.
-        RULE_DIR (Path): The absolute path to the ``workflow/rules``.
         SCRIPTS_DIR (Path): The absolute path to the ``workflow/scripts``.
         SNAKEFILE (Path): The absolute path to the ``workflow/Snakefile``.
 
@@ -38,9 +37,7 @@ class ConfigMgr:
 
     Methods:
         expand: Uses columns from the user's sample sheet to expand a file pattern.
-        envmodules: Pulls environmental module information from user's config.
         conda: Creates the full path to conda environment.
-        rules: Creates the full path to snakemake rule.
         scripts: Creates the full path to an internal script.
     """
 
@@ -49,7 +46,6 @@ class ConfigMgr:
     TEMPLATE_DIR = SRC_DIR / "reporting/templates"
 
     CONDA_DIR = WORKFLOW_DIR / "conda"
-    RULE_DIR = WORKFLOW_DIR / "rules"
     MODULE_DIR = WORKFLOW_DIR / "modules"
     SCRIPTS_DIR = WORKFLOW_DIR / "scripts"
     SUBWORKFLOW_DIR = WORKFLOW_DIR / "sub_workflows"
@@ -121,15 +117,6 @@ class ConfigMgr:
         df = self.ss.query(query) if query else self.ss
         return expand(file_pattern, combination, **df.to_dict("list"))
 
-    def envmodules(self, module_name: str) -> str:
-        """Returns the HPC environment module from user's config.
-
-        On HPC systems you can use environment modules instead of conda. The
-        specific module versions are stored in the main config.
-        """
-        modules = self.config.dict().get("env_modules")
-        return modules.get(module_name, "") if modules else ""
-
     @classmethod
     def conda(cls, filename: str) -> str:
         """Return path to a conda env file.
@@ -137,14 +124,6 @@ class ConfigMgr:
         Given a conda env file_name, prepends the full path to that file.
         """
         return (cls.CONDA_DIR / f"{filename}.yml").as_posix()
-
-    @classmethod
-    def rules(cls, filename: str) -> str:
-        """Return the path to a rule file.
-
-        Given a rule file_name, prepends the full path to that rule.
-        """
-        return (cls.RULE_DIR / f"{filename}.smk").as_posix()
 
     @classmethod
     def modules(cls, filename: str) -> str:

@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field, validator
 
 from cgr_gwas_qc.version import __version__
 
-from .env_modules import EnvModules
 from .reference_files import ReferenceFiles
 from .software_params import SoftwareParams
 from .user_files import Idat, UserFiles
@@ -62,7 +61,6 @@ class Config(BaseModel):
     workflow_params: WorkflowParams = (
         WorkflowParams()
     )  # Parameters to control how the workflow is run.
-    env_modules: Optional[EnvModules]  # Use these HPC environmental modules."
     Sample_IDs_to_remove: Optional[Sequence[str]]
 
     @validator("pipeline_version")

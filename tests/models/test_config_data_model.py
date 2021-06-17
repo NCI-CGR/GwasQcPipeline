@@ -32,7 +32,6 @@ def test_user_files_defaults():
 
     # THEN: all values default to None
     assert user_files.output_pattern == "{prefix}/{file_type}.{ext}"
-    assert user_files.lims_output_dir is None
     assert user_files.gtc_pattern is None
     assert user_files.idat_pattern is None
     assert user_files.ped is None
@@ -155,6 +154,7 @@ def test_workflow_params_defaults():
     assert workflow_params.remove_rep_discordant is True
     assert workflow_params.minimum_pop_subjects == 50
     assert workflow_params.control_hwp_threshold == 50
+    assert workflow_params.lims_upload is False
 
 
 @pytest.mark.parametrize("value", [-0.01, 0, 1.01])

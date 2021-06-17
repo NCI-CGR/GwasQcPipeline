@@ -24,7 +24,14 @@ CGEMS_QC_DIR = Path("/DCEG/CGF/GWAS/Scans/GSA_Lab_QC")
 @app.command()
 def main(
     sample_sheet: Path = typer.Option(
-        ..., prompt="Path to LIMs Sample Sheet", exists=True, readable=True, file_okay=True
+        ...,
+        "--sample-sheet",
+        "-s",
+        help="Path to the Sample Sheet",
+        prompt="Path to the Sample Sheet",
+        exists=True,
+        readable=True,
+        file_okay=True,
     ),
     project_name: Optional[str] = typer.Option(None, help="The current project title."),
     bpm_file: Optional[Path] = typer.Option(None, help="The BPM File to use."),
@@ -32,7 +39,7 @@ def main(
         GenomeBuild.hg37, case_sensitive=False, help="Which human genome build to use."
     ),
     include_unused_settings: bool = typer.Option(
-        False, "--include-unused-settings", help="Include unused options in the config."
+        False, "--include-unused-settings", "-u", help="Include unused options in the config."
     ),
     cgems: bool = typer.Option(
         False,
@@ -60,7 +67,7 @@ def main(
     config_file = cgems_production_config_file(cfg, no_prompt) if cgems else "config.yml"
 
     # Save config
-    config_to_yaml(cfg, yaml_file=config_file, exclude_none=~include_unused_settings)
+    config_to_yaml(cfg, yaml_file=config_file, exclude_none=not include_unused_settings)
     typer.secho(
         dedent(
             f"""
@@ -89,7 +96,7 @@ def initialize_config(
     place holders that are not valid values.
     """
     return Config.construct(
-        project_name=project_name or "TestProject",
+        project_name=project_name,
         sample_sheet=sample_sheet.resolve(),
         genome_build=genome_build,
         num_snps=0,
@@ -118,6 +125,7 @@ def update_config_for_cgems(cfg: Config):
 
 
 def update_config_for_general(cfg: Config):
+    _add_project_name(cfg)
     _add_sample_sheet_metadata(cfg)
     _update_number_of_snps(cfg)
 
@@ -141,7 +149,7 @@ def cgems_production_config_file(cfg: Config, no_prompt: bool):
 
 
 def _add_project_name(cfg: Config):
-    if not cfg.project_name:
+    if cfg.project_name is None:
         cfg.project_name = _sample_sheet_name_to_project_name(cfg.sample_sheet.stem)
 
 
