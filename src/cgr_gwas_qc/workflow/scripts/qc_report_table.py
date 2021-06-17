@@ -127,15 +127,11 @@ _SAMPLE_CONCORDANCE_COLUMNS = [
 
 def _excel_limit_filter(df: pd.DataFrame) -> pd.DataFrame:
     """Remove extra rows if larger than the excel limit."""
-    max_excel_rows = 1_048_576
+    max_excel_rows = 1_000_000  # the real max is 1_048_576
     if df.shape[0] < max_excel_rows:
         return df
 
-    return (
-        df.sort_values("PLINK_PI_HAT", ascending=False)
-        .head(max_excel_rows)
-        .sort_values(["Sample_ID1", "Sample_ID2"])
-    )
+    return df.sort_values("PLINK_PI_HAT", ascending=False).head(max_excel_rows)
 
 
 def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLike) -> pd.DataFrame:
@@ -173,6 +169,7 @@ def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLik
         )
         .reindex(_SAMPLE_CONCORDANCE_COLUMNS, axis=1)
         .pipe(_excel_limit_filter)
+        .sort_values(["Sample_ID1", "Sample_ID2"])
     )
 
 
@@ -289,9 +286,9 @@ def _population_concordance(population_concordance_csv: PathLike, writer: pd.Exc
     )
 
     for population, dd in df.groupby("population"):
-        dd.reindex(_POPULATION_CONCORDANCE_COLUMNS, axis=1).to_excel(
-            writer, sheet_name=f"{population}_IBD", index=False
-        )
+        dd.reindex(_POPULATION_CONCORDANCE_COLUMNS, axis=1).pipe(_excel_limit_filter).sort_values(
+            ["Subject_ID1", "Subject_ID2"]
+        ).to_excel(writer, sheet_name=f"{population}_IBD", index=False)
 
 
 _PCA_COLUMNS = [
