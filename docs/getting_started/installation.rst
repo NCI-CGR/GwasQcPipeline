@@ -8,7 +8,7 @@ These are the recommended installation instructions for ``CGEMS/CCAD``.
 
 Create a ``conda`` environment (python=3.8):
 
-.. code-block:: bash
+.. code-block::
 
     $ module load miniconda/4.8.3
     $ conda create -n GwasQcPipeline -y python=3.8 pip
@@ -16,7 +16,7 @@ Create a ``conda`` environment (python=3.8):
 
 Install the current release of the ``GwasQcPipeline``:
 
-.. code-block:: bash
+.. code-block::
     :substitutions:
 
     $ pip install |pkgurl|
@@ -24,7 +24,7 @@ Install the current release of the ``GwasQcPipeline``:
 
 After the initial installation, to use ``GwasQcPipeline``:
 
-.. code-block:: bash
+.. code-block::
 
     $ module load miniconda/4.8.3
     $ conda activate GwasQcPipeline
@@ -32,7 +32,7 @@ After the initial installation, to use ``GwasQcPipeline``:
 
 To update the latest version of ``GwasQcPipeline``:
 
-.. code-block:: bash
+.. code-block::
     :substitutions:
 
     $ module load miniconda/4.8.3
@@ -44,11 +44,13 @@ To update the latest version of ``GwasQcPipeline``:
 Installing on other systems
 ---------------------------
 
-The ``GwasQcPipeline`` requires ``conda`` to run. We suggest you follow these directions to install Miniconda_. Once you have ``conda`` installed, you need to create a ``conda`` environment and install the ``GwasQcPipeline``.
+The ``GwasQcPipeline`` requires ``conda`` to run.
+We suggest you follow these directions to install Miniconda_.
+Once you have ``conda`` installed, you need to create a ``conda`` environment and install the ``GwasQcPipeline``.
 
 .. _Miniconda: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
 
-.. code-block:: bash
+.. code-block::
     :substitutions:
 
     $ conda create -n GwasQcPipeline -y python=3.8 pip
@@ -59,14 +61,14 @@ The ``GwasQcPipeline`` requires ``conda`` to run. We suggest you follow these di
 
 To use ``GwasQcPipeline`` first activate your ``conda`` environment:
 
-.. code-block:: bash
+.. code-block::
 
     $ conda activate GwasQcPipeline
     $ cgr --help
 
 And to update:
 
-.. code-block:: bash
+.. code-block::
     :substitutions:
 
     $ conda activate GwasQcPipeline

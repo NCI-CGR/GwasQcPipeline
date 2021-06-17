@@ -38,7 +38,7 @@ templates_path = ["templates"]
 exclude_patterns = ["_build", "api/cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.rst"]
 
 rst_prolog = f"""
-.. |pkgurl| replace:: https://storage.googleapis.com/gwasqc/releases/{pkg}
+.. |pkgurl| replace:: https://github.com/NCI-CGR/GwasQcPipeline/releases/download/{__version__}/{pkg}
 .. |cgr| replace:: *CGR GwasQcPipeline*
 """
 
