@@ -44,13 +44,6 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./docs/_build/html
 
-    - name: Deploy GCP
-      uses: google-github-actions/upload-cloud-storage@v0.2.0
-      with:
-        credentials: ${{ secrets.GCP_CREDENTIALS }}
-        path: ./docs/_build/html
-        destination: gwasqc
-
   build_and_test:
     runs-on: ubuntu-latest
     if: "!startsWith(github.event.head_commit.message, 'noci') && !startsWith(github.event.head_commit.message, 'docs')"
