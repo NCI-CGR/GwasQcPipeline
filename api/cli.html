@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0rc6 documentation</title>
+  <title>Command Line Interface &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -195,8 +195,17 @@
 <div class="section" id="module-cgr_gwas_qc.cli.config">
 <span id="config"></span><h2>Config<a class="headerlink" href="#module-cgr_gwas_qc.cli.config" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
+<dt id="cgr_gwas_qc.cli.config.initialize_config">
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.config.</code><code class="sig-name descname">initialize_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample_sheet</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">project_name</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">bpm_file</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">genome_build</span><span class="p">:</span> <span class="n">cgr_gwas_qc.models.config.GenomeBuild</span></em><span class="sig-paren">)</span> &#x2192; cgr_gwas_qc.models.config.Config<a class="reference internal" href="../_modules/cgr_gwas_qc/cli/config.html#initialize_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.config.initialize_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize config object.</p>
+<p>Here I am using the construct methods on the pydantic data models to skip
+validation. This allows me to incrementally build the config object with
+place holders that are not valid values.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="cgr_gwas_qc.cli.config.main">
-<code class="sig-prename descclassname">cgr_gwas_qc.cli.config.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">sample_sheet: pathlib.Path = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">project_name: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">bpm_file: Optional[pathlib.Path] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">genome_build: cgr_gwas_qc.models.config.GenomeBuild = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/config.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.config.main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.cli.config.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">sample_sheet: pathlib.Path = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">project_name: Optional[str] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">bpm_file: Optional[pathlib.Path] = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">genome_build: cgr_gwas_qc.models.config.GenomeBuild = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">include_unused_settings: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cgems: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">cgems_dev: bool = &lt;typer.models.OptionInfo object&gt;</em>, <em class="sig-param">no_prompt: bool = &lt;typer.models.OptionInfo object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/cli/config.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.cli.config.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Gwas Qc Pipeline config file in the current working directory.</p>
 </dd></dl>
 
