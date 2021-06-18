@@ -360,8 +360,8 @@ def compare_concordance(legacy_dir: Path, maf: float, ld: float):
 
 
 def _contamination_differences(cmp: Comparison, mix_atol, llk_atol, llk0_atol) -> str:
-    legacy = pd.read_csv(cmp.legacy, index_col="ID").rename_axis("Sample_ID")
-    dev = pd.read_csv(cmp.current, index_col="Sample_ID").drop(
+    legacy = pd.read_csv(cmp.legacy, index_col="ID", low_memory=False).rename_axis("Sample_ID")
+    dev = pd.read_csv(cmp.current, index_col="Sample_ID", low_memory=False).drop(
         "is_contaminated", axis=1, errors="ignore"
     )
 
@@ -448,7 +448,7 @@ def compare_contamination(legacy_dir: Path, mix_atol: float, llk_atol: float, ll
 
 def _parse_snpweights(filename):
     return (
-        pd.read_csv(filename, dtype={"ID": str})
+        pd.read_csv(filename, dtype={"ID": str}, low_memory=False)
         .rename(
             {
                 "ID": "Sample_ID",
@@ -472,7 +472,7 @@ def _parse_snpweights(filename):
 
 def _parse_graf(filename):
     return (
-        pd.read_csv(filename, sep="\t", dtype={"Subject": str})
+        pd.read_csv(filename, sep="\t", dtype={"Subject": str}, low_memory=False)
         .rename(
             {
                 "Subject": "Sample_ID",
@@ -557,7 +557,7 @@ def _legacy_sample_level_exclusions(filename):
     }
 
     return (
-        pd.read_csv(filename, dtype={"Sample_ID": str})
+        pd.read_csv(filename, dtype={"Sample_ID": str}, low_memory=False)
         .set_index("Sample_ID")
         .replace({"N": False, "Y": True})
         .assign(is_missing_idats=lambda x: ~x.IdatsInProjectDir.astype(bool))
@@ -599,7 +599,7 @@ def compare_sample_analytic_exclusions(legacy_dir: Path):
 
 def _legacy_selected_subjects(filename):
     return (
-        pd.read_csv(filename, dtype={"Subject_ID": str, "Sample_ID": str})
+        pd.read_csv(filename, dtype={"Subject_ID": str, "Sample_ID": str}, low_memory=False)
         .set_index("Subject_ID")
         .sort_index()
         .squeeze()
@@ -642,7 +642,7 @@ def _legacy_subject_level_exclusions(filename):
     }
 
     return (
-        pd.read_csv(filename, dtype={"Sample_ID": str})
+        pd.read_csv(filename, dtype={"Sample_ID": str}, low_memory=False)
         .set_index("Sample_ID")
         .replace({"N": False, "Y": True})
         .astype({**{k: "boolean" for k in exclusion_criteria.keys()}})
@@ -690,7 +690,7 @@ def compare_subject_analytic_exclusions(legacy_dir: Path):
 
 def _legacy_table_4a(exclusions, remaining):
     counts = (
-        pd.read_csv(exclusions)
+        pd.read_csv(exclusions, low_memory=False)
         .set_index("Reason")
         .rename_axis("Filter Reason/Description")
         .drop(["SexDiscordant", "UnexpectedReplicates", "AutosomalHet"])
@@ -698,7 +698,7 @@ def _legacy_table_4a(exclusions, remaining):
     )
 
     totals = (
-        pd.read_csv(remaining)
+        pd.read_csv(remaining, low_memory=False)
         .set_index("ExlusionPriorToCounts")
         .rename_axis("Filter Reason/Description")
         .reindex(["InternalQC", "SubjectLevel"])
@@ -738,7 +738,7 @@ def compare_4a(legacy_dir: Path):
 
 def _legacy_table_4b(exclusions):
     return (
-        pd.read_csv(exclusions)
+        pd.read_csv(exclusions, low_memory=False)
         .set_index("Reason")
         .rename_axis("Filter Reason/Description")
         .reindex(["SexDiscordant", "UnexpectedReplicates", "AutosomalHet"])
