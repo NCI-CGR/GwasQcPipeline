@@ -2,18 +2,22 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from typer.testing import CliRunner
 
 from cgr_gwas_qc.cli import pre_flight
 from cgr_gwas_qc.config import ConfigMgr
 from cgr_gwas_qc.testing import chdir
+
+runner = CliRunner()
 
 
 def test_preflight(fake_cfg: ConfigMgr):
     # GIVEN: a working directory
     with chdir(fake_cfg.root):
         # WHEN: Run `cgr pre-flight`
-        pre_flight.main(Path("config.yml"))
+        res = runner.invoke(pre_flight.app)
         # THEN: No errors and `cgr_sample_sheet.csv` exists
+        assert res.exit_code == 0
         assert Path("cgr_sample_sheet.csv").exists()
 
 
