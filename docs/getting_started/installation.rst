@@ -1,6 +1,8 @@
 Installing GwasQcPipeline
 =========================
 
+.. _installation:
+
 Installing on CGEMS/CCAD
 ------------------------
 
@@ -45,10 +47,8 @@ Installing on other systems
 ---------------------------
 
 The ``GwasQcPipeline`` requires ``conda`` to run.
-We suggest you follow these directions to install Miniconda_.
+We suggest you first install Miniconda_.
 Once you have ``conda`` installed, you need to create a ``conda`` environment and install the ``GwasQcPipeline``.
-
-.. _Miniconda: https://conda.io/projects/conda/en/latest/user-guide/install/index.html
 
 .. code-block::
     :substitutions:

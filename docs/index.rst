@@ -3,10 +3,10 @@ GwasQcPipeline Documentation
 
 The |cgr| generates a number of sample level QC metrics followed by several filtering criteria.
 Samples are then split into ancestral populations and examined for relatedness, population structure, and genotyping errors.
-The full workflow is pictured in :numref:`full-pipeline`.
+The full workflow is pictured in :numref:`fig-full-pipeline`.
 
 .. figure:: static/GwasQcPipelineWorkflow.*
-   :name: full-pipeline
+   :name: fig-full-pipeline
 
    The |cgr|.
 
@@ -17,6 +17,7 @@ The full workflow is pictured in :numref:`full-pipeline`.
 
    getting_started/installation
    getting_started/running_pipeline
+   getting_started/configuration
 
 |cgr| is designed to be an easy to deploy to multiple cluster systems.
 It is built on top of snakemake_ but packaged into as an easy to install python utility.
@@ -54,6 +55,7 @@ Here we describe the various steps that each sub-workflow runs, the config optio
 
    dev_docs/setup
    dev_docs/documentation
+   dev_docs/testing
 
 .. toctree::
    :caption: API Reference
@@ -66,7 +68,3 @@ To Do
 -----
 
 .. todolist::
-
-
-.. _snakemake: https://snakemake.readthedocs.io/en/stable/
-.. _miniconda: https://docs.conda.io/en/latest/miniconda.html
