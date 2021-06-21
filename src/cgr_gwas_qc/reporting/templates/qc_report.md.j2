@@ -1,5 +1,5 @@
 ---
-title: {{ config.project_name }} QC report (INTERIM)
+title: {{ project_name }} QC report (INTERIM)
 date: {{ date }}
 ---
 
@@ -9,22 +9,22 @@ PART I of this report describes the quality control (QC) process applied at the 
 
 # Introduction
 
-NOTE: This is an interim QC report for {{ config.project_name }}. Samples/subjects identified as exclusions within this report may be eligible for recovery efforts, depending on the cause of failure and available recovery options.
+NOTE: This is an interim QC report for {{ project_name }}. Samples/subjects identified as exclusions within this report may be eligible for recovery efforts, depending on the cause of failure and available recovery options.
 
-{{ config.num_samples | numFormat }} samples representing {{ sample_qc.summary.num_starting_subjects | numFormat}} subjects were scanned at {{ config.num_snps | numFormat }} loci on the {{ config.snp_array }} Illumina genotyping array (**Table 1**).
+{{ config.num_samples | numFormat }} samples representing {{ sample_qc.summary.num_starting_subjects | numFormat}} subjects were scanned at {{ config.num_snps | numFormat }} loci on the {{ snp_array }} Illumina genotyping array (**Table 1**).
 
 **Table 1**. Sample manifest summary before processing.
 
 | Study Name         | Array           | Case:Control          | Male:Female           | Total Count       |
 |:-------------------|:----------------|----------------------:|----------------------:|------------------:|
-| {{ config.project_name }} | {{ config.snp_array }} | {{ sample_qc.summary.case_control }} | {{ sample_qc.summary.male_female }} | {{ config.num_samples | numFormat }} |
+| {{ project_name }} | {{ snp_array }} | {{ sample_qc.summary.case_control }} | {{ sample_qc.summary.male_female }} | {{ config.num_samples | numFormat }} |
 
 
 # PART I (Sample Level QC)
 
 ## Array Processing
 
-A total of {{ config.num_samples | numFormat }} samples were scanned on the {{ config.snp_array }} array using the [standard Illumina microarray data analysis workflow](https://www.illumina.com/documents/products/technotes/technote_array_analysis_workflows.pdf) and a custom cluster file ({{ config.reference_files.illumina_cluster_file or "which can be provided on request" }}).
+A total of {{ config.num_samples | numFormat }} samples were scanned on the {{ snp_array }} array using the [standard Illumina microarray data analysis workflow](https://www.illumina.com/documents/products/technotes/technote_array_analysis_workflows.pdf) and a custom cluster file ({{ config.reference_files.illumina_cluster_file or "which can be provided on request" }}).
 {% if sample_qc.array_processing.num_samples_excluded > 0 %}
 There were {{ sample_qc.array_processing.num_samples_excluded | numFormat }} samples excluded from QC analysis.
 {% if sample_qc.array_processing.num_array_processing_failure > 0 %}

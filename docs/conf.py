@@ -35,11 +35,18 @@ templates_path = ["templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "api/cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.rst"]
+exclude_patterns = [
+    "_build",
+    "api/cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.rst",
+    "common_urls.rst",  # used in rst_epilog not
+]
 
 rst_prolog = f"""
-.. |pkgurl| replace:: https://storage.googleapis.com/gwasqc/releases/{pkg}
+.. |pkgurl| replace:: https://github.com/NCI-CGR/GwasQcPipeline/releases/download/{__version__}/{pkg}
+.. |cgr| replace:: *CGR GwasQcPipeline*
 """
+
+rst_epilog = ".. include:: /common_urls.rst"
 
 # -- Extension Settings -------------------------------------------------
 # Add any Sphinx extension module names here, as strings. They can be
@@ -50,10 +57,12 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    "sphinx.ext.autosectionlabel",
     "sphinx-pydantic",
     "sphinxcontrib.mermaid",
     "sphinx-prompt",
     "sphinx_substitution_extensions",
+    "sphinx_click",
 ]
 
 todo_include_todos = True
@@ -65,6 +74,7 @@ todo_include_todos = True
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+numfig = True
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

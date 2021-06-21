@@ -51,12 +51,14 @@ def main(
     )
 
     payload = {
+        "project_name": config.project_name or "CGR GwasQcPipeline",
         "excel_file_name": Path(
             config.user_files.output_pattern.format(prefix="", file_type="QC_Report", ext="xlsx")
         ).name,  # SR0000-001_1_QC_Report_999999999999.xls
         "date": datetime.now().strftime(
             "%a %b %d %H:%M:%S %Y"
         ),  # https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
+        "snp_array": config.snp_array or "",
         "config": config,
         "sample_qc": SampleQC.construct(
             ss,

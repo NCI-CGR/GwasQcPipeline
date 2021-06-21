@@ -51,5 +51,3 @@ Population QC Summary
     - ``population_level/{population}/subjects_unrelated{pi}_maf{maf}_ld{ld}_pruned.eigenvec``
 - **Output**: ``population_level/population_qc.csv``
 - **Script**: ``cgr_gwas_qc/workflow/scripts/population_qc_table.py``
-
-.. automodule:: cgr_gwas_qc.workflow.scripts.population_qc_table

@@ -29,6 +29,9 @@ from typing import MutableMapping, Optional, TypeVar, Union
 from warnings import warn
 
 from cgr_gwas_qc.cli.pre_flight import update_sample_sheet
+from cgr_gwas_qc.models.config.reference_files import ReferenceFiles
+from cgr_gwas_qc.models.config.software_params import SoftwareParams
+from cgr_gwas_qc.models.config.user_files import UserFiles
 from cgr_gwas_qc.models.config.workflow_params import WorkflowParams
 from cgr_gwas_qc.parsers.sample_sheet import SampleManifest
 from cgr_gwas_qc.testing import make_snakefile, make_test_config
@@ -85,22 +88,24 @@ class DataRepo(ABC):
         self._config["snp_array"] = self.ss.manifests["snp_array"]
         self._config["num_snps"] = self._num_snps
 
-        self._config["sample_sheet"] = (self / self._sample_sheet).absolute()
+        self._config["sample_sheet"] = (self / self._sample_sheet).resolve()
         self._config["num_samples"] = self.ss.data.shape[0]
 
-        self._config["reference_files"]["illumina_manifest_file"] = (
-            self / self._illumina_manifest_file
-        ).absolute()
-        self._config["reference_files"]["thousand_genome_vcf"] = (
-            self / self._thousand_genome_vcf
-        ).absolute()
-        self._config["reference_files"]["thousand_genome_tbi"] = (
-            self / self._thousand_genome_tbi
-        ).absolute()
+        self._config["reference_files"] = ReferenceFiles(
+            illumina_manifest_file=(self / self._illumina_manifest_file).resolve(),
+            thousand_genome_vcf=(self / self._thousand_genome_vcf).resolve(),
+            thousand_genome_tbi=(self / self._thousand_genome_tbi).resolve(),
+        ).dict()
 
-        self._config["workflow_params"]["subject_id_column"] = self._subject_id_column
-        self._config["workflow_params"]["expected_sex_column"] = self._expected_sex_column
-        self._config["workflow_params"]["case_control_column"] = self._case_control_column
+        self._config["user_files"] = UserFiles().dict()
+
+        self._config["software_params"] = SoftwareParams().dict()
+
+        self._config["workflow_params"] = WorkflowParams(
+            subject_id_column=self._subject_id_column,
+            expected_sex_column=self._expected_sex_column,
+            case_control_column=self._case_control_column,
+        ).dict()
 
     @abstractmethod
     def _add_gtcs(self):

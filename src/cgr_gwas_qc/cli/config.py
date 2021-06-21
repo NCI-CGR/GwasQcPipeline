@@ -9,6 +9,8 @@ import typer
 
 from cgr_gwas_qc.config import config_to_yaml
 from cgr_gwas_qc.models.config import Config, GenomeBuild, Idat, ReferenceFiles, UserFiles
+from cgr_gwas_qc.models.config.software_params import SoftwareParams
+from cgr_gwas_qc.models.config.workflow_params import WorkflowParams
 from cgr_gwas_qc.parsers import sample_sheet as sample_sheet_parser
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest
 
@@ -27,35 +29,82 @@ def main(
         ...,
         "--sample-sheet",
         "-s",
-        help="Path to the Sample Sheet",
-        prompt="Path to the Sample Sheet",
+        help="Path to a sample sheet or CGR LIMs manifest file.",
         exists=True,
         readable=True,
         file_okay=True,
     ),
-    project_name: Optional[str] = typer.Option(None, help="The current project title."),
-    bpm_file: Optional[Path] = typer.Option(None, help="The BPM File to use."),
+    bpm_file: Optional[Path] = typer.Option(
+        None, help="Path to the Illumina BPM file used to generate the data."
+    ),
     genome_build: GenomeBuild = typer.Option(
-        GenomeBuild.hg37, case_sensitive=False, help="Which human genome build to use."
+        GenomeBuild.hg37, case_sensitive=False, help="The name of the human genome build to use."
+    ),
+    project_name: Optional[str] = typer.Option(
+        None, help="The project name to use for this QC run."
     ),
     include_unused_settings: bool = typer.Option(
-        False, "--include-unused-settings", "-u", help="Include unused options in the config."
+        False,
+        "--include-unused-settings",
+        "-u",
+        help="Include unused settings in the config. "
+        "To keep the config file tidy, we do not output non-required settings that are set as ``None``. "
+        "With this option, we will output all settings, which maybe especially useful for new users.",
     ),
     cgems: bool = typer.Option(
         False,
         "--cgems",
-        help="Create folder structure and config for a production run on CGEMs/CCAD.",
+        help="Create folder structure for a production run on CGEMs/CCAD. "
+        "Then use standard paths for CGEMs/CCAD.",
     ),
     cgems_dev: bool = typer.Option(
         False,
         "--cgems-dev",
-        help="Use CGEMs/CCAD standard paths but create the config in the current working directory.",
+        help=(
+            "Use CGEMs/CCAD standard paths but create the config in the current working directory. "
+            "This is particularly useful for testing."
+        ),
     ),
     no_prompt: bool = typer.Option(
-        False, "-y", help="Don't prompt during CGEMs/CCAD folder creation."
+        False,
+        "-y",
+        help="Don't prompt during CGEMs/CCAD folder creation. "
+        "Note: this option is only used with ``--cgems``.",
     ),
 ):
-    """Creates a Gwas Qc Pipeline config file in the current working directory."""
+    """Create the CGR GwasQcPipline's configuration file (``config.yml``).
+
+    **CGEMs/CCAD Users**
+
+    For CGR users on CGEMs/CCAD you will probably want to run::
+
+        $ cgr config --cgems -s <path to lims manifest file>
+
+    This will create the default production run folder structure in
+    ``GSA_Lab_QC/<project>/builds/QC_v#_######``. This will also populate
+    ``config.yml`` with CGEMs/CCAD file locations and naming patterns. If you do
+    not want to create the production folder structure then you can use the
+    ``--cgems-dev`` option instead of ``--cgems``.
+
+    **Other Users**
+
+    Non-CGR users and CGR users on other systems will probably want to run::
+
+        $ cgr config -s <path to lims manifest file or sample sheet> --project-name <my project name>
+
+    This will create the ``config.yml`` file in the current working directory
+    with place holders for reference files and user files.
+
+    .. attention::
+        All uses should always open the ``config.yml`` file and make any
+        necessary changes. When you are happy then continue to ``cgr
+        pre-flight``.
+
+    .. warning::
+        The sample sheet must exist and be readable. We will raises an error if
+        it is not.
+
+    """
     cfg = initialize_config(sample_sheet, project_name, bpm_file, genome_build)
 
     # Update config to use paths on CGEMs/CCAD or add place holders for other systems
@@ -113,6 +162,8 @@ def initialize_config(
             ),
             gtc_pattern="/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc",
         ),
+        software_params=SoftwareParams(),
+        workflow_params=WorkflowParams(),
     )
 
 
@@ -227,8 +278,9 @@ def _update_number_of_snps(cfg: Config):
             )
 
 
-def _get_cgems_production_run_dir(project_name: str) -> Path:
-    project_dir = CGEMS_QC_DIR / f"{project_name}/builds"
+def _get_cgems_production_run_dir(project_name: Optional[str]) -> Path:
+    name = project_name or f"GwasQcPipeline_{TODAY}"
+    project_dir = CGEMS_QC_DIR / f"{name}/builds"
     num_previous_runs = len(list(project_dir.glob("*")))
     run_number = num_previous_runs + 1
     return project_dir / f"QC_v{run_number}_{TODAY}"
@@ -250,3 +302,5 @@ def _create_cgems_production_run_dir(run_dir: Path, no_prompt: bool = False) -> 
 
 if __name__ == "__main__":
     app()
+
+typer_click_object = typer.main.get_command(app)  # only needed for building documentation

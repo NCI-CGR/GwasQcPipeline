@@ -25,8 +25,8 @@ Kinship Table
     PropIBD, float, Proportion of genome with shared IBD (e.g., IBD2Seg + IBD1Seg/2)
     relationship, string, The assigned relationship based on Kinship
 
-Relationship Values
-*******************
+King Relationships
+******************
 
 Categories were assigned based on Kinship ranges provided in the `KING manual`_.
 
