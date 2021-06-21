@@ -32,36 +32,95 @@ class GenomeBuild(str, Enum):
 
 
 class Config(BaseModel):
-    """Data model for config.yml
+    """``config.yml`` data model.
 
-    The ``config.yml`` contains all workflow configuration information. This
-    is a data model of the config file. It allows for clearly defining a
-    schema and implementing data validation.
+    .. code-block:: yaml
+
+        pipeline_version: v1.0.0
+        project_name: SR0001-001_1_0000000
+        sample_sheet: /path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv
+        genome_build: hg37
+        snp_array: GSAMD-24v1-0
+        num_samples: 6336
+        num_snps: 700078
+        reference_files: ...  # Reference file namesapace
+        user_files: ...  # User file namespace
+        software_params: ...  # Software parameter namespace
+        workflow_params: ...  # Workflow parameter namespace
+        Sample_IDs_to_remove:
+
     """
 
-    pipeline_version: str = Field(__version__, description="The version of the pipeline to use.")
-    project_name: str = Field("Example Project Name", description="The project title.")
+    pipeline_version: str = Field(
+        __version__,
+        description="The version of the GwasQcPipeline to use. "
+        "If you want to use a different version you may just edit this value to match. "
+        "However, it is suggested that you re-run the entire pipeline incases there are differences between version.",
+    )
+
+    project_name: Optional[str] = Field(
+        None, description="The title of the project to use during report generation."
+    )
+
     sample_sheet: Path = Field(
-        Path("sample_sheet.csv"), description="Path to the sample manifest from LIMs."
+        ...,
+        description="The path to the sample sheet (or LIMs manifest). "
+        "This is the file referenced during ``cgr config`` and used to generate ``cgr_sample_sheet.csv``.",
     )
-    genome_build: GenomeBuild = Field(GenomeBuild.hg37, help="The human genome build.")
+
+    genome_build: GenomeBuild = Field(
+        GenomeBuild.hg37,
+        description="The human genome build. "
+        "This field is not actually used by the workflow. "
+        "It is only used during ``cgr config`` to select the VCF file when running on CGEMs/CCAD.",
+    )
+
     snp_array: Optional[str] = Field(
-        None, help="Which SNP array was used. Only used for reporting."
+        None, description="Which SNP array was used. Only used for reporting."
     )
+
     num_samples: int = Field(
-        ..., help="Number of samples, automatically calculated from the sample sheet."
+        ...,
+        description="Number of samples, automatically calculated from the sample sheet during ``cgr config``.",
     )
+
     num_snps: int = Field(
         ...,
-        help="Number of markers, automatically calculated from the `reference_files.illumina_manifest_file",
+        description="Number of markers, automatically calculated from the ``reference_files.illumina_manifest_file``. "
+        "We will attempt to calculate this during ``cgr config`` and ``cgr pre-flight``.",
     )
-    reference_files: ReferenceFiles
-    user_files: UserFiles = UserFiles()  # Paths to user provided files.
-    software_params: SoftwareParams = SoftwareParams()  # Various software parameters.
-    workflow_params: WorkflowParams = (
-        WorkflowParams()
-    )  # Parameters to control how the workflow is run.
-    Sample_IDs_to_remove: Optional[Sequence[str]]
+
+    reference_files: ReferenceFiles = Field(
+        ...,
+        description="Reference file namespace. "
+        "Reference files include the Illumina provided BPM and the 1000 Genomes VCF.",
+    )
+
+    user_files: UserFiles = Field(
+        ...,
+        description="User file namespace. "
+        "User files include the user provided genotype data in IDAT/GTC, PED/MAP, or BED/BIM/FAM formats.",
+    )
+
+    software_params: SoftwareParams = Field(
+        ...,
+        description="Software parameter namespace. "
+        "This includes all parameters passed to 3rd party and internal software and scripts.",
+    )
+
+    workflow_params: WorkflowParams = Field(
+        ...,
+        description="Workflow parameter namespace. "
+        "This includes all parameters used to control workflow behavior.",
+    )
+
+    Sample_IDs_to_remove: Optional[Sequence[str]] = Field(
+        None,
+        description="A list of Sample_IDs to exclude from QC. "
+        "This is the easiest way for a user to exclude specific samples from the GwasQcPipeline. "
+        "These samples will be flagged as ``is_user_exclusion`` and will be present in the report, "
+        "but they will have not have any results from this analysis.",
+    )
 
     @validator("pipeline_version")
     def validate_pipeline_version(cls, v):
@@ -71,6 +130,42 @@ class Config(BaseModel):
                 "Either update your config or install a different version of the pipeline."
             )
         return v
+
+    @staticmethod
+    def schema_rst():
+        """Tweak schema for rendering in Sphinx."""
+        import copy
+        import json
+
+        content = copy.deepcopy(Config.schema())
+        content["title"] = "Top Level Config"
+
+        del content["properties"]["genome_build"]["allOf"]
+        content["properties"]["genome_build"]["type"] = "string; [hg37|hg38]"
+        del content["definitions"]["GenomeBuild"]
+
+        del content["properties"]["reference_files"]["allOf"]
+        content["properties"]["reference_files"]["type"] = "namespace"
+        del content["definitions"]["ReferenceFiles"]
+
+        del content["properties"]["user_files"]["allOf"]
+        content["properties"]["user_files"]["type"] = "namespace"
+        del content["definitions"]["UserFiles"]
+        del content["definitions"]["Idat"]
+
+        del content["properties"]["software_params"]["allOf"]
+        content["properties"]["software_params"]["type"] = "namespace"
+        del content["definitions"]["SoftwareParams"]
+
+        del content["properties"]["workflow_params"]["allOf"]
+        content["properties"]["workflow_params"]["type"] = "namespace"
+        del content["definitions"]["WorkflowParams"]
+
+        content["properties"]["Sample_IDs_to_remove"]["type"] = "list of strings"
+        del content["properties"]["Sample_IDs_to_remove"]["items"]
+
+        del content["definitions"]
+        return json.dumps(content, indent=2)
 
 
 Config.update_forward_refs()

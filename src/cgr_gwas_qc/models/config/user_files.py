@@ -5,45 +5,88 @@ from pydantic import BaseModel, Field, root_validator, validator
 
 
 class UserFiles(BaseModel):
-    """File name patterns for user provided data.
+    """A list of user provided files or naming patterns.
 
-    The GWAS QC Pipeline requires GTC or IDAT files.
+    .. code-block:: yaml
+
+        user_files:
+            output_pattern: '{prefix}/{file_type}.{ext}'
+            idat_pattern:
+                red: /expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat
+                green: /expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat
+            gtc_pattern: /expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc
+
+    or
+
+    .. code-block:: yaml
+
+        user_files:
+            output_pattern: '{prefix}/{file_type}.{ext}'
+            ped: /path/to/samples.ped
+            map: /path/to/samples.map
+
+    or
+
+    .. code-block:: yaml
+
+        user_files:
+            output_pattern: '{prefix}/{file_type}.{ext}'
+            bed: /path/to/samples.bed
+            bim: /path/to/samples.bim
+            fam: /path/to/samples.fam
+
+    .. note::
+        The IDAT/GTC patterns, PED/MAP paths, and BED/BIM/FAM paths are mutually exclusive.
+        You should only provide one set of patterns/paths.
     """
 
     output_pattern: str = Field(
-        "{prefix}/{file_type}.{ext}", description="File naming pattern for deliverable files."
+        "{prefix}/{file_type}.{ext}",
+        description="File naming pattern for deliverable files. "
+        "In general, you should not need to edit this. "
+        "However, if you do decide to change this pattern you must keep the ``{prefix}``, ``{file_type}``, and ``{ext}`` patterns. "
+        "These are filled in by the workflow, see the delivery sub-workflow for more details.",
     )
 
-    idat_pattern: Optional["Idat"]
+    idat_pattern: Optional["Idat"] = Field(
+        None,
+        description="File naming pattern for IDAT files. "
+        "There are two IDAT files for each samples (red and green). "
+        "You need to provide a file naming pattern for each IDAT file. "
+        "Wildcards are indicated by an ``{}``. "
+        "Wildcards have to match column names in the sample sheet exactly.",
+    )
 
     # GTC
     gtc_pattern: Optional[str] = Field(
         None,
-        description="File name pattern for GTC file. Wildcards are columns in the sample sheet.",
+        description="File name pattern for GTC file. "
+        "Wildcards are indicated by an ``{}``. "
+        "Wildcards have to match column names in the sample sheet exactly.",
     )
 
     # PED/MAP
     ped: Optional[Path] = Field(
         None,
-        description="Aggregated PED file if sample level GTC files are not available.",
+        description="The full path to an aggregated PED file if the sample level GTC files are not available.",
     )
     map: Optional[Path] = Field(
         None,
-        description="Aggregated MAP file if sample level GTC files are not available.",
+        description="The full path to an aggregated MAP file if the sample level GTC files are not available.",
     )
 
     # BED/BIM/FAM
     bed: Optional[Path] = Field(
         None,
-        description="Aggregated BED file if sample level GTC files are not available.",
+        description="The full path to an aggregated BED file if the sample level GTC files are not available.",
     )
     bim: Optional[Path] = Field(
         None,
-        description="Aggregated BIM file if sample level GTC files are not available.",
+        description="The full path to an aggregated BIM file if the sample level GTC files are not available.",
     )
     fam: Optional[Path] = Field(
         None,
-        description="Aggregated FAM file if sample level GTC files are not available.",
+        description="The full path to an aggregated FAM file if the sample level GTC files are not available.",
     )
 
     @validator("gtc_pattern")
@@ -88,18 +131,36 @@ class UserFiles(BaseModel):
 
         return values
 
+    @staticmethod
+    def schema_rst():
+        """Tweak schema for rendering in Sphinx."""
+        import json
+
+        content = UserFiles.schema()
+        content["title"] = "User Files"
+
+        del content["properties"]["idat_pattern"]["allOf"]
+        content["properties"]["idat_pattern"]["type"] = "namespace"
+        del content["definitions"]
+
+        return json.dumps(content, indent=2)
+
 
 class Idat(BaseModel):
     """Each sample has an Idat file in two color channels."""
 
     red: str = Field(
         ...,
-        description="File name pattern for Red Channel Idat. Wildcards are columns in the sample sheet.",
+        description="File name pattern for Red Channel Idat. "
+        "Wildcards are indicated by an ``{}``. "
+        "Wildcards have to match column names in the sample sheet exactly.",
     )
 
     green: str = Field(
         ...,
-        description="File name pattern for Green Channel Idat. Wildcards are columns in the sample sheet.",
+        description="File name pattern for Green Channel Idat. "
+        "Wildcards are indicated by an ``{}``. "
+        "Wildcards have to match column names in the sample sheet exactly.",
     )
 
     @validator("*")
