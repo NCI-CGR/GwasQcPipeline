@@ -44,12 +44,10 @@ Here we describe the various steps that each sub-workflow runs, the config optio
    :name: module-reference
    :maxdepth: 1
 
-   reference/cli
    reference/file_types
-   reference/rules
 
 .. toctree::
-   :caption: Developer Documentation
+   :caption: Developer Reference
    :name: dev-docs
    :titlesonly:
 

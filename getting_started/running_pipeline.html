@@ -109,19 +109,17 @@
 </ul>
 <p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
@@ -497,7 +495,7 @@ sub-workflow by running:</p>
 <dt>subworkflow (str):</dt><dd><p>Specify which sub-workflow to run [default: None].
 Must be one of [<code class="docutils literal notranslate"><span class="pre">entry_points</span></code> | <code class="docutils literal notranslate"><span class="pre">contamination</span></code> | <code class="docutils literal notranslate"><span class="pre">sample_qc</span></code> | <code class="docutils literal notranslate"><span class="pre">subject_qc</span></code> | <code class="docutils literal notranslate"><span class="pre">delivery</span></code>].</p>
 </dd>
-<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs:</dt><dd><p>All snakemake arguments will be passed to snakemake.
+<dt>other-kwargs:</dt><dd><p>All snakemake arguments will be passed to snakemake.
 See their documentation for possible options.</p>
 </dd>
 </dl>

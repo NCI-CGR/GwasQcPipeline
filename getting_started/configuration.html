@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Entry Points" href="../sub_workflows/entry_points.html" />
+    <link rel="next" title="Entry Points Sub-workflow" href="../sub_workflows/entry_points.html" />
     <link rel="prev" title="Running the Pipeline" href="running_pipeline.html" /> 
 </head>
 
@@ -105,19 +105,17 @@
 </ul>
 <p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
@@ -204,11 +202,11 @@ See the <a class="reference internal" href="#workflow-parameters">Workflow Param
 <p>Example of the basic required structure of a sample sheet.
 You can have any other metadata as additional columns.
 The only column name that is required is <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code>, the other columns can be named anything as long as they are referenced correctly in <a class="reference internal" href="#workflow-parameters">Workflow Parameters</a>.</p>
-<div class="highlight-CSV notranslate"><div class="highlight"><pre><span></span>Sample_ID,Subject_ID,Expected_Sex,Case_Control
-Samp0001,Sub0001,M,Case
-Samp0002,Sub0001,M,Case
-Samp0003,Sub0002,F,Control
-Samp0004,Sub0003,F,QC
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Sample_ID</span><span class="p">,</span><span class="n">Subject_ID</span><span class="p">,</span><span class="n">Expected_Sex</span><span class="p">,</span><span class="n">Case_Control</span>
+<span class="n">Samp0001</span><span class="p">,</span><span class="n">Sub0001</span><span class="p">,</span><span class="n">M</span><span class="p">,</span><span class="n">Case</span>
+<span class="n">Samp0002</span><span class="p">,</span><span class="n">Sub0001</span><span class="p">,</span><span class="n">M</span><span class="p">,</span><span class="n">Case</span>
+<span class="n">Samp0003</span><span class="p">,</span><span class="n">Sub0002</span><span class="p">,</span><span class="n">F</span><span class="p">,</span><span class="n">Control</span>
+<span class="n">Samp0004</span><span class="p">,</span><span class="n">Sub0003</span><span class="p">,</span><span class="n">F</span><span class="p">,</span><span class="n">QC</span>
 </pre></div>
 </div>
 </div>
@@ -1244,7 +1242,7 @@ These samples will be indicated as <code class="docutils literal notranslate"><s
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../sub_workflows/entry_points.html" class="btn btn-neutral float-right" title="Entry Points" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../sub_workflows/entry_points.html" class="btn btn-neutral float-right" title="Entry Points Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="running_pipeline.html" class="btn btn-neutral float-left" title="Running the Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

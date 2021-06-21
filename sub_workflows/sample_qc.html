@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Sample QC &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Sample QC Sub-workflow &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -31,15 +31,14 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
-        <script src="https://unpkg.com/mermaid@8.4.8/dist/mermaid.min.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Subject QC" href="subject_qc.html" />
-    <link rel="prev" title="Contamination" href="contamination.html" /> 
+    <link rel="next" title="Subject QC Sub-workflow" href="subject_qc.html" />
+    <link rel="prev" title="Contamination Sub-workflow" href="contamination.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,23 +91,28 @@
 </ul>
 <p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Sample QC</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#genotype-call-rate-filters">Genotype Call Rate Filters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sample-contamination-detection">Sample Contamination Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination Sub-workflow</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Sample QC Sub-workflow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#call-rate-filters">Call Rate Filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contamination-summary">Contamination Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#replicate-concordance">Replicate Concordance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ancestry">Ancestry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sample-qc-summary">Sample QC Summary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#internal-sample-qc-report">Internal Sample QC Report</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#internal-snp-qc-report">Internal SNP QC Report</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
@@ -163,7 +167,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Sample QC</li>
+      <li>Sample QC Sub-workflow</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -182,61 +186,365 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sample-qc">
-<h1>Sample QC<a class="headerlink" href="#sample-qc" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="genotype-call-rate-filters">
-<h2>Genotype Call Rate Filters<a class="headerlink" href="#genotype-call-rate-filters" title="Permalink to this headline">¶</a></h2>
-<p>This module uses <code class="docutils literal notranslate"><span class="pre">plink</span></code> to look at Sample and SNP level genotype call rates. Two call rate thresholds are defined in the config (80%/95%). Low call rate is an indicator of poor sample quality or sample contamination resulting in a large amount of missing data. Quality control metrics (MAF, pct missing, HWE, autosomal homozygosity, X-linked homozygosity) are calculated for (starting data, filtered data at 80% thresholds, and filtered data at 95% threshold) using <code class="docutils literal notranslate"><span class="pre">plink</span></code>.</p>
-<script>mermaid.initialize({startOnLoad:true});</script><div class="mermaid">
-            graph TD
-    D1{Genotype Calls}
-    D2{Illumina Manifest}
-    S1[gtc_to_ped]
-    S2[merge_sample_peds]
-    S3[plink_sample_qc_stats::start]
-    S4[filter_call_rate_1]
-    S5[plink_sample_qc_stats::filter1]
-    S6[filter_call_rate_2]
-    S7[plink_sample_qc_stats::filter2]
-    D1 --&gt;|&quot;{sample_id}.gtc&quot;| S1
-    D2 --&gt;|bpm| S1
-    S1 --&gt;|&quot;{sample_id}.ped + {sample_id}.map&quot;| S2
-    S2 --&gt;|bed + bim + fam| S3 &amp; S4
-    S4 --&gt;|bed + bim + fam| S5 &amp; S6
-    S6 --&gt;|bed + bim + fam| S7
-        </div></div>
-<div class="section" id="sample-contamination-detection">
-<h2>Sample Contamination Detection<a class="headerlink" href="#sample-contamination-detection" title="Permalink to this headline">¶</a></h2>
-<p>Mixing of 2+ samples or swapping sample labels is a common problem for high-throughput genomics. Contamination is detected by modeling allele intensities accounting for population level allele frequencies. Here we use the tool <code class="docutils literal notranslate"><span class="pre">verifyIDintensity</span></code> to perform this analysis on individual
-samples.</p>
-<p>Sample swaps between male and female samples can be detected by looking at X-linked SNP heterozygosity.</p>
-<div class="mermaid">
-            graph TD
-    D1{Genotype Calls}
-    D2{Illumina Manifest}
-    D3{1000 Genome&lt;br&gt;VCF}
-
-    A[gtc_to_adpc]
-    D1 --&gt;|&lt;sample_id&gt;.gtc| A
-    D2 --&gt;|bmp| A
-
-    B[make_abf_txt]
-    D2 --&gt;|bmp| B
-    D3 --&gt;|vcf.gz| B
-
-    C[contam_test_GSA_1000g]
-    A  --&gt;|&lt;sample_id&gt;.adpc.bin| C
-    B --&gt;|abf.txt| C
-
-    D[combine_contam_one_samp_b_1000g]
-    C --&gt;|&lt;sample_id&gt;.contam.out| D
-
-    %% I don't know where these are from yet
-    intens(all_sample_idat_intensity/idat_intensity.csv)
-    imiss3(plink_filter_call_rate_2/samples_filter2.imiss)
-    intens --&gt; D
-    imiss3 --&gt; D
-        </div></div>
+  <div class="section" id="sample-qc-sub-workflow">
+<span id="sample-qc"></span><h1>Sample QC Sub-workflow<a class="headerlink" href="#sample-qc-sub-workflow" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt><strong>Workflow File</strong>:</dt><dd><p><a class="reference external" href="https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/sample_qc.smk">https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/sample_qc.smk</a></p>
+</dd>
+</dl>
+<p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reference_files.thousand_genome_vcf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reference_files.thousand_genome_tbi</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.sample_call_rate_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.snp_call_rate_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.sample_call_rate_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.snp_call_rate_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.intensity_threshold</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.contam_threshold</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.ibd_pi_hat_min</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.ibd_pi_hat_max</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.maf_for_ibd</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.ld_prune_r2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.dup_concordance_cutoff</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.pi_hat_threshold</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.remove_contam</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.remove_rep_discordant</span></code></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/sample_qc.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/snp_qc.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/KnownReplicates.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/InternalQcKnown.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/StudySampleKnown.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/UnknownReplicates.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/summary_stats.txt</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/call_rate.png</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/chrx_inbreeding.png</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/ancestry.png</span></code></p></li>
+</ul>
+</div></blockquote>
+<div class="figure align-default" id="fig-sample-qc-workflow">
+<img alt="../_images/sample_qc.svg" src="../_images/sample_qc.svg" /><p class="caption"><span class="caption-number">Fig. 4 </span><span class="caption-text">The sample-qc sub-workflow.
+This runs all major QC checks at the sample level.</span><a class="headerlink" href="#fig-sample-qc-workflow" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="call-rate-filters">
+<h2>Call Rate Filters<a class="headerlink" href="#call-rate-filters" title="Permalink to this headline">¶</a></h2>
+<p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.sample_call_rate_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.snp_call_rate_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.sample_call_rate_2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.snp_call_rate_2</span></code></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/call_rate_1/samples.{bed,bim,fam}</span></code> data set after level 1 sample/snp call rate filters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/call_rate_2/samples.{bed,bim,fam}</span></code> data set after level 2 sample/snp call rate filters.</p></li>
+</ul>
+</div></blockquote>
+<p>First we run a series of call rate (a.k.a. completion) filters.
+Here we remove samples then SNPs which have high missingness in across samples.</p>
+</div>
+<div class="section" id="contamination-summary">
+<h2>Contamination Summary<a class="headerlink" href="#contamination-summary" title="Permalink to this headline">¶</a></h2>
+<p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.intensity_threshold</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.contam_threshold</span></code></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/contamination/summary.csv</span></code> aggregate summary table of contamination results.</p></li>
+</ul>
+</div></blockquote>
+<p>If IDAT/GTC files are present and we ran <a class="reference internal" href="contamination.html#contamination"><span class="std std-ref">Contamination Sub-workflow</span></a> then we will create a summary table.
+For samples that have a low call rate and a median idat intensity &lt; the intensity_threshold we will set %Mix to NaN.
+We then will flag a sample <code class="docutils literal notranslate"><span class="pre">is_contaminated</span></code> if the %Mix is &gt;= contam_threshold.</p>
+</div>
+<div class="section" id="replicate-concordance">
+<h2>Replicate Concordance<a class="headerlink" href="#replicate-concordance" title="Permalink to this headline">¶</a></h2>
+<p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.ibd_pi_hat_min</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.ibd_pi_hat_max</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.maf_for_ibd</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.ld_prune_r2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.dup_concordance_cutoff</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.pi_hat_threshold</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.remove_contam</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.remove_rep_discordant</span></code></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/concordance/summary.csv</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>It is common to include multiple replicates for a subset of samples as a QC metric.
+Here we check these replicates and make sure that they are highly concordant.
+We report 3 methods for checking relatedness/concordance (PLINK IBD, GRAF, and KING).
+We mostly rely on IBD results but report the others in our summary tables.
+For all three methods, we do all pairwise comparisons to determine which samples are related/replicated.
+We flag two samples as concordant (<code class="docutils literal notranslate"><span class="pre">is_ge_concordance</span></code>) if concordance (proportion IBD2) &gt; dup_concordance_cutoff.
+We flag two samples as related (<code class="docutils literal notranslate"><span class="pre">is_ge_pi_hat</span></code>) if PLINK’s PI_HAT is &gt;= pi_hat_threshold.</p>
+</div>
+<div class="section" id="ancestry">
+<h2>Ancestry<a class="headerlink" href="#ancestry" title="Permalink to this headline">¶</a></h2>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/ancestry/graf_ancestry.txt</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>Finally, we estimate ancestry using <a class="reference external" href="https://github.com/ncbi/graf">GRAF</a>.
+Here we categorize each sample into 1 of 9 possible groups (see <a class="reference external" href="https://github.com/ncbi/graf">GRAF</a> for more details).
+We also report the percent mixture of the 3 major continental population (African, East Asian, European).</p>
+</div>
+<div class="section" id="sample-qc-summary">
+<h2>Sample QC Summary<a class="headerlink" href="#sample-qc-summary" title="Permalink to this headline">¶</a></h2>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/sample_qc.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/snp_qc.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/summary_stats.txt</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/call_rate.png</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/chrx_inbreeding.png</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/ancestry.png</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>Finally, we aggregate all of the QC results.
+We generate two summary tables described below:</p>
+<span class="target" id="module-cgr_gwas_qc.workflow.scripts.sample_qc_table"><span id="sample-qc-table"></span></span><div class="section" id="internal-sample-qc-report">
+<h3>Internal Sample QC Report<a class="headerlink" href="#internal-sample-qc-report" title="Permalink to this headline">¶</a></h3>
+<p><strong>Script</strong>: <code class="docutils literal notranslate"><span class="pre">workflow/scripts/sample_qc_table.py</span></code></p>
+<p>This script takes various outputs from the GwasQcPipeline and
+aggregates/summarizes results into an internal QC report. Here we use a
+functional approach to build up the QC report. Each file has it’s own
+function to parse/summarize its content. This makes it easier to add new
+components or change the behavior. Search for <cite>TO-ADD</cite> comments for where you
+would have to make modifications to add new components.</p>
+<p><strong>Output</strong>: <code class="docutils literal notranslate"><span class="pre">sample_level/sample_qc.csv</span></code></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sample_ID</p></td>
+<td><p>string</p></td>
+<td><p>The sample identifier used by the workflow.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Group_By_Subject_ID</p></td>
+<td><p>string</p></td>
+<td><p>The subject identifier used by the workflow</p></td>
+</tr>
+<tr class="row-even"><td><p>num_samples_per_subject</p></td>
+<td><p>UInt32</p></td>
+<td><p>The total number of <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> per <code class="docutils literal notranslate"><span class="pre">Group_By_Subject_ID</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>analytic_exclusion</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the sample failed QC criteria.</p></td>
+</tr>
+<tr class="row-even"><td><p>num_analytic_exclusion</p></td>
+<td><p>boolean</p></td>
+<td><p>The number of QC criteria the sample failed.</p></td>
+</tr>
+<tr class="row-odd"><td><p>analytic_exclusion_reason</p></td>
+<td><p>string</p></td>
+<td><p>A list of QC criteria the sample failed.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_subject_representative</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> is used to represent the subject.</p></td>
+</tr>
+<tr class="row-odd"><td><p>subject_dropped_from_study</p></td>
+<td><p>boolean</p></td>
+<td><p>True if there are no samples passing QC for this subject.</p></td>
+</tr>
+<tr class="row-even"><td><p>case_control</p></td>
+<td><p>CASE_CONTROL_DTYPE</p></td>
+<td><p>Phenotype status [<code class="docutils literal notranslate"><span class="pre">Case</span></code> | <code class="docutils literal notranslate"><span class="pre">Control</span></code> | <code class="docutils literal notranslate"><span class="pre">QC</span></code> | <code class="docutils literal notranslate"><span class="pre">Unknown</span></code>].</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_internal_control</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the sample is an internal control.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_sample_exclusion</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the sample is excluded in the config or missing IDAT/GTC files.</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_user_exclusion</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the sample is excluded in the config</p></td>
+</tr>
+<tr class="row-even"><td><p>is_missing_idats</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the IDAT files were missing during pre-flight.</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_missing_gtc</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the IDAT files were missing during pre-flight.</p></td>
+</tr>
+<tr class="row-even"><td><p>Call_Rate_Initial</p></td>
+<td><p>float</p></td>
+<td><p>The Initial sample call rate before any filters.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Call_Rate_1</p></td>
+<td><p>float</p></td>
+<td><p>The sample call rate after the first filter.</p></td>
+</tr>
+<tr class="row-even"><td><p>Call_Rate_2</p></td>
+<td><p>float</p></td>
+<td><p>The sample call rate after the second filter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_cr1_filtered</p></td>
+<td><p>boolean</p></td>
+<td><p>True if a sample was removed by the first call rate filter.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_cr2_filtered</p></td>
+<td><p>boolean</p></td>
+<td><p>True if a sample was removed by the second call rate filter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>is_call_rate_filtered</p></td>
+<td><p>boolean</p></td>
+<td><p>True if a sample was removed by either call rate filter.</p></td>
+</tr>
+<tr class="row-even"><td><p>IdatIntensity</p></td>
+<td><p>float</p></td>
+<td><p>The median IDAT intensity.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Contamination_Rate</p></td>
+<td><p>float</p></td>
+<td><p>The SNPweights contamination rate (%Mix)</p></td>
+</tr>
+<tr class="row-even"><td><p>is_contaminated</p></td>
+<td><p>boolean</p></td>
+<td><p>True if a sample exceed the contamination rate threshold.</p></td>
+</tr>
+<tr class="row-odd"><td><p>replicate_ids</p></td>
+<td><p>string</p></td>
+<td><p>Concatenated Sample_IDs that are replicates.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_discordant_replicate</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the replicates had low concordance.</p></td>
+</tr>
+<tr class="row-odd"><td><p>expected_sex</p></td>
+<td><p>SEX_DTYPE</p></td>
+<td><p>The expected sex from the provided sample sheet.</p></td>
+</tr>
+<tr class="row-even"><td><p>predicted_sex</p></td>
+<td><p>SEX_DTYPE</p></td>
+<td><p>The predicted sex based on X chromosome heterozygosity.</p></td>
+</tr>
+<tr class="row-odd"><td><p>X_inbreeding_coefficient</p></td>
+<td><p>float</p></td>
+<td><p>The X chromosome F coefficient.</p></td>
+</tr>
+<tr class="row-even"><td><p>is_sex_discordant</p></td>
+<td><p>boolean</p></td>
+<td><p>True if expected and predicted sex did not match.</p></td>
+</tr>
+<tr class="row-odd"><td><p>AFR</p></td>
+<td><p>float</p></td>
+<td><p>Proportion African ancestry.</p></td>
+</tr>
+<tr class="row-even"><td><p>EUR</p></td>
+<td><p>float</p></td>
+<td><p>Proportion European ancestry.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ASN</p></td>
+<td><p>float</p></td>
+<td><p>Proportion East Asian ancestry.</p></td>
+</tr>
+<tr class="row-even"><td><p>Ancestry</p></td>
+<td><p>category</p></td>
+<td><p>Assigned ancestral population (GRAF).</p></td>
+</tr>
+<tr class="row-odd"><td><p>identifiler_needed</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the lab needs to run Identifiler.</p></td>
+</tr>
+<tr class="row-even"><td><p>identifiler_reason</p></td>
+<td><p>string</p></td>
+<td><p>The QC problem that needs checked with Identifiler.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<span class="target" id="module-cgr_gwas_qc.workflow.scripts.snp_qc_table"><span id="snp-qc-table"></span></span><div class="section" id="internal-snp-qc-report">
+<h3>Internal SNP QC Report<a class="headerlink" href="#internal-snp-qc-report" title="Permalink to this headline">¶</a></h3>
+<p><strong>Script</strong>: <code class="docutils literal notranslate"><span class="pre">workflow/scripts/snp_qc_table.py</span></code></p>
+<p>This script takes various outputs from the GwasQcPipeline and
+aggregates/summarizes results into an internal SNP level QC report.</p>
+<p><strong>Output</strong>: <code class="docutils literal notranslate"><span class="pre">sample_level/snp_qc.csv</span></code></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>dtype</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>array_snp_id</p></td>
+<td><p>string</p></td>
+<td><p>The SNP ID as found in the BPM file.</p></td>
+</tr>
+<tr class="row-odd"><td><p>thousand_genomes_snp_id</p></td>
+<td><p>string</p></td>
+<td><p>The rsID found in the 1000 Genomes VCF.</p></td>
+</tr>
+<tr class="row-even"><td><p>chromosome</p></td>
+<td><p>string</p></td>
+<td><p>The chromosome that the SNP is on.</p></td>
+</tr>
+<tr class="row-odd"><td><p>snp_cr1</p></td>
+<td><p>float</p></td>
+<td><p>The SNP call rate results after the first filter.</p></td>
+</tr>
+<tr class="row-even"><td><p>snp_cr1_removed</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the SNP was removed by the first call rate filter.</p></td>
+</tr>
+<tr class="row-odd"><td><p>snp_cr2</p></td>
+<td><p>float</p></td>
+<td><p>The SNP call rate results after the second filter.</p></td>
+</tr>
+<tr class="row-even"><td><p>snp_cr2_removed</p></td>
+<td><p>boolean</p></td>
+<td><p>True if the SNP was removed by the second call rate filter.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 
 
@@ -247,10 +555,10 @@ samples.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="subject_qc.html" class="btn btn-neutral float-right" title="Subject QC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="subject_qc.html" class="btn btn-neutral float-right" title="Subject QC Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="contamination.html" class="btn btn-neutral float-left" title="Contamination" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="contamination.html" class="btn btn-neutral float-left" title="Contamination Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

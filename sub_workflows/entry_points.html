@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Entry Points &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Entry Points Sub-workflow &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Contamination" href="contamination.html" />
+    <link rel="next" title="Contamination Sub-workflow" href="contamination.html" />
     <link rel="prev" title="Configuration Files" href="../getting_started/configuration.html" /> 
 </head>
 
@@ -91,19 +91,17 @@
 </ul>
 <p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Entry Points</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
@@ -158,7 +156,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Entry Points</li>
+      <li>Entry Points Sub-workflow</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -177,8 +175,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="entry-points">
-<h1>Entry Points<a class="headerlink" href="#entry-points" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="entry-points-sub-workflow">
+<span id="entry-points"></span><h1>Entry Points Sub-workflow<a class="headerlink" href="#entry-points-sub-workflow" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt><strong>Workflow File</strong>:</dt><dd><p><a class="reference external" href="https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/entry_points.smk">https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/entry_points.smk</a></p>
+</dd>
+</dl>
+<p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.idat_pattern</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.ped</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.map</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.bed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.bim</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.fam</span></code></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/samples.bed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/samples.bim</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/samples.fam</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>There are three paths we can take to create these files:</p>
+<ol class="arabic simple">
+<li><p>If GTC files are provided using <code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code> then we will</p></li>
+</ol>
+<div class="figure align-default" id="fig-entry-points-gtc">
+<img alt="../_images/entry-points_gtc.png" src="../_images/entry-points_gtc.png" />
+<p class="caption"><span class="caption-number">Fig. 2 </span><span class="caption-text">The GTC entry-point workflow.
+If per sample GTC files are provided, then we will convert these files to the PED/MAP format and merge them together.</span><a class="headerlink" href="#fig-entry-points-gtc" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>If an aggregated PED/MAP is provided using <code class="docutils literal notranslate"><span class="pre">user_files.ped</span></code> and <code class="docutils literal notranslate"><span class="pre">user_files.map</span></code> then we will convert the PED/MAP to BED/BIM/FAM.</p></li>
+<li><p>If an aggregated BED/BIM/FAM is provided using <code class="docutils literal notranslate"><span class="pre">user_files.bed</span></code>, <code class="docutils literal notranslate"><span class="pre">user_files.bim</span></code>, <code class="docutils literal notranslate"><span class="pre">user_files.fam</span></code> then we will create a symbolic link.</p></li>
+</ol>
 </div>
 
 
@@ -189,7 +224,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="contamination.html" class="btn btn-neutral float-right" title="Contamination" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="contamination.html" class="btn btn-neutral float-right" title="Contamination Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../getting_started/configuration.html" class="btn btn-neutral float-left" title="Configuration Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

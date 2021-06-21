@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Contamination &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Contamination Sub-workflow &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Sample QC" href="sample_qc.html" />
-    <link rel="prev" title="Entry Points" href="entry_points.html" /> 
+    <link rel="next" title="Sample QC Sub-workflow" href="sample_qc.html" />
+    <link rel="prev" title="Entry Points Sub-workflow" href="entry_points.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -91,19 +91,17 @@
 </ul>
 <p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Contamination</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contamination Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
@@ -158,7 +156,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Contamination</li>
+      <li>Contamination Sub-workflow</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -177,8 +175,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="contamination">
-<h1>Contamination<a class="headerlink" href="#contamination" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="contamination-sub-workflow">
+<span id="contamination"></span><h1>Contamination Sub-workflow<a class="headerlink" href="#contamination-sub-workflow" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt><strong>Workflow File</strong>:</dt><dd><p><a class="reference external" href="https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/contamination.smk">https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/contamination.smk</a></p>
+</dd>
+</dl>
+<p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reference_files.thousand_genome_vcf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reference_files.thousand_genome_tbi</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.idat_pattern</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">software_params.contam_population</span></code></p></li>
+</ul>
+</div></blockquote>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/&lt;BPM</span> <span class="pre">Prefix&gt;.&lt;software_params.contam_population&gt;.abf.txt</span></code> B allele frequencies from the 1000 genomes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/contamination/median_idat_intensity.csv</span></code> aggregated table of median IDAT intensities.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/contamination/verifyIDintensity.csv</span></code> aggregated table of contamination scores.</p></li>
+</ul>
+</div></blockquote>
+<div class="figure align-default" id="fig-contamination-workflow">
+<img alt="../_images/contamination.png" src="../_images/contamination.png" />
+<p class="caption"><span class="caption-number">Fig. 3 </span><span class="caption-text">The contamination sub-workflow.
+This workflow will estimate contamination using verifyIDintensity on each sample individually.
+It requires that you have GTC/IDAT files.
+It first pull B-allele frequencies from the 1000 Genomes VCF file.
+It then estimate contamination for each sample and aggregates these results.
+Finally, it also estimates the per sample median IDAT intensity, which is used to filter contamination results in the <a class="reference internal" href="sample_qc.html#sample-qc"><span class="std std-ref">Sample QC Sub-workflow</span></a></span><a class="headerlink" href="#fig-contamination-workflow" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 
 
@@ -189,10 +218,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sample_qc.html" class="btn btn-neutral float-right" title="Sample QC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sample_qc.html" class="btn btn-neutral float-right" title="Sample QC Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="entry_points.html" class="btn btn-neutral float-left" title="Entry Points" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="entry_points.html" class="btn btn-neutral float-left" title="Entry Points Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

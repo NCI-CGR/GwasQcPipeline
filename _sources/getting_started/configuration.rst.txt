@@ -17,7 +17,7 @@ See the `Workflow Parameters`_ section below for details about what values are a
    You can have any other metadata as additional columns.
    The only column name that is required is ``Sample_ID``, the other columns can be named anything as long as they are referenced correctly in `Workflow Parameters`_.
 
-   .. code-block:: CSV
+   .. code-block::
 
       Sample_ID,Subject_ID,Expected_Sex,Case_Control
       Samp0001,Sub0001,M,Case
