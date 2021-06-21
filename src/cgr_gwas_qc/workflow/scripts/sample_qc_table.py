@@ -3,7 +3,7 @@
 Internal Sample QC Report
 -------------------------
 
-``workflow/scripts/sample_qc_table.py``
+**Script**: ``workflow/scripts/sample_qc_table.py``
 
 This script takes various outputs from the GwasQcPipeline and
 aggregates/summarizes results into an internal QC report. Here we use a
@@ -12,18 +12,20 @@ function to parse/summarize its content. This makes it easier to add new
 components or change the behavior. Search for `TO-ADD` comments for where you
 would have to make modifications to add new components.
 
+**Output**: ``sample_level/sample_qc.csv``
+
 .. csv-table::
     :header: name, dtype, description
 
     Sample_ID, string, The sample identifier used by the workflow.
     Group_By_Subject_ID, string, The subject identifier used by the workflow
     num_samples_per_subject, UInt32, The total number of ``Sample_ID`` per ``Group_By_Subject_ID``.
-    analytic_exclusion: boolean, True if the sample failed QC criteria.
-    num_analytic_exclusion: boolean, The number of QC criteria the sample failed.
-    analytic_exclusion_reason: string, A list of QC criteria the sample failed.
+    analytic_exclusion, boolean, True if the sample failed QC criteria.
+    num_analytic_exclusion, boolean, The number of QC criteria the sample failed.
+    analytic_exclusion_reason, string, A list of QC criteria the sample failed.
     is_subject_representative, boolean, True if the ``Sample_ID`` is used to represent the subject.
     subject_dropped_from_study, boolean, True if there are no samples passing QC for this subject.
-    case_control, CASE_CONTROL_DTYPE, Phenotype status {Case, Control, QC, Unknown}
+    case_control, CASE_CONTROL_DTYPE, Phenotype status [``Case`` | ``Control`` | ``QC`` | ``Unknown``].
     is_internal_control, boolean, True if the sample is an internal control.
     is_sample_exclusion, boolean, True if the sample is excluded in the config or missing IDAT/GTC files.
     is_user_exclusion, boolean, True if the sample is excluded in the config

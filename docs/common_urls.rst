@@ -2,6 +2,7 @@
 
 .. _snakemake: https://snakemake.readthedocs.io/en/stable/
 .. _Miniconda: https://docs.conda.io/en/latest/miniconda.html
+.. _GRAF: https://github.com/ncbi/graf
 
 .. Internal Links
 

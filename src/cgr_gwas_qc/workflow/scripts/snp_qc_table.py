@@ -1,13 +1,25 @@
-"""Creates a SNP QC Summary Table.
+"""
+Internal SNP QC Report
+----------------------
 
-Columns:
-    - array_snp_id (str)
-    - thousand_genomes_snp_id (str)
-    - chromosome (int, str)
-    - snp_cr1 (float)
-    - snp_cr1_removed (bool)
-    - snp_cr2 (float)
-    - snp_cr2_removed (bool)
+**Script**: ``workflow/scripts/snp_qc_table.py``
+
+This script takes various outputs from the GwasQcPipeline and
+aggregates/summarizes results into an internal SNP level QC report.
+
+**Output**: ``sample_level/snp_qc.csv``
+
+.. csv-table::
+    :header: name, dtype, description
+
+    array_snp_id, string, The SNP ID as found in the BPM file.
+    thousand_genomes_snp_id, string, The rsID found in the 1000 Genomes VCF.
+    chromosome, string, The chromosome that the SNP is on.
+    snp_cr1, float, The SNP call rate results after the first filter.
+    snp_cr1_removed, boolean, True if the SNP was removed by the first call rate filter.
+    snp_cr2, float, The SNP call rate results after the second filter.
+    snp_cr2_removed, boolean, True if the SNP was removed by the second call rate filter.
+
 """
 from pathlib import Path
 
