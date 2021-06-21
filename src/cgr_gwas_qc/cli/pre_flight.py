@@ -29,21 +29,59 @@ class ProblemFile:
 
 @app.command()
 def main(
-    config_file: Path = typer.Option("config.yml", exists=True, readable=True),
-    reference_check: bool = True,
-    user_files_check: bool = True,
-    update_config: bool = True,
-    threads: int = 4,
-    cluster_group_size: int = 1000,
+    config_file: Path = typer.Option(
+        "config.yml", help="Path to the configuration file.", exists=True, readable=True
+    ),
+    no_reference_check: bool = typer.Option(
+        False,
+        "--no-reference-files-check",
+        help="Skip checks of reference files. " "Not suggested.",
+    ),
+    no_user_files_check: bool = typer.Option(
+        False, "--no-user-files-check", help="Skip checks of user files. " "Not suggested."
+    ),
+    no_update_config: bool = typer.Option(
+        False, "--no-update-config", help="Do not update the config file. " "Not suggested."
+    ),
+    threads: int = typer.Option(
+        4, "--threads", "-j", help="Number of theads to use when checking user files."
+    ),
+    cluster_group_size: int = typer.Option(
+        1000, help="The number of samples to group to gether when running in cluster mode."
+    ),
 ):
-    """Pre-flight checks to make sure user input files are readable and complete.
+    """Check all input files to make sure they are readable and complete.
 
-    Pre-flight checks include the Sample Sheet, reference files, Idat files,
-    and GTC files. For Idat and GTC files, the user provided file name
-    pattern is extended using the columns in the sample sheet.
+    **Included Checks**. ``cgr pre-fight`` first checks the ``config.yml`` file makes sure all config settings are valid.
+    It then reads the sample sheet (or LIMS manifest file) and checks that all columns defined in the config are present.
+    These include ``workflow_params.subject_id_column``, ``workflow_params.expected_sex_column``, and ``workflow_params.case_control_column``.
+    Next it checks all reference files (BPM, VCF, TBI) and makes sure that they exist, are readable, and complete.
+    Finally, it will search for all IDAT and GTC files if ``user_files.idat_pattern`` and ``user_files.gtc_pattern`` are defined.
+    Again, it makes sure all files exist, are readable, and are complete.
 
-    Pre-flight also creates a parsed version of the sample sheet
-    ``cgr_sample_sheet.csv``. This file is used in the Gwas QC workflow.
+    **File Updates**.
+    This step also updates the ``config.yml`` file with the ``num_samples`` (from the sample sheet) and the ``num_snps`` (from the BPM file).
+
+    **Creates ``cgr_sample_sheet.csv``**.
+    Finally, this step creates a normalized version of the sample sheet (or LIMs manifest).
+    This include all of the columns in the sample sheet as well as the following added columns:
+
+    - ``Group_By_Subject_ID``: a column with the subject ID to use for subject level qc.
+    - ``expected_sex``: copies the expected sex column from the config.
+    - ``case_control``: copies the case control column from the config.
+    - ``is_internal_control``: a flag indicating if the sample is a CGR internal control (i.e., sVALID-001).
+    - ``is_user_exclusion``: a flag indicating if the sample was marked to be excluded in the config.
+    - ``is_missing_idats``: a flag indicating if the sample was missing an IDAT file.
+    - ``is_missing_gtc``: a flag indicating if the sample was missing its GTC file.
+    - ``is_sample_exclusion``: a flag indicating if the sample had missing IDAT or GTC files.
+    - ``num_samples_per_subject``: The number of samples per subject.
+    - ``replicate_ids``: A concatenated list of Sample_IDs from reach subject.
+    - ``cluster_group``: Group names used when running on a cluster in the form of ``cgroup#``.
+
+    You will almost always run::
+
+        $ cgr pre-flight --threads 4
+
     """
     config = check_config(config_file)
     ss = check_sample_sheet(
@@ -53,11 +91,11 @@ def main(
         config.workflow_params.case_control_column,
     )
 
-    if reference_check:
+    if not no_reference_check:
         check_reference_files(config.reference_files)
 
     problem_samples = (
-        check_user_files(config.user_files, ss, threads) if user_files_check else set()
+        check_user_files(config.user_files, ss, threads) if not no_user_files_check else set()
     )
 
     if config.Sample_IDs_to_remove:
@@ -78,7 +116,7 @@ def main(
     ).to_csv("cgr_sample_sheet.csv", index=False)
 
     # Update the config file with some dynamic settings
-    if update_config:
+    if not no_update_config:
         # Update the config file with problem samples and re-calculate values
         typer.secho("Saving Updated Config to (cgr_config.yml)", fg=typer.colors.GREEN)
         update_config_file(config, ss)
@@ -485,9 +523,10 @@ def update_sample_sheet(
     _add_missing_gtc(df, problem_samples)
     _update_expected_sex(df, expected_sex_column)
     _update_case_control(df, case_control_column)
-    _add_replicate_info(df)
     return _add_replicate_info(df).pipe(_add_cluster_group, cluster_group_size)
 
 
 if __name__ == "__main__":
     app()
+
+typer_click_object = typer.main.get_command(app)  # only needed for building documentation

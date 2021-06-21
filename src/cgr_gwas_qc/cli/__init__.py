@@ -11,14 +11,7 @@ from cgr_gwas_qc.cli import cgems_copy, config, pre_flight, snakemake, submit, v
 app = typer.Typer(add_completion=False, help=__doc__)
 app.command("config")(config.main)
 app.command("pre-flight")(pre_flight.main)
-app.command(
-    "snakemake",
-    context_settings={
-        "allow_extra_args": True,
-        "ignore_unknown_options": True,
-        "help_option_names": [],
-    },
-)(snakemake.main)
+app.command("snakemake", context_settings=snakemake.context_settings)(snakemake.main)
 app.command("submit")(submit.main)
 app.command("version")(version.main)
 app.command("cgems-copy")(cgems_copy.main)
