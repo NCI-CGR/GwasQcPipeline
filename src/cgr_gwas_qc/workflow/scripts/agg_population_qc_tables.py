@@ -1,36 +1,37 @@
 """
-agg_population_qc_tables.py
----------------------------
+Internal Population QC Report
+-----------------------------
+
+**Script**: ``agg_population_qc_tables.py``
 
 Aggregate per population summary tables into a single table. Then add extra
 metadata from the sample qc table.
 
-Output:
-    ``population_level/population_qc.csv``
+**Output**: ``population_level/population_qc.csv``
 
     .. csv-table::
-        :header: name, description
+        :header: name, dtype, description
 
-        population, The population name
-        Subject_ID, The Subject's ID
-        Sample_ID, Sample ID
-        case_control, Case/Control Status
-        QC_Family_ID, An arbitrary ID assigned to each related set of subjects.
-        relatives, A list of related Subject_IDs concatenated together with a '|'.
-        PC1, Principal component 1
-        PC2, Principal component 2
-        PC3, Principal component 3
-        PC4, Principal component 4
-        PC5, Principal component 5
-        PC6, Principal component 6
-        PC7, Principal component 7
-        PC8, Principal component 8
-        PC9, Principal component 9
-        PC10, Principal component 10
-        O_HOM, Observed number of homozygotes
-        E_HOM, Expected number of homozygotes
-        N_NM, Number of non-missing autosomal genotypes
-        F, Method-of-moments F coefficient estimate
+        population, string, The population name
+        Subject_ID, string, The subject identifier used by the workflow
+        Sample_ID, string, The sample identifier used by the workflow.
+        case_control, CASE_CONTROL_DTYPE, Phenotype status [``Case`` | ``Control`` | ``QC`` | ``Unknown``].
+        QC_Family_ID, string, An arbitrary ID assigned to each related set of subjects.
+        relatives, string, A list of related Subject_IDs concatenated together with a '|'.
+        PC1, float, Principal component 1
+        PC2, float, Principal component 2
+        PC3, float, Principal component 3
+        PC4, float, Principal component 4
+        PC5, float, Principal component 5
+        PC6, float, Principal component 6
+        PC7, float, Principal component 7
+        PC8, float, Principal component 8
+        PC9, float, Principal component 9
+        PC10, float, Principal component 10
+        O_HOM, int, Observed number of homozygotes
+        E_HOM, int, Expected number of homozygotes
+        N_NM, int, Number of non-missing autosomal genotypes
+        F, float, Method-of-moments F coefficient estimate
 
 References:
 

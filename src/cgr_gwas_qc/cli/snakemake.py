@@ -48,7 +48,7 @@ def main(ctx: typer.Context):
         subworkflow (str):
             Specify which sub-workflow to run [default: None].
             Must be one of [``entry_points`` | ``contamination`` | ``sample_qc`` | ``subject_qc`` | ``delivery``].
-        **kwargs:
+        other-kwargs:
             All snakemake arguments will be passed to snakemake.
             See their documentation for possible options.
 

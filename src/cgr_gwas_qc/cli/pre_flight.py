@@ -118,7 +118,7 @@ def main(
     # Update the config file with some dynamic settings
     if not no_update_config:
         # Update the config file with problem samples and re-calculate values
-        typer.secho("Saving Updated Config to (cgr_config.yml)", fg=typer.colors.GREEN)
+        typer.secho("Saving Updated Config to (config.yml)", fg=typer.colors.GREEN)
         update_config_file(config, ss)
 
 

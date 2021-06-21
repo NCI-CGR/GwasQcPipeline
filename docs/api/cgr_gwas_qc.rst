@@ -6,4 +6,3 @@ API Reference
 
     config.rst
     parsers.rst
-    workflow.rst
