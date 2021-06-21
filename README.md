@@ -23,5 +23,6 @@ QC pipeline for Illumina SNP Array data generated at [CGR](https://dceg.cancer.g
 
 ## Usage
 
-If you use this workflow in a paper, please cite the URL of this repository (https://github.com/NCI-CGR/GwasQcPipeline) and, if available, its DOI (see above).
+If you use this workflow in a paper, please cite the URL of this repository (https://github.com/NCI-CGR/GwasQcPipeline).
+
 The documentation of this pipeline is at https://nci-cgr.github.io/GwasQcPipeline/
