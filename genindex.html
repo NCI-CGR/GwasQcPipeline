@@ -82,32 +82,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="qc_modules/reporting.html">QC Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="dev_docs/building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_docs/dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_docs/running_tests.html">Running Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_docs/writing_docs.html">Writing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -177,50 +178,326 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#C"><strong>C</strong></a>
+ <a href="#Symbols"><strong>Symbols</strong></a>
+ | <a href="#C"><strong>C</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
- | <a href="#I"><strong>I</strong></a>
  | <a href="#M"><strong>M</strong></a>
- | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
- | <a href="#S"><strong>S</strong></a>
- | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
- | <a href="#W"><strong>W</strong></a>
  
 </div>
+<h2 id="Symbols">Symbols</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    --biowulf
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-biowulf">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --bpm-file &lt;bpm_file&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-bpm-file">cgr-config command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --cgems
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-cgems">cgr-config command line option</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-cgems">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --cgems-dev
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-cgems-dev">cgr-config command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --cluster-group-size &lt;cluster_group_size&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-cluster-group-size">cgr-pre-flight command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --cluster-profile &lt;cluster_profile&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-cluster-profile">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --config-file &lt;config_file&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-config-file">cgr-pre-flight command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --dry-run
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-dry-run">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --genome-build &lt;genome_build&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-genome-build">cgr-config command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --include-unused-settings
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-u">cgr-config command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --local-mem-mb &lt;local_mem_mb&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-local-mem-mb">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --local-tasks &lt;local_tasks&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-local-tasks">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --no-biowulf
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-biowulf">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --no-cgems
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-cgems">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --no-dry-run
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-dry-run">cgr-submit command line option</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    --no-notemp
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-notemp">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --no-reference-files-check
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-no-reference-files-check">cgr-pre-flight command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --no-update-config
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-no-update-config">cgr-pre-flight command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --no-user-files-check
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-no-user-files-check">cgr-pre-flight command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --notemp
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-notemp">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --project-name &lt;project_name&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-project-name">cgr-config command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --queue &lt;queue&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-queue">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --sample-sheet &lt;sample_sheet&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-s">cgr-config command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --submission-cmd &lt;submission_cmd&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-submission-cmd">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --subworkflow &lt;subworkflow&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-subworkflow">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --threads &lt;threads&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-j">cgr-pre-flight command line option</a>
+</li>
+      </ul></li>
+      <li>
+    --time-hr &lt;time_hr&gt;
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-time-hr">cgr-submit command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -j
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-j">cgr-pre-flight command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -s
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-s">cgr-config command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -u
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-u">cgr-config command line option</a>
+</li>
+      </ul></li>
+      <li>
+    -y
+
+      <ul>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-y">cgr-config command line option</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    cgr_gwas_qc.cli.config
+    cgr-config command line option
 
       <ul>
-        <li><a href="api/cli.html#module-cgr_gwas_qc.cli.config">module</a>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-bpm-file">--bpm-file &lt;bpm_file&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-cgems">--cgems</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-cgems-dev">--cgems-dev</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-genome-build">--genome-build &lt;genome_build&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-u">--include-unused-settings</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-project-name">--project-name &lt;project_name&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-s">--sample-sheet &lt;sample_sheet&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-s">-s</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-u">-u</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-config-y">-y</a>
 </li>
       </ul></li>
       <li>
-    cgr_gwas_qc.cli.pre_flight
+    cgr-pre-flight command line option
 
       <ul>
-        <li><a href="api/cli.html#module-cgr_gwas_qc.cli.pre_flight">module</a>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-cluster-group-size">--cluster-group-size &lt;cluster_group_size&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-config-file">--config-file &lt;config_file&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-no-reference-files-check">--no-reference-files-check</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-no-update-config">--no-update-config</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-no-user-files-check">--no-user-files-check</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-j">--threads &lt;threads&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-pre-flight-j">-j</a>
 </li>
       </ul></li>
       <li>
-    cgr_gwas_qc.cli.snakemake
+    cgr-submit command line option
 
       <ul>
-        <li><a href="api/cli.html#module-cgr_gwas_qc.cli.snakemake">module</a>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-biowulf">--biowulf</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-cgems">--cgems</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-cluster-profile">--cluster-profile &lt;cluster_profile&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-dry-run">--dry-run</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-local-mem-mb">--local-mem-mb &lt;local_mem_mb&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-local-tasks">--local-tasks &lt;local_tasks&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-biowulf">--no-biowulf</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-cgems">--no-cgems</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-dry-run">--no-dry-run</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-notemp">--no-notemp</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-notemp">--notemp</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-queue">--queue &lt;queue&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-submission-cmd">--submission-cmd &lt;submission_cmd&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-subworkflow">--subworkflow &lt;subworkflow&gt;</a>
+</li>
+        <li><a href="getting_started/running_pipeline.html#cmdoption-cgr-submit-time-hr">--time-hr &lt;time_hr&gt;</a>
 </li>
       </ul></li>
-      <li>
-    cgr_gwas_qc.cli.submit
-
-      <ul>
-        <li><a href="api/cli.html#module-cgr_gwas_qc.cli.submit">module</a>
-</li>
-      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cgr_gwas_qc.parsers.eigensoft
 
@@ -263,13 +540,11 @@
         <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.concordance_table">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     cgr_gwas_qc.workflow.scripts.population_qc_table
 
       <ul>
-        <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.population_qc_table">module</a>, <a href="qc_modules/reporting.html#module-cgr_gwas_qc.workflow.scripts.population_qc_table">[1]</a>
+        <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.population_qc_table">module</a>
 </li>
       </ul></li>
       <li>
@@ -300,25 +575,7 @@
         <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.split_sample_concordance">module</a>
 </li>
       </ul></li>
-      <li><a href="api/cli.html#cgr_gwas_qc.cli.snakemake.check_and_prepend_arg">check_and_prepend_arg() (in module cgr_gwas_qc.cli.snakemake)</a>
-</li>
-      <li><a href="api/cli.html#cgr_gwas_qc.cli.pre_flight.check_user_files">check_user_files() (in module cgr_gwas_qc.cli.pre_flight)</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.cluster_groups">cluster_groups (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec.components">components (cgr_gwas_qc.parsers.eigensoft.Eigenvec attribute)</a>
-</li>
-      <li><a href="api/config.html#id0">conda() (cgr_gwas_qc.config.ConfigMgr class method)</a>
-
-      <ul>
-        <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.conda">(cgr_gwas_qc.config.ConfigMgr method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.config">config (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.CONFIG_DIR">CONFIG_DIR (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr">ConfigMgr (class in cgr_gwas_qc.config)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -327,12 +584,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec">Eigenvec (class in cgr_gwas_qc.parsers.eigensoft)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.envmodules">envmodules() (cgr_gwas_qc.config.ConfigMgr method)</a>, <a href="api/config.html#id1">[1]</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.expand">expand() (cgr_gwas_qc.config.ConfigMgr method)</a>, <a href="api/config.html#id2">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -345,45 +596,13 @@
   </ul></td>
 </tr></table>
 
-<h2 id="I">I</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/cli.html#cgr_gwas_qc.cli.config.initialize_config">initialize_config() (in module cgr_gwas_qc.cli.config)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.instance">instance() (cgr_gwas_qc.config.ConfigMgr class method)</a>
-</li>
-      <li><a href="api/cli.html#cgr_gwas_qc.cli.snakemake.is_arg">is_arg() (in module cgr_gwas_qc.cli.snakemake)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/cli.html#cgr_gwas_qc.cli.config.main">main() (in module cgr_gwas_qc.cli.config)</a>
-
-      <ul>
-        <li><a href="api/cli.html#cgr_gwas_qc.cli.pre_flight.main">(in module cgr_gwas_qc.cli.pre_flight)</a>
-</li>
-        <li><a href="api/cli.html#cgr_gwas_qc.cli.snakemake.main">(in module cgr_gwas_qc.cli.snakemake)</a>
-</li>
-        <li><a href="api/cli.html#cgr_gwas_qc.cli.submit.main">(in module cgr_gwas_qc.cli.submit)</a>
-</li>
-      </ul></li>
       <li>
     module
 
       <ul>
-        <li><a href="api/cli.html#module-cgr_gwas_qc.cli.config">cgr_gwas_qc.cli.config</a>
-</li>
-        <li><a href="api/cli.html#module-cgr_gwas_qc.cli.pre_flight">cgr_gwas_qc.cli.pre_flight</a>
-</li>
-        <li><a href="api/cli.html#module-cgr_gwas_qc.cli.snakemake">cgr_gwas_qc.cli.snakemake</a>
-</li>
-        <li><a href="api/cli.html#module-cgr_gwas_qc.cli.submit">cgr_gwas_qc.cli.submit</a>
-</li>
         <li><a href="api/parsers.html#module-cgr_gwas_qc.parsers.eigensoft">cgr_gwas_qc.parsers.eigensoft</a>
 </li>
         <li><a href="api/parsers.html#module-cgr_gwas_qc.parsers.graf">cgr_gwas_qc.parsers.graf</a>
@@ -396,7 +615,7 @@
 </li>
         <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.concordance_table">cgr_gwas_qc.workflow.scripts.concordance_table</a>
 </li>
-        <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.population_qc_table">cgr_gwas_qc.workflow.scripts.population_qc_table</a>, <a href="qc_modules/reporting.html#module-cgr_gwas_qc.workflow.scripts.population_qc_table">[1]</a>
+        <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.population_qc_table">cgr_gwas_qc.workflow.scripts.population_qc_table</a>
 </li>
         <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.related_subjects">cgr_gwas_qc.workflow.scripts.related_subjects</a>
 </li>
@@ -407,18 +626,6 @@
         <li><a href="api/workflow.html#module-cgr_gwas_qc.workflow.scripts.split_sample_concordance">cgr_gwas_qc.workflow.scripts.split_sample_concordance</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.modules">modules() (cgr_gwas_qc.config.ConfigMgr class method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="P">P</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/cli.html#cgr_gwas_qc.cli.pre_flight.ProblemFile">ProblemFile (class in cgr_gwas_qc.cli.pre_flight)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -433,63 +640,15 @@
 </li>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.plink.read_imiss">read_imiss() (in module cgr_gwas_qc.parsers.plink)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.plink.read_lmiss">read_lmiss() (in module cgr_gwas_qc.parsers.plink)</a>
 </li>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.king.read_related">read_related() (in module cgr_gwas_qc.parsers.king)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.graf.read_relatedness">read_relatedness() (in module cgr_gwas_qc.parsers.graf)</a>
 </li>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.plink.read_sexcheck">read_sexcheck() (in module cgr_gwas_qc.parsers.plink)</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.root">root (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.RULE_DIR">RULE_DIR (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-      <li><a href="api/config.html#id3">rules() (cgr_gwas_qc.config.ConfigMgr class method)</a>
-
-      <ul>
-        <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.rules">(cgr_gwas_qc.config.ConfigMgr method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="S">S</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#id4">scripts() (cgr_gwas_qc.config.ConfigMgr class method)</a>
-
-      <ul>
-        <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.scripts">(cgr_gwas_qc.config.ConfigMgr method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.SCRIPTS_DIR">SCRIPTS_DIR (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.SNAKEFILE">SNAKEFILE (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.SRC_DIR">SRC_DIR (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.ss">ss (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-      <li><a href="api/config.html#id5">ss() (cgr_gwas_qc.config.ConfigMgr property)</a>
-</li>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.subworkflow">subworkflow() (cgr_gwas_qc.config.ConfigMgr class method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.user_config">user_config (cgr_gwas_qc.config.ConfigMgr attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.user_patterns">user_patterns (cgr_gwas_qc.config.ConfigMgr attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -498,14 +657,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec.values">values (cgr_gwas_qc.parsers.eigensoft.Eigenvec attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="W">W</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/config.html#cgr_gwas_qc.config.ConfigMgr.WORKFLOW_DIR">WORKFLOW_DIR (cgr_gwas_qc.config.ConfigMgr attribute)</a>
 </li>
   </ul></td>
 </tr></table>

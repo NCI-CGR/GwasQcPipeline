@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Variant QC &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Subject QC &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -38,8 +38,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="QC Report" href="reporting.html" />
-    <link rel="prev" title="Sample QC" href="sample_level.html" /> 
+    <link rel="next" title="Delivery" href="delivery.html" />
+    <link rel="prev" title="Sample QC" href="sample_qc.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,32 +84,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="sample_level.html">Sample QC</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reporting.html">QC Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/writing_docs.html">Writing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -158,13 +159,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Variant QC</li>
+      <li>Subject QC</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/qc_modules/variant_level.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sub_workflows/subject_qc.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -177,8 +178,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="variant-qc">
-<h1>Variant QC<a class="headerlink" href="#variant-qc" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="subject-qc">
+<h1>Subject QC<a class="headerlink" href="#subject-qc" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -189,10 +190,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="reporting.html" class="btn btn-neutral float-right" title="QC Report" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="delivery.html" class="btn btn-neutral float-right" title="Delivery" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sample_level.html" class="btn btn-neutral float-left" title="Sample QC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sample_qc.html" class="btn btn-neutral float-left" title="Sample QC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

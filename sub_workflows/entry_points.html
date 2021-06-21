@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Building Documentation &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Entry Points &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Development Tools" href="dev_tools.html" />
-    <link rel="prev" title="Rule Reference" href="../reference/rules.html" /> 
+    <link rel="next" title="Contamination" href="contamination.html" />
+    <link rel="prev" title="Configuration Files" href="../getting_started/configuration.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,32 +83,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="running_tests.html">Running Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="writing_docs.html">Writing Documentation</a></li>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -157,13 +158,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Building Documentation</li>
+      <li>Entry Points</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/dev_docs/building_docs.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sub_workflows/entry_points.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,13 +177,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="building-documentation">
-<h1>Building Documentation<a class="headerlink" href="#building-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate ./venv
-$ make clean <span class="o">&amp;&amp;</span> make html
-</pre></div>
-</div>
-<p>An html version of documentation is then available in <code class="docutils literal notranslate"><span class="pre">_build/html/index.html</span></code>.</p>
+  <div class="section" id="entry-points">
+<h1>Entry Points<a class="headerlink" href="#entry-points" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -193,10 +189,10 @@ $ make clean <span class="o">&amp;&amp;</span> make html
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="dev_tools.html" class="btn btn-neutral float-right" title="Development Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="contamination.html" class="btn btn-neutral float-right" title="Contamination" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../reference/rules.html" class="btn btn-neutral float-left" title="Rule Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../getting_started/configuration.html" class="btn btn-neutral float-left" title="Configuration Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

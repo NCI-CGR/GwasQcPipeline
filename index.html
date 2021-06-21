@@ -82,32 +82,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="qc_modules/reporting.html">QC Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="dev_docs/building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_docs/dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_docs/running_tests.html">Running Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_docs/writing_docs.html">Writing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -177,54 +178,86 @@
             
   <div class="section" id="gwasqcpipeline-documentation">
 <h1>GwasQcPipeline Documentation<a class="headerlink" href="#gwasqcpipeline-documentation" title="Permalink to this headline">¶</a></h1>
-<img alt="_images/GwasQcPipelineWorkflow.svg" src="_images/GwasQcPipelineWorkflow.svg" /><div class="section" id="getting-started">
-<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
-<p>In this section we walk you through installing the required software using <code class="docutils literal notranslate"><span class="pre">conda</span></code>.</p>
+<p>The <em>CGR GwasQcPipeline</em> generates a number of sample level QC metrics followed by several filtering criteria.
+Samples are then split into ancestral populations and examined for relatedness, population structure, and genotyping errors.
+The full workflow is pictured in <a class="reference internal" href="#fig-full-pipeline"><span class="std std-numref">Fig. 1</span></a>.</p>
+<div class="figure align-default" id="fig-full-pipeline">
+<img alt="_images/GwasQcPipelineWorkflow.svg" src="_images/GwasQcPipelineWorkflow.svg" /><p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">The <em>CGR GwasQcPipeline</em>.</span><a class="headerlink" href="#fig-full-pipeline" title="Permalink to this image">¶</a></p>
 </div>
-<div class="section" id="qc-modules">
-<h2>QC Modules<a class="headerlink" href="#qc-modules" title="Permalink to this headline">¶</a></h2>
-<p>In this section we describe the different QC steps and point out optional parameters.</p>
+<div class="toctree-wrapper compound" id="getting-started">
+<p class="caption"><span class="caption-text">Getting Started</span><a class="headerlink" href="#getting-started" title="Permalink to this toctree">¶</a></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/configuration.html">Configuration Files</a></li>
+</ul>
 </div>
-<div class="section" id="module-reference">
-<h2>Module Reference<a class="headerlink" href="#module-reference" title="Permalink to this headline">¶</a></h2>
-<p>In this section we describe technical details about each module and all of the associated file types.</p>
+<p><em>CGR GwasQcPipeline</em> is designed to be an easy to deploy to multiple cluster systems.
+It is built on top of <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> but packaged into as an easy to install python utility.
+This lets us take advantage of <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a>’s amazing workflow management system, while adding a custom library of helper tools.</p>
+<div class="toctree-wrapper compound" id="sub-workflows">
+<p class="caption"><span class="caption-text">QC Sub Workflows</span><a class="headerlink" href="#sub-workflows" title="Permalink to this toctree">¶</a></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sub_workflows/delivery.html">Delivery</a></li>
+</ul>
 </div>
-<div class="section" id="developer-documentation">
-<h2>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h2>
-<p>This is a guide meant to help other work on this project.</p>
-<div class="toctree-wrapper compound" id="id1">
-</div>
-<div class="toctree-wrapper compound" id="id2">
-</div>
-<div class="toctree-wrapper compound" id="id3">
+<p><em>CGR GwasQcPipeline</em> is broken into 5 sub-workflows.
+Each sub-workflow can be run independently, as long as all previous sub-workflows are complete.
+For example, the <em>Sample QC</em> sub-workflow requires the <em>Entry Points</em> sub-workflow (and optionally the <em>Contamination</em>) to be complete.
+Here we describe the various steps that each sub-workflow runs, the config options, and a summary of the generated outputs.</p>
+<div class="toctree-wrapper compound" id="module-reference">
+<p class="caption"><span class="caption-text">User Reference</span><a class="headerlink" href="#module-reference" title="Permalink to this toctree">¶</a></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/file_types.html">File Type Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/rules.html">Rule Reference</a></li>
+</ul>
 </div>
 <div class="toctree-wrapper compound" id="dev-docs">
+<p class="caption"><span class="caption-text">Developer Documentation</span><a class="headerlink" href="#dev-docs" title="Permalink to this toctree">¶</a></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_docs/testing.html">Running Tests</a></li>
+</ul>
 </div>
 <div class="toctree-wrapper compound" id="api">
+<p class="caption"><span class="caption-text">API Reference</span><a class="headerlink" href="#api" title="Permalink to this toctree">¶</a></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/cgr_gwas_qc.html">API Reference</a></li>
+</ul>
 </div>
+<div class="section" id="to-do">
+<h2>To Do<a class="headerlink" href="#to-do" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition">
+<p class="admonition-title">Todo</p>
+<p>Add note about docs folder structure.</p>
 </div>
-<div class="section" id="todos">
-<h2>TODOs<a class="headerlink" href="#todos" title="Permalink to this headline">¶</a></h2>
+<p class="todo-source">(The <a class="reference internal" href="dev_docs/documentation.html#id1"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/dev_docs/documentation.rst, line 23.)</p>
 <div class="admonition-todo admonition">
 <p class="admonition-title">Todo</p>
 <p>Describe the README</p>
 </div>
-<p class="todo-source">(The <a class="reference internal" href="qc_modules/reporting.html#id1"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/qc_modules/reporting.rst, line 7.)</p>
+<p class="todo-source">(The <a class="reference internal" href="sub_workflows/reporting.html#id1"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/sub_workflows/reporting.rst, line 7.)</p>
 <div class="admonition-todo admonition">
 <p class="admonition-title">Todo</p>
 <p>Describe the text report</p>
 </div>
-<p class="todo-source">(The <a class="reference internal" href="qc_modules/reporting.html#id2"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/qc_modules/reporting.rst, line 16.)</p>
+<p class="todo-source">(The <a class="reference internal" href="sub_workflows/reporting.html#id2"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/sub_workflows/reporting.rst, line 16.)</p>
 <div class="admonition-todo admonition">
 <p class="admonition-title">Todo</p>
 <p>Describe the summary Excel file</p>
 </div>
-<p class="todo-source">(The <a class="reference internal" href="qc_modules/reporting.html#id3"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/qc_modules/reporting.rst, line 25.)</p>
+<p class="todo-source">(The <a class="reference internal" href="sub_workflows/reporting.html#id3"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/sub_workflows/reporting.rst, line 25.)</p>
 <div class="admonition-todo admonition">
 <p class="admonition-title">Todo</p>
 <p>Describe the sample QC table.</p>
 </div>
-<p class="todo-source">(The <a class="reference internal" href="qc_modules/reporting.html#id4"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/qc_modules/reporting.rst, line 39.)</p>
+<p class="todo-source">(The <a class="reference internal" href="sub_workflows/reporting.html#id4"><em>original entry</em></a> is located in /home/runner/work/GwasQcPipeline/GwasQcPipeline/docs/sub_workflows/reporting.rst, line 39.)</p>
 </div>
 </div>
 

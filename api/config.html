@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Configuration API &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Parsers" href="parsers.html" />
-    <link rel="prev" title="Command Line Interface" href="cli.html" /> 
+    <link rel="prev" title="API Reference" href="cgr_gwas_qc.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,41 +83,36 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/writing_docs.html">Writing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="cgr_gwas_qc.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#data-models">Data Models</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#config">Config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#softwareparams">SoftwareParams</a></li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#configuration-manager">Configuration Manager</a></li>
 </ul>
 </li>
@@ -173,7 +168,7 @@
         
           <li><a href="cgr_gwas_qc.html">API Reference</a> &raquo;</li>
         
-      <li>Configuration</li>
+      <li>Configuration API</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -192,1277 +187,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="configuration">
-<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="data-models">
-<h2>Data Models<a class="headerlink" href="#data-models" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="config">
-<h3>Config<a class="headerlink" href="#config" title="Permalink to this headline">¶</a></h3>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td colspan="4"><p>Data model for config.yml</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> contains all workflow configuration information. This
-is a data model of the config file. It allows for clearly defining a
-schema and implementing data validation.</p>
-</td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="3"><p><em>object</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="4"><p>properties</p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>pipeline_version</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Pipeline Version</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="3"><p>The version of the pipeline to use.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>v1.0.0-rc.7</p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>project_name</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Project Name</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="3"><p>The project title.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>Example Project Name</p></td>
-</tr>
-<tr class="row-even"><td rowspan="5"><ul class="simple">
-<li><p>sample_sheet</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Sample Sheet</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="3"><p>Path to the sample manifest from LIMs.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>sample_sheet.csv</p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td colspan="2"><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>genome_build</p></li>
-</ul>
-</td>
-<td><p>default</p></td>
-<td colspan="2"><p>hg37</p></td>
-</tr>
-<tr class="row-even"><td><p>allOf</p></td>
-<td><ul class="simple">
-<li></li>
-</ul>
-</td>
-<td><p><span class="xref std std-ref">#/definitions/GenomeBuild</span></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p>snp_array</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Snp Array</em></p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p><strong>num_samples</strong></p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Num Samples</em></p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>integer</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p><strong>num_snps</strong></p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Num Snps</em></p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>integer</em></p></td>
-</tr>
-<tr class="row-odd"><td><ul class="simple">
-<li><p><strong>reference_files</strong></p></li>
-</ul>
-</td>
-<td colspan="3"><p><span class="xref std std-ref">#/definitions/ReferenceFiles</span></p></td>
-</tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
-<li><p>user_files</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>User Files</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>OrderedDict([(‘output_pattern’, ‘{prefix}/{file_type}.{ext}’), (‘lims_output_dir’, None), (‘idat_pattern’, None), (‘gtc_pattern’, None), (‘ped’, None), (‘map’, None), (‘bed’, None), (‘bim’, None), (‘fam’, None)])</p></td>
-</tr>
-<tr class="row-even"><td><p>allOf</p></td>
-<td><ul class="simple">
-<li></li>
-</ul>
-</td>
-<td><p><span class="xref std std-ref">#/definitions/UserFiles</span></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
-<li><p>software_params</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Software Params</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td colspan="2"><p>OrderedDict([(‘sample_call_rate_1’, 0.8), (‘snp_call_rate_1’, 0.8), (‘sample_call_rate_2’, 0.95), (‘snp_call_rate_2’, 0.95), (‘ld_prune_r2’, 0.1), (‘maf_for_ibd’, 0.2), (‘maf_for_hwe’, 0.05), (‘ibd_pi_hat_min’, 0.05), (‘ibd_pi_hat_max’, 1.0), (‘dup_concordance_cutoff’, 0.95), (‘intensity_threshold’, 6000), (‘contam_threshold’, 0.1), (‘contam_population’, ‘AF’), (‘pi_hat_threshold’, 0.2), (‘autosomal_het_threshold’, 0.1), (‘strand’, ‘top’)])</p></td>
-</tr>
-<tr class="row-odd"><td><p>allOf</p></td>
-<td><ul class="simple">
-<li></li>
-</ul>
-</td>
-<td><p><span class="xref std std-ref">#/definitions/SoftwareParams</span></p></td>
-</tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
-<li><p>workflow_params</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Workflow Params</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td colspan="2"><p>OrderedDict([(‘subject_id_column’, ‘Group_By’), (‘expected_sex_column’, ‘Expected_Sex’), (‘case_control_column’, ‘Case/Control_Status’), (‘remove_contam’, True), (‘remove_rep_discordant’, True), (‘minimum_pop_subjects’, 50), (‘control_hwp_threshold’, 50), (‘lims_upload’, False)])</p></td>
-</tr>
-<tr class="row-even"><td><p>allOf</p></td>
-<td><ul class="simple">
-<li></li>
-</ul>
-</td>
-<td><p><span class="xref std std-ref">#/definitions/WorkflowParams</span></p></td>
-</tr>
-<tr class="row-odd"><td><ul class="simple">
-<li><p>env_modules</p></li>
-</ul>
-</td>
-<td colspan="3"><p><span class="xref std std-ref">#/definitions/EnvModules</span></p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>Sample_IDs_to_remove</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Sample Ids To Remove</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>array</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>items</p></td>
-</tr>
-<tr class="row-odd"><td><ul class="simple">
-<li></li>
-</ul>
-</td>
-<td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="4"><p>definitions</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>GenomeBuild</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>GenomeBuild</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>An enumeration.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>enum</p></td>
-<td colspan="2"><p>hg37, hg38</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="20"><ul class="simple">
-<li><p>ReferenceFiles</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>ReferenceFiles</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>A list of reference files used by the pipeline.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p><strong>illumina_manifest_file</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Illumina Manifest File</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Path to the array BPM file.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>illumina_cluster_file</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Illumina Cluster File</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Path to the array cluster EGT file.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p><strong>thousand_genome_vcf</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Thousand Genome Vcf</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Path to the 1KG VCF file.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p><strong>thousand_genome_tbi</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Thousand Genome Tbi</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Path to the corresponding index for the 1KG VCF file.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="10"><ul class="simple">
-<li><p>Idat</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>Idat</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>Each sample has an Idat file in two color channels.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
-<li><p><strong>red</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Red</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>File name pattern for Red Channel Idat. Wildcards are columns in the sample sheet.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
-<li><p><strong>green</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Green</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>File name pattern for Green Channel Idat. Wildcards are columns in the sample sheet.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="36"><ul class="simple">
-<li><p>UserFiles</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>UserFiles</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>File name patterns for user provided data.</p>
-<p>The GWAS QC Pipeline requires GTC or IDAT files.</p>
-</td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>output_pattern</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Output Pattern</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>File naming pattern for deliverable files.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>{prefix}/{file_type}.{ext}</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>lims_output_dir</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Lims Output Dir</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Directory to copy QC files to upload to LIMS</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td><ul class="simple">
-<li><p>idat_pattern</p></li>
-</ul>
-</td>
-<td colspan="2"><p><span class="xref std std-ref">#/definitions/Idat</span></p></td>
-</tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
-<li><p>gtc_pattern</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Gtc Pattern</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>File name pattern for GTC file. Wildcards are columns in the sample sheet.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>ped</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Ped</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Aggregated PED file if sample level GTC files are not available.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>map</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Map</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Aggregated MAP file if sample level GTC files are not available.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>bed</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Bed</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Aggregated BED file if sample level GTC files are not available.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>bim</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Bim</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Aggregated BIM file if sample level GTC files are not available.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>fam</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Fam</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Aggregated FAM file if sample level GTC files are not available.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>format</p></td>
-<td><p>path</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="94"><ul class="simple">
-<li><p>SoftwareParams</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>SoftwareParams</em></p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>sample_call_rate_1</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Sample Call Rate 1</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Sample call rate filter 1</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.8</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>snp_call_rate_1</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Snp Call Rate 1</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>SNP call rate filter 1</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.8</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>sample_call_rate_2</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Sample Call Rate 2</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Sample call rate filter 2</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.95</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>snp_call_rate_2</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Snp Call Rate 2</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>SNP call rate filter 2</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.95</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>ld_prune_r2</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Ld Prune R2</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>r-squared threshold for LD pruning of SNPS for use with IBD and concordance.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.1</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>maf_for_ibd</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Maf For Ibd</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Minor allele frequency threshold of SNPS for use with IBD and concordance.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.2</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>maf_for_hwe</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Maf For Hwe</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Minor allele frequency threshold of SNPs for use with HWE.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.05</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>ibd_pi_hat_min</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Ibd Pi Hat Min</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Minimum IBD pi hat threshold.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMaximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>minimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.05</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>ibd_pi_hat_max</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Ibd Pi Hat Max</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Maximum IBD pi hat threshold.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>1.0</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>dup_concordance_cutoff</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Dup Concordance Cutoff</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>SNP concordance threshold to call samples as replicates.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.95</p></td>
-</tr>
-<tr class="row-even"><td rowspan="5"><ul class="simple">
-<li><p>intensity_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Intensity Threshold</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>IDAT intensity threshold used for estimating contamination.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>6000</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>contam_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Contam Threshold</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Threshold to call a sample contaminated.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.1</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>contam_population</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Contam Population</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Population from 1KG to use for B allele frequencies during contamination testing {AF, EAS_AF, AMR_AF, AFR_AF, EUR_AF, SAS_AF}.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>AF</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>pi_hat_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Pi Hat Threshold</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>PI hat threshold used for calling related subjects. The default of 0.2 removes 2nd degree or higher relatives.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.2</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>autosomal_het_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Autosomal Het Threshold</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Autosomal heterozygosity F coefficient threshold to remove subjects.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.1</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>strand</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Strand</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Which strand to use for genotypes when converting GTC to plink {TOP, FWD, PLUS}.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>top</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="38"><ul class="simple">
-<li><p>WorkflowParams</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>WorkflowParams</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>This set of parameters control what parts and how the workflow is run.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>subject_id_column</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Subject Id Column</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>The name of the column in the sample sheet which identifies unique subjects.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>Group_By</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>expected_sex_column</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Expected Sex Column</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>The name of the column in the sample sheet which identifies expected sex of samples.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>Expected_Sex</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>case_control_column</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Case Control Column</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>The name of the column in the sample sheet which identifies Case/Control status.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>Case/Control_Status</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>remove_contam</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Remove Contam</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Contaminated samples will be removed prior to sample to subject transformation.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>True</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>remove_rep_discordant</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Remove Rep Discordant</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Discordant replicates will be pruned prior to sample to subject transformation.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>True</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="5"><ul class="simple">
-<li><p>minimum_pop_subjects</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Minimum Pop Subjects</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Minimum number of subjects required in order to analyze a population</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>50</p></td>
-</tr>
-<tr class="row-even"><td rowspan="5"><ul class="simple">
-<li><p>control_hwp_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Control Hwp Threshold</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Minimum number of controls (in a population) required for HWE estimation</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>50</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>lims_upload</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Lims Upload</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Create summary file for automatic upload to the CGEMs/CCAD LIMs system.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="12"><ul class="simple">
-<li><p>EnvModules</p></li>
-</ul>
-</td>
-<td colspan="3"><p><em>EnvModules</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>Environmental modules found on CGEMS or other HPC Systems.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p><strong>eigensoft</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Eigensoft</em></p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p><strong>graf</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Graf</em></p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p><strong>plink2</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Plink2</em></p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><ul class="simple">
-<li><p><strong>r</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>R</em></p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="softwareparams">
-<h3>SoftwareParams<a class="headerlink" href="#softwareparams" title="Permalink to this headline">¶</a></h3>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p>type</p></td>
-<td colspan="2"><p><em>object</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="3"><p>properties</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>sample_call_rate_1</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Sample Call Rate 1</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Sample call rate filter 1</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.8</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>snp_call_rate_1</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Snp Call Rate 1</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>SNP call rate filter 1</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.8</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>sample_call_rate_2</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Sample Call Rate 2</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Sample call rate filter 2</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.95</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>snp_call_rate_2</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Snp Call Rate 2</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>SNP call rate filter 2</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.95</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>ld_prune_r2</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Ld Prune R2</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>r-squared threshold for LD pruning of SNPS for use with IBD and concordance.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.1</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>maf_for_ibd</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Maf For Ibd</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Minor allele frequency threshold of SNPS for use with IBD and concordance.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.2</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>maf_for_hwe</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Maf For Hwe</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Minor allele frequency threshold of SNPs for use with HWE.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.05</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>ibd_pi_hat_min</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Ibd Pi Hat Min</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Minimum IBD pi hat threshold.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMaximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>minimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.05</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>ibd_pi_hat_max</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Ibd Pi Hat Max</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Maximum IBD pi hat threshold.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>1.0</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="6"><ul class="simple">
-<li><p>dup_concordance_cutoff</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Dup Concordance Cutoff</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>SNP concordance threshold to call samples as replicates.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-even"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>0.95</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="5"><ul class="simple">
-<li><p>intensity_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Intensity Threshold</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>IDAT intensity threshold used for estimating contamination.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>6000</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>contam_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Contam Threshold</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Threshold to call a sample contaminated.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.1</p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>contam_population</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Contam Population</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Population from 1KG to use for B allele frequencies during contamination testing {AF, EAS_AF, AMR_AF, AFR_AF, EUR_AF, SAS_AF}.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>AF</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>pi_hat_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Pi Hat Threshold</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>PI hat threshold used for calling related subjects. The default of 0.2 removes 2nd degree or higher relatives.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.2</p></td>
-</tr>
-<tr class="row-even"><td rowspan="6"><ul class="simple">
-<li><p>autosomal_het_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Autosomal Het Threshold</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Autosomal heterozygosity F coefficient threshold to remove subjects.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>number</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>maximum</p></td>
-<td><p>1</p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>0.1</p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>strand</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Strand</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>Which strand to use for genotypes when converting GTC to plink {TOP, FWD, PLUS}.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>top</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+  <div class="section" id="configuration-api">
+<h1>Configuration API<a class="headerlink" href="#configuration-api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="configuration-manager">
 <h2>Configuration Manager<a class="headerlink" href="#configuration-manager" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="cgr_gwas_qc.config.ConfigMgr">
-<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.config.</code><code class="sig-name descname">ConfigMgr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">root</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">user_config</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.config.</code><code class="sig-name descname">ConfigMgr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">root</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">user_config</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Manage all things config.</p>
 <p>There should only be a single instance of this running at a time.</p>
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.SRC_DIR">
-<code class="sig-name descname">SRC_DIR</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.SRC_DIR" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">SRC_DIR</code></dt>
 <dd><p>The absolute path to <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc</span></code> source code.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1472,8 +208,8 @@ schema and implementing data validation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.WORKFLOW_DIR">
-<code class="sig-name descname">WORKFLOW_DIR</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.WORKFLOW_DIR" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">WORKFLOW_DIR</code></dt>
 <dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow</span></code> source code.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1483,8 +219,8 @@ schema and implementing data validation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.CONFIG_DIR">
-<code class="sig-name descname">CONFIG_DIR</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.CONFIG_DIR" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">CONFIG_DIR</code></dt>
 <dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/config</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1494,19 +230,8 @@ schema and implementing data validation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.RULE_DIR">
-<code class="sig-name descname">RULE_DIR</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.RULE_DIR" title="Permalink to this definition">¶</a></dt>
-<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/rules</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.SCRIPTS_DIR">
-<code class="sig-name descname">SCRIPTS_DIR</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.SCRIPTS_DIR" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">SCRIPTS_DIR</code></dt>
 <dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/scripts</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1516,8 +241,8 @@ schema and implementing data validation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.SNAKEFILE">
-<code class="sig-name descname">SNAKEFILE</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.SNAKEFILE" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">SNAKEFILE</code></dt>
 <dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/Snakefile</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1527,8 +252,8 @@ schema and implementing data validation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.root">
-<code class="sig-name descname">root</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.root" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">root</code></dt>
 <dd><p>The current working directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1538,8 +263,8 @@ schema and implementing data validation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.user_config">
-<code class="sig-name descname">user_config</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.user_config" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">user_config</code></dt>
 <dd><p>The config.yml in the current working directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1549,8 +274,8 @@ schema and implementing data validation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.user_patterns">
-<code class="sig-name descname">user_patterns</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.user_patterns" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">user_patterns</code></dt>
 <dd><p>The patterns.yml in the current working directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -1560,71 +285,51 @@ schema and implementing data validation.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.config">
-<code class="sig-name descname">config</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.config" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">config</code></dt>
 <dd><p>Workflow configuration settings.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.ss">
-<code class="sig-name descname">ss</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.ss" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">ss</code></dt>
 <dd><p>User’s sample sheet data.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="cgr_gwas_qc.config.ConfigMgr.cluster_groups">
-<code class="sig-name descname">cluster_groups</code><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.cluster_groups" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">cluster_groups</code></dt>
 <dd><p>List of the cluster group names.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cgr_gwas_qc.config.ConfigMgr.expand">
-<code class="sig-name descname">expand</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.expand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.expand" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">expand</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.expand"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Uses columns from the user’s sample sheet to expand a file pattern.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cgr_gwas_qc.config.ConfigMgr.envmodules">
-<code class="sig-name descname">envmodules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.envmodules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.envmodules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pulls environmental module information from user’s config.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cgr_gwas_qc.config.ConfigMgr.conda">
-<code class="sig-name descname">conda</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.conda" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">conda</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Creates the full path to conda environment.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cgr_gwas_qc.config.ConfigMgr.rules">
-<code class="sig-name descname">rules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.rules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates the full path to snakemake rule.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="cgr_gwas_qc.config.ConfigMgr.scripts">
-<code class="sig-name descname">scripts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.scripts" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">scripts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Creates the full path to an internal script.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id0">
-<em class="property">classmethod </em><code class="sig-name descname">conda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">classmethod </em><code class="sig-name descname">conda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Return path to a conda env file.</p>
 <p>Given a conda env file_name, prepends the full path to that file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id1">
-<code class="sig-name descname">envmodules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module_name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.envmodules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the HPC environment module from user’s config.</p>
-<p>On HPC systems you can use environment modules instead of conda. The
-specific module versions are stored in the main config.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="id2">
-<code class="sig-name descname">expand</code><span class="sig-paren">(</span><em class="sig-param">file_pattern: str</em>, <em class="sig-param">combination: Callable = &lt;class 'zip'&gt;</em>, <em class="sig-param">query: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.expand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="sig-name descname">expand</code><span class="sig-paren">(</span><em class="sig-param">file_pattern: str</em>, <em class="sig-param">combination: Callable = &lt;class 'zip'&gt;</em>, <em class="sig-param">query: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.expand"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Use sample sheet columns to fill in file pattern</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1643,42 +348,35 @@ expansion. Defaults to None.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cgr_gwas_qc.config.ConfigMgr.instance">
-<em class="property">classmethod </em><code class="sig-name descname">instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pytest</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.instance" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">classmethod </em><code class="sig-name descname">instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pytest</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.instance"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Returns the active ConfigMgr instance.</p>
 <p>This ensures that only 1 ConfigMgr is created per python session.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cgr_gwas_qc.config.ConfigMgr.modules">
-<em class="property">classmethod </em><code class="sig-name descname">modules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.modules" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">classmethod </em><code class="sig-name descname">modules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.modules"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Return the path to a module file.</p>
 <p>Given a rule file_name, prepends the full path to that module.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id3">
-<em class="property">classmethod </em><code class="sig-name descname">rules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the path to a rule file.</p>
-<p>Given a rule file_name, prepends the full path to that rule.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="id4">
-<em class="property">classmethod </em><code class="sig-name descname">scripts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">classmethod </em><code class="sig-name descname">scripts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Return the path to an internal script.</p>
 <p>Given a script file_name, prepends the full path to that script.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="id5">
-<em class="property">property </em><code class="sig-name descname">ss</code><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">property </em><code class="sig-name descname">ss</code></dt>
 <dd><p>Access the sample sheet DataFrame.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="cgr_gwas_qc.config.ConfigMgr.subworkflow">
-<em class="property">classmethod </em><code class="sig-name descname">subworkflow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">workflow</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.subworkflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.config.ConfigMgr.subworkflow" title="Permalink to this definition">¶</a></dt>
+<dt>
+<em class="property">classmethod </em><code class="sig-name descname">subworkflow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">workflow</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.subworkflow"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Return the path to a sub-workflow.</p>
 <p>Given a sub-workflow name, give the full path to the snakefile.</p>
 </dd></dl>
@@ -1699,7 +397,7 @@ expansion. Defaults to None.</p></li>
         <a href="parsers.html" class="btn btn-neutral float-right" title="Parsers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="cli.html" class="btn btn-neutral float-left" title="Command Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="cgr_gwas_qc.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

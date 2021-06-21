@@ -83,7 +83,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installing GwasQcPipeline</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installing-on-cgems-ccad">Installing on CGEMS/CCAD</a></li>
@@ -91,28 +91,29 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/writing_docs.html">Writing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -183,51 +184,53 @@
   <div class="section" id="installing-gwasqcpipeline">
 <h1>Installing GwasQcPipeline<a class="headerlink" href="#installing-gwasqcpipeline" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="installing-on-cgems-ccad">
-<h2>Installing on CGEMS/CCAD<a class="headerlink" href="#installing-on-cgems-ccad" title="Permalink to this headline">¶</a></h2>
+<span id="installation"></span><h2>Installing on CGEMS/CCAD<a class="headerlink" href="#installing-on-cgems-ccad" title="Permalink to this headline">¶</a></h2>
 <p>These are the recommended installation instructions for <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code>.</p>
 <p>Create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment (python=3.8):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
-$ conda create -n GwasQcPipeline -y <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 pip
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
+$ conda create -n GwasQcPipeline -y python=3.8 pip
 $ conda activate GwasQcPipeline
 </pre></div>
 </div>
 <p>Install the current release of the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install https://storage.googleapis.com/gwasqc/releases/cgr_gwas_qc-1.0.0rc7-py3-none-any.whl
-$ cgr --help  <span class="c1"># Should provide help information for running the GwasQcPipeline.</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0rc7/cgr_gwas_qc-1.0.0rc7-py3-none-any.whl
+$ cgr --help  # Should provide help information for running the GwasQcPipeline.
 </pre></div>
 </div>
 <p>After the initial installation, to use <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
 $ conda activate GwasQcPipeline
 $ cgr --help
 </pre></div>
 </div>
 <p>To update the latest version of <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
 $ conda activate GwasQcPipeline
-$ pip install --force-reinstall https://storage.googleapis.com/gwasqc/releases/cgr_gwas_qc-1.0.0rc7-py3-none-any.whl
-<span class="c1"># See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases</span>
+$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0rc7/cgr_gwas_qc-1.0.0rc7-py3-none-any.whl
+# See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 </pre></div>
 </div>
 </div>
 <div class="section" id="installing-on-other-systems">
 <h2>Installing on other systems<a class="headerlink" href="#installing-on-other-systems" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> requires <code class="docutils literal notranslate"><span class="pre">conda</span></code> to run. We suggest you follow these directions to install <a class="reference external" href="https://conda.io/projects/conda/en/latest/user-guide/install/index.html">Miniconda</a>. Once you have <code class="docutils literal notranslate"><span class="pre">conda</span></code> installed, you need to create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment and install the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda create -n GwasQcPipeline -y <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8 pip
+<p>The <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> requires <code class="docutils literal notranslate"><span class="pre">conda</span></code> to run.
+We suggest you first install <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a>.
+Once you have <code class="docutils literal notranslate"><span class="pre">conda</span></code> installed, you need to create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment and install the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n GwasQcPipeline -y python=3.8 pip
 $ conda activate GwasQcPipeline
-$ pip install https://storage.googleapis.com/gwasqc/releases/cgr_gwas_qc-1.0.0rc7-py3-none-any.whl
-$ cgr --help  <span class="c1"># Should provide help information for running the GwasQcPipeline.</span>
+$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0rc7/cgr_gwas_qc-1.0.0rc7-py3-none-any.whl
+$ cgr --help  # Should provide help information for running the GwasQcPipeline.
 </pre></div>
 </div>
 <p>To use <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> first activate your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline
 $ cgr --help
 </pre></div>
 </div>
 <p>And to update:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline
-$ pip install --force-reinstall https://storage.googleapis.com/gwasqc/releases/cgr_gwas_qc-1.0.0rc7-py3-none-any.whl
-<span class="c1"># See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline
+$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0rc7/cgr_gwas_qc-1.0.0rc7-py3-none-any.whl
+# See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 </pre></div>
 </div>
 </div>

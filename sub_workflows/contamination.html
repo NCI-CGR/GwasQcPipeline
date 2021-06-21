@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Running Tests &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Contamination &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Setting-up the Development Environment" href="setup.html" />
-    <link rel="prev" title="Development Tools" href="dev_tools.html" /> 
+    <link rel="next" title="Sample QC" href="sample_qc.html" />
+    <link rel="prev" title="Entry Points" href="entry_points.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,32 +83,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Running Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="writing_docs.html">Writing Documentation</a></li>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -157,13 +158,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Running Tests</li>
+      <li>Contamination</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/dev_docs/running_tests.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sub_workflows/contamination.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -176,9 +177,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="running-tests">
-<h1>Running Tests<a class="headerlink" href="#running-tests" title="Permalink to this headline">¶</a></h1>
-<p>There are currently no tests to run.</p>
+  <div class="section" id="contamination">
+<h1>Contamination<a class="headerlink" href="#contamination" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -189,10 +189,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="setup.html" class="btn btn-neutral float-right" title="Setting-up the Development Environment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sample_qc.html" class="btn btn-neutral float-right" title="Sample QC" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="dev_tools.html" class="btn btn-neutral float-left" title="Development Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="entry_points.html" class="btn btn-neutral float-left" title="Entry Points" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

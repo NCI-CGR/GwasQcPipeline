@@ -36,9 +36,7 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Command Line Interface" href="../reference/cli.html" />
-    <link rel="prev" title="Variant QC" href="variant_level.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,45 +81,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="variant_level.html">Variant QC</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">QC Report</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#readme">README</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#report">Report</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#summary-table">Summary Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#supplemental-tables-and-parts">Supplemental Tables and Parts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#sample-qc-summary">Sample QC Summary</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#population-qc-summary">Population QC Summary</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#population-qc-table-py">population_qc_table.py</a></li>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery</a></li>
 </ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/writing_docs.html">Writing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -176,7 +162,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/qc_modules/reporting.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sub_workflows/reporting.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -257,92 +243,6 @@
 <li><p><strong>Output</strong>: <code class="docutils literal notranslate"><span class="pre">population_level/population_qc.csv</span></code></p></li>
 <li><p><strong>Script</strong>: <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc/workflow/scripts/population_qc_table.py</span></code></p></li>
 </ul>
-<span class="target" id="module-cgr_gwas_qc.workflow.scripts.population_qc_table"></span><div class="section" id="population-qc-table-py">
-<h4>population_qc_table.py<a class="headerlink" href="#population-qc-table-py" title="Permalink to this headline">¶</a></h4>
-<p>Creates a QC summary table for each population. This is done by aggregating major population-level results including:</p>
-<ul class="simple">
-<li><p>Within population subject reslationships (IBS/IBD)</p></li>
-<li><p>Principal components analysis</p></li>
-<li><p>Autosomal heterozygosity</p></li>
-</ul>
-<dl>
-<dt>Output:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">population_level/{population}/qc.csv</span></code></p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>name</p></th>
-<th class="head"><p>description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>population</p></td>
-<td><p>The population name</p></td>
-</tr>
-<tr class="row-odd"><td><p>Subject_ID</p></td>
-<td><p>The Subject’s ID</p></td>
-</tr>
-<tr class="row-even"><td><p>QC_Family_ID</p></td>
-<td><p>An arbitrary ID assigned to each related set of subjects.</p></td>
-</tr>
-<tr class="row-odd"><td><p>relatives</p></td>
-<td><p>A list of related Subject_IDs concatenated together with a <cite>|</cite>.</p></td>
-</tr>
-<tr class="row-even"><td><p>PC1</p></td>
-<td><p>Principal component 1</p></td>
-</tr>
-<tr class="row-odd"><td><p>PC2</p></td>
-<td><p>Principal component 2</p></td>
-</tr>
-<tr class="row-even"><td><p>PC3</p></td>
-<td><p>Principal component 3</p></td>
-</tr>
-<tr class="row-odd"><td><p>PC4</p></td>
-<td><p>Principal component 4</p></td>
-</tr>
-<tr class="row-even"><td><p>PC5</p></td>
-<td><p>Principal component 5</p></td>
-</tr>
-<tr class="row-odd"><td><p>PC6</p></td>
-<td><p>Principal component 6</p></td>
-</tr>
-<tr class="row-even"><td><p>PC7</p></td>
-<td><p>Principal component 7</p></td>
-</tr>
-<tr class="row-odd"><td><p>PC8</p></td>
-<td><p>Principal component 8</p></td>
-</tr>
-<tr class="row-even"><td><p>PC9</p></td>
-<td><p>Principal component 9</p></td>
-</tr>
-<tr class="row-odd"><td><p>PC10</p></td>
-<td><p>Principal component 10</p></td>
-</tr>
-<tr class="row-even"><td><p>O_HOM</p></td>
-<td><p>Observed number of homozygotes</p></td>
-</tr>
-<tr class="row-odd"><td><p>E_HOM</p></td>
-<td><p>Expected number of homozygotes</p></td>
-</tr>
-<tr class="row-even"><td><p>N_NM</p></td>
-<td><p>Number of non-missing autosomal genotypes</p></td>
-</tr>
-<tr class="row-odd"><td><p>F</p></td>
-<td><p>Method-of-moments F coefficient estimate</p></td>
-</tr>
-</tbody>
-</table>
-</dd>
-</dl>
-<p class="rubric">References</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="../api/workflow.html#module-cgr_gwas_qc.workflow.scripts.related_subjects" title="cgr_gwas_qc.workflow.scripts.related_subjects"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cgr_gwas_qc.workflow.scripts.related_subjects</span></code></a></p></li>
-<li><p><a class="reference internal" href="../api/parsers.html#cgr_gwas_qc.parsers.plink.read_het" title="cgr_gwas_qc.parsers.plink.read_het"><code class="xref py py-func docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.plink.read_het()</span></code></a></p></li>
-<li><p><a class="reference internal" href="../api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec" title="cgr_gwas_qc.parsers.eigensoft.Eigenvec"><code class="xref py py-class docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.eigensoft.Eigenvec</span></code></a></p></li>
-</ul>
-</div>
 </div>
 </div>
 </div>
@@ -352,15 +252,6 @@
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../reference/cli.html" class="btn btn-neutral float-right" title="Command Line Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="variant_level.html" class="btn btn-neutral float-left" title="Variant QC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

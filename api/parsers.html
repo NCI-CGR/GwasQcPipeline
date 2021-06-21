@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Workflow Scripts" href="workflow.html" />
-    <link rel="prev" title="Configuration" href="config.html" /> 
+    <link rel="prev" title="Configuration API" href="config.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,36 +83,36 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/running_tests.html">Running Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/writing_docs.html">Writing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="cgr_gwas_qc.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration API</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Parsers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.eigensoft">Eigensoft</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.graf">GRAF</a><ul>
@@ -501,8 +501,8 @@ with MAF or LD filters).</p>
 </tr>
 </tbody>
 </table>
-<div class="section" id="id1">
-<h5>Relationship Values<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="king-relationships">
+<h5>King Relationships<a class="headerlink" href="#king-relationships" title="Permalink to this headline">¶</a></h5>
 <p>Categories were assigned based on Kinship ranges provided in the <a class="reference external" href="http://people.virginia.edu/~wc9c/KING/manual.html#WITHIN">KING manual</a>.</p>
 <table class="docutils align-default">
 <colgroup>
@@ -1133,7 +1133,7 @@ you can assume the order.</p>
         <a href="workflow.html" class="btn btn-neutral float-right" title="Workflow Scripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="config.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-left" title="Configuration API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

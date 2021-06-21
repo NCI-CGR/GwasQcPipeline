@@ -1,0 +1,1295 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration Files &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Entry Points" href="../sub_workflows/entry_points.html" />
+    <link rel="prev" title="Running the Pipeline" href="running_pipeline.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sample-sheet-file">Sample Sheet File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cgr-lims-manifest-file">CGR LIMs Manifest File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-config-yml">The <code class="docutils literal notranslate"><span class="pre">config.yml</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#top-level-config">Top Level Config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reference-files">Reference Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user-files">User Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#software-parameters">Software Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#workflow-parameters">Workflow Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sample-ids-to-remove">Sample IDs to Remove</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#full-example">Full Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Configuration Files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/getting_started/configuration.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration-files">
+<h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sample-sheet-file">
+<span id="sample-sheet"></span><h2>Sample Sheet File<a class="headerlink" href="#sample-sheet-file" title="Permalink to this headline">¶</a></h2>
+<p>A sample sheet is a CSV formatted file where each row represents a sample and columns contain various metadata.
+This file must contain a column named <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> which has a unique ID for each row.
+You also need a column describing (1) the subject ID representing samples from an individual, (2) the expected sex of individual, and (3) the case control status of the individual.
+See the <a class="reference internal" href="#workflow-parameters">Workflow Parameters</a> section below for details about what values are allowed for subject ID, expected sex, and case control.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example of the basic required structure of a sample sheet.
+You can have any other metadata as additional columns.
+The only column name that is required is <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code>, the other columns can be named anything as long as they are referenced correctly in <a class="reference internal" href="#workflow-parameters">Workflow Parameters</a>.</p>
+<div class="highlight-CSV notranslate"><div class="highlight"><pre><span></span>Sample_ID,Subject_ID,Expected_Sex,Case_Control
+Samp0001,Sub0001,M,Case
+Samp0002,Sub0001,M,Case
+Samp0003,Sub0002,F,Control
+Samp0004,Sub0003,F,QC
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="cgr-lims-manifest-file">
+<span id="lims"></span><h2>CGR LIMs Manifest File<a class="headerlink" href="#cgr-lims-manifest-file" title="Permalink to this headline">¶</a></h2>
+<p>The CGR LIMs manifest file is our internal way to distribute sample information.
+If you use a <a class="reference internal" href="#sample-sheet-file">Sample Sheet File</a> then you can ignore this section.
+The manifest file is an INI-like file with three section (header, manifests, data).
+During <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code> we will pull out the data section.
+This file should already have all of the required columns.
+See the <a class="reference internal" href="#workflow-parameters">Workflow Parameters</a> section below for details about what values are allowed for subject ID, expected sex, and case control.</p>
+</div>
+<div class="section" id="the-config-yml">
+<span id="config-yaml"></span><h2>The <code class="docutils literal notranslate"><span class="pre">config.yml</span></code><a class="headerlink" href="#the-config-yml" title="Permalink to this headline">¶</a></h2>
+<p>In <a class="reference internal" href="running_pipeline.html#running-the-pipeline"><span class="std std-ref">Running the Pipeline</span></a>, we created the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> using <a class="reference internal" href="running_pipeline.html#cgr-config"><span class="std std-ref">Creating Configuration</span></a>.
+This file is central to running the <em>CGR GwasQcPipeline</em>.
+Here we will describe the main configuration options.
+The config file is broken down into different sections called “namespaces”.
+I will walk through each section below and end this page with a full example.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Required options without defaults are in bold.</p>
+</div>
+<div class="section" id="top-level-config">
+<h3>Top Level Config<a class="headerlink" href="#top-level-config" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="3"><p><code class="docutils literal notranslate"><span class="pre">config.yml</span></code> data model.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v1.0.0</span>
+<span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span>
+<span class="nt">sample_sheet</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span>
+<span class="nt">genome_build</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hg37</span>
+<span class="nt">snp_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span>
+<span class="nt">num_samples</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6336</span>
+<span class="nt">num_snps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">700078</span>
+<span class="nt">reference_files</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">...</span>  <span class="c1"># Reference file namesapace</span>
+<span class="nt">user_files</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">...</span>  <span class="c1"># User file namespace</span>
+<span class="nt">software_params</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">...</span>  <span class="c1"># Software parameter namespace</span>
+<span class="nt">workflow_params</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">...</span>  <span class="c1"># Workflow parameter namespace</span>
+<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>pipeline_version</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Pipeline Version</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The version of the GwasQcPipeline to use. If you want to use a different version you may just edit this value to match. However, it is suggested that you re-run the entire pipeline incases there are differences between version.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>v1.0.0rc7</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>project_name</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Project Name</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The title of the project to use during report generation.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p><strong>sample_sheet</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Sample Sheet</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The path to the sample sheet (or LIMs manifest). This is the file referenced during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> and used to generate <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>genome_build</p></li>
+</ul>
+</td>
+<td colspan="2"><p>The human genome build. This field is not actually used by the workflow. It is only used during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> to select the VCF file when running on CGEMs/CCAD.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string; [hg37|hg38]</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>hg37</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>snp_array</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Snp Array</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Which SNP array was used. Only used for reporting.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p><strong>num_samples</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Num Samples</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Number of samples, automatically calculated from the sample sheet during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p><strong>num_snps</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Num Snps</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Number of markers, automatically calculated from the <code class="docutils literal notranslate"><span class="pre">reference_files.illumina_manifest_file</span></code>. We will attempt to calculate this during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> and <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p><strong>reference_files</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Reference Files</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Reference file namespace. Reference files include the Illumina provided BPM and the 1000 Genomes VCF.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>namespace</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p><strong>user_files</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>User Files</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>User file namespace. User files include the user provided genotype data in IDAT/GTC, PED/MAP, or BED/BIM/FAM formats.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>namespace</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p><strong>software_params</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Software Params</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Software parameter namespace. This includes all parameters passed to 3rd party and internal software and scripts.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>namespace</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p><strong>workflow_params</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Workflow Params</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Workflow parameter namespace. This includes all parameters used to control workflow behavior.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>namespace</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>Sample_IDs_to_remove</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Sample Ids To Remove</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>A list of Sample_IDs to exclude from QC. This is the easiest way for a user to exclude specific samples from the GwasQcPipeline. These samples will be flagged as <code class="docutils literal notranslate"><span class="pre">is_user_exclusion</span></code> and will be present in the report, but they will have not have any results from this analysis.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>list of strings</em></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file contains all workflow configurations.
+The top level section is automatically populated by <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> and <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code>.
+You should not need to edit this section unless you want to
+(1) update the version of the workflow you are using, (2) change the project name, or (3) switch human references.</p>
+<div class="section" id="reference-files">
+<h3>Reference Files<a class="headerlink" href="#reference-files" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="3"><p>A list of reference files used by the pipeline.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">reference_files</span><span class="p">:</span>
+    <span class="nt">illumina_manifest_file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
+    <span class="nt">thousand_genome_vcf</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
+    <span class="nt">thousand_genome_tbi</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p><strong>illumina_manifest_file</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Illumina Manifest File</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Path to the Illumina provided BPM file.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>illumina_cluster_file</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Illumina Cluster File</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Path to the array cluster EGT file.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p><strong>thousand_genome_vcf</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Thousand Genome Vcf</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Path to the 1000 Genomes VCF file.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p><strong>thousand_genome_tbi</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Thousand Genome Tbi</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Path to the corresponding index for the 1000 Genomes VCF file.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If you are on <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code> then the paths of the reference files are correctly populated by <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span> <span class="pre">--cgems</span></code> or <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span> <span class="pre">--cgems-dev</span></code>.
+If you are on another system then you most provide the correct paths and versions of these files.
+The <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code> is provided by Illumina.
+The <code class="docutils literal notranslate"><span class="pre">thousand_genome_vcf</span></code> and <code class="docutils literal notranslate"><span class="pre">thousand_genome_tbi</span></code> files can be downloaded from the 1000 Genome’s website.
+The <code class="docutils literal notranslate"><span class="pre">illumina_cluster_file</span></code> is the EGT file used to generate GTCs; this file is not required and is only referenced in the QC report if present.</p>
+<dl class="simple">
+<dt>1000 Genomes reference files download links</dt><dd><ul class="simple">
+<li><p><strong>hg37</strong>: <a class="reference external" href="http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz">VCF</a>,
+<a class="reference external" href="http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi">TBI</a></p></li>
+<li><p><strong>hg38</strong>: <a class="reference external" href="http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20181203_biallelic_SNV/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz">VCF</a>,
+<a class="reference external" href="http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20181203_biallelic_SNV/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz.tbi">TBI</a></p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The genome build needs to match <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code>, <code class="docutils literal notranslate"><span class="pre">thousand_genome_*</span></code>, and <code class="docutils literal notranslate"><span class="pre">genome_build</span></code> above.
+Currently we only support <code class="docutils literal notranslate"><span class="pre">hg37</span></code> and <code class="docutils literal notranslate"><span class="pre">hg38</span></code>.
+Though in reality as long as <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code> and <code class="docutils literal notranslate"><span class="pre">thousand_genome_*</span></code> are from the same build then everything should work.</p>
+</div>
+<div class="section" id="user-files">
+<h3>User Files<a class="headerlink" href="#user-files" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="3"><p>A list of user provided files or naming patterns.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
+    <span class="nt">output_pattern</span><span class="p">:</span> <span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+    <span class="nt">idat_pattern</span><span class="p">:</span>
+        <span class="nt">red</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span>
+        <span class="nt">green</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span>
+    <span class="nt">gtc_pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
+    <span class="nt">output_pattern</span><span class="p">:</span> <span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+    <span class="nt">ped</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.ped</span>
+    <span class="nt">map</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.map</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
+    <span class="nt">output_pattern</span><span class="p">:</span> <span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+    <span class="nt">bed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bed</span>
+    <span class="nt">bim</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bim</span>
+    <span class="nt">fam</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.fam</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The IDAT/GTC patterns, PED/MAP paths, and BED/BIM/FAM paths are mutually exclusive.
+You should only provide one set of patterns/paths.</p>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>output_pattern</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Output Pattern</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>File naming pattern for deliverable files. In general, you should not need to edit this. However, if you do decide to change this pattern you must keep the <code class="docutils literal notranslate"><span class="pre">{prefix}</span></code>, <code class="docutils literal notranslate"><span class="pre">{file_type}</span></code>, and <code class="docutils literal notranslate"><span class="pre">{ext}</span></code> patterns. These are filled in by the workflow, see the delivery sub-workflow for more details.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>{prefix}/{file_type}.{ext}</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>idat_pattern</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Idat Pattern</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>File naming pattern for IDAT files. There are two IDAT files for each samples (red and green). You need to provide a file naming pattern for each IDAT file. Wildcards are indicated by an <code class="docutils literal notranslate"><span class="pre">{}</span></code>. Wildcards have to match column names in the sample sheet exactly.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>namespace</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>gtc_pattern</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Gtc Pattern</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>File name pattern for GTC file. Wildcards are indicated by an <code class="docutils literal notranslate"><span class="pre">{}</span></code>. Wildcards have to match column names in the sample sheet exactly.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>ped</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Ped</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The full path to an aggregated PED file if the sample level GTC files are not available.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>map</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Map</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The full path to an aggregated MAP file if the sample level GTC files are not available.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>bed</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Bed</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The full path to an aggregated BED file if the sample level GTC files are not available.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>bim</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Bim</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The full path to an aggregated BIM file if the sample level GTC files are not available.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>fam</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Fam</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The full path to an aggregated FAM file if the sample level GTC files are not available.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">user_files</span></code> section has a number of different mutually exclusive configurations depending on the starting file types.
+By default we assume you will be starting with IDAT and GTC files.
+Though we also accept aggregated PED/MAP and aggregated BED/BIM/FAM files.
+In the example, <code class="docutils literal notranslate"><span class="pre">{Project}</span></code> and <code class="docutils literal notranslate"><span class="pre">{Sample_ID}</span></code> will be filled by values from <code class="docutils literal notranslate"><span class="pre">Project</span></code> and <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> columns in <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">gtc_pattern</span></code> is given, then this will trigger the GTC entry point.
+We will convert each sample’s GTC to a PED/MAP and then aggregate all samples and convert to a single BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
+<p>If the PED/MAP files are given, then this will trigger the PED/MAP entry point.
+Which will convert these files to a single BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
+<p>If the BED/BIM/FAM files are given, then this will trigger the BED/BIM/FAM entry point.
+Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
+<div class="section" id="software-parameters">
+<h3>Software Parameters<a class="headerlink" href="#software-parameters" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="3"><p>Software parameters used by various tools in the workflow.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">software_params</span><span class="p">:</span>
+    <span class="nt">strand</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">top</span>
+
+    <span class="nt">sample_call_rate_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
+    <span class="nt">snp_call_rate_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
+    <span class="nt">sample_call_rate_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
+    <span class="nt">snp_call_rate_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
+
+    <span class="nt">intensity_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6000</span>
+    <span class="nt">contam_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+    <span class="nt">contam_population</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">AF</span>
+
+    <span class="nt">ld_prune_r2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+    <span class="nt">maf_for_ibd</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
+    <span class="nt">maf_for_hwe</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+
+    <span class="nt">ibd_pi_hat_min</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+    <span class="nt">ibd_pi_hat_max</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+    <span class="nt">dup_concordance_cutoff</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
+    <span class="nt">pi_hat_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
+
+    <span class="nt">autosomal_het_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>strand</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Strand</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Which Illumina strand to use for genotypes when converting GTC to plink {TOP, FWD, PLUS}. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/gtc2plink.py</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>top</p></td>
+</tr>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>sample_call_rate_1</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Sample Call Rate 1</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Sample call rate filter 1 threshold. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--mind</span> <span class="pre">(1</span> <span class="pre">-</span> <span class="pre">sample_call_rate_1</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/filter#missing">reference</a></p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>0.8</p></td>
+</tr>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>snp_call_rate_1</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Snp Call Rate 1</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>SNP call rate filter 1 threshold. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--geno</span> <span class="pre">(1</span> <span class="pre">-</span> <span class="pre">sample_call_rate_1</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/filter#missing">reference</a></p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>0.8</p></td>
+</tr>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>sample_call_rate_2</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Sample Call Rate 2</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Sample call rate filter 2 threshold. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--mind</span> <span class="pre">(1</span> <span class="pre">-</span> <span class="pre">sample_call_rate_1</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/filter#missing">reference</a></p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>0.95</p></td>
+</tr>
+<tr class="row-even"><td rowspan="6"><ul class="simple">
+<li><p>snp_call_rate_2</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Snp Call Rate 2</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>SNP call rate filter 2 threshold. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--geno</span> <span class="pre">(1</span> <span class="pre">-</span> <span class="pre">sample_call_rate_1</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/filter#missing">reference</a></p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>0.95</p></td>
+</tr>
+<tr class="row-even"><td rowspan="5"><ul class="simple">
+<li><p>intensity_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Intensity Threshold</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Median IDAT intensity threshold used to filter samples during estimating contamination check. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/agg_contamination.py</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>6000</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>contam_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Contam Threshold</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>%Mix cutoff to consider a sample as contaminated. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/agg_contamination.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.1</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>contam_population</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Contam Population</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>While population from the 1000 Genomes project to use for B-allele frequencies during contamination testing .Can be one of {AF, EAS_AF, AMR_AF, AFR_AF, EUR_AF, SAS_AF}. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/bpm2abf.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>AF</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>ld_prune_r2</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Ld Prune R2</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The r-squared threshold for LD pruning of SNPS for use with IBD and replicate concordance. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--indep-pairwise</span> <span class="pre">50</span> <span class="pre">5</span> <span class="pre">ld_prune_r2</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/ld#indep">reference</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.1</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>maf_for_ibd</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Maf For Ibd</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The minor allele frequency threshold of SNPS for use with IBD and replicate concordance. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--maf</span> <span class="pre">maf_for_ibd</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/filter#maf">reference</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.2</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>maf_for_hwe</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Maf For Hwe</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The minor allele frequency threshold of SNPS for use with population level HWE estimates. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--maf</span> <span class="pre">maf_for_hwe</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/filter#maf">reference</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.05</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>ibd_pi_hat_min</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Ibd Pi Hat Min</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The minimum IBD pi hat value to save in the results table. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--genome</span> <span class="pre">full</span> <span class="pre">--min</span> <span class="pre">ibd_pi_hat_min</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/ibd">reference</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMaximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>minimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.05</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>ibd_pi_hat_max</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Ibd Pi Hat Max</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The maximum IBD pi hat value to save in the results table. <code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--genome</span> <span class="pre">full</span> <span class="pre">--max</span> <span class="pre">ibd_pi_hat_max</span></code>; <a class="reference external" href="https://www.cog-genomics.org/plink/1.9/ibd">reference</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>1.0</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>dup_concordance_cutoff</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Dup Concordance Cutoff</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The concordance threshold to consider two samples as replicates. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/concordance_table.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.95</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>pi_hat_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Pi Hat Threshold</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The pi hat threshold to consider two samples as related. The default of 0.2 reports 1st and 2nd degree relatives. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/concordance_table.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.2</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="6"><ul class="simple">
+<li><p>autosomal_het_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Autosomal Het Threshold</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The autosomal heterozygosity F coefficient threshold which to flag subject for removal. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/plot_autosomal_heterozygosity.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>number</em></p></td>
+</tr>
+<tr class="row-even"><td><p>maximum</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>0.1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="workflow-parameters">
+<h3>Workflow Parameters<a class="headerlink" href="#workflow-parameters" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="3"><p>This set of parameters control what parts and how the workflow is run.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">workflow_params</span><span class="p">:</span>
+    <span class="nt">subject_id_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Group_By</span>
+    <span class="nt">expected_sex_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span>
+    <span class="nt">case_control_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span>
+    <span class="nt">remove_contam</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+    <span class="nt">remove_rep_discordant</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+    <span class="nt">minimum_pop_subjects</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+    <span class="nt">control_hwp_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+    <span class="nt">lims_upload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>subject_id_column</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Subject Id Column</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The column in your sample sheet that contains the subject ID. We expect that there may be multiple samples (rows) that have the sample subject ID. If there are multiple columns that you want use for subject ID, you can create a special column named <code class="docutils literal notranslate"><span class="pre">Group_By</span></code>. This would be a column that contains the column name to use as subject ID for that given samples (row).</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>Group_By</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>expected_sex_column</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Expected Sex Column</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The name of the column in the sample sheet which identifies expected sex of samples. Allowed values in this columns are [<code class="docutils literal notranslate"><span class="pre">F</span></code> | <code class="docutils literal notranslate"><span class="pre">M</span></code> | <code class="docutils literal notranslate"><span class="pre">U</span></code>]</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>Expected_Sex</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>case_control_column</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Case Control Column</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The name of the colun in the sample sheet which identifies Case/Control status. Allowed values in this column are [<code class="docutils literal notranslate"><span class="pre">Control</span></code> | <code class="docutils literal notranslate"><span class="pre">Case</span></code> | <code class="docutils literal notranslate"><span class="pre">QC</span></code> | <code class="docutils literal notranslate"><span class="pre">Unknown</span></code>].</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>Case/Control_Status</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>remove_contam</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Remove Contam</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>True if you want to remove contaminated samples before running the subject level QC.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>remove_rep_discordant</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Remove Rep Discordant</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>True if you want to remove discordant replicates before running the subject level QC.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="5"><ul class="simple">
+<li><p>minimum_pop_subjects</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Minimum Pop Subjects</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The minimum number of samples needed to use a population for population level QC (PCA, Autosomal Heterozygosity).</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>50</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="5"><ul class="simple">
+<li><p>control_hwp_threshold</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Control Hwp Threshold</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>The minimum number of control samples needed to use a population for population level QC (HWE).</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>50</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>lims_upload</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Lims Upload</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>For <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code> use only, will place a copy of the LimsUpload file in the root directory.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>False</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="sample-ids-to-remove">
+<h3>Sample IDs to Remove<a class="headerlink" href="#sample-ids-to-remove" title="Permalink to this headline">¶</a></h3>
+<p>This is an optional section where you can list <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> that you do not want to include in the QC run.
+These samples will be indicated as <code class="docutils literal notranslate"><span class="pre">is_user_exclusion</span> <span class="pre">=</span> <span class="pre">True</span></code> in the sample level QC table.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
+   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Sample0001</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="full-example">
+<h3>Full Example<a class="headerlink" href="#full-example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v1.0.0</span>
+<span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span>
+<span class="nt">sample_sheet</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span>
+<span class="nt">genome_build</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hg37</span>
+<span class="nt">snp_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span>
+<span class="nt">num_samples</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6336</span>
+<span class="nt">num_snps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">700078</span>
+<span class="nt">reference_files</span><span class="p">:</span>
+   <span class="nt">illumina_manifest_file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
+   <span class="nt">thousand_genome_vcf</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
+   <span class="nt">thousand_genome_tbi</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
+<span class="nt">user_files</span><span class="p">:</span>
+   <span class="nt">output_pattern</span><span class="p">:</span> <span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+   <span class="nt">idat_pattern</span><span class="p">:</span>
+      <span class="nt">red</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span>
+      <span class="nt">green</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span>
+   <span class="nt">gtc_pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span>
+<span class="nt">software_params</span><span class="p">:</span>
+   <span class="nt">sample_call_rate_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
+   <span class="nt">snp_call_rate_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
+   <span class="nt">sample_call_rate_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
+   <span class="nt">snp_call_rate_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
+   <span class="nt">ld_prune_r2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+   <span class="nt">maf_for_ibd</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
+   <span class="nt">maf_for_hwe</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+   <span class="nt">ibd_pi_hat_min</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+   <span class="nt">ibd_pi_hat_max</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+   <span class="nt">dup_concordance_cutoff</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
+   <span class="nt">intensity_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6000</span>
+   <span class="nt">contam_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+   <span class="nt">contam_population</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">AF</span>
+   <span class="nt">pi_hat_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
+   <span class="nt">autosomal_het_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+   <span class="nt">strand</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">top</span>
+<span class="nt">workflow_params</span><span class="p">:</span>
+   <span class="nt">subject_id_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Group_By</span>
+   <span class="nt">expected_sex_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span>
+   <span class="nt">case_control_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span>
+   <span class="nt">remove_contam</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+   <span class="nt">remove_rep_discordant</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+   <span class="nt">minimum_pop_subjects</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+   <span class="nt">control_hwp_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+   <span class="nt">lims_upload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
+   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Sample0001</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../sub_workflows/entry_points.html" class="btn btn-neutral float-right" title="Entry Points" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="running_pipeline.html" class="btn btn-neutral float-left" title="Running the Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

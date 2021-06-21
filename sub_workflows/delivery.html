@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Development Tools &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Delivery &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Running Tests" href="running_tests.html" />
-    <link rel="prev" title="Building Documentation" href="building_docs.html" /> 
+    <link rel="next" title="Command Line Interface" href="../reference/cli.html" />
+    <link rel="prev" title="Subject QC" href="subject_qc.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,36 +83,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../qc_modules/reporting.html">QC Report</a></li>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Development Tools</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#required-tools">Required Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#suggested-tools">Suggested Tools</a></li>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="running_tests.html">Running Tests</a></li>
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="writing_docs.html">Writing Documentation</a></li>
-</ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -161,13 +158,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Development Tools</li>
+      <li>Delivery</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/dev_docs/dev_tools.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sub_workflows/delivery.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -180,26 +177,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="development-tools">
-<h1>Development Tools<a class="headerlink" href="#development-tools" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="required-tools">
-<h2>Required Tools<a class="headerlink" href="#required-tools" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>sphinx: documentation engine.</p></li>
-<li><p>sphinx_rtd_theme: documentation theme.</p></li>
-<li><p>pytest: test engine.</p></li>
-</ul>
-</div>
-<div class="section" id="suggested-tools">
-<h2>Suggested Tools<a class="headerlink" href="#suggested-tools" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>black: autoformatter for python files.</p></li>
-<li><p>snakefmt: autoformatter for snakemake files.</p></li>
-<li><p>pylint: linter for python files.</p></li>
-<li><p>rstcheck: linter for rst files.</p></li>
-<li><p>VS code: IDE with settings defined in <code class="docutils literal notranslate"><span class="pre">.vscode</span></code></p></li>
-</ul>
-</div>
+  <div class="section" id="delivery">
+<h1>Delivery<a class="headerlink" href="#delivery" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -210,10 +189,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="running_tests.html" class="btn btn-neutral float-right" title="Running Tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../reference/cli.html" class="btn btn-neutral float-right" title="Command Line Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="building_docs.html" class="btn btn-neutral float-left" title="Building Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="subject_qc.html" class="btn btn-neutral float-left" title="Subject QC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

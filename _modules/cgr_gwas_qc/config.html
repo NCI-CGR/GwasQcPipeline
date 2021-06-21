@@ -82,32 +82,33 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started:</span></p>
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Modules:</span></p>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../qc_modules/sample_level.html">Sample QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../qc_modules/variant_level.html">Variant QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../qc_modules/reporting.html">QC Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/entry_points.html">Entry Points</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/contamination.html">Contamination</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/sample_qc.html">Sample QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/subject_qc.html">Subject QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/delivery.html">Delivery</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Module Reference:</span></p>
+<p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/cli.html">Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/file_types.html">File Type Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/rules.html">Rule Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Documentation:</span></p>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/building_docs.html">Building Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/dev_tools.html">Development Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/running_tests.html">Running Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/writing_docs.html">Writing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/testing.html">Running Tests</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference:</span></p>
+<p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -200,7 +201,6 @@
 <span class="sd">        SRC_DIR (Path): The absolute path to ``cgr_gwas_qc`` source code.</span>
 <span class="sd">        WORKFLOW_DIR (Path): The absolute path to the ``workflow`` source code.</span>
 <span class="sd">        CONFIG_DIR (Path): The absolute path to the ``workflow/config``.</span>
-<span class="sd">        RULE_DIR (Path): The absolute path to the ``workflow/rules``.</span>
 <span class="sd">        SCRIPTS_DIR (Path): The absolute path to the ``workflow/scripts``.</span>
 <span class="sd">        SNAKEFILE (Path): The absolute path to the ``workflow/Snakefile``.</span>
 
@@ -214,9 +214,7 @@
 
 <span class="sd">    Methods:</span>
 <span class="sd">        expand: Uses columns from the user&#39;s sample sheet to expand a file pattern.</span>
-<span class="sd">        envmodules: Pulls environmental module information from user&#39;s config.</span>
 <span class="sd">        conda: Creates the full path to conda environment.</span>
-<span class="sd">        rules: Creates the full path to snakemake rule.</span>
 <span class="sd">        scripts: Creates the full path to an internal script.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -225,7 +223,6 @@
     <span class="n">TEMPLATE_DIR</span> <span class="o">=</span> <span class="n">SRC_DIR</span> <span class="o">/</span> <span class="s2">&quot;reporting/templates&quot;</span>
 
     <span class="n">CONDA_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;conda&quot;</span>
-    <span class="n">RULE_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;rules&quot;</span>
     <span class="n">MODULE_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;modules&quot;</span>
     <span class="n">SCRIPTS_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;scripts&quot;</span>
     <span class="n">SUBWORKFLOW_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;sub_workflows&quot;</span>
@@ -297,15 +294,6 @@
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span> <span class="k">if</span> <span class="n">query</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span>
         <span class="k">return</span> <span class="n">expand</span><span class="p">(</span><span class="n">file_pattern</span><span class="p">,</span> <span class="n">combination</span><span class="p">,</span> <span class="o">**</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ConfigMgr.envmodules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.envmodules">[docs]</a>    <span class="k">def</span> <span class="nf">envmodules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Returns the HPC environment module from user&#39;s config.</span>
-
-<span class="sd">        On HPC systems you can use environment modules instead of conda. The</span>
-<span class="sd">        specific module versions are stored in the main config.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">modules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;env_modules&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">modules</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span></div>
-
 <div class="viewcode-block" id="ConfigMgr.conda"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.conda">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">conda</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return path to a conda env file.</span>
@@ -313,14 +301,6 @@
 <span class="sd">        Given a conda env file_name, prepends the full path to that file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">CONDA_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.yml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="ConfigMgr.rules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.rules">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">rules</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the path to a rule file.</span>
-
-<span class="sd">        Given a rule file_name, prepends the full path to that rule.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">RULE_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.smk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConfigMgr.modules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.modules">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
