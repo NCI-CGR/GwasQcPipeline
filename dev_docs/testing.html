@@ -179,8 +179,8 @@
   <div class="section" id="working-with-test-suite">
 <h1>Working with Test Suite<a class="headerlink" href="#working-with-test-suite" title="Permalink to this headline">¶</a></h1>
 <p>Software testing is a technique where you isolate different parts of a system and test specific functionality.
-Testing bioinformatics workflows is challenging because large amounts of data are often needed for certain steps to run.
-Here we try to take a test driven approach and use both unit tests (tests targeting 1 specific piece of functionality) and integration tests (test targeting many steps at once).
+Testing in bioinformatics is challenging because we often need large amounts of data.
+We used a test driven approach and use both unit tests (tests targeting 1 specific piece of functionality) and integration tests (test targeting many steps at once).
 Where possible we used very small “fake” datasets to ensure the test suite runs quickly.
 However, much of the workflow could only be tested using real data.
 We do not currently distribute our real test data but we have made the test suite module so that all developers can at least run the fake data tests.
@@ -191,7 +191,7 @@ We are using the powerful <a class="reference external" href="https://docs.pytes
    ├── cli/
    ├── cluster_profiles/
    ├── conftest.py
-   ├── data/
+   ├── data/                                <span class="c1"># This is a git submodule pointing to our fake test data at https://github.com/NCI-CGR/GwasQcPipeline-test-data</span>
    ├── models/
    ├── parsers/
    ├── reporting/
@@ -202,19 +202,119 @@ We are using the powerful <a class="reference external" href="https://docs.pytes
    └── workflow/
 </pre></div>
 </div>
+<p>Notice that the <code class="docutils literal notranslate"><span class="pre">test/</span></code> structure closely mimics the <code class="docutils literal notranslate"><span class="pre">src/cgr_gwas_qc/</span></code> structure.
+<a class="reference external" href="https://docs.pytest.org/en/6.2.x/">pytest</a> requires a few naming conventions.</p>
+<ol class="arabic simple">
+<li><p>Any file that contains tests must be named <code class="docutils literal notranslate"><span class="pre">test_*.py</span></code></p></li>
+<li><p>Any test function must be named <code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">test_*()</span></code></p></li>
+<li><p>There is a special file <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code> that is shared by all of the test files.
+The file <code class="docutils literal notranslate"><span class="pre">tests/conftest.py</span></code> is available to all tests.
+While a file <code class="docutils literal notranslate"><span class="pre">tests/cli/conftest.py</span></code> would be available to all tests in the <code class="docutils literal notranslate"><span class="pre">tests/cli</span></code> folder and subdirectories.</p></li>
+</ol>
+<p><a class="reference external" href="https://docs.pytest.org/en/6.2.x/">pytest</a> also uses a concept called <code class="docutils literal notranslate"><span class="pre">fixtures</span></code>, where you can define a function that generates some data/state and then use the return value in your tests.
+For example,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">one</span><span class="p">():</span>
+   <span class="k">return</span> <span class="mi">1</span>
+
+<span class="k">def</span> <span class="nf">test_addition</span><span class="p">(</span><span class="n">one</span><span class="p">):</span>
+   <span class="k">assert</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">one</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>In this simple example, we create a fixture <code class="docutils literal notranslate"><span class="pre">one</span></code> that returns the number <code class="docutils literal notranslate"><span class="pre">1</span></code>.
+Our test function <code class="docutils literal notranslate"><span class="pre">test_addition</span></code> has the fixture name as one of its parameters.
+<a class="reference external" href="https://docs.pytest.org/en/6.2.x/">pytest</a> will replace the fixture name with the return value so you can use it directly as a variable in your test.
+I use <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code> as a way to store and share fixtures among tests.</p>
 <div class="section" id="fake-data">
 <h2>Fake Data<a class="headerlink" href="#fake-data" title="Permalink to this headline">¶</a></h2>
-<p>To run fake data tests you can simply run:</p>
+<p>Our “fake” test data is stored at <a class="reference external" href="https://github.com/NCI-CGR/GwasQcPipeline-test-data">https://github.com/NCI-CGR/GwasQcPipeline-test-data</a>.
+We have this repository as a git submodule in the test directory.
+So if you followed <a class="reference internal" href="setup.html#dev-setup"><span class="std std-ref">Development Environment Set-up</span></a> where we <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">--recursive</span></code> you already have this data at <code class="docutils literal notranslate"><span class="pre">tests/data/</span></code>.</p>
+<p>To run all tests that use these data simply:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
 </pre></div>
 </div>
+<p>You will notice the use of <code class="docutils literal notranslate"><span class="pre">FakeData()</span></code> in our test cases.
+This is a helper class for providing the correct paths to our test data.
+See the <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc.testing.data</span></code> module for more information.</p>
+<dl class="py class">
+<dt id="cgr_gwas_qc.testing.data.FakeData">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.testing.data.</code><code class="sig-name descname">FakeData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>pathlib.Path<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/testing/data.html#FakeData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.testing.data.FakeData" title="Permalink to this definition">¶</a></dt>
+<dd><p>A repository of synthetic data stored in <code class="docutils literal notranslate"><span class="pre">tests/data</span></code>.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span> <span class="o">=</span> <span class="n">FakeData</span><span class="p">(</span><span class="n">working_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span> <span class="o">/</span> <span class="n">existing_file</span><span class="o">.</span><span class="n">txt</span>  <span class="c1"># If file exists then returns path to the file</span>
+<span class="go">Path(&quot;.../existing_file.txt&quot;)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span> <span class="o">/</span> <span class="n">non_existing_file</span><span class="o">.</span><span class="n">txt</span>  <span class="c1"># If file does not exist then raises exception</span>
+<span class="go">FileNotFoundError: &quot;.../non_existing_file.txt&quot;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">make_cgr_sample_sheet</span><span class="p">()</span>  <span class="c1"># copy sample sheet to working dir</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">add_user_files</span><span class="p">()</span>  <span class="c1"># add BED/BIM/FAM to working dir</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">make_config</span><span class="p">()</span>  <span class="c1"># make the config for files added using cache</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </div>
 <div class="section" id="real-data">
 <h2>Real Data<a class="headerlink" href="#real-data" title="Permalink to this headline">¶</a></h2>
-<p>To run all tests, including those with real data you can simply run:</p>
+<p>We also have small set real data stored on CGEMs/CCAD at <code class="docutils literal notranslate"><span class="pre">/DCEG/CGF/Bioinformatics/Production/data/cgr_gwas_qc</span></code>.
+We do not distribute this data publicly but CGR users can sync this data to other NIH computers/servers using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cgr_gwas_qc.testing.data</span> <span class="kn">import</span> <span class="n">RealData</span>
+
+<span class="n">RealData</span><span class="p">(</span><span class="n">sync</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will rsync the real data to <code class="docutils literal notranslate"><span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">cloned</span> <span class="pre">version</span> <span class="pre">of</span> <span class="pre">repository&gt;/.cache/cgr_gwas_qc/test_data</span></code>.
+If down the road CGR shares this data with other users then they can save the data on their own internal server.
+Then users would need to set the environmental variables <code class="docutils literal notranslate"><span class="pre">TEST_DATA_USER</span></code>, <code class="docutils literal notranslate"><span class="pre">TEST_DATA_SERVER</span></code>, and <code class="docutils literal notranslate"><span class="pre">TEST_DATA_PATH</span></code> to replicate the rsync capabilities.</p>
+<p>To run all tests, including those with real data, simply:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest --real-data
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You will see the use of <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.real_data</span></code> as a decorator on test functions.
+For example,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">real_data</span>
+<span class="k">def</span> <span class="nf">test_addition</span><span class="p">():</span>
+   <span class="k">pass</span>
+</pre></div>
+</div>
+<p>This tells <a class="reference external" href="https://docs.pytest.org/en/6.2.x/">pytest</a> that this test uses real data and should be skipped unless the <code class="docutils literal notranslate"><span class="pre">--real-data</span></code> flag is given.</p>
+</div>
+<dl class="py class">
+<dt id="cgr_gwas_qc.testing.data.RealData">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.testing.data.</code><code class="sig-name descname">RealData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>pathlib.Path<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">full_sample_sheet</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sync</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">GRCh_version</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">37</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/testing/data.html#RealData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.testing.data.RealData" title="Permalink to this definition">¶</a></dt>
+<dd><p>A repository of real data stored on cgems.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span> <span class="o">=</span> <span class="n">ReadData</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">sync</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># automatically symlink (on cgems) or rsync data locally</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span> <span class="o">/</span> <span class="n">existing_file</span><span class="o">.</span><span class="n">txt</span>  <span class="c1"># If file exists then returns path to the file</span>
+<span class="go">Path(&quot;../../../.cache/cgr_gwas_qc/test_data/existing_file.txt&quot;)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span> <span class="o">/</span> <span class="n">non_existing_file</span><span class="o">.</span><span class="n">txt</span>  <span class="c1"># If file does not exist then raises exception</span>
+<span class="go">FileNotFoundError: &quot;../../../.cache/cgr_gwas_qc/test_data/non_existing_file.txt&quot;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">make_cgr_sample_sheet</span><span class="p">()</span>  <span class="c1"># copy sample sheet to working dir</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">add_user_files</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># add full path of user files to config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span><span class="o">.</span><span class="n">make_config</span><span class="p">()</span>  <span class="c1"># make the config for files added using cache</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </div>
 </div>
 
