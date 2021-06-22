@@ -262,7 +262,7 @@ def _families(population_qc_csv: PathLike, writer):
     if df.shape[0] > 0:
         for population, dd in df.groupby("population"):
             dd.reindex(_FAMILY_COLUMNS, axis=1).to_excel(
-                writer, sheet_name=f"{population}_FAMILY", index=False
+                writer, sheet_name=f"{population[:24]}_FAMILY", index=False
             )
 
 
@@ -288,7 +288,7 @@ def _population_concordance(population_concordance_csv: PathLike, writer: pd.Exc
     for population, dd in df.groupby("population"):
         dd.reindex(_POPULATION_CONCORDANCE_COLUMNS, axis=1).pipe(_excel_limit_filter).sort_values(
             ["Subject_ID1", "Subject_ID2"]
-        ).to_excel(writer, sheet_name=f"{population}_IBD", index=False)
+        ).to_excel(writer, sheet_name=f"{population[:24]}_IBD", index=False)
 
 
 _PCA_COLUMNS = [
@@ -311,7 +311,7 @@ def _pca(population_qc_csv: PathLike, writer: pd.ExcelWriter):
     df = population_qc_table.read(population_qc_csv).rename(REPORT_NAME_MAPPER, axis=1)
     for population, dd in df.groupby("population"):
         dd.reindex(_PCA_COLUMNS, axis=1).to_excel(
-            writer, sheet_name=f"{population}_PCA", index=False
+            writer, sheet_name=f"{population[:24]}_PCA", index=False
         )
 
 
@@ -322,7 +322,7 @@ def _het(population_qc_csv: PathLike, writer: pd.ExcelWriter):
     df = population_qc_table.read(population_qc_csv).rename(REPORT_NAME_MAPPER, axis=1)
     for population, dd in df.groupby("population"):
         dd.reindex(_HET_COLUMNS, axis=1).to_excel(
-            writer, sheet_name=f"{population}_HET", index=False
+            writer, sheet_name=f"{population[:24]}_HET", index=False
         )
 
 
