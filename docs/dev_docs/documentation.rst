@@ -1,28 +1,29 @@
-Documentation
-=============
+.. _documentation:
+
+Working with Documentation
+==========================
 
 |cgr| uses the Sphinx_ python documentation generator.
 Documentation is written in reStructuredText_, a markup language similar to Markdown but with more advanced features.
+The sphinx documentation is stored in the ``docs/`` folder.
 
-Writing Documentation
----------------------
+.. code-block:: bash
 
-All documentation is found in the ``docs/`` folder.
+   .
+   ├── docs/
+   │  ├── api/              # Implementation details for parsers and other helpers
+   │  ├── common_urls.rst   # URLs used throughout documentation
+   │  ├── conf.py           # Sphinx configuration file
+   │  ├── dev_docs/         # Development documentation
+   │  ├── getting_started/  # Getting started documentation
+   │  ├── index.rst         # Main page, if you add a new page link to it here
+   │  ├── Makefile          # Sphinx make file for building docs ``make html``
+   │  ├── reference/        # User reference material, i.e., file-type reference
+   │  ├── static/           # Images and styling
+   │  └── sub_workflows/    # Workflow documentation
 
-.. code-block::
-
-   # GwasQcPipeline folder cloned from https://github.com/NCI-CGR/GwasQcPipeline
-   .github/
-   docs/ # This folder contains all documentation.
-   src/
-   tests/
-   README.md  # This is displayed on the main GitHub page.
-   ...
-
-
-.. todo::
-
-   Add note about docs folder structure.
+However, I also embed documentation directly from the source code using keywords like ``.. automodule``, ``.. pydantic``, and ``.. click``.
+This allows me to have details in a single location as close to the code as possible.
 
 .. note::
 

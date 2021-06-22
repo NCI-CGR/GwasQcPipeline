@@ -18,38 +18,35 @@ class CgrGwasQcConfigError(Exception):
 class ConfigMgr:
     """Manage all things config.
 
-    There should only be a single instance of this running at a time.
+    Example:
+        >>> from cgr_gwas_qc import load_config
+        >>> cfg = load_config()  # must have ``config.yml`` and ``cgr_sample_sheet.csv`` in current directory.
 
-    Attributes:
-        SRC_DIR (Path): The absolute path to ``cgr_gwas_qc`` source code.
-        WORKFLOW_DIR (Path): The absolute path to the ``workflow`` source code.
-        CONFIG_DIR (Path): The absolute path to the ``workflow/config``.
-        SCRIPTS_DIR (Path): The absolute path to the ``workflow/scripts``.
-        SNAKEFILE (Path): The absolute path to the ``workflow/Snakefile``.
-
-        root (Path): The current working directory.
-        user_config (Optional[Path]): The config.yml in the current working directory.
-        user_patterns (Optional[Path]): The patterns.yml in the current working directory.
-
-        config : Workflow configuration settings.
-        ss: User's sample sheet data.
-        cluster_groups: List of the cluster group names.
-
-    Methods:
-        expand: Uses columns from the user's sample sheet to expand a file pattern.
-        conda: Creates the full path to conda environment.
-        scripts: Creates the full path to an internal script.
     """
 
-    SRC_DIR = Path(__file__).parent.absolute()
-    WORKFLOW_DIR = SRC_DIR / "workflow"
-    TEMPLATE_DIR = SRC_DIR / "reporting/templates"
+    #: The absolute path to ``cgr_gwas_qc`` source code.
+    SRC_DIR: Path = Path(__file__).parent.absolute()
 
-    CONDA_DIR = WORKFLOW_DIR / "conda"
-    MODULE_DIR = WORKFLOW_DIR / "modules"
-    SCRIPTS_DIR = WORKFLOW_DIR / "scripts"
-    SUBWORKFLOW_DIR = WORKFLOW_DIR / "sub_workflows"
-    SNAKEFILE = WORKFLOW_DIR / "Snakefile"
+    #: The absolute path to the ``workflow`` source code.
+    WORKFLOW_DIR: Path = SRC_DIR / "workflow"
+
+    #: The absolute path to the ``workflow/conda``.
+    CONDA_DIR: Path = WORKFLOW_DIR / "conda"
+
+    #: The absolute path to the ``workflow/modules``.
+    MODULE_DIR: Path = WORKFLOW_DIR / "modules"
+
+    #: The absolute path to the ``workflow/scripts``.
+    SCRIPTS_DIR: Path = WORKFLOW_DIR / "scripts"
+
+    #: The absolute path to the ``workflow/sub_workflows``.
+    SUBWORKFLOW_DIR: Path = WORKFLOW_DIR / "sub_workflows"
+
+    #: The absolute path to the ``workflow/Snakefile``.
+    SNAKEFILE: Path = WORKFLOW_DIR / "Snakefile"
+
+    #: The absolute path to the ``reporting/templates``.
+    TEMPLATE_DIR: Path = SRC_DIR / "reporting/templates"
 
     __instance = None
 
@@ -57,8 +54,13 @@ class ConfigMgr:
     # Set-up
     ################################################################################
     def __init__(self, root: Path, user_config: Path, sample_sheet_file: Path):
+        #: The current working directory.
         self.root: Path = root
+
+        #: The ``config.yml``` in the current working directory.
         self.user_config: Path = user_config
+
+        #: The ``cgr_sample_sheet.csv``` in the current working directory.
         self.sample_sheet_file: Path = sample_sheet_file
 
         data = yaml.load(self.user_config)
@@ -85,15 +87,38 @@ class ConfigMgr:
     ################################################################################
     @property
     def config(self) -> Config:
+        """The user's config settings from ``config.yml``.
+
+        Example:
+            >>> from cgr_gwas_qc import load_config
+            >>> cfg = load_config()
+            >>> cfg.config.software_params.maf_for_ibd
+            0.2
+        """
         return self._config
 
     @property
     def ss(self) -> pd.DataFrame:
-        """Access the sample sheet DataFrame."""
+        """The user's sample sheet data.
+
+        Example:
+            >>> cfg = load_config()
+            >>> cfg.ss.head(2)
+            Sample_ID   Subject_ID    ...
+                SP001        SB001    ...
+                SP002        SB002    ...
+        """
         return self._sample_sheet
 
     @property
     def cluster_groups(self) -> List[str]:
+        """List of the cluster group names from ``cgr_sample_sheet.csv``.
+
+        Example:
+            >>> cfg = load_config()
+            >>> cfg.cluster_groups
+            ["cgroup1", "cgroup2"]
+        """
         return self._cluster_groups
 
     ################################################################################
@@ -113,6 +138,13 @@ class ConfigMgr:
 
         Returns:
             A list of expanded file names.
+
+        Example:
+            >>> cfg = load_config()  # assuming ``cgr_sample_sheet.csv`` contains 3 samples SP00{1,2,3}
+            >>> cfg.expand("{Sample_ID}.txt")
+            ["SP001.txt", "SP002.txt", "SP003.txt"]
+            >>> cfg.expand("{Sample_ID}.txt", query="Sample_ID == 'SP002'")
+            [SP002.txt"]
         """
         df = self.ss.query(query) if query else self.ss
         return expand(file_pattern, combination, **df.to_dict("list"))
@@ -151,6 +183,7 @@ class ConfigMgr:
 
     @property
     def docx_template(self) -> str:
+        """Return the path to the docx template."""
         return (self.TEMPLATE_DIR / "cgr_reference.docx").as_posix()
 
 
