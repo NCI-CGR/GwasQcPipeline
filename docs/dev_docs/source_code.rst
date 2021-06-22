@@ -142,7 +142,7 @@ I also tried to follow the key programming principle, only do something once!
    There are a few exceptions to all 3rd party tools are in a module.
 
    - I had to embed a PLINK command in ``workflow/scripts/plink_merge.py``.
-   - I had to embed verifyidintensity in ``workflow/scripts/verifyidintensity.py`
+   - I had to embed verifyidintensity in ``workflow/scripts/verifyidintensity.py``
    - I never created a King module, so all that code is in ``workflow/sub_workflows/sample_qc.smk``
 
 Almost all custom code are in ``cgr_gwas_qc.workflow.scripts``.
