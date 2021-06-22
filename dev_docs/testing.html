@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Running Tests &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  <title>Working with Test Suite &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
   
 
   
@@ -38,7 +38,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API Reference" href="../api/cgr_gwas_qc.html" />
-    <link rel="prev" title="Documentation" href="documentation.html" /> 
+    <link rel="prev" title="Working with Source Code" href="source_code.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,7 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
@@ -103,9 +103,10 @@
 </ul>
 <p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Development Environment Set-up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Working with Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_code.html">Working with Source Code</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Working with Test Suite</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -156,7 +157,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Running Tests</li>
+      <li>Working with Test Suite</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -175,9 +176,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="running-tests">
-<h1>Running Tests<a class="headerlink" href="#running-tests" title="Permalink to this headline">¶</a></h1>
-<p>There are currently no tests to run.</p>
+  <div class="section" id="working-with-test-suite">
+<h1>Working with Test Suite<a class="headerlink" href="#working-with-test-suite" title="Permalink to this headline">¶</a></h1>
+<p>Software testing is a technique where you isolate different parts of a system and test specific functionality.
+Testing bioinformatics workflows is challenging because large amounts of data are often needed for certain steps to run.
+Here we try to take a test driven approach and use both unit tests (tests targeting 1 specific piece of functionality) and integration tests (test targeting many steps at once).
+Where possible we used very small “fake” datasets to ensure the test suite runs quickly.
+However, much of the workflow could only be tested using real data.
+We do not currently distribute our real test data but we have made the test suite module so that all developers can at least run the fake data tests.
+We are using the powerful <a class="reference external" href="https://docs.pytest.org/en/6.2.x/">pytest</a> to orchestrate running of our tests.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.
+└── tests
+   ├── __init__.py
+   ├── cli/
+   ├── cluster_profiles/
+   ├── conftest.py
+   ├── data/
+   ├── models/
+   ├── parsers/
+   ├── reporting/
+   ├── test_config.py
+   ├── test_snakemake_job_grouping.py
+   ├── testing/
+   ├── validators/
+   └── workflow/
+</pre></div>
+</div>
+<div class="section" id="fake-data">
+<h2>Fake Data<a class="headerlink" href="#fake-data" title="Permalink to this headline">¶</a></h2>
+<p>To run fake data tests you can simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
+</pre></div>
+</div>
+</div>
+<div class="section" id="real-data">
+<h2>Real Data<a class="headerlink" href="#real-data" title="Permalink to this headline">¶</a></h2>
+<p>To run all tests, including those with real data you can simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest --real-data
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -191,7 +229,7 @@
         <a href="../api/cgr_gwas_qc.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="documentation.html" class="btn btn-neutral float-left" title="Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="source_code.html" class="btn btn-neutral float-left" title="Working with Source Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

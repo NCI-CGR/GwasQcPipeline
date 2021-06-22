@@ -95,7 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
@@ -103,9 +103,10 @@
 </ul>
 <p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Development Environment Set-up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Working with Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/source_code.html">Working with Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
@@ -192,129 +193,69 @@
 <dt>
 <em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.config.</code><code class="sig-name descname">ConfigMgr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">root</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">user_config</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Manage all things config.</p>
-<p>There should only be a single instance of this running at a time.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cgr_gwas_qc</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>  <span class="c1"># must have ``config.yml`` and ``cgr_sample_sheet.csv`` in current directory.</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">SRC_DIR</code></dt>
-<dd><p>The absolute path to <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc</span></code> source code.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
+<code class="sig-name descname">CONDA_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/conda')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/conda</span></code>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">WORKFLOW_DIR</code></dt>
-<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow</span></code> source code.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
+<code class="sig-name descname">MODULE_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/modules')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/modules</span></code>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">CONFIG_DIR</code></dt>
-<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/config</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt>
-<code class="sig-name descname">SCRIPTS_DIR</code></dt>
+<code class="sig-name descname">SCRIPTS_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/scripts')</em></dt>
 <dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/scripts</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">SNAKEFILE</code></dt>
+<code class="sig-name descname">SNAKEFILE</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/Snakefile')</em></dt>
 <dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/Snakefile</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">root</code></dt>
-<dd><p>The current working directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
+<code class="sig-name descname">SRC_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc')</em></dt>
+<dd><p>The absolute path to <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc</span></code> source code.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">user_config</code></dt>
-<dd><p>The config.yml in the current working directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Optional[Path]</p>
-</dd>
-</dl>
+<code class="sig-name descname">SUBWORKFLOW_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/sub_workflows')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/sub_workflows</span></code>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">user_patterns</code></dt>
-<dd><p>The patterns.yml in the current working directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Optional[Path]</p>
-</dd>
-</dl>
+<code class="sig-name descname">TEMPLATE_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/reporting/templates')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">reporting/templates</span></code>.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt>
-<code class="sig-name descname">config</code></dt>
-<dd><p>Workflow configuration settings.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt>
-<code class="sig-name descname">ss</code></dt>
-<dd><p>User’s sample sheet data.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt>
-<code class="sig-name descname">cluster_groups</code></dt>
-<dd><p>List of the cluster group names.</p>
+<code class="sig-name descname">WORKFLOW_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow</span></code> source code.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt>
-<code class="sig-name descname">expand</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.expand"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Uses columns from the user’s sample sheet to expand a file pattern.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt>
-<code class="sig-name descname">conda</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Creates the full path to conda environment.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt>
-<code class="sig-name descname">scripts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Creates the full path to an internal script.</p>
+<em class="property">property </em><code class="sig-name descname">cluster_groups</code></dt>
+<dd><p>List of the cluster group names from <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">cluster_groups</span>
+<span class="go">[&quot;cgroup1&quot;, &quot;cgroup2&quot;]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -322,6 +263,25 @@
 <em class="property">classmethod </em><code class="sig-name descname">conda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Return path to a conda env file.</p>
 <p>Given a conda env file_name, prepends the full path to that file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">config</code></dt>
+<dd><p>The user’s config settings from <code class="docutils literal notranslate"><span class="pre">config.yml</span></code>.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cgr_gwas_qc</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">software_params</span><span class="o">.</span><span class="n">maf_for_ibd</span>
+<span class="go">0.2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">docx_template</code></dt>
+<dd><p>Return the path to the docx template.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -342,6 +302,14 @@ expansion. Defaults to None.</p></li>
 <dd class="field-even"><p>A list of expanded file names.</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>  <span class="c1"># assuming ``cgr_sample_sheet.csv`` contains 3 samples SP00{1,2,3}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{Sample_ID}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+<span class="go">[&quot;SP001.txt&quot;, &quot;SP002.txt&quot;, &quot;SP003.txt&quot;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{Sample_ID}</span><span class="s2">.txt&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">&quot;Sample_ID == &#39;SP002&#39;&quot;</span><span class="p">)</span>
+<span class="go">[SP002.txt&quot;]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -358,6 +326,18 @@ expansion. Defaults to None.</p></li>
 <p>Given a rule file_name, prepends the full path to that module.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">root</code><em class="property">: Path</em></dt>
+<dd><p>The current working directory.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">sample_sheet_file</code><em class="property">: Path</em></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv`</span></code> in the current working directory.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt>
 <em class="property">classmethod </em><code class="sig-name descname">scripts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a></dt>
@@ -368,7 +348,15 @@ expansion. Defaults to None.</p></li>
 <dl class="py method">
 <dt>
 <em class="property">property </em><code class="sig-name descname">ss</code></dt>
-<dd><p>Access the sample sheet DataFrame.</p>
+<dd><p>The user’s sample sheet data.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">Sample_ID   Subject_ID    ...</span>
+<span class="go">    SP001        SB001    ...</span>
+<span class="go">    SP002        SB002    ...</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -376,6 +364,12 @@ expansion. Defaults to None.</p></li>
 <em class="property">classmethod </em><code class="sig-name descname">subworkflow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">workflow</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.subworkflow"><span class="viewcode-link">[source]</span></a></dt>
 <dd><p>Return the path to a sub-workflow.</p>
 <p>Given a sub-workflow name, give the full path to the snakefile.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">user_config</code><em class="property">: Path</em></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">config.yml`</span></code> in the current working directory.</p>
 </dd></dl>
 
 </dd></dl>

@@ -94,7 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
@@ -102,25 +102,27 @@
 </ul>
 <p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Development Environment Set-up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Working with Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/source_code.html">Working with Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="cgr_gwas_qc.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="config.html">Configuration API</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Parsers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.eigensoft">Eigensoft</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.graf">GRAF</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.eigensoft">Eigensoft Parsers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.graf">GRAF Parsers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#genetic-relationship-and-fingerprinting">Genetic Relationship and Fingerprinting</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.king">KING</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.king">KING Parsers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#king-relationship-inferences">KING Relationship Inferences</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.plink">Plink</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.plink">Plink Parsers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cgr_gwas_qc.parsers.bpm">Illumina Parsers</a></li>
 </ul>
 </li>
 </ul>
@@ -195,7 +197,7 @@
   <div class="section" id="parsers">
 <h1>Parsers<a class="headerlink" href="#parsers" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-cgr_gwas_qc.parsers.eigensoft">
-<span id="eigensoft"></span><h2>Eigensoft<a class="headerlink" href="#module-cgr_gwas_qc.parsers.eigensoft" title="Permalink to this headline">¶</a></h2>
+<span id="eigensoft-parsers"></span><h2>Eigensoft Parsers<a class="headerlink" href="#module-cgr_gwas_qc.parsers.eigensoft" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="cgr_gwas_qc.parsers.eigensoft.Eigenvec">
 <em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.eigensoft.</code><code class="sig-name descname">Eigenvec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/eigensoft.html#Eigenvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.eigensoft.Eigenvec" title="Permalink to this definition">¶</a></dt>
@@ -277,7 +279,7 @@
 
 </div>
 <div class="section" id="module-cgr_gwas_qc.parsers.graf">
-<span id="graf"></span><h2>GRAF<a class="headerlink" href="#module-cgr_gwas_qc.parsers.graf" title="Permalink to this headline">¶</a></h2>
+<span id="graf-parsers"></span><h2>GRAF Parsers<a class="headerlink" href="#module-cgr_gwas_qc.parsers.graf" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="genetic-relationship-and-fingerprinting">
 <h3>Genetic Relationship and Fingerprinting<a class="headerlink" href="#genetic-relationship-and-fingerprinting" title="Permalink to this headline">¶</a></h3>
 <p>GRAF is a package that allows estmation or relatedness and ancestry.</p>
@@ -412,7 +414,7 @@ data. PLoS One. 12(6):e0179106.</p></li>
 </div>
 </div>
 <div class="section" id="module-cgr_gwas_qc.parsers.king">
-<span id="king"></span><h2>KING<a class="headerlink" href="#module-cgr_gwas_qc.parsers.king" title="Permalink to this headline">¶</a></h2>
+<span id="king-parsers"></span><h2>KING Parsers<a class="headerlink" href="#module-cgr_gwas_qc.parsers.king" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="king-relationship-inferences">
 <h3>KING Relationship Inferences<a class="headerlink" href="#king-relationship-inferences" title="Permalink to this headline">¶</a></h3>
 <p>KING is a toolset to robustly identify different types of relatedness. Unlike
@@ -572,7 +574,7 @@ alphanumerically.</p>
 </div>
 </div>
 <div class="section" id="module-cgr_gwas_qc.parsers.plink">
-<span id="plink"></span><h2>Plink<a class="headerlink" href="#module-cgr_gwas_qc.parsers.plink" title="Permalink to this headline">¶</a></h2>
+<span id="plink-parsers"></span><h2>Plink Parsers<a class="headerlink" href="#module-cgr_gwas_qc.parsers.plink" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_genome">
 <code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_genome" title="Permalink to this definition">¶</a></dt>
@@ -1113,6 +1115,784 @@ you can assume the order.</p>
 <li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/basic_stats#check_sex">https://www.cog-genomics.org/plink/1.9/basic_stats#check_sex</a></p></li>
 <li><p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#sexcheck">https://www.cog-genomics.org/plink/1.9/formats#sexcheck</a></p></li>
 </ul>
+</dd></dl>
+
+<span class="target" id="module-cgr_gwas_qc.parsers.bim"></span><p>Parser for the PLINK BIM format.</p>
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.bim.BimFile">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.bim.</code><code class="sig-name descname">BimFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'r'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/bim.html#BimFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.bim.BimFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an iterable interface to BIM files.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.bim.BimRecord">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.bim.</code><code class="sig-name descname">BimRecord</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">chrom</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">pos</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">allele_1</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">allele_2</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">encoded_chrom</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">morgans</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>int<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/bim.html#BimRecord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.bim.BimRecord" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="cgr_gwas_qc.parsers.bim.BimRecord.get_record_problems">
+<code class="sig-name descname">get_record_problems</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/bim.html#BimRecord.get_record_problems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.bim.BimRecord.get_record_problems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the record for common problems.</p>
+<p>A convenience method to check the record for a set of common problems
+and return a list of those problems. Potential problems:
+[“not_major_chrom”, “bad_position”, “ambiguous_allele”, “indel].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.bim.open">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.bim.</code><code class="sig-name descname">open</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">mode</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'r'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/bim.html#open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.bim.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note this has to be used as a context manager.</p>
+<p>To open and close while not using a <cite>with</cite> block you must to the
+<cite>BimFile</cite> class directly.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgr_gwas_qc.parsers.bpm">
+<span id="illumina-parsers"></span><h2>Illumina Parsers<a class="headerlink" href="#module-cgr_gwas_qc.parsers.bpm" title="Permalink to this headline">¶</a></h2>
+<p>Parser for the Illumina BPM format.</p>
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.bpm.BpmFile">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.bpm.</code><code class="sig-name descname">BpmFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/bpm.html#BpmFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.bpm.BpmFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an iterable interface to BPM files.</p>
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.bpm.BpmFile.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/bpm.html#BpmFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.bpm.BpmFile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>This version of write adds <cite>self.endchar</cite> when writing.</p>
+<p>If the subclass sets <cite>self.endchar</cite> this method will add that
+character when writing record. Useful for automatically adding a
+newline character. This can be directly overridden by setting
+<cite>enchar</cite> to None upon calling.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.bpm.BpmRecord">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.bpm.</code><code class="sig-name descname">BpmRecord</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">chrom</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">pos</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">allele_1</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">allele_2</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">snp</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ref_strand</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">source_strand</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>NoneType<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/bpm.html#BpmRecord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.bpm.BpmRecord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.bpm.open">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.bpm.</code><code class="sig-name descname">open</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/bpm.html#open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.bpm.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note this has to be used as a context manager.</p>
+<p>To open and close while not using a <cite>with</cite> block you must to the
+<cite>BpmFile</cite> class directly.</p>
+</dd></dl>
+
+<span class="target" id="module-cgr_gwas_qc.parsers.illumina.adpc"></span><dl class="py class">
+<dt id="cgr_gwas_qc.parsers.illumina.adpc.AdpcBase">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.adpc.</code><code class="sig-name descname">AdpcBase</code><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/adpc.html#AdpcBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.adpc.AdpcBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for Illumina’s adpc.bin files.</p>
+<p>Based on information found on Picard’s website:</p>
+<p><a class="reference external" href="https://javadoc.io/static/org.broadinstitute/gatk/4.1.4.1/picard/arrays/illumina/IlluminaAdpcFileWriter.html">https://javadoc.io/static/org.broadinstitute/gatk/4.1.4.1/picard/arrays/illumina/IlluminaAdpcFileWriter.html</a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.illumina.adpc.AdpcReader">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.adpc.</code><code class="sig-name descname">AdpcReader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/adpc.html#AdpcReader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.adpc.AdpcReader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.illumina.adpc.AdpcWriter">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.adpc.</code><code class="sig-name descname">AdpcWriter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/adpc.html#AdpcWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.adpc.AdpcWriter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles"></span><dl class="py class">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">BeadPoolManifest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#BeadPoolManifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for parsing binary (BPM) manifest file.
+.. attribute:: names</p>
+<blockquote>
+<div><p>Names of loci from manifest</p>
+<dl class="field-list simple">
+<dt class="field-odd">type</dt>
+<dd class="field-odd"><p>list of strings</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.snps">
+<code class="sig-name descname">snps</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.snps" title="Permalink to this definition">¶</a></dt>
+<dd><p>SNP values of loci from manifest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of strings</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.chroms">
+<code class="sig-name descname">chroms</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.chroms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Chromosome values for loci</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">map_infos =</code></dt>
+<dd><p>Map info values for loci</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.addresses">
+<code class="sig-name descname">addresses</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.addresses" title="Permalink to this definition">¶</a></dt>
+<dd><p>AddressA IDs of loci from manifest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.normalization_lookups">
+<code class="sig-name descname">normalization_lookups</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.normalization_lookups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalization lookups from manifest. This indexes into
+list of normalization transforms read from GTC file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.ref_strands">
+<code class="sig-name descname">ref_strands</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.ref_strands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference strand annotation for loci (see RefStrand class)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.source_strands">
+<code class="sig-name descname">source_strands</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.source_strands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Source strand annotations for loci (see SourceStrand class)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.num_loci">
+<code class="sig-name descname">num_loci</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.num_loci" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of loci in manifest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.manifest_name">
+<code class="sig-name descname">manifest_name</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.manifest_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of manifest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.control_config">
+<code class="sig-name descname">control_config</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest.control_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Control description from manifest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">GenotypeCalls</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">ignore_version</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">check_write_complete</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to parse gtc files as produced by Illumina AutoConvert
+and AutoCall software.</p>
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.supported_versions">
+<code class="sig-name descname">supported_versions</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.supported_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supported file versions as a list of integers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_date">
+<code class="sig-name descname">get_autocall_date</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_autocall_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The imaging date of scanning as a string
+For example</p>
+<blockquote>
+<div><p>2/17/2015 1:47 PM</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_version">
+<code class="sig-name descname">get_autocall_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_autocall_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The version of AutoCall used for genotyping as a string
+For example</p>
+<blockquote>
+<div><p>1.6.2.2</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ballele_freqs">
+<code class="sig-name descname">get_ballele_freqs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_ballele_freqs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ballele_freqs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The B allele frequencies as a list of floats</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls">
+<code class="sig-name descname">get_base_calls</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>str<span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_base_calls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields:
+The genotype basecalls as a string.
+The characters are A, C, G, T, or - for a no-call/null.
+The calls are relative to the top strand.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_forward_strand">
+<code class="sig-name descname">get_base_calls_forward_strand</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">snps</span></em>, <em class="sig-param"><span class="n">forward_strand_annotations</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>str<span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_base_calls_forward_strand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_forward_strand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get base calls on the forward strand.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snps</strong> (<em>list&lt;string&gt;</em>) – A list of string representing the snp on the design strand for the loci (e.g. [A/C])</p></li>
+<li><p><strong>forward_strand_annotations</strong> (<em>list&lt;int&gt;</em>) – A list of strand annotations for the loci (e.g., SourceStrand.Forward)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p>The genotype basecalls on the report strand as a string.
+The characters are A, C, G, T, or - for a no-call/null.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_generic">
+<code class="sig-name descname">get_base_calls_generic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">snps</span></em>, <em class="sig-param"><span class="n">strand_annotations</span></em>, <em class="sig-param"><span class="n">report_strand</span></em>, <em class="sig-param"><span class="n">unknown_annotation</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>str<span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_base_calls_generic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get base calls on arbitrary strand
+:param snps: A list of string representing the snp on the design strand for the loci (e.g. [A/C])
+:type snps: list&lt;string&gt;
+:param strand_annotations: A list of strand annotations for the loci
+:type strand_annotations: list&lt;int&gt;
+:param report_strand: The strand to use for reporting (must match encoding of strand_annotations)
+:type report_strand: int
+:param unknown_annotation: The encoding used in strand annotations for an unknown strand
+:type unknown_annotation: int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><p>The genotype basecalls on the report strand as a string.
+The characters are A, C, G, T, or - for a no-call/null.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_plus_strand">
+<code class="sig-name descname">get_base_calls_plus_strand</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">snps</span></em>, <em class="sig-param"><span class="n">ref_strand_annotations</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>str<span class="p">, </span>None<span class="p">, </span>None<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_base_calls_plus_strand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_plus_strand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get base calls on plus strand of genomic reference. If you only see no-calls returned from this method,
+please verify that the reference strand annotations passed as argument are not unknown (RefStrand.Unknown)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snps</strong> (<em>list&lt;string&gt;</em>) – A list of string representing the snp on the design strand for the loci (e.g. [A/C])</p></li>
+<li><p><strong>ref_strand_annotations</strong> (<em>list&lt;int&gt;</em>) – A list of strand annotations for the loci (e.g., RefStrand.Plus)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p>The genotype basecalls on the report strand as a string.
+The characters are A, C, G, T, or - for a no-call/null.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_call_rate">
+<code class="sig-name descname">get_call_rate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_call_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_call_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The call rate as a float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_cluster_file">
+<code class="sig-name descname">get_cluster_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_cluster_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_cluster_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The name of the cluster file used for genotyping as a string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_control_x_intensities">
+<code class="sig-name descname">get_control_x_intensities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_control_x_intensities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_control_x_intensities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The x intensities of control bead types as a list of integers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_control_y_intensities">
+<code class="sig-name descname">get_control_y_intensities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_control_y_intensities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_control_y_intensities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The y intensities of control bead types as a list of integers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gc10">
+<code class="sig-name descname">get_gc10</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_gc10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gc10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The GC10 (GenCall score - 10th percentile) as a float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gc50">
+<code class="sig-name descname">get_gc50</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_gc50"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gc50" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The GC50 (GenCall score - 50th percentile) as a float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gender">
+<code class="sig-name descname">get_gender</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_gender"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gender" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The gender as a char
+M - Male, F - Female, U-Unknown</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_genotype_scores">
+<code class="sig-name descname">get_genotype_scores</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_genotype_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_genotype_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The genotype scores as a list of floats</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_genotypes">
+<code class="sig-name descname">get_genotypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_genotypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_genotypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+A byte list (string) of genotypes. See code2genotype for mapping</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_imaging_date">
+<code class="sig-name descname">get_imaging_date</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_imaging_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_imaging_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The imaging date of scanning as a string
+For example</p>
+<blockquote>
+<div><p>Monday, December 01, 2014 4:51:47 PM</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_logr_dev">
+<code class="sig-name descname">get_logr_dev</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_logr_dev"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_logr_dev" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The logR deviation as a float</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_logr_ratios">
+<code class="sig-name descname">get_logr_ratios</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_logr_ratios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_logr_ratios" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The logR ratios as a list of floats</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalization_transforms">
+<code class="sig-name descname">get_normalization_transforms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_normalization_transforms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalization_transforms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The normalization transforms used during genotyping (as a lit of NormalizationTransforms)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalized_intensities">
+<code class="sig-name descname">get_normalized_intensities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalization_lookups</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_normalized_intensities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalized_intensities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate and return the normalized intensities
+:param normalization_lookups: Map from each SNP to a normalization transform.</p>
+<blockquote>
+<div><p>This list can be obtained from the BeadPoolManifest object.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The normalized intensities for the sample as a list of (x,y) float tuples</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_calls">
+<code class="sig-name descname">get_num_calls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_num_calls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_calls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The number of calls as an integer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_intensity_only">
+<code class="sig-name descname">get_num_intensity_only</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_num_intensity_only"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_intensity_only" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The number of intensity only SNPs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_no_calls">
+<code class="sig-name descname">get_num_no_calls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_num_no_calls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_no_calls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The number of no calls as an integer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_snps">
+<code class="sig-name descname">get_num_snps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_num_snps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_snps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The number of SNPs in the file as an integer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_percentiles_x">
+<code class="sig-name descname">get_percentiles_x</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_percentiles_x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_percentiles_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+An array of length three representing 5th, 50th and 95th percentiles for
+x intensity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_percentiles_y">
+<code class="sig-name descname">get_percentiles_y</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_percentiles_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_percentiles_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+An array of length three representing 5th, 50th and 95th percentiles for
+y intensity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ploidy">
+<code class="sig-name descname">get_ploidy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_ploidy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ploidy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The ploidy of the sample</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ploidy_type">
+<code class="sig-name descname">get_ploidy_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_ploidy_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ploidy_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The ploidy type of the sample</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_raw_x_intensities">
+<code class="sig-name descname">get_raw_x_intensities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_raw_x_intensities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_raw_x_intensities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The raw x intensities of assay bead types as a list of integers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_raw_y_intensities">
+<code class="sig-name descname">get_raw_y_intensities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_raw_y_intensities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_raw_y_intensities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The raw y intensities of assay bead types as a list of integers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_name">
+<code class="sig-name descname">get_sample_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_sample_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The name of the sample as a string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_plate">
+<code class="sig-name descname">get_sample_plate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_sample_plate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_plate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The name of the sample plate as a string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_well">
+<code class="sig-name descname">get_sample_well</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_sample_well"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_well" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The name of the sample well as a string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_scanner_data">
+<code class="sig-name descname">get_scanner_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_scanner_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_scanner_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+Information about scanner as ScannerData object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_slide_identifier">
+<code class="sig-name descname">get_slide_identifier</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_slide_identifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_slide_identifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The name of the sample as a string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_snp_manifest">
+<code class="sig-name descname">get_snp_manifest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.get_snp_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_snp_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+The name of the manifest used for genotyping as a string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.is_write_complete">
+<code class="sig-name descname">is_write_complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#GenotypeCalls.is_write_complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.is_write_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for last item written to GTC file to verify that write
+has successfully completed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns</dt><dd><p>Whether or not write is complete (bool)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry">
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">LocusEntry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#LocusEntry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper class representing a locus entry within a bead pool manifest. Current only support version
+6,7, and 8.
+.. attribute:: ilmn_id</p>
+<blockquote>
+<div><p>IlmnID (probe identifier) of locus</p>
+<dl class="field-list simple">
+<dt class="field-odd">type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name (variant identifier) of locus</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.snp">
+<code class="sig-name descname">snp</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.snp" title="Permalink to this definition">¶</a></dt>
+<dd><p>SNP value for locus (e.g., [A/C])</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.chrom">
+<code class="sig-name descname">chrom</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.chrom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Chromosome for the locus (e.g., XY)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.map_info">
+<code class="sig-name descname">map_info</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.map_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping location of locus</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.assay_type">
+<code class="sig-name descname">assay_type</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.assay_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies type of assay (0 - Infinium II , 1 - Infinium I (A/T), 2 - Infinium I (G/C)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.address_a">
+<code class="sig-name descname">address_a</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.address_a" title="Permalink to this definition">¶</a></dt>
+<dd><p>AddressA ID of locus</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.address_b">
+<code class="sig-name descname">address_b</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.address_b" title="Permalink to this definition">¶</a></dt>
+<dd><p>AddressB ID of locus (0 if none)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.ref_strand">
+<code class="sig-name descname">ref_strand</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.ref_strand" title="Permalink to this definition">¶</a></dt>
+<dd><p>See RefStrand class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.source_strand">
+<code class="sig-name descname">source_strand</code><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry.source_strand" title="Permalink to this definition">¶</a></dt>
+<dd><p>See SourceStrand class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.complement">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">complement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nucleotide</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#complement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.complement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complement a single nucleotide. Complements of D(eletion) and I(nsertion) are D and I, respectively.
+:param nucleotide: Nucleotide, must be A, C, T, G, D, or I
+:type nucleotide: string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Complemented nucleotide</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_byte">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">read_byte</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#read_byte"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_byte" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to parse byte from file handle
+:param handle: File handle
+:type handle: file handle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>byte value read from handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_char">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">read_char</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#read_char"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_char" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to parse character from file handle
+:param handle: File handle
+:type handle: file handle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>char value read from handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_float">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">read_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#read_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to parse float from file handle
+:param handle: File handle
+:type handle: file handle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>numpy.float32 value read from handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_int">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">read_int</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#read_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to parse int from file handle
+:param handle: File handle
+:type handle: file handle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>numpy.int32 value read from handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_scanner_data">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">read_scanner_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#read_scanner_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_scanner_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to parse ScannerData object from file handle.
+:param handle: File handle
+:type handle: file handle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ScannerData value read from handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_string">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">read_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#read_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to parse string from file handle. See <a class="reference external" href="https://msdn.microsoft.com/en-us/library/yzxa6408(v=vs.100).aspx">https://msdn.microsoft.com/en-us/library/yzxa6408(v=vs.100).aspx</a>
+for additional details on string format.
+:param handle: File handle
+:type handle: file handle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>string value read from handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_ushort">
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.</code><code class="sig-name descname">read_ushort</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handle</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html#read_ushort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_ushort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to parse ushort from file handle
+:param handle: File handle
+:type handle: file handle</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>numpy.int16 value read from handle</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

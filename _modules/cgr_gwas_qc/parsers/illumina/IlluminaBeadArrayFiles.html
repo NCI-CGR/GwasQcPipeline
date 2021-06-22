@@ -1,0 +1,1354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/configuration.html">Configuration Files</a></li>
+</ul>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reference/file_types.html">File Type Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/setup.html">Development Environment Set-up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/documentation.html">Working with Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/source_code.html">Working with Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/testing.html">Working with Test Suite</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/cgr_gwas_qc.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles</h1><div class="highlight"><pre>
+<span></span><span class="c1">##    Copyright (c) 2016, Illumina</span>
+<span class="c1">##    All rights reserved.</span>
+<span class="c1">##</span>
+<span class="c1">##    Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">##    modification, are permitted provided that the following conditions are met:</span>
+<span class="c1">##</span>
+<span class="c1">##    1. Redistributions of source code must retain the above copyright notice, this</span>
+<span class="c1">##       list of conditions and the following disclaimer.</span>
+<span class="c1">##    2. Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="c1">##       this list of conditions and the following disclaimer in the documentation</span>
+<span class="c1">##       and/or other materials provided with the distribution.</span>
+<span class="c1">##</span>
+<span class="c1">##    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND</span>
+<span class="c1">##    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1">##    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
+<span class="c1">##    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR</span>
+<span class="c1">##    ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES</span>
+<span class="c1">##    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<span class="c1">##    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND</span>
+<span class="c1">##    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">##    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS</span>
+<span class="c1">##    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">##</span>
+<span class="c1">##    The views and conclusions contained in the software and documentation are those</span>
+<span class="c1">##    of the authors and should not be interpreted as representing official policies,</span>
+<span class="c1">##    either expressed or implied, of the FreeBSD Project.</span>
+
+<span class="c1"># This file is a copy of</span>
+<span class="c1"># https://github.com/Illumina/GTCtoVCF/IlluminaBeadArraysFiles.py with the</span>
+<span class="c1"># following changes:</span>
+<span class="c1">#   - Reformated code with black</span>
+<span class="c1">#   - Added comment to disable flake8</span>
+<span class="c1">#   - Refactored GenotypeCalls.get_base_calls* to use generators</span>
+<span class="c1"># flake8: noqa</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.2.0&quot;</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span>
+
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">arctan2</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">float32</span><span class="p">,</span> <span class="n">frombuffer</span><span class="p">,</span> <span class="n">int32</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">seterr</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">uint16</span>
+
+<span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+<span class="n">nan</span> <span class="o">=</span> <span class="n">float32</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+
+<span class="n">code2genotype</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;NC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NULL&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ABB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AABB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ABBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAABB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AABBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ABBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAAA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAAB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAABB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAABBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AABBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ABBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BBBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAAAA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAAAB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAABB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAABBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAABBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AABBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ABBBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BBBBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAAAAA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAAAAB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAAABB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAAABBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAAABBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAABBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AABBBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ABBBBBBB&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BBBBBBBB&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">NC</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">AA</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">AB</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">BB</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GenotypeCalls"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls">[docs]</a><span class="k">class</span> <span class="nc">GenotypeCalls</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class to parse gtc files as produced by Illumina AutoConvert</span>
+<span class="sd">    and AutoCall software.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        supported_versions: Supported file versions as a list of integers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__ID_NUM_SNPS</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">__ID_PLOIDY</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">__ID_PLOIDY_TYPE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">__ID_SAMPLE_NAME</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">__ID_SAMPLE_PLATE</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="n">__ID_SAMPLE_WELL</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">__ID_CLUSTER_FILE</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">__ID_SNP_MANIFEST</span> <span class="o">=</span> <span class="mi">101</span>
+    <span class="n">__ID_IMAGING_DATE</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">__ID_AUTOCALL_DATE</span> <span class="o">=</span> <span class="mi">201</span>
+    <span class="n">__ID_AUTOCALL_VERSION</span> <span class="o">=</span> <span class="mi">300</span>
+    <span class="n">__ID_NORMALIZATION_TRANSFORMS</span> <span class="o">=</span> <span class="mi">400</span>
+    <span class="n">__ID_CONTROLS_X</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="n">__ID_CONTROLS_Y</span> <span class="o">=</span> <span class="mi">501</span>
+    <span class="n">__ID_RAW_X</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">__ID_RAW_Y</span> <span class="o">=</span> <span class="mi">1001</span>
+    <span class="n">__ID_GENOTYPES</span> <span class="o">=</span> <span class="mi">1002</span>
+    <span class="n">__ID_BASE_CALLS</span> <span class="o">=</span> <span class="mi">1003</span>
+    <span class="n">__ID_GENOTYPE_SCORES</span> <span class="o">=</span> <span class="mi">1004</span>
+    <span class="n">__ID_SCANNER_DATA</span> <span class="o">=</span> <span class="mi">1005</span>
+    <span class="n">__ID_CALL_RATE</span> <span class="o">=</span> <span class="mi">1006</span>
+    <span class="n">__ID_GENDER</span> <span class="o">=</span> <span class="mi">1007</span>
+    <span class="n">__ID_LOGR_DEV</span> <span class="o">=</span> <span class="mi">1008</span>
+    <span class="n">__ID_GC10</span> <span class="o">=</span> <span class="mi">1009</span>
+    <span class="n">__ID_GC50</span> <span class="o">=</span> <span class="mi">1011</span>
+    <span class="n">__ID_B_ALLELE_FREQS</span> <span class="o">=</span> <span class="mi">1012</span>
+    <span class="n">__ID_LOGR_RATIOS</span> <span class="o">=</span> <span class="mi">1013</span>
+    <span class="n">__ID_PERCENTILES_X</span> <span class="o">=</span> <span class="mi">1014</span>
+    <span class="n">__ID_PERCENTILES_Y</span> <span class="o">=</span> <span class="mi">1015</span>
+    <span class="n">__ID_SLIDE_IDENTIFIER</span> <span class="o">=</span> <span class="mi">1016</span>
+
+    <span class="n">supported_version</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">ignore_version</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_write_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (string): GTC filename</span>
+<span class="sd">            ignore_version (bool): boolean to ignore automated checks on</span>
+<span class="sd">                            file version, not recommended (default: False)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            GenotypeCalls object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">identifier</span> <span class="o">=</span> <span class="n">gtc_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">identifier</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;gtc&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;GTC format error: bad format identifier&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">read_byte</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">supported_version</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ignore_version</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unsupported GTC File version (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+            <span class="n">number_toc_entries</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span>
+
+            <span class="c1">#</span>
+            <span class="c1"># Parse the table of contents and map the toc entry</span>
+            <span class="c1"># to the lookup</span>
+            <span class="c1">#</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">toc_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_toc_entries</span><span class="p">):</span>
+                <span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&lt;hI&quot;</span><span class="p">,</span> <span class="n">gtc_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
+        <span class="k">if</span> <span class="n">check_write_complete</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_write_complete</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;GTC file is incomplete&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__get_generic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toc_entry</span><span class="p">,</span> <span class="n">parse_function</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Internal helper function to access a data element in a</span>
+<span class="sd">        generic fashion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            toc_entry (int): Identifier for entry in table of contents</span>
+<span class="sd">            parse_function (function): Used to parse the value</span>
+<span class="sd">                                         from a file handle</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A single value parsed from the file (type dependent on</span>
+<span class="sd">            parse_function)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">toc_entry</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">parse_function</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__get_generic_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toc_entry</span><span class="p">,</span> <span class="n">parse_function</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Internal helper function to access a data array in a generic</span>
+<span class="sd">        fashion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            toc_entry (int): Identifier for entry in table of contents</span>
+<span class="sd">            parse_function (function): A function used to parse the value</span>
+<span class="sd">                                         from a file handle</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            An array parsed from the file (type dependent on parse_function)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">toc_entry</span><span class="p">])</span>
+            <span class="n">num_entries</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_entries</span><span class="p">):</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_function</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">__get_generic_array_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toc_entry</span><span class="p">,</span> <span class="n">numpy_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Internal helper function to access a data array in a generic</span>
+<span class="sd">        fashion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            toc_entry (int): Identifier for entry in table of contents</span>
+<span class="sd">            parse_function (function): A function used to parse the value</span>
+<span class="sd">                                         from a file handle</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            An array parsed from the file (type dependent on parse_function)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">numpy_type</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">(</span><span class="n">numpy_type</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">toc_entry</span><span class="p">])</span>
+            <span class="n">num_entries</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">frombuffer</span><span class="p">(</span><span class="n">gtc_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">num_entries</span> <span class="o">*</span> <span class="n">numpy_type</span><span class="o">.</span><span class="n">itemsize</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy_type</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GenotypeCalls.get_num_snps"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_snps">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_snps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The number of SNPs in the file as an integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_NUM_SNPS</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_ploidy"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ploidy">[docs]</a>    <span class="k">def</span> <span class="nf">get_ploidy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The ploidy of the sample</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_PLOIDY</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_ploidy_type"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ploidy_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_ploidy_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The ploidy type of the sample</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_PLOIDY_TYPE</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_sample_name"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The name of the sample as a string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SAMPLE_NAME</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_slide_identifier"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_slide_identifier">[docs]</a>    <span class="k">def</span> <span class="nf">get_slide_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The name of the sample as a string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SLIDE_IDENTIFIER</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_sample_plate"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_plate">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_plate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The name of the sample plate as a string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SAMPLE_PLATE</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_sample_well"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_well">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_well</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The name of the sample well as a string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SAMPLE_WELL</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_cluster_file"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_cluster_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_cluster_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The name of the cluster file used for genotyping as a string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_CLUSTER_FILE</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_snp_manifest"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_snp_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">get_snp_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The name of the manifest used for genotyping as a string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SNP_MANIFEST</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_imaging_date"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_imaging_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_imaging_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The imaging date of scanning as a string</span>
+<span class="sd">        For example</span>
+<span class="sd">            Monday, December 01, 2014 4:51:47 PM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_IMAGING_DATE</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_autocall_date"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_autocall_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The imaging date of scanning as a string</span>
+<span class="sd">        For example</span>
+<span class="sd">            2/17/2015 1:47 PM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_AUTOCALL_DATE</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_autocall_version"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_autocall_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The version of AutoCall used for genotyping as a string</span>
+<span class="sd">        For example</span>
+<span class="sd">            1.6.2.2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_AUTOCALL_VERSION</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_genotypes"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_genotypes">[docs]</a>    <span class="k">def</span> <span class="nf">get_genotypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        A byte list (string) of genotypes. See code2genotype for mapping</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GENOTYPES</span><span class="p">,</span> <span class="n">read_byte</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_base_calls_generic"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_generic">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_calls_generic</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">strand_annotations</span><span class="p">,</span> <span class="n">report_strand</span><span class="p">,</span> <span class="n">unknown_annotation</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get base calls on arbitrary strand</span>
+<span class="sd">        Args:</span>
+<span class="sd">            snps (list&lt;string&gt;) : A list of string representing the snp on the design strand for the loci (e.g. [A/C])</span>
+<span class="sd">            strand_annotations (list&lt;int&gt;) : A list of strand annotations for the loci</span>
+<span class="sd">            report_strand (int) : The strand to use for reporting (must match encoding of strand_annotations)</span>
+<span class="sd">            unknown_annotation (int) : The encoding used in strand annotations for an unknown strand</span>
+<span class="sd">        Yields:</span>
+<span class="sd">            The genotype basecalls on the report strand as a string.</span>
+<span class="sd">            The characters are A, C, G, T, or - for a no-call/null.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">genotypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_genotypes</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">genotypes</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">snps</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of SNPs must match the number of loci in the GTC file&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">genotypes</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">strand_annotations</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The number of reference strand annotations must match the number of loci in the GTC file&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">genotype</span><span class="p">,</span> <span class="n">snp</span><span class="p">,</span> <span class="n">strand_annotation</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">genotypes</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">strand_annotations</span><span class="p">):</span>
+            <span class="n">ab_genotype</span> <span class="o">=</span> <span class="n">code2genotype</span><span class="p">[</span><span class="n">genotype</span><span class="p">]</span>
+            <span class="n">a_nucleotide</span> <span class="o">=</span> <span class="n">snp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">b_nucleotide</span> <span class="o">=</span> <span class="n">snp</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">a_nucleotide</span> <span class="o">==</span> <span class="s2">&quot;N&quot;</span>
+                <span class="ow">or</span> <span class="n">b_nucleotide</span> <span class="o">==</span> <span class="s2">&quot;N&quot;</span>
+                <span class="ow">or</span> <span class="n">strand_annotation</span> <span class="o">==</span> <span class="n">unknown_annotation</span>
+                <span class="ow">or</span> <span class="n">ab_genotype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;NC&quot;</span><span class="p">,</span> <span class="s2">&quot;NULL&quot;</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="k">yield</span> <span class="s2">&quot;-&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">report_strand_nucleotides</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">ab_allele</span> <span class="ow">in</span> <span class="n">ab_genotype</span><span class="p">:</span>
+                    <span class="n">nucleotide_allele</span> <span class="o">=</span> <span class="n">a_nucleotide</span> <span class="k">if</span> <span class="n">ab_allele</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span> <span class="k">else</span> <span class="n">b_nucleotide</span>
+                    <span class="n">report_strand_nucleotides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">nucleotide_allele</span>
+                        <span class="k">if</span> <span class="n">strand_annotation</span> <span class="o">==</span> <span class="n">report_strand</span>
+                        <span class="k">else</span> <span class="n">complement</span><span class="p">(</span><span class="n">nucleotide_allele</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">yield</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_strand_nucleotides</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_base_calls_plus_strand"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_plus_strand">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_calls_plus_strand</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">ref_strand_annotations</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get base calls on plus strand of genomic reference. If you only see no-calls returned from this method,</span>
+<span class="sd">        please verify that the reference strand annotations passed as argument are not unknown (RefStrand.Unknown)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            snps (list&lt;string&gt;) : A list of string representing the snp on the design strand for the loci (e.g. [A/C])</span>
+<span class="sd">            ref_strand_annotations (list&lt;int&gt;) : A list of strand annotations for the loci (e.g., RefStrand.Plus)</span>
+<span class="sd">        Yields:</span>
+<span class="sd">            The genotype basecalls on the report strand as a string.</span>
+<span class="sd">            The characters are A, C, G, T, or - for a no-call/null.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_calls_generic</span><span class="p">(</span>
+            <span class="n">snps</span><span class="p">,</span> <span class="n">ref_strand_annotations</span><span class="p">,</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Plus</span><span class="p">,</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Unknown</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_base_calls_forward_strand"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_forward_strand">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_calls_forward_strand</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">forward_strand_annotations</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get base calls on the forward strand.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            snps (list&lt;string&gt;) : A list of string representing the snp on the design strand for the loci (e.g. [A/C])</span>
+<span class="sd">            forward_strand_annotations (list&lt;int&gt;) : A list of strand annotations for the loci (e.g., SourceStrand.Forward)</span>
+<span class="sd">        Yields:</span>
+<span class="sd">            The genotype basecalls on the report strand as a string.</span>
+<span class="sd">            The characters are A, C, G, T, or - for a no-call/null.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_base_calls_generic</span><span class="p">(</span>
+            <span class="n">snps</span><span class="p">,</span> <span class="n">forward_strand_annotations</span><span class="p">,</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">Forward</span><span class="p">,</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Unknown</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_base_calls"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Yields:</span>
+<span class="sd">        The genotype basecalls as a string.</span>
+<span class="sd">        The characters are A, C, G, T, or - for a no-call/null.</span>
+<span class="sd">        The calls are relative to the top strand.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ploidy_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ploidy_type</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">ploidy_type</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">genotypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_genotypes</span><span class="p">()</span> <span class="k">if</span> <span class="n">ploidy_type</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_BASE_CALLS</span><span class="p">])</span>
+            <span class="n">num_entries</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_entries</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ploidy_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">gtc_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">data_string</span> <span class="o">=</span> <span class="n">gtc_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                    <span class="n">ab_genotype</span> <span class="o">=</span> <span class="n">code2genotype</span><span class="p">[</span><span class="n">genotypes</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
+                    <span class="k">if</span> <span class="n">ab_genotype</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;NC&quot;</span><span class="p">,</span> <span class="s2">&quot;NULL&quot;</span><span class="p">]:</span>
+                        <span class="k">yield</span> <span class="s2">&quot;-&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="p">[</span>
+                                <span class="n">data_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">allele</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span> <span class="k">else</span> <span class="n">data_string</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                                <span class="k">for</span> <span class="n">allele</span> <span class="ow">in</span> <span class="n">ab_genotype</span>
+                            <span class="p">]</span>
+                        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_genotype_scores"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_genotype_scores">[docs]</a>    <span class="k">def</span> <span class="nf">get_genotype_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The genotype scores as a list of floats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GENOTYPE_SCORES</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_scanner_data"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_scanner_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_scanner_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        Information about scanner as ScannerData object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SCANNER_DATA</span><span class="p">,</span> <span class="n">read_scanner_data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_control_x_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_control_x_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_control_x_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The x intensities of control bead types as a list of integers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_CONTROLS_X</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_control_y_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_control_y_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_control_y_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The y intensities of control bead types as a list of integers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_CONTROLS_Y</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_raw_x_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_raw_x_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_x_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The raw x intensities of assay bead types as a list of integers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_RAW_X</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_raw_y_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_raw_y_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_y_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The raw y intensities of assay bead types as a list of integers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_RAW_Y</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_call_rate"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_call_rate">[docs]</a>    <span class="k">def</span> <span class="nf">get_call_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The call rate as a float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_CALL_RATE</span><span class="p">,</span> <span class="n">read_float</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_gender"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gender">[docs]</a>    <span class="k">def</span> <span class="nf">get_gender</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The gender as a char</span>
+<span class="sd">        M - Male, F - Female, U-Unknown</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GENDER</span><span class="p">,</span> <span class="n">read_char</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_logr_dev"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_logr_dev">[docs]</a>    <span class="k">def</span> <span class="nf">get_logr_dev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The logR deviation as a float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_LOGR_DEV</span><span class="p">,</span> <span class="n">read_float</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_gc10"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gc10">[docs]</a>    <span class="k">def</span> <span class="nf">get_gc10</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The GC10 (GenCall score - 10th percentile) as a float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GC10</span><span class="p">,</span> <span class="n">read_float</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_gc50"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gc50">[docs]</a>    <span class="k">def</span> <span class="nf">get_gc50</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The GC50 (GenCall score - 50th percentile) as a float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GC50</span><span class="p">,</span> <span class="n">read_float</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_num_calls"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_calls">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The number of calls as an integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GC50</span><span class="p">]</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_num_no_calls"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_no_calls">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_no_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The number of no calls as an integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GC50</span><span class="p">]</span> <span class="o">+</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_num_intensity_only"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_intensity_only">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_intensity_only</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The number of intensity only SNPs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GC50</span><span class="p">]</span> <span class="o">+</span> <span class="mi">12</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_ballele_freqs"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ballele_freqs">[docs]</a>    <span class="k">def</span> <span class="nf">get_ballele_freqs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The B allele frequencies as a list of floats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;B allele frequencies unavailable in GTC File version (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_B_ALLELE_FREQS</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_logr_ratios"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_logr_ratios">[docs]</a>    <span class="k">def</span> <span class="nf">get_logr_ratios</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The logR ratios as a list of floats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;LogR ratios unavailable in GTC File version (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_LOGR_RATIOS</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_percentiles_x"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_percentiles_x">[docs]</a>    <span class="k">def</span> <span class="nf">get_percentiles_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        An array of length three representing 5th, 50th and 95th percentiles for</span>
+<span class="sd">        x intensity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Percentile intensities unavailable in GTC File version (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_PERCENTILES_X</span><span class="p">])</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">read_ushort</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_percentiles_y"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_percentiles_y">[docs]</a>    <span class="k">def</span> <span class="nf">get_percentiles_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        An array of length three representing 5th, 50th and 95th percentiles for</span>
+<span class="sd">        y intensity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Percentile intensities unavailable in GTC File version (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
+            <span class="n">gtc_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_PERCENTILES_Y</span><span class="p">])</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">read_ushort</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_normalized_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalized_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_normalized_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalization_lookups</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate and return the normalized intensities</span>
+<span class="sd">        Args:</span>
+<span class="sd">            normalization_lookups (list of ints): Map from each SNP to a normalization transform.</span>
+<span class="sd">                                   This list can be obtained from the BeadPoolManifest object.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            The normalized intensities for the sample as a list of (x,y) float tuples</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">normalization_transforms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_normalization_transforms</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">normalization_transforms</span><span class="p">[</span><span class="n">lookup</span><span class="p">]</span><span class="o">.</span><span class="n">normalize_intensities</span><span class="p">(</span><span class="n">x_raw</span><span class="p">,</span> <span class="n">y_raw</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">x_raw</span><span class="p">,</span> <span class="n">y_raw</span><span class="p">,</span> <span class="n">lookup</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_x_intensities</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_y_intensities</span><span class="p">(),</span> <span class="n">normalization_lookups</span>
+            <span class="p">)</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.get_normalization_transforms"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalization_transforms">[docs]</a>    <span class="k">def</span> <span class="nf">get_normalization_transforms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">        The normalization transforms used during genotyping (as a lit of NormalizationTransforms)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array</span><span class="p">(</span>
+            <span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_NORMALIZATION_TRANSFORMS</span><span class="p">,</span>
+            <span class="n">NormalizationTransform</span><span class="o">.</span><span class="n">read_normalization_transform</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GenotypeCalls.is_write_complete"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.is_write_complete">[docs]</a>    <span class="k">def</span> <span class="nf">is_write_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check for last item written to GTC file to verify that write</span>
+<span class="sd">        has successfully completed</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">            Whether or not write is complete (bool)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_num_intensity_only</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_logr_ratios</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_slide_identifier</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Unable to test for write completion on version &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; GTC file&quot;</span>
+            <span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">NormalizationTransform</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="sd">        Args:</span>
+<span class="sd">            buffer (string): byte string containing binary data for transform</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            NormalizationTransform object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&lt;i&quot;</span><span class="p">,</span> <span class="n">buffer</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offset_x</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">offset_y</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scale_x</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scale_y</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shear</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="n">frombuffer</span><span class="p">(</span><span class="n">buffer</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">28</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_normalization_transform</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Static helper function to read normalization transform from file handle</span>
+<span class="sd">        Args:</span>
+<span class="sd">            handle (file handle): File handle with position at start of normalization transform entry</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            NormalizationTransform object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NormalizationTransform</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">52</span><span class="p">))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rect_to_polar</span><span class="p">(</span><span class="n">x_y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts normalized x,y intensities to (pseudo) polar coordinates (R, theta)</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x_y (float, float): Normalized x,y intensities for probe</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            (R,theta) polar values as tuple of floats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x_y</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">pi</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">normalize_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply this normalization transform to raw intensities</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (int): Raw x intensities</span>
+<span class="sd">            y (int): Raw y intensities</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            (xn, yn) normalized intensities as tuple of floats</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">nan</span><span class="p">,</span> <span class="n">nan</span><span class="p">)</span>
+
+        <span class="n">tempx</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset_x</span>
+        <span class="n">tempy</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset_y</span>
+
+        <span class="n">tempx2</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">tempx</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">tempy</span>
+        <span class="n">tempy2</span> <span class="o">=</span> <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">tempx</span> <span class="o">+</span> <span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">tempy</span>
+
+        <span class="n">tempx3</span> <span class="o">=</span> <span class="n">tempx2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">shear</span> <span class="o">*</span> <span class="n">tempy2</span>
+        <span class="n">tempy3</span> <span class="o">=</span> <span class="n">tempy2</span>
+
+        <span class="n">xn</span> <span class="o">=</span> <span class="n">tempx3</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_x</span>
+        <span class="n">yn</span> <span class="o">=</span> <span class="n">tempy3</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_y</span>
+
+        <span class="k">if</span> <span class="n">threshold</span><span class="p">:</span>
+            <span class="n">xn</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="n">xn</span> <span class="k">else</span> <span class="n">xn</span>
+            <span class="n">yn</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="n">yn</span> <span class="k">else</span> <span class="n">yn</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">xn</span><span class="p">,</span> <span class="n">yn</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ScannerData</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">pmt_green</span><span class="p">,</span> <span class="n">pmt_red</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="sd">        Args:</span>
+<span class="sd">            name (string): scanner identifier</span>
+<span class="sd">            pmt_green (int): gain setting (green channel)</span>
+<span class="sd">            pmt_red (int): gain setting (red channel)</span>
+<span class="sd">            version (string): version of scanner software</span>
+<span class="sd">            user (string): user of the scanner software</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            ScannerData object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pmt_green</span> <span class="o">=</span> <span class="n">pmt_green</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pmt_red</span> <span class="o">=</span> <span class="n">pmt_red</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+
+
+<div class="viewcode-block" id="BeadPoolManifest"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest">[docs]</a><span class="k">class</span> <span class="nc">BeadPoolManifest</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class for parsing binary (BPM) manifest file.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        names (list of strings): Names of loci from manifest</span>
+<span class="sd">        snps (list of strings) : SNP values of loci from manifest</span>
+<span class="sd">        chroms (list of string) : Chromosome values for loci</span>
+<span class="sd">        map_infos = (list of ints) : Map info values for loci</span>
+<span class="sd">        addresses (list of ints): AddressA IDs of loci from manifest</span>
+<span class="sd">        normalization_lookups (list of ints): Normalization lookups from manifest. This indexes into</span>
+<span class="sd">                                         list of normalization transforms read from GTC file</span>
+<span class="sd">        ref_strands (list of ints) : Reference strand annotation for loci (see RefStrand class)</span>
+<span class="sd">        source_strands (list of ints) : Source strand annotations for loci (see SourceStrand class)</span>
+<span class="sd">        num_loci (int): Number of loci in manifest</span>
+<span class="sd">        manifest_name (string): Name of manifest</span>
+<span class="sd">        control_config (string): Control description from manifest</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="sd">        Args:</span>
+<span class="sd">            filename (string): Locations of BPM (bead pool manifest) file</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            BeadPoolManifest</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chroms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map_infos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addresses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalization_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assay_types</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalization_lookups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_strands</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_strands</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_config</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__parse_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function to initialize this object from a file.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            manifest_file (string): Location of BPM (bead pool manifest) file</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">manifest_file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">manifest_handle</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">manifest_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">!=</span> <span class="sa">b</span><span class="s2">&quot;BPM&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Invalid BPM format&quot;</span><span class="p">)</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="n">read_byte</span><span class="p">(</span><span class="n">manifest_handle</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">version</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown BPM version (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">version</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+
+            <span class="n">version</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">manifest_handle</span><span class="p">)</span>
+            <span class="n">version_flag</span> <span class="o">=</span> <span class="mh">0x1000</span>
+            <span class="k">if</span> <span class="n">version</span> <span class="o">&amp;</span> <span class="n">version_flag</span> <span class="o">==</span> <span class="n">version_flag</span><span class="p">:</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="n">version</span> <span class="o">^</span> <span class="n">version_flag</span>
+            <span class="k">if</span> <span class="n">version</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="ow">or</span> <span class="n">version</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unsupported BPM version (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest_name</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">manifest_handle</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">version</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_config</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">manifest_handle</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">manifest_handle</span><span class="p">)</span>
+            <span class="n">manifest_handle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">name_lookup</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">read_string</span><span class="p">(</span><span class="n">manifest_handle</span><span class="p">))</span>
+                <span class="n">name_lookup</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">idx</span>
+
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span><span class="p">):</span>
+                <span class="n">normalization_id</span> <span class="o">=</span> <span class="n">read_byte</span><span class="p">(</span><span class="n">manifest_handle</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">normalization_id</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Manifest format error: read invalid normalization ID&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">normalization_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">normalization_id</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">assay_types</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addresses</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">snps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chroms</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">map_infos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ref_strands</span> <span class="o">=</span> <span class="p">[</span><span class="n">RefStrand</span><span class="o">.</span><span class="n">Unknown</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">source_strands</span> <span class="o">=</span> <span class="p">[</span><span class="n">SourceStrand</span><span class="o">.</span><span class="n">Unknown</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span><span class="p">):</span>
+                <span class="n">locus_entry</span> <span class="o">=</span> <span class="n">LocusEntry</span><span class="p">(</span><span class="n">manifest_handle</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assay_types</span><span class="p">[</span><span class="n">name_lookup</span><span class="p">[</span><span class="n">locus_entry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">locus_entry</span><span class="o">.</span><span class="n">assay_type</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addresses</span><span class="p">[</span><span class="n">name_lookup</span><span class="p">[</span><span class="n">locus_entry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">locus_entry</span><span class="o">.</span><span class="n">address_a</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">snps</span><span class="p">[</span><span class="n">name_lookup</span><span class="p">[</span><span class="n">locus_entry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">locus_entry</span><span class="o">.</span><span class="n">snp</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chroms</span><span class="p">[</span><span class="n">name_lookup</span><span class="p">[</span><span class="n">locus_entry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">locus_entry</span><span class="o">.</span><span class="n">chrom</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">map_infos</span><span class="p">[</span><span class="n">name_lookup</span><span class="p">[</span><span class="n">locus_entry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">locus_entry</span><span class="o">.</span><span class="n">map_info</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ref_strands</span><span class="p">[</span><span class="n">name_lookup</span><span class="p">[</span><span class="n">locus_entry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">locus_entry</span><span class="o">.</span><span class="n">ref_strand</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">source_strands</span><span class="p">[</span><span class="n">name_lookup</span><span class="p">[</span><span class="n">locus_entry</span><span class="o">.</span><span class="n">name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">locus_entry</span><span class="o">.</span><span class="n">source_strand</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normalization_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assay_types</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Manifest format error: read invalid number of assay entries&quot;</span><span class="p">)</span>
+
+            <span class="n">all_norm_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">locus_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_loci</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">normalization_ids</span><span class="p">[</span><span class="n">locus_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">100</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">assay_types</span><span class="p">[</span><span class="n">locus_idx</span><span class="p">]</span>
+                <span class="c1"># To mimic the byte-wrapping behavior from GenomeStudio, AutoCall, IAAP take the mod of 256</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">normalization_ids</span><span class="p">[</span><span class="n">locus_idx</span><span class="p">]</span> <span class="o">%=</span> <span class="mi">256</span>
+                <span class="n">all_norm_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normalization_ids</span><span class="p">[</span><span class="n">locus_idx</span><span class="p">])</span>
+            <span class="n">sorted_norm_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_norm_ids</span><span class="p">)</span>
+            <span class="n">lookup_dictionary</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_norm_ids</span><span class="p">)):</span>
+                <span class="n">lookup_dictionary</span><span class="p">[</span><span class="n">sorted_norm_ids</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">=</span> <span class="n">idx</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalization_lookups</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">lookup_dictionary</span><span class="p">[</span><span class="n">normalization_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">normalization_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization_ids</span>
+            <span class="p">]</span></div>
+
+
+<span class="k">class</span> <span class="nc">SourceStrand</span><span class="p">:</span>
+    <span class="n">Unknown</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Forward</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Reverse</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="n">source_strand</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get an integer representation of source strand annotation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source_strand (str) : string representation of source strand annotation (e.g., &quot;F&quot;)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int : int representation of source strand annotation (e.g. SourceStrand.Forward)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">source_strand</span> <span class="o">==</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">Unknown</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;U&quot;</span>
+        <span class="k">elif</span> <span class="n">source_strand</span> <span class="o">==</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">Forward</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;F&quot;</span>
+        <span class="k">elif</span> <span class="n">source_strand</span> <span class="o">==</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">Reverse</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;R&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unexpected value for source strand &quot;</span> <span class="o">+</span> <span class="n">source_strand</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="n">source_strand</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a string representation of source strand annotation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source_strand (int) : int representation of source strand (e.g., SourceStrand.Forward)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str : string representation of source strand annotation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">source_strand</span> <span class="o">==</span> <span class="s2">&quot;U&quot;</span> <span class="ow">or</span> <span class="n">source_strand</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">Unknown</span>
+        <span class="k">if</span> <span class="n">source_strand</span> <span class="o">==</span> <span class="s2">&quot;F&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">Forward</span>
+        <span class="k">elif</span> <span class="n">source_strand</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">Reverse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unexpected value for source strand &quot;</span> <span class="o">+</span> <span class="n">source_strand</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">RefStrand</span><span class="p">:</span>
+    <span class="n">Unknown</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Plus</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Minus</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="n">ref_strand</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a string reprensetation of ref strand annotation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ref_strand (int) : int representation of ref strand (e.g., RefStrand.Plus)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str : string representation of reference strand annotation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ref_strand</span> <span class="o">==</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Unknown</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;U&quot;</span>
+        <span class="k">elif</span> <span class="n">ref_strand</span> <span class="o">==</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Plus</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;+&quot;</span>
+        <span class="k">elif</span> <span class="n">ref_strand</span> <span class="o">==</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Minus</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;-&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unexpected value for reference strand &quot;</span> <span class="o">+</span> <span class="n">ref_strand</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="n">ref_strand</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get an integer representation of ref strand annotation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ref_strand (str) : string representation of reference strand annotation (e.g., &quot;+&quot;)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int : int representation of reference strand annotation (e.g. RefStrand.Plus)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ref_strand</span> <span class="o">==</span> <span class="s2">&quot;U&quot;</span> <span class="ow">or</span> <span class="n">ref_strand</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Unknown</span>
+        <span class="k">if</span> <span class="n">ref_strand</span> <span class="o">==</span> <span class="s2">&quot;+&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Plus</span>
+        <span class="k">elif</span> <span class="n">ref_strand</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Minus</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unexpected value for reference strand &quot;</span> <span class="o">+</span> <span class="n">ref_strand</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LocusEntry"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry">[docs]</a><span class="k">class</span> <span class="nc">LocusEntry</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Helper class representing a locus entry within a bead pool manifest. Current only support version</span>
+<span class="sd">    6,7, and 8.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        ilmn_id (string) : IlmnID (probe identifier) of locus</span>
+<span class="sd">        name (string): Name (variant identifier) of locus</span>
+<span class="sd">        snp (string) : SNP value for locus (e.g., [A/C])</span>
+<span class="sd">        chrom (string) : Chromosome for the locus (e.g., XY)</span>
+<span class="sd">        map_info (int) : Mapping location of locus</span>
+<span class="sd">        assay_type (int) : Identifies type of assay (0 - Infinium II , 1 - Infinium I (A/T), 2 - Infinium I (G/C)</span>
+<span class="sd">        address_a (int) : AddressA ID of locus</span>
+<span class="sd">        address_b (int) : AddressB ID of locus (0 if none)</span>
+<span class="sd">        ref_strand (int) : See RefStrand class</span>
+<span class="sd">        source_strand (int) : See SourceStrand class</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="sd">        Args:</span>
+<span class="sd">            handle (file handle):  File handle at start of locus entry record</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            LocusEntry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ilmn_id</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chrom</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map_info</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assay_type</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_a</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_b</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_strand</span> <span class="o">=</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">Unknown</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_strand</span> <span class="o">=</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">Unknown</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_file</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__parse_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function to initialize this object from a file handle</span>
+<span class="sd">        Args:</span>
+<span class="sd">            handle (file handle): File handle at start of locus entry record</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parse_locus_version_6</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parse_locus_version_7</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__parse_locus_version_8</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s2">&quot;Manifest format error: unknown version for locus entry (&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__parse_locus_version_6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function to parse version 6 locus entry</span>
+<span class="sd">        Args:</span>
+<span class="sd">            handle (file handle): File handle at start of locus entry record</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ilmn_id</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_strand</span> <span class="o">=</span> <span class="n">SourceStrand</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ilmn_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">snp</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chrom</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map_info</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_a</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_b</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">):</span>
+            <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assay_type</span> <span class="o">=</span> <span class="n">read_byte</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assay_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Format error in reading assay type from locus entry&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assay_type</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Manifest format error: Assay type is inconsistent with address B&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assay_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Manifest format error: Assay type is inconsistent with address B&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__parse_locus_version_7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function to parse version 7 locus entry</span>
+<span class="sd">        Args:</span>
+<span class="sd">            handle (file handle): File handle at start of locus entry record</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_locus_version_6</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__parse_locus_version_8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper function to parse version 8 locus entry</span>
+<span class="sd">        Args:</span>
+<span class="sd">            handle (file handle): File handle at start of locus entry record</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__parse_locus_version_7</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_strand</span> <span class="o">=</span> <span class="n">RefStrand</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">))</span></div>
+
+
+<span class="n">complement_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">:</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">:</span> <span class="s2">&quot;I&quot;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="complement"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.complement">[docs]</a><span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="n">nucleotide</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Complement a single nucleotide. Complements of D(eletion) and I(nsertion) are D and I, respectively.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        nucleotide (string) : Nucleotide, must be A, C, T, G, D, or I</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str : Complemented nucleotide</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">nucleotide</span> <span class="ow">in</span> <span class="n">complement_map</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">complement_map</span><span class="p">[</span><span class="n">nucleotide</span><span class="p">]</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Nucleotide must be one of A, C, T, G, D, or I&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_char"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_char">[docs]</a><span class="k">def</span> <span class="nf">read_char</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to parse character from file handle</span>
+<span class="sd">    Args:</span>
+<span class="sd">        handle (file handle): File handle</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        char value read from handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_ushort"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_ushort">[docs]</a><span class="k">def</span> <span class="nf">read_ushort</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to parse ushort from file handle</span>
+<span class="sd">    Args:</span>
+<span class="sd">        handle (file handle): File handle</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.int16 value read from handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">frombuffer</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">uint16</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="read_int"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_int">[docs]</a><span class="k">def</span> <span class="nf">read_int</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to parse int from file handle</span>
+<span class="sd">    Args:</span>
+<span class="sd">        handle (file handle): File handle</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.int32 value read from handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&lt;i&quot;</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="read_float"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_float">[docs]</a><span class="k">def</span> <span class="nf">read_float</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to parse float from file handle</span>
+<span class="sd">    Args:</span>
+<span class="sd">        handle (file handle): File handle</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.float32 value read from handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">frombuffer</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="read_byte"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_byte">[docs]</a><span class="k">def</span> <span class="nf">read_byte</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to parse byte from file handle</span>
+<span class="sd">    Args:</span>
+<span class="sd">        handle (file handle): File handle</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        byte value read from handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&lt;B&quot;</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="read_string"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_string">[docs]</a><span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to parse string from file handle. See https://msdn.microsoft.com/en-us/library/yzxa6408(v=vs.100).aspx</span>
+<span class="sd">    for additional details on string format.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        handle (file handle): File handle</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        string value read from handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total_length</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">partial_length</span> <span class="o">=</span> <span class="n">read_byte</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="n">num_bytes</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">partial_length</span> <span class="o">&amp;</span> <span class="mh">0x80</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">total_length</span> <span class="o">+=</span> <span class="p">(</span><span class="n">partial_length</span> <span class="o">&amp;</span> <span class="mh">0x7F</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">num_bytes</span><span class="p">)</span>
+        <span class="n">partial_length</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">num_bytes</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">total_length</span> <span class="o">+=</span> <span class="n">partial_length</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">num_bytes</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">total_length</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">total_length</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Failed to read complete string&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="read_scanner_data"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_scanner_data">[docs]</a><span class="k">def</span> <span class="nf">read_scanner_data</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to parse ScannerData object from file handle.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        handle (file handle): File handle</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        ScannerData value read from handle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="n">pmt_green</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="n">pmt_red</span> <span class="o">=</span> <span class="n">read_int</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="n">scanner_version</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="n">imaging_user</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ScannerData</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">pmt_green</span><span class="p">,</span> <span class="n">pmt_red</span><span class="p">,</span> <span class="n">scanner_version</span><span class="p">,</span> <span class="n">imaging_user</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

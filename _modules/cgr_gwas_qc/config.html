@@ -93,7 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/delivery.html">Delivery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
 <p class="caption"><span class="caption-text">User Reference</span></p>
 <ul>
@@ -101,9 +101,10 @@
 </ul>
 <p class="caption"><span class="caption-text">Developer Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/setup.html">Setting-up the Development Environment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/documentation.html">Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/testing.html">Running Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/setup.html">Development Environment Set-up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/documentation.html">Working with Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/source_code.html">Working with Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -189,41 +190,38 @@
     <span class="k">pass</span>
 
 
-<div class="viewcode-block" id="ConfigMgr"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr">[docs]</a><span class="k">class</span> <span class="nc">ConfigMgr</span><span class="p">:</span>
+<div class="viewcode-block" id="ConfigMgr"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr">[docs]</a><span class="k">class</span> <span class="nc">ConfigMgr</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Manage all things config.</span>
 
-<span class="sd">    There should only be a single instance of this running at a time.</span>
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from cgr_gwas_qc import load_config</span>
+<span class="sd">        &gt;&gt;&gt; cfg = load_config()  # must have ``config.yml`` and ``cgr_sample_sheet.csv`` in current directory.</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        SRC_DIR (Path): The absolute path to ``cgr_gwas_qc`` source code.</span>
-<span class="sd">        WORKFLOW_DIR (Path): The absolute path to the ``workflow`` source code.</span>
-<span class="sd">        CONFIG_DIR (Path): The absolute path to the ``workflow/config``.</span>
-<span class="sd">        SCRIPTS_DIR (Path): The absolute path to the ``workflow/scripts``.</span>
-<span class="sd">        SNAKEFILE (Path): The absolute path to the ``workflow/Snakefile``.</span>
-
-<span class="sd">        root (Path): The current working directory.</span>
-<span class="sd">        user_config (Optional[Path]): The config.yml in the current working directory.</span>
-<span class="sd">        user_patterns (Optional[Path]): The patterns.yml in the current working directory.</span>
-
-<span class="sd">        config : Workflow configuration settings.</span>
-<span class="sd">        ss: User&#39;s sample sheet data.</span>
-<span class="sd">        cluster_groups: List of the cluster group names.</span>
-
-<span class="sd">    Methods:</span>
-<span class="sd">        expand: Uses columns from the user&#39;s sample sheet to expand a file pattern.</span>
-<span class="sd">        conda: Creates the full path to conda environment.</span>
-<span class="sd">        scripts: Creates the full path to an internal script.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">SRC_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
-    <span class="n">WORKFLOW_DIR</span> <span class="o">=</span> <span class="n">SRC_DIR</span> <span class="o">/</span> <span class="s2">&quot;workflow&quot;</span>
-    <span class="n">TEMPLATE_DIR</span> <span class="o">=</span> <span class="n">SRC_DIR</span> <span class="o">/</span> <span class="s2">&quot;reporting/templates&quot;</span>
+    <span class="c1">#: The absolute path to ``cgr_gwas_qc`` source code.</span>
+    <span class="n">SRC_DIR</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
 
-    <span class="n">CONDA_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;conda&quot;</span>
-    <span class="n">MODULE_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;modules&quot;</span>
-    <span class="n">SCRIPTS_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;scripts&quot;</span>
-    <span class="n">SUBWORKFLOW_DIR</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;sub_workflows&quot;</span>
-    <span class="n">SNAKEFILE</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;Snakefile&quot;</span>
+    <span class="c1">#: The absolute path to the ``workflow`` source code.</span>
+    <span class="n">WORKFLOW_DIR</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">SRC_DIR</span> <span class="o">/</span> <span class="s2">&quot;workflow&quot;</span>
+
+    <span class="c1">#: The absolute path to the ``workflow/conda``.</span>
+    <span class="n">CONDA_DIR</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;conda&quot;</span>
+
+    <span class="c1">#: The absolute path to the ``workflow/modules``.</span>
+    <span class="n">MODULE_DIR</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;modules&quot;</span>
+
+    <span class="c1">#: The absolute path to the ``workflow/scripts``.</span>
+    <span class="n">SCRIPTS_DIR</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;scripts&quot;</span>
+
+    <span class="c1">#: The absolute path to the ``workflow/sub_workflows``.</span>
+    <span class="n">SUBWORKFLOW_DIR</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;sub_workflows&quot;</span>
+
+    <span class="c1">#: The absolute path to the ``workflow/Snakefile``.</span>
+    <span class="n">SNAKEFILE</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WORKFLOW_DIR</span> <span class="o">/</span> <span class="s2">&quot;Snakefile&quot;</span>
+
+    <span class="c1">#: The absolute path to the ``reporting/templates``.</span>
+    <span class="n">TEMPLATE_DIR</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">SRC_DIR</span> <span class="o">/</span> <span class="s2">&quot;reporting/templates&quot;</span>
 
     <span class="n">__instance</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -231,8 +229,13 @@
     <span class="c1"># Set-up</span>
     <span class="c1">################################################################################</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="c1">#: The current working directory.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">root</span>
+
+        <span class="c1">#: The ``config.yml``` in the current working directory.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_config</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">user_config</span>
+
+        <span class="c1">#: The ``cgr_sample_sheet.csv``` in the current working directory.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">sample_sheet_file</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_config</span><span class="p">)</span>
@@ -259,21 +262,44 @@
     <span class="c1">################################################################################</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The user&#39;s config settings from ``config.yml``.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; from cgr_gwas_qc import load_config</span>
+<span class="sd">            &gt;&gt;&gt; cfg = load_config()</span>
+<span class="sd">            &gt;&gt;&gt; cfg.config.software_params.maf_for_ibd</span>
+<span class="sd">            0.2</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Access the sample sheet DataFrame.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;The user&#39;s sample sheet data.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; cfg = load_config()</span>
+<span class="sd">            &gt;&gt;&gt; cfg.ss.head(2)</span>
+<span class="sd">            Sample_ID   Subject_ID    ...</span>
+<span class="sd">                SP001        SB001    ...</span>
+<span class="sd">                SP002        SB002    ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_sheet</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cluster_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;List of the cluster group names from ``cgr_sample_sheet.csv``.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; cfg = load_config()</span>
+<span class="sd">            &gt;&gt;&gt; cfg.cluster_groups</span>
+<span class="sd">            [&quot;cgroup1&quot;, &quot;cgroup2&quot;]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_groups</span>
 
     <span class="c1">################################################################################</span>
     <span class="c1"># Helper functions for snakemake</span>
     <span class="c1">################################################################################</span>
-<div class="viewcode-block" id="ConfigMgr.expand"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.expand">[docs]</a>    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
+<div class="viewcode-block" id="ConfigMgr.expand"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr.expand">[docs]</a>    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">file_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">combination</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Use sample sheet columns to fill in file pattern</span>
@@ -287,11 +313,18 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A list of expanded file names.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; cfg = load_config()  # assuming ``cgr_sample_sheet.csv`` contains 3 samples SP00{1,2,3}</span>
+<span class="sd">            &gt;&gt;&gt; cfg.expand(&quot;{Sample_ID}.txt&quot;)</span>
+<span class="sd">            [&quot;SP001.txt&quot;, &quot;SP002.txt&quot;, &quot;SP003.txt&quot;]</span>
+<span class="sd">            &gt;&gt;&gt; cfg.expand(&quot;{Sample_ID}.txt&quot;, query=&quot;Sample_ID == &#39;SP002&#39;&quot;)</span>
+<span class="sd">            [SP002.txt&quot;]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span> <span class="k">if</span> <span class="n">query</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span>
         <span class="k">return</span> <span class="n">expand</span><span class="p">(</span><span class="n">file_pattern</span><span class="p">,</span> <span class="n">combination</span><span class="p">,</span> <span class="o">**</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ConfigMgr.conda"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.conda">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ConfigMgr.conda"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr.conda">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">conda</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return path to a conda env file.</span>
 
@@ -307,7 +340,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">MODULE_DIR</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.smk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConfigMgr.scripts"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.scripts">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ConfigMgr.scripts"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr.scripts">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">scripts</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the path to an internal script.</span>
 
@@ -315,7 +348,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">SCRIPTS_DIR</span> <span class="o">/</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConfigMgr.subworkflow"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.subworkflow">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ConfigMgr.subworkflow"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr.subworkflow">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">subworkflow</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">workflow</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the path to a sub-workflow.</span>
 
@@ -325,6 +358,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">docx_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the path to the docx template.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_DIR</span> <span class="o">/</span> <span class="s2">&quot;cgr_reference.docx&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
 

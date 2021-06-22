@@ -1,5 +1,7 @@
-Setting-up the Development Environment
-======================================
+.. _dev-setup:
+
+Development Environment Set-up
+==============================
 
 Download GwasQcPipeline
 -----------------------

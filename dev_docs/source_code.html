@@ -1,0 +1,655 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Working with Source Code &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Working with Test Suite" href="testing.html" />
+    <link rel="prev" title="Working with Documentation" href="documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
+</ul>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Development Environment Set-up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Working with Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Working with Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Working with Test Suite</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Working with Source Code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/dev_docs/source_code.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="working-with-source-code">
+<span id="source"></span><h1>Working with Source Code<a class="headerlink" href="#working-with-source-code" title="Permalink to this headline">¶</a></h1>
+<p>The <em>CGR GwasQcPipeline</em> source code is located in <code class="docutils literal notranslate"><span class="pre">src/cgr_gwas_qc</span></code>.
+This includes the GwasQcPipeline workflow, the <code class="docutils literal notranslate"><span class="pre">cgr</span></code> command line utility, and various helper functions.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.
+├── src
+│  └── cgr_gwas_qc
+│     ├── __init__.py
+│     ├── __main__.py          <span class="c1"># Points to the ``cgr`` entry point</span>
+│     ├── cli/                 <span class="c1"># All code for the ``cgr`` command line interface</span>
+│     ├── cluster_profiles/    <span class="c1"># Cluster profiles for CGEMs and Biowuld</span>
+│     ├── conda.py             <span class="c1"># Helpers to activate conda environments in a script</span>
+│     ├── config.py            <span class="c1"># Configuration manager helper code ``cfg``</span>
+│     ├── exceptions.py        <span class="c1"># Custom exceptions for nicer error handling</span>
+│     ├── models/              <span class="c1"># Data models for ``config.yml``</span>
+│     ├── parsers/             <span class="c1"># Various tools for parsing 3rd party files</span>
+│     ├── paths.py             <span class="c1"># Helpers for working with paths</span>
+│     ├── reporting/           <span class="c1"># Code for writing the QC report ``.docx``</span>
+│     ├── scripts/             <span class="c1"># Legacy compare script</span>
+│     ├── testing/             <span class="c1"># Helpers for testing</span>
+│     ├── typing.py            <span class="c1"># Custom PathLike data type</span>
+│     ├── validators/          <span class="c1"># Code to validate different file formats</span>
+│     ├── version.py           <span class="c1"># Gets the workflow version</span>
+│     ├── workflow/            <span class="c1"># The GwasQcPipeline workflow</span>
+│     └── yaml.py              <span class="c1"># Helpers for working with YAML files</span>
+</pre></div>
+</div>
+<p>I will briefly discussion a few of the more important or complicated bits.</p>
+<div class="section" id="configuration-management">
+<h2>Configuration Management<a class="headerlink" href="#configuration-management" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>src
+└── cgr_gwas_qc
+   ├── ...
+   ├── config.py                   <span class="c1"># The ``cgr_gwas_qc.config.ConfigMgr``</span>
+   ├── models/                     <span class="c1"># Pydantic data models defining ``config.yml``</span>
+   │  ├── __init__.py
+   │  └── config/
+   │     ├── __init__.py           <span class="c1"># Top Level ``config.yml``</span>
+   │     ├── reference_files.py    <span class="c1"># Reference Files namespace</span>
+   │     ├── software_params.py    <span class="c1"># Software Parameters namespace</span>
+   │     ├── user_files.py         <span class="c1"># User Files namespace</span>
+   │     └── workflow_params.py    <span class="c1"># Workflow Parameters</span>
+   ├── parsers/
+   │  ├── sample_sheet.py          <span class="c1"># LIMs Manifest and sample sheet parsers</span>
+   ├── ...
+</pre></div>
+</div>
+<p>Configuration management is the most complicated aspect of the entire project.
+I wanted to create an easy to use system for all things configuration.
+The core of this system is <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc.config.ConfigMgr</span></code>.
+You will see this referred to as <code class="docutils literal notranslate"><span class="pre">cfg</span></code> throughout the workflow, tests, and some scripts.
+<code class="docutils literal notranslate"><span class="pre">cfg</span></code> provides easy access to the values stored in the <code class="docutils literal notranslate"><span class="pre">config.yml`</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">dictionary</span> <span class="pre">at</span> <span class="pre">``cfg.config</span></code>, the <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code> as a data frame at <code class="docutils literal notranslate"><span class="pre">cfg.ss</span></code>, and to a number of helpers.</p>
+<p>Essentially, I am trying to solve two problems with <code class="docutils literal notranslate"><span class="pre">cfg</span></code>.</p>
+<p>1. <strong>Resolving file paths.</strong>
+<a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> makes many assumptions about the locations of inputs/outputs, snakefiles, conda environments, and scripts.
+Traditionally this works as expected when you have your workflow in the current working directory.
+However, GwasQcPipeline lives in the install location so we need to adjust adjust the paths for <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a>.
+<code class="docutils literal notranslate"><span class="pre">cgf</span></code> has several helpers to do just that.</p>
+<dl class="py class">
+<dt>
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.config.</code><code class="sig-name descname">ConfigMgr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">root</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">user_config</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Manage all things config.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cgr_gwas_qc</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>  <span class="c1"># must have ``config.yml`` and ``cgr_sample_sheet.csv`` in current directory.</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">CONDA_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/conda')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/conda</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">MODULE_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/modules')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/modules</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">SCRIPTS_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/scripts')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/scripts</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">SNAKEFILE</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/Snakefile')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/Snakefile</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">SRC_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc')</em></dt>
+<dd><p>The absolute path to <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc</span></code> source code.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">SUBWORKFLOW_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/sub_workflows')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/sub_workflows</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">TEMPLATE_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/reporting/templates')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">reporting/templates</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
+<code class="sig-name descname">WORKFLOW_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow</span></code> source code.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">classmethod </em><code class="sig-name descname">conda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.conda"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Return path to a conda env file.</p>
+<p>Given a conda env file_name, prepends the full path to that file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">docx_template</code></dt>
+<dd><p>Return the path to the docx template.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">classmethod </em><code class="sig-name descname">scripts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.scripts"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Return the path to an internal script.</p>
+<p>Given a script file_name, prepends the full path to that script.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">classmethod </em><code class="sig-name descname">subworkflow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">workflow</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.subworkflow"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Return the path to a sub-workflow.</p>
+<p>Given a sub-workflow name, give the full path to the snakefile.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>2. <strong>Using config/sample sheet values.</strong>
+A common pattern in <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> workflows is to fill in wildcards of a file name pattern.
+We often want to use values stored in <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code> to do this.
+The <code class="docutils literal notranslate"><span class="pre">cgf</span></code> object gives us access to both the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> and <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.
+And it provides an enhanced version of <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a>’s <code class="docutils literal notranslate"><span class="pre">expand</span></code> function to minimize the amount of code you have to type.</p>
+<dl class="py class">
+<dt>
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.config.</code><code class="sig-name descname">ConfigMgr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">root</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">user_config</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sample_sheet_file</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Manage all things config.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cgr_gwas_qc</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>  <span class="c1"># must have ``config.yml`` and ``cgr_sample_sheet.csv`` in current directory.</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">cluster_groups</code></dt>
+<dd><p>List of the cluster group names from <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">cluster_groups</span>
+<span class="go">[&quot;cgroup1&quot;, &quot;cgroup2&quot;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">config</code></dt>
+<dd><p>The user’s config settings from <code class="docutils literal notranslate"><span class="pre">config.yml</span></code>.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cgr_gwas_qc</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">software_params</span><span class="o">.</span><span class="n">maf_for_ibd</span>
+<span class="go">0.2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<code class="sig-name descname">expand</code><span class="sig-paren">(</span><em class="sig-param">file_pattern: str</em>, <em class="sig-param">combination: Callable = &lt;class 'zip'&gt;</em>, <em class="sig-param">query: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/cgr_gwas_qc/config.html#ConfigMgr.expand"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Use sample sheet columns to fill in file pattern</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_pattern</strong> – A snakemake compatible file name pattern.</p></li>
+<li><p><strong>combination</strong> – The combinatorial method to use (see
+snakemake.rules.expand). Defaults to zip.</p></li>
+<li><p><strong>query</strong> – A pandas.DataFrame.query to use to filter before
+expansion. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of expanded file names.</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>  <span class="c1"># assuming ``cgr_sample_sheet.csv`` contains 3 samples SP00{1,2,3}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{Sample_ID}</span><span class="s2">.txt&quot;</span><span class="p">)</span>
+<span class="go">[&quot;SP001.txt&quot;, &quot;SP002.txt&quot;, &quot;SP003.txt&quot;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{Sample_ID}</span><span class="s2">.txt&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">&quot;Sample_ID == &#39;SP002&#39;&quot;</span><span class="p">)</span>
+<span class="go">[SP002.txt&quot;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">ss</code></dt>
+<dd><p>The user’s sample sheet data.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cfg</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">Sample_ID   Subject_ID    ...</span>
+<span class="go">    SP001        SB001    ...</span>
+<span class="go">    SP002        SB002    ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<p>As discussed in <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a>, the other part of the configuration system are the data models that describe <code class="docutils literal notranslate"><span class="pre">config.yml</span></code>.
+These models are located in <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc.models.config</span></code>.
+Here I am using <a class="reference external" href="https://pydantic-docs.helpmanual.io/">pydantic</a> to describe the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code>.
+Essentially, that means I create a very basic class to define each namespace.
+I was not sure if I was going to have other data models, so that is why these live in the <code class="docutils literal notranslate"><span class="pre">models/config</span></code> subfolder.
+I chose the <code class="docutils literal notranslate"><span class="pre">models</span></code> terminology because that is commonly used in the web application space.</p>
+<p>To add a new config option, you need to do the following:</p>
+<ol class="arabic simple">
+<li><p>Decide which name space you want the value to reside.</p></li>
+<li><p>Add that value to the correct class in <code class="docutils literal notranslate"><span class="pre">models/config</span></code>.</p></li>
+<li><p>You can give the option a default value in the pydantic class (suggested for <code class="docutils literal notranslate"><span class="pre">software_params</span></code> and <code class="docutils literal notranslate"><span class="pre">workflow_params</span></code>), or you can add a default value to <code class="docutils literal notranslate"><span class="pre">cli/config.py</span></code> (suggested for <code class="docutils literal notranslate"><span class="pre">reference_files</span></code> and <code class="docutils literal notranslate"><span class="pre">user_files</span></code>).</p></li>
+<li><p>You may need to adjust tests if you require a value but do not provide a default.</p></li>
+</ol>
+</div>
+<div class="section" id="gwasqcpipeline-workflow">
+<h2>GwasQcPipeline Workflow<a class="headerlink" href="#gwasqcpipeline-workflow" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>src
+└── cgr_gwas_qc
+   ├── workflow
+   │  ├── __init__.py
+   │  ├── conda/                       <span class="c1"># Definition of conda environments used by the workflow</span>
+   │  │  ├── eigensoft.yml
+   │  │  ├── graf.yml
+   │  │  ├── illuminaio.yml
+   │  │  ├── king.yml
+   │  │  ├── pandoc.yml
+   │  │  ├── plink2.yml
+   │  │  └── verifyidintensity.yml
+   │  ├── modules/                     <span class="c1"># Rules for different software packages</span>
+   │  │  ├── eigensoft.smk
+   │  │  ├── graf.smk
+   │  │  ├── plink.smk
+   │  │  └── thousand_genomes.smk
+   │  ├── scripts/                     <span class="c1"># Custom python scripts used by the workflow</span>
+   │  │  ├── __init__.py
+   │  │  └── ...
+   │  ├── Snakefile                    <span class="c1"># The main workflow, this is what is called when a sub-workflow is not specified</span>
+   │  └── sub_workflows/               <span class="c1"># The sub-workflows</span>
+   │     ├── contamination.smk
+   │     ├── delivery.smk
+   │     ├── entry_points.smk
+   │     ├── sample_qc.smk
+   │     └── subject_qc.smk
+</pre></div>
+</div>
+<p>The <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> workflow lives in <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc.workflow</span></code>.
+When you run <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">snakemake</span></code> or <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">submit</span></code> without specifying a subworkflow you run <code class="docutils literal notranslate"><span class="pre">workflow/Sankefile</span></code>.
+If you use the <code class="docutils literal notranslate"><span class="pre">--subworkflow</span> <span class="pre">&lt;name&gt;</span></code> then you will run one of <code class="docutils literal notranslate"><span class="pre">workflow/subworkflow</span></code></p>
+<p>Besides sub-workflow, I also have a number of software modules located in <cite>workflow/modules</cite>.
+My goal here was to group all of the rules for each 3rd party software to make maintenance easier.
+I also tried to follow the key programming principle, only do something once!</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are a few exceptions to all 3rd party tools are in a module.</p>
+<ul class="simple">
+<li><p>I had to embed a PLINK command in <code class="docutils literal notranslate"><span class="pre">workflow/scripts/plink_merge.py</span></code>.</p></li>
+<li><p>I had to embed verifyidintensity in <a href="#id1"><span class="problematic" id="id2">``</span></a>workflow/scripts/verifyidintensity.py`</p></li>
+<li><p>I never created a King module, so all that code is in <code class="docutils literal notranslate"><span class="pre">workflow/sub_workflows/sample_qc.smk</span></code></p></li>
+</ul>
+</div>
+<p>Almost all custom code are in <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc.workflow.scripts</span></code>.
+These scripts are designed to be called directly from snakemake using the <code class="docutils literal notranslate"><span class="pre">scripts:</span></code> directive.
+Some of them can also be run directly from the command line.
+I tried to use descriptive names, but in general it is probably easier to go to the corresponding sub-workflow and see which script is referenced.</p>
+</div>
+<div class="section" id="qc-report-generation">
+<h2>QC Report Generation<a class="headerlink" href="#qc-report-generation" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>src
+└── cgr_gwas_qc
+   ├── reporting
+   │  ├── __init__.py
+   │  ├── constants.py
+   │  ├── qc_exclusions.py
+   │  ├── sample_qc.py
+   │  ├── subject_qc.py
+   │  ├── templates
+   │  │  ├── __init__.py
+   │  │  ├── cgr_reference.docx
+   │  │  ├── qc_report.md.j2
+   │  │  └── summary_stats.txt.j2
+   │  └── templating.py
+</pre></div>
+</div>
+<p>One major change from the legacy workflow is that we moved the QC report to a markdown file that is converted to <code class="docutils literal notranslate"><span class="pre">docx</span></code> at runtime.
+The text of the QC report is in <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc/reporting/templates/qc_report.md.j2</span></code>.
+This file is in the <a class="reference external" href="https://jinja.palletsprojects.com/en/3.0.x/">jinja2</a> format.
+<a class="reference external" href="https://jinja.palletsprojects.com/en/3.0.x/">jinja2</a> is a template framework.
+It is mostly used to dynamically build HTML pages, but here we use it to build our markdown report.
+It allows for value substitutions, flow control (if/else), and loops.
+To build the QC report we create a giant dictionary with all of the values and then pass this “payload” to <a class="reference external" href="https://jinja.palletsprojects.com/en/3.0.x/">jinja2</a>.</p>
+<p>The report is pretty complicated and has a lot of logic to generate all of the necessary counts.
+The workflow script <code class="docutils literal notranslate"><span class="pre">workflow/scripts/qc_report.py</span></code> uses helpers in the reporting folder to try to keep things clean.
+There are three major sections: Sample QC, Subject QC, QC Exclusions (a.k.a Table 4).
+The values in these three sections are calculated in <code class="docutils literal notranslate"><span class="pre">reporting/sample_qc.py</span></code>, <code class="docutils literal notranslate"><span class="pre">reporting/subject_qc.py</span></code>, and <code class="docutils literal notranslate"><span class="pre">reporting/qc_exclusions.py</span></code> respectively.</p>
+</div>
+<div class="section" id="command-line-interface-cli">
+<h2>Command Line Interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>src
+└── cgr_gwas_qc
+   ├── __main__.py
+   ├── cli
+   │  ├── __init__.py
+   │  ├── cgems_copy.py
+   │  ├── config.py
+   │  ├── pre_flight.py
+   │  ├── snakemake.py
+   │  ├── submit.py
+   │  └── version.py
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">cgr</span></code> command line interface lives in <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc/cli</span></code>.
+Each of the sub-commands are in their own python file.
+I am using the python CLI framework called <a class="reference external" href="https://typer.tiangolo.com/">typer</a>.
+It is an easy way to build up nice command line tools.
+To add a new command you would create a new python script in <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc/cli</span></code> and register the command with <code class="docutils literal notranslate"><span class="pre">cgr</span></code> by adding it to <code class="docutils literal notranslate"><span class="pre">cli/__init__.py</span></code></p>
+</div>
+<div class="section" id="nih-cluster-profiles">
+<h2>NIH Cluster Profiles<a class="headerlink" href="#nih-cluster-profiles" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>src
+└── cgr_gwas_qc
+   ├── cluster_profiles
+   │  ├── __init__.py
+   │  ├── biowulf
+   │  │  ├── __init__.py
+   │  │  ├── config.yaml
+   │  │  ├── jobscript.sh
+   │  │  ├── status.py
+   │  │  └── submit.py
+   │  ├── cgems
+   │  │  ├── __init__.py
+   │  │  ├── cgems_jobscript.sh
+   │  │  ├── cgems_status.py
+   │  │  ├── cgems_submit.py
+   │  │  └── config.yaml
+   │  ├── cluster.yaml
+   │  └── snakemake.sh
+</pre></div>
+</div>
+<p><a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> provides a plugin architecture to tell it how to interact with your cluster environment (<a class="reference external" href="https://github.com/snakemake-profiles/doc">their docs</a>).
+This consists of 3 major parts: a job-script template, a submission script, and a status check script.
+For each rule that is submitted to the cluster, snakemake creates a job.
+The submission script is given this job, it can then pull out job’s metadata and build a submission script using the job-script template.
+<a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> will run the status check script repeatedly for each submitted job.
+The status script then tells snakemake if the job is “running”, “failed”, or “success”.</p>
+<p>I created two cluster profiles, one for Biowulf and one for CGEMs/CCAD.
+Code that is shared by both profiles lives in <code class="docutils literal notranslate"><span class="pre">cluster_profiles/__init__.py</span></code></p>
+<ul class="simple">
+<li><p>job-script template: <code class="docutils literal notranslate"><span class="pre">cluster_profiles/biowulf/jobscript.sh</span></code> and <code class="docutils literal notranslate"><span class="pre">cluster_profiles/cgems/cgems_jobscript.sh</span></code></p></li>
+<li><p>submit-script template: <code class="docutils literal notranslate"><span class="pre">cluster_profiles/biowulf/submit.py</span></code> and <code class="docutils literal notranslate"><span class="pre">cluster_profiles/cgems/cgems_submit.py</span></code></p></li>
+<li><p>status-script template: <code class="docutils literal notranslate"><span class="pre">cluster_profiles/biowulf/status.py</span></code> and <code class="docutils literal notranslate"><span class="pre">cluster_profiles/cgems/cgems_status.py</span></code></p></li>
+</ul>
+<p>When you run <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">submit</span> <span class="pre">--cgems</span></code> or <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">submit</span> <span class="pre">--biowulf</span></code> we create a submission script for the main snakemake task that is saved in <code class="docutils literal notranslate"><span class="pre">.snakemake/GwasQcPipeline_submission.sh</span></code>
+To create this script we use the <a class="reference external" href="https://jinja.palletsprojects.com/en/3.0.x/">jinja2</a> template <code class="docutils literal notranslate"><span class="pre">cluster_profiles/snakemake.sh</span></code>.</p>
+</div>
+<div class="section" id="parsers-and-validators">
+<h2>Parsers and Validators<a class="headerlink" href="#parsers-and-validators" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>src
+└── cgr_gwas_qc
+   ├── parsers
+   │  ├── __init__.py
+   │  ├── bim.py
+   │  ├── bpm.py
+   │  ├── common.py
+   │  ├── eigensoft.py
+   │  ├── graf.py
+   │  ├── illumina
+   │  │  ├── __init__.py
+   │  │  ├── adpc.py
+   │  │  └── IlluminaBeadArrayFiles.py
+   │  ├── king.py
+   │  ├── plink.py
+   │  ├── sample_sheet.py
+   │  ├── vcf.py
+   │  └── verifyidintensity.py
+   ├── validators
+   │  ├── __init__.py
+   │  ├── bgzip.py
+   │  ├── bpm.py
+   │  ├── gtc.py
+   │  ├── idat.py
+   │  └── sample_sheet.py
+</pre></div>
+</div>
+<p>This workflow uses a lot of different file types.
+Many of them are binary while others are plain text in a various formats.
+I created a series of parsers and validators for many of the different file types.
+I centralized them here again to only do something once!</p>
+<p>The file <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.py</span></code> was downloaded from Illumina’s github page.
+All of the other parsers/validators I wrote.
+See <a class="reference internal" href="../api/cgr_gwas_qc.html#api-reference"><span class="std std-ref">API Reference</span></a> for more details.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="testing.html" class="btn btn-neutral float-right" title="Working with Test Suite" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="documentation.html" class="btn btn-neutral float-left" title="Working with Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

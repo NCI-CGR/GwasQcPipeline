@@ -53,6 +53,7 @@ Here we describe the various steps that each sub-workflow runs, the config optio
 
    dev_docs/setup
    dev_docs/documentation
+   dev_docs/source_code
    dev_docs/testing
 
 .. toctree::

@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cgr_gwas_qc.parsers.bim &mdash; GwasQcPipeline 1.0.0rc7 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started/configuration.html">Configuration Files</a></li>
+</ul>
+<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference/file_types.html">File Type Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/setup.html">Development Environment Set-up</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/documentation.html">Working with Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/source_code.html">Working with Source Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/testing.html">Working with Test Suite</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/cgr_gwas_qc.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">GwasQcPipeline</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cgr_gwas_qc.parsers.bim</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cgr_gwas_qc.parsers.bim</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Parser for the PLINK BIM format.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">CgrBiAllelicVariantRecord</span><span class="p">,</span> <span class="n">CgrFile</span>
+
+
+<div class="viewcode-block" id="open"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.bim.open">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;r&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Note this has to be used as a context manager.</span>
+
+<span class="sd">    To open and close while not using a `with` block you must to the</span>
+<span class="sd">    `BimFile` class directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bim_file</span> <span class="o">=</span> <span class="n">BimFile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">bim_file</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">bim_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BimFile"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.bim.BimFile">[docs]</a><span class="k">class</span> <span class="nc">BimFile</span><span class="p">(</span><span class="n">CgrFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provides an iterable interface to BIM files.&quot;&quot;&quot;</span>
+
+    <span class="n">endchar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;encoded_chrom&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;morgans&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pos&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;allele_1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;allele_2&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="s2">&quot;BimRecord&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+
+            <span class="c1"># Fix types</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;morgans&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;morgans&quot;</span><span class="p">])</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">])</span>
+
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;chrom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_decode</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;encoded_chrom&quot;</span><span class="p">])</span>
+
+            <span class="k">yield</span> <span class="n">BimRecord</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_decode</span><span class="p">(</span><span class="n">chrom</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decodes BIM chromosome code.&quot;&quot;&quot;</span>
+    <span class="n">chrom_codes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;23&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;24&quot;</span><span class="p">:</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;25&quot;</span><span class="p">:</span> <span class="s2">&quot;XY&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;26&quot;</span><span class="p">:</span> <span class="s2">&quot;MT&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">chrom_codes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">chrom</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BimRecord"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.bim.BimRecord">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">BimRecord</span><span class="p">(</span><span class="n">CgrBiAllelicVariantRecord</span><span class="p">):</span>
+    <span class="n">encoded_chrom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># encoded chromosome</span>
+    <span class="n">morgans</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># position in morgans</span>
+
+<div class="viewcode-block" id="BimRecord.get_record_problems"><a class="viewcode-back" href="../../../api/parsers.html#cgr_gwas_qc.parsers.bim.BimRecord.get_record_problems">[docs]</a>    <span class="k">def</span> <span class="nf">get_record_problems</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Checks the record for common problems.</span>
+
+<span class="sd">        A convenience method to check the record for a set of common problems</span>
+<span class="sd">        and return a list of those problems. Potential problems:</span>
+<span class="sd">        [&quot;not_major_chrom&quot;, &quot;bad_position&quot;, &quot;ambiguous_allele&quot;, &quot;indel].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">problems</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">not_major_chrom</span><span class="p">():</span>
+            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;not_major_chrom&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;bad_position&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ambiguous</span><span class="p">():</span>
+            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;ambiguous_allele&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_indel</span><span class="p">():</span>
+            <span class="n">problems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;indel&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">problems</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">encoded_chrom</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">morgans</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allele_1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allele_2</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare two BimRecords ignoring the allele order.</span>
+
+<span class="sd">        Allele order is not consistent when running PLINK, so I want to</span>
+<span class="sd">        consider two records equal even if the alleles are swapped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">BimRecord</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BimRecord</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrom</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">chrom</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoded_chrom</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">encoded_chrom</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">morgans</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">morgans</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pos</span>
+            <span class="ow">and</span> <span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allele_1</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">allele_1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">allele_2</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">allele_2</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allele_1</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">allele_2</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">allele_2</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">allele_1</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

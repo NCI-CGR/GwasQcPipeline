@@ -1,26 +1,41 @@
 Parsers
 =======
 
-Eigensoft
----------
+Eigensoft Parsers
+-----------------
 
 .. automodule:: cgr_gwas_qc.parsers.eigensoft
     :members:
 
-GRAF
-----
+GRAF Parsers
+------------
 
 .. automodule:: cgr_gwas_qc.parsers.graf
     :members:
 
-KING
-----
+KING Parsers
+------------
 
 .. automodule:: cgr_gwas_qc.parsers.king
     :members:
 
-Plink
------
+Plink Parsers
+-------------
 
 .. automodule:: cgr_gwas_qc.parsers.plink
+    :members:
+
+.. automodule:: cgr_gwas_qc.parsers.bim
+    :members:
+
+Illumina Parsers
+----------------
+
+.. automodule:: cgr_gwas_qc.parsers.bpm
+    :members:
+
+.. automodule:: cgr_gwas_qc.parsers.illumina.adpc
+    :members:
+
+.. automodule:: cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles
     :members:
