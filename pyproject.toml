@@ -22,7 +22,7 @@ packages = [
 python = "^3.8"
 typer = "^0.3.2"
 pandas = "^1.2.4"
-snakemake = "^6.15.5"
+snakemake = "~6.15.5"
 pysam = "^0.16.0"
 ryd = "^0.4.1"
 pydantic = "^1.8.2"
@@ -33,7 +33,7 @@ seaborn = "^0.11.1"
 python-ternary = "^1.0.8"
 tabulate = "^0.8.9"
 openpyxl = "^3.0.7"
-markupsafe = "^2.0.2"
+markupsafe = "~2.0.2"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
