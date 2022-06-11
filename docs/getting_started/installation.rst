@@ -42,6 +42,10 @@ To update the latest version of ``GwasQcPipeline``:
     $ pip install --force-reinstall |pkgurl|
     # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 
+Installing on NIH Biowulf
+-------------------------
+
+Comming soon
 
 Installing on other systems
 ---------------------------

@@ -1,0 +1,1190 @@
+============================= test session starts ==============================
+platform linux -- Python 3.8.13, pytest-6.2.5, py-1.11.0, pluggy-1.0.0 -- /data/okuharad2/QC_workflow/GwasQcPipeline/conda/envs/cgr-dev/bin/python3.8
+cachedir: .pytest_cache
+rootdir: /gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline, configfile: pyproject.toml
+plugins: xdist-2.5.0, mock-3.7.0, forked-1.4.0
+collecting ... collected 452 items
+
+tests/test_config.py::test_scan_for_yaml[config-yml] PASSED              [  0%]
+tests/test_config.py::test_scan_for_yaml[config-yaml] PASSED             [  0%]
+tests/test_config.py::test_config_only_uses_one_instance PASSED          [  0%]
+tests/test_config.py::test_manually_loading_config PASSED                [  0%]
+tests/test_config.py::test_load_config PASSED                            [  1%]
+tests/test_config.py::test_group_by_column_default PASSED                [  1%]
+tests/test_config.py::test_group_by_column_config_option PASSED          [  1%]
+tests/test_config.py::test_group_by_column PASSED                        [  1%]
+tests/test_snakemake_job_grouping.py::test_wildcards PASSED              [  1%]
+tests/test_snakemake_job_grouping.py::test_basic_grouping FAILED         [  2%]
+tests/test_snakemake_job_grouping.py::test_wildcard_grouping FAILED      [  2%]
+tests/test_snakemake_job_grouping.py::test_basic_grouping_max_resource[2-1] FAILED [  2%]
+tests/test_snakemake_job_grouping.py::test_basic_grouping_max_resource[1-2] FAILED [  2%]
+tests/test_snakemake_job_grouping.py::test_basic_grouping_max_threads[2-1] FAILED [  3%]
+tests/test_snakemake_job_grouping.py::test_basic_grouping_max_threads[1-2] FAILED [  3%]
+tests/test_snakemake_job_grouping.py::test_basic_component_grouping PASSED [  3%]
+tests/test_snakemake_job_grouping.py::test_basic_component_grouping_cluster_override PASSED [  3%]
+tests/cli/test_cgems_copy.py::test_project_name[project] PASSED          [  3%]
+tests/cli/test_cgems_copy.py::test_project_name[build] PASSED            [  4%]
+tests/cli/test_cgems_copy.py::test_project_name[run] PASSED              [  4%]
+tests/cli/test_cgems_copy.py::test_get_previous_run_dir PASSED           [  4%]
+tests/cli/test_cgems_copy.py::test_clone_previous_run PASSED             [  4%]
+tests/cli/test_config.py::test_get_cgems_production_run_dir PASSED       [  5%]
+tests/cli/test_config.py::test_get_cgems_production_run_dir_increment_if_previous_runs PASSED [  5%]
+tests/cli/test_pre_flight.py::test_preflight PASSED                      [  5%]
+tests/cli/test_pre_flight.py::test_check_config PASSED                   [  5%]
+tests/cli/test_pre_flight.py::test_check_config_missing PASSED           [  5%]
+tests/cli/test_pre_flight.py::test_check_sample_sheet PASSED             [  6%]
+tests/cli/test_pre_flight.py::test_check_sample_sheet_missing PASSED     [  6%]
+tests/cli/test_pre_flight.py::test_check_reference_files PASSED          [  6%]
+tests/cli/test_pre_flight.py::test_check_reference_files_bpm_error PASSED [  6%]
+tests/cli/test_pre_flight.py::test_check_reference_files_vcf_error PASSED [  7%]
+tests/cli/test_pre_flight.py::test_check_reference_files_tbi_error PASSED [  7%]
+tests/cli/test_pre_flight.py::test_check_user_files_no_problems PASSED   [  7%]
+tests/cli/test_pre_flight.py::test_check_user_files_missing_gtc PASSED   [  7%]
+tests/cli/test_pre_flight.py::test_check_user_files_missing_both_idat PASSED [  7%]
+tests/cli/test_pre_flight.py::test_update_sample_sheet_sample_no_reps PASSED [  8%]
+tests/cli/test_pre_flight.py::test_update_sample_sheet_sample_w_reps PASSED [  8%]
+tests/cli/test_pre_flight.py::test_update_sample_sheet_internal_control PASSED [  8%]
+tests/cli/test_pre_flight.py::test_update_sample_sheet_excluded_sample PASSED [  8%]
+tests/cli/test_pre_flight.py::test_update_sample_sheet_missing_idats PASSED [  9%]
+tests/cli/test_submit.py::test_check_exclusive_options_no_error[True-False-None] PASSED [  9%]
+tests/cli/test_submit.py::test_check_exclusive_options_no_error[False-True-None] PASSED [  9%]
+tests/cli/test_submit.py::test_check_exclusive_options_no_error[False-False-./test] PASSED [  9%]
+tests/cli/test_submit.py::test_check_exclusive_options_raises_error[True-True-./test] PASSED [  9%]
+tests/cli/test_submit.py::test_check_exclusive_options_raises_error[True-True-None] PASSED [ 10%]
+tests/cli/test_submit.py::test_check_exclusive_options_raises_error[True-False-./test] PASSED [ 10%]
+tests/cli/test_submit.py::test_check_exclusive_options_raises_error[False-True-./test] PASSED [ 10%]
+tests/cli/test_submit.py::test_get_profile[cgems] PASSED                 [ 10%]
+tests/cli/test_submit.py::test_get_profile[biowulf] PASSED               [ 11%]
+tests/cli/test_submit.py::test_check_custom_cluster_profile PASSED       [ 11%]
+tests/cli/test_submit.py::test_check_custom_cluster_profile_no_profile PASSED [ 11%]
+tests/cli/test_submit.py::test_check_custom_cluster_profile_no_queue PASSED [ 11%]
+tests/cli/test_submit.py::test_check_custom_cluster_profile_no_cmd PASSED [ 11%]
+tests/cli/test_submit.py::test_create_submission_script_cgems PASSED     [ 12%]
+tests/cli/test_submit.py::test_create_submission_script_biowulf PASSED   [ 12%]
+tests/cli/test_submit.py::test_run_submit_with_right_command[cgems-qsub] PASSED [ 12%]
+tests/cli/test_submit.py::test_run_submit_with_right_command[biowulf-sbatch] PASSED [ 12%]
+tests/cli/test_submit.py::test_run_submit_with_right_command[custom-pbs] PASSED [ 13%]
+tests/cluster_profiles/test_cgems.py::test_cgems_submission_end_to_end PASSED [ 13%]
+tests/cluster_profiles/test_cgems_status.py::test_check_queue[2-running] PASSED [ 13%]
+tests/cluster_profiles/test_cgems_status.py::test_check_queue[4-failed] PASSED [ 13%]
+tests/cluster_profiles/test_cgems_status.py::test_check_queue[22-None] PASSED [ 13%]
+tests/cluster_profiles/test_cluster_profiles.py::test_load_cluster_config[basic_config] PASSED [ 14%]
+tests/cluster_profiles/test_cluster_profiles.py::test_load_cluster_config[no __default__ section] PASSED [ 14%]
+tests/cluster_profiles/test_cluster_profiles.py::test_update_properties[basic properties] PASSED [ 14%]
+tests/cluster_profiles/test_cluster_profiles.py::test_update_properties[cluster profile adds threads] PASSED [ 14%]
+tests/cluster_profiles/test_cluster_profiles.py::test_update_properties[mem resources added] PASSED [ 15%]
+tests/cluster_profiles/test_cluster_profiles.py::test_update_properties[resources override --cluster-config] PASSED [ 15%]
+tests/cluster_profiles/test_cluster_profiles.py::test_get_rule_names_basic_group PASSED [ 15%]
+tests/cluster_profiles/test_cluster_profiles.py::test_get_rule_names_multisample_group PASSED [ 15%]
+tests/cluster_profiles/test_cluster_profiles.py::test_update_group_properties_basic_group[basic group] PASSED [ 15%]
+tests/cluster_profiles/test_cluster_profiles.py::test_update_group_properties_basic_group[basic group with resources] PASSED [ 16%]
+tests/models/test_config_data_model.py::test_reference_files PASSED      [ 16%]
+tests/models/test_config_data_model.py::test_user_files_defaults PASSED  [ 16%]
+tests/models/test_config_data_model.py::test_user_files_gtc_pattern PASSED [ 16%]
+tests/models/test_config_data_model.py::test_user_files_ped_map PASSED   [ 17%]
+tests/models/test_config_data_model.py::test_user_files_bed_bim_fam PASSED [ 17%]
+tests/models/test_config_data_model.py::test_idat PASSED                 [ 17%]
+tests/models/test_config_data_model.py::test_software_params_defaults PASSED [ 17%]
+tests/models/test_config_data_model.py::test_workflow_params_defaults PASSED [ 17%]
+tests/models/test_config_data_model.py::test_call_rate_param_limits[-0.01] PASSED [ 18%]
+tests/models/test_config_data_model.py::test_call_rate_param_limits[0] PASSED [ 18%]
+tests/models/test_config_data_model.py::test_call_rate_param_limits[1.01] PASSED [ 18%]
+tests/parsers/test_bim.py::test_bim_reader PASSED                        [ 18%]
+tests/parsers/test_bim.py::test_bim_writer PASSED                        [ 19%]
+tests/parsers/test_bim.py::test_is_ambiguous[record0-True] PASSED        [ 19%]
+tests/parsers/test_bim.py::test_is_ambiguous[record1-True] PASSED        [ 19%]
+tests/parsers/test_bim.py::test_is_ambiguous[record2-False] PASSED       [ 19%]
+tests/parsers/test_bim.py::test_is_ambiguous[record3-False] PASSED       [ 19%]
+tests/parsers/test_bim.py::test_is_ambiguous[record4-False] PASSED       [ 20%]
+tests/parsers/test_bim.py::test_is_ambiguous[record5-False] PASSED       [ 20%]
+tests/parsers/test_bim.py::test_is_indel[record0-True] PASSED            [ 20%]
+tests/parsers/test_bim.py::test_is_indel[record1-True] PASSED            [ 20%]
+tests/parsers/test_bim.py::test_is_indel[record2-True] PASSED            [ 21%]
+tests/parsers/test_bim.py::test_is_indel[record3-False] PASSED           [ 21%]
+tests/parsers/test_bim.py::test_not_major_chrom[record0-True] PASSED     [ 21%]
+tests/parsers/test_bim.py::test_not_major_chrom[record1-True] PASSED     [ 21%]
+tests/parsers/test_bim.py::test_not_major_chrom[record2-True] PASSED     [ 21%]
+tests/parsers/test_bim.py::test_not_major_chrom[record3-True] PASSED     [ 22%]
+tests/parsers/test_bim.py::test_not_major_chrom[record4-False] PASSED    [ 22%]
+tests/parsers/test_bim.py::test_not_major_chrom[record5-False] PASSED    [ 22%]
+tests/parsers/test_bim.py::test_switch_allele_order[record0-expected0] PASSED [ 22%]
+tests/parsers/test_bim.py::test_switch_allele_order[record1-expected1] PASSED [ 23%]
+tests/parsers/test_bim.py::test_switch_allele_order[record2-expected2] PASSED [ 23%]
+tests/parsers/test_bim.py::test_switch_allele_order[record3-expected3] PASSED [ 23%]
+tests/parsers/test_bim.py::test_switch_allele_order[record4-expected4] PASSED [ 23%]
+tests/parsers/test_bim.py::test_complement_alleles[record0-expected0] PASSED [ 23%]
+tests/parsers/test_bim.py::test_complement_alleles[record1-expected1] PASSED [ 24%]
+tests/parsers/test_bim.py::test_complement_alleles[record2-expected2] PASSED [ 24%]
+tests/parsers/test_bim.py::test_complement_alleles[record3-expected3] PASSED [ 24%]
+tests/parsers/test_bim.py::test_complement_alleles[record4-expected4] PASSED [ 24%]
+tests/parsers/test_bim.py::test_get_problems[record0-expected0] PASSED   [ 25%]
+tests/parsers/test_bim.py::test_get_problems[record1-expected1] PASSED   [ 25%]
+tests/parsers/test_bim.py::test_get_problems[record2-expected2] PASSED   [ 25%]
+tests/parsers/test_bim.py::test_get_problems[record3-expected3] PASSED   [ 25%]
+tests/parsers/test_bim.py::test_get_problems[record4-expected4] PASSED   [ 25%]
+tests/parsers/test_eigensoft.py::test_Eigenvec_componenets SKIPPED (...) [ 26%]
+tests/parsers/test_eigensoft.py::test_Eigenvec_values SKIPPED (need ...) [ 26%]
+tests/parsers/test_graf.py::test_read_relatedness_sort_ids PASSED        [ 26%]
+tests/parsers/test_graf.py::test_read_relatedness_no_spaces_in_columns PASSED [ 26%]
+tests/parsers/test_graf.py::test_read_relatedness_relationships PASSED   [ 26%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[names] PASSED [ 27%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[snps] PASSED [ 27%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[chroms] PASSED [ 27%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[map_infos] PASSED [ 27%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[addresses] PASSED [ 28%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[normalization_ids] PASSED [ 28%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[assay_types] PASSED [ 28%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[normalization_lookups] PASSED [ 28%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[ref_strands] PASSED [ 28%]
+tests/parsers/test_illumina_bpm.py::test_bpm_attribute_lengths[source_strands] PASSED [ 29%]
+tests/parsers/test_illumina_gtc.py::test_length_of_gtc_toc PASSED        [ 29%]
+tests/parsers/test_illumina_gtc.py::test_get_top_base_calls PASSED       [ 29%]
+tests/parsers/test_illumina_gtc.py::test_get_fwd_base_calls PASSED       [ 29%]
+tests/parsers/test_illumina_gtc.py::test_get_plus_base_calls PASSED      [ 30%]
+tests/parsers/test_illumina_gtc.py::test_genotype_scores PASSED          [ 30%]
+tests/parsers/test_king.py::test_read_related PASSED                     [ 30%]
+tests/parsers/test_plink.py::test_read_het SKIPPED (need --real-data...) [ 30%]
+tests/parsers/test_sample_sheet_parser.py::test_strip_terminal_commas[key1,value1,,,,,,,,,,\nkey2,value2,,,,,,,,,,\n-key1,value1\nkey2,value2\n] PASSED [ 30%]
+tests/parsers/test_sample_sheet_parser.py::test_strip_terminal_commas[key1,value1,,,,,,,,,,\n,,,,,,,,,,,\n,,,,,,,,,,,\n-key1,value1\n] PASSED [ 31%]
+tests/parsers/test_sample_sheet_parser.py::test_convert_to_key_value_pair[key1,value1\nkey2,value2\n-expected0] PASSED [ 31%]
+tests/parsers/test_sample_sheet_parser.py::test_convert_to_key_value_pair[key1,value1\n-expected1] PASSED [ 31%]
+tests/parsers/test_sample_sheet_parser.py::test_load_str_or_path[tests/data/example_sample_sheet.csv] PASSED [ 31%]
+tests/parsers/test_sample_sheet_parser.py::test_load_str_or_path[file_name1] PASSED [ 32%]
+tests/parsers/test_sample_sheet_parser.py::test_sample_sheet_properties_right_type PASSED [ 32%]
+tests/parsers/test_sample_sheet_parser.py::test_header_contains_project_info PASSED [ 32%]
+tests/parsers/test_sample_sheet_parser.py::test_manifests_contains_bpm_info PASSED [ 32%]
+tests/parsers/test_sample_sheet_parser.py::test_sample_sheet_data PASSED [ 32%]
+tests/parsers/test_sample_sheet_parser.py::test_empty_row_in_sample_sheet_data PASSED [ 33%]
+tests/parsers/test_vcf.py::test_vcf_file_fetch_different_chrom_formats[10] PASSED [ 33%]
+tests/parsers/test_vcf.py::test_vcf_file_fetch_different_chrom_formats[11] PASSED [ 33%]
+tests/parsers/test_vcf.py::test_vcf_file_fetch_different_chrom_formats[chr1] PASSED [ 33%]
+tests/parsers/test_vcf.py::test_vcf_file_fetch_different_chrom_formats[X] PASSED [ 34%]
+tests/parsers/test_vcf.py::test_vcf_file_fetch_different_chrom_formats[chrX] PASSED [ 34%]
+tests/parsers/test_vcf.py::test_vcf_file_fetch_nonsense_chrom[-1] PASSED [ 34%]
+tests/parsers/test_vcf.py::test_vcf_file_fetch_nonsense_chrom[XY] PASSED [ 34%]
+tests/parsers/test_vcf.py::test_vcf_file_fetch_nonsense_chrom[NA] PASSED [ 34%]
+tests/parsers/test_vcf.py::test_vcf_record_is_multiallelic[record0-True] PASSED [ 35%]
+tests/parsers/test_vcf.py::test_vcf_record_is_multiallelic[record1-False] PASSED [ 35%]
+tests/parsers/test_vcf.py::test_vcf_record_is_snp[record0-True] PASSED   [ 35%]
+tests/parsers/test_vcf.py::test_vcf_record_is_snp[record1-False] PASSED  [ 35%]
+tests/parsers/test_vcf.py::test_vcf_record_is_snp[record2-False] PASSED  [ 36%]
+tests/parsers/test_verifyidintensity.py::test_remove_header_delim PASSED [ 36%]
+tests/parsers/test_verifyidintensity.py::test_pandas_parsing_multiple_spaces PASSED [ 36%]
+tests/reporting/test_qc_exclusions.py::test_sample_exclusion_table SKIPPED [ 36%]
+tests/reporting/test_qc_exclusions.py::test_subject_exclusion_table SKIPPED [ 36%]
+tests/reporting/test_sample_qc.py::test_ArrayProcessing SKIPPED (nee...) [ 37%]
+tests/reporting/test_sample_qc.py::test_CompletionRate SKIPPED (need...) [ 37%]
+tests/reporting/test_sample_qc.py::test_Contamination SKIPPED (need ...) [ 37%]
+tests/reporting/test_sample_qc.py::test_InternalControls SKIPPED (ne...) [ 37%]
+tests/reporting/test_sample_qc.py::test_ExpectedReplicates SKIPPED (...) [ 38%]
+tests/reporting/test_sample_qc.py::test_SampleSummary SKIPPED (need ...) [ 38%]
+tests/reporting/test_sample_qc.py::test_Ancestry SKIPPED (need --rea...) [ 38%]
+tests/reporting/test_subject_qc.py::test_UnExpectedReplicates SKIPPED    [ 38%]
+tests/reporting/test_subject_qc.py::test_SexVerification SKIPPED (ne...) [ 38%]
+tests/reporting/test_subject_qc.py::test_Relatedness SKIPPED (need -...) [ 39%]
+tests/reporting/test_subject_qc.py::test_Autosomal[1] SKIPPED (need ...) [ 39%]
+tests/reporting/test_subject_qc.py::test_Autosomal[2] SKIPPED (need ...) [ 39%]
+tests/reporting/test_subject_qc.py::test_Autosomal[5] SKIPPED (need ...) [ 39%]
+tests/reporting/test_subject_qc.py::test_Pca[1] PASSED                   [ 40%]
+tests/reporting/test_subject_qc.py::test_Pca[2] PASSED                   [ 40%]
+tests/reporting/test_subject_qc.py::test_Pca[5] PASSED                   [ 40%]
+tests/reporting/test_subject_qc.py::test_Hwe[1] PASSED                   [ 40%]
+tests/reporting/test_subject_qc.py::test_Hwe[2] PASSED                   [ 40%]
+tests/reporting/test_subject_qc.py::test_Hwe[5] PASSED                   [ 41%]
+tests/testing/test_conda.py::test_copy_conda_env PASSED                  [ 41%]
+tests/testing/test_conda.py::test_conda_env_works_with_snakemake PASSED  [ 41%]
+tests/testing/test_data.py::test_fake_data PASSED                        [ 41%]
+tests/testing/test_data.py::test_fake_data_tweak_config PASSED           [ 42%]
+tests/testing/test_data.py::test_real_data_caching SKIPPED (need --r...) [ 42%]
+tests/testing/test_data.py::test_copy_file_to_tmp_dir SKIPPED (need ...) [ 42%]
+tests/testing/test_data.py::test_copy_folder_to_tmp_dir SKIPPED (nee...) [ 42%]
+tests/testing/test_testing.py::test_chdir PASSED                         [ 42%]
+tests/testing/test_testing.py::test_file_hashes_equal PASSED             [ 43%]
+tests/testing/test_testing.py::test_file_hashes_not_equal PASSED         [ 43%]
+tests/testing/test_testing.py::test_files_almost_equal PASSED            [ 43%]
+tests/testing/test_testing.py::test_files_almost_not_equal PASSED        [ 43%]
+tests/testing/test_testing.py::test_make_snakefile PASSED                [ 44%]
+tests/validators/test_bgzip.py::test_bgzip_good_vcf_file PASSED          [ 44%]
+tests/validators/test_bgzip.py::test_bgzip_good_tbi_file PASSED          [ 44%]
+tests/validators/test_bgzip.py::test_bgzip_bad_magic_number PASSED       [ 44%]
+tests/validators/test_bgzip.py::test_truncated_bgzip_file[1] PASSED      [ 44%]
+tests/validators/test_bgzip.py::test_truncated_bgzip_file[2] PASSED      [ 45%]
+tests/validators/test_bgzip.py::test_truncated_bgzip_file[4] PASSED      [ 45%]
+tests/validators/test_bpm.py::test_bpm_good_bpm_file PASSED              [ 45%]
+tests/validators/test_bpm.py::test_bpm_bad_magic_number PASSED           [ 45%]
+tests/validators/test_gtc.py::test_gtc_good_gtc_file PASSED              [ 46%]
+tests/validators/test_gtc.py::test_gtc_bad_magic_number PASSED           [ 46%]
+tests/validators/test_gtc.py::test_truncated_file[1] PASSED              [ 46%]
+tests/validators/test_gtc.py::test_truncated_file[2] PASSED              [ 46%]
+tests/validators/test_gtc.py::test_truncated_file[4] PASSED              [ 46%]
+tests/validators/test_idat.py::test_idat_good_idat_file PASSED           [ 47%]
+tests/validators/test_idat.py::test_IDAT_bad_magic_number PASSED         [ 47%]
+tests/validators/test_idat.py::test_truncated_file[50] PASSED            [ 47%]
+tests/validators/test_idat.py::test_truncated_file[100] PASSED           [ 47%]
+tests/validators/test_sample_sheet.py::test_sample_sheet_good_sample_sheet PASSED [ 48%]
+tests/validators/test_sample_sheet.py::test_missing_sections[,,,\n[Manifests],,,\n,,,\n[Data],,,\nSample_ID,col2,col3,col4\nSP00001,001,002,004\n] PASSED [ 48%]
+tests/validators/test_sample_sheet.py::test_missing_sections[[Header],,,\n,,,\n,,,\n[Data],,,\nSample_ID,col2,col3,col4\nSP00001,001,002,004\n] PASSED [ 48%]
+tests/validators/test_sample_sheet.py::test_missing_sections[[Header],,,\n,,,\n[Manifests],,,\n,,,\n] PASSED [ 48%]
+tests/validators/test_sample_sheet.py::test_truncated_file[Missing last field] PASSED [ 48%]
+tests/validators/test_sample_sheet.py::test_truncated_file[No missing data] XFAIL [ 49%]
+tests/validators/test_sample_sheet.py::test_null_row_in_data_section[[Header],,,\n[Data],,,\nSample_ID,col2,col3,col4\nSP00001,001,002,004\nSP00002,001,002,003\nSP00001,001,002,003\n,,,\n] PASSED [ 49%]
+tests/validators/test_sample_sheet.py::test_null_row_in_data_section[[Header],,,\n[Data],,,\nSample_ID,col2,col3,col4\nSP00001,001,002,004\nSP00002,001,002,003\n,,,\nSP00001,001,002,003\n] PASSED [ 49%]
+tests/validators/test_sample_sheet.py::test_null_row_in_another_section[[Header],,,\n,,,\n[Data],,,\nSample_ID,col2,col3,col4\nSP00001,001,002,004\nSP00002,001,002,003\nSP00001,001,002,003\n] PASSED [ 49%]
+tests/validators/test_sample_sheet.py::test_null_row_in_another_section[[Manifests],,,\n,,,\n[Data],,,\nSample_ID,col2,col3,col4\nSP00001,001,002,004\nSP00002,001,002,003\nSP00001,001,002,003\n] PASSED [ 50%]
+tests/validators/test_sample_sheet.py::test_check_required_columns[[Data],,\ncol1,LIMS_Individual_ID,col3,col4\nSP00001,001,002,004\nSP00002,001,002,003\n] PASSED [ 50%]
+tests/validators/test_sample_sheet.py::test_check_required_columns[[Data],,,\nSample_ID,col2,col3,col4\nSP00001,001,002,004\nSP00002,,002,003\nSP00002,001,002,003\n] PASSED [ 50%]
+tests/validators/test_sample_sheet.py::test_null_columns[[Data],,,\nSample_ID,LIMS_Individual_ID,col3,col4\nSP00001,001,002,004\nSP00002,001,002,003\n,001,002,003\n] PASSED [ 50%]
+tests/workflow/modules/test_eigensoft.py::test_eigensoft_convert SKIPPED [ 50%]
+tests/workflow/modules/test_eigensoft.py::test_eigensoft_smartpca SKIPPED [ 51%]
+tests/workflow/modules/test_plink.py::test_call_rate_filters SKIPPED     [ 51%]
+tests/workflow/modules/test_plink.py::test_maf_and_ld_prune SKIPPED      [ 51%]
+tests/workflow/modules/test_plink.py::test_maf_snp_autosome_filters SKIPPED [ 51%]
+tests/workflow/modules/test_plink.py::test_rename_ids SKIPPED (need ...) [ 51%]
+tests/workflow/modules/test_plink.py::test_bed_to_ped SKIPPED (need ...) [ 52%]
+tests/workflow/modules/test_plink.py::test_miss SKIPPED (need --real...) [ 52%]
+tests/workflow/modules/test_plink.py::test_sexcheck SKIPPED (need --...) [ 52%]
+tests/workflow/modules/test_plink.py::test_frq SKIPPED (need --real-...) [ 52%]
+tests/workflow/modules/test_plink.py::test_hwe SKIPPED (need --real-...) [ 53%]
+tests/workflow/modules/test_plink.py::test_het SKIPPED (need --real-...) [ 53%]
+tests/workflow/modules/test_plink.py::test_genome SKIPPED (need --re...) [ 53%]
+tests/workflow/scripts/test_agg_contamination.py::test_agg_df PASSED     [ 53%]
+tests/workflow/scripts/test_agg_contamination.py::test_mask_low_intensity PASSED [ 53%]
+tests/workflow/scripts/test_agg_contamination.py::test_flag_contaminated PASSED [ 54%]
+tests/workflow/scripts/test_agg_contamination.py::test_legacy_masking SKIPPED [ 54%]
+tests/workflow/scripts/test_agg_population_qc_tables.py::test_aggregate_qc_tables PASSED [ 54%]
+tests/workflow/scripts/test_agg_population_qc_tables.py::test_add_metadata SKIPPED [ 54%]
+tests/workflow/scripts/test_bim_filter_vcf.py::test_bim_filter_vcf PASSED [ 55%]
+tests/workflow/scripts/test_bim_filter_vcf.py::test_update_record_with_vcf[record0-missing] PASSED [ 55%]
+tests/workflow/scripts/test_bim_filter_vcf.py::test_update_record_with_vcf[record1-missing] PASSED [ 55%]
+tests/workflow/scripts/test_bim_filter_vcf.py::test_update_record_with_vcf[record2-exact_match] PASSED [ 55%]
+tests/workflow/scripts/test_bim_filter_vcf.py::test_update_record_with_vcf[record3-exact_match] PASSED [ 55%]
+tests/workflow/scripts/test_bim_filter_vcf.py::test_update_record_with_vcf[record4-flip] PASSED [ 56%]
+tests/workflow/scripts/test_bim_filter_vcf.py::test_update_record_with_vcf[record5-flip] PASSED [ 56%]
+tests/workflow/scripts/test_bim_filter_vcf.py::test_update_record_with_vcf_duplicates PASSED [ 56%]
+tests/workflow/scripts/test_bpm2abf.py::test_bpm2abf_unknown_population PASSED [ 56%]
+tests/workflow/scripts/test_bpm2abf.py::test_get_abf_from_vcf[Perfect Match] PASSED [ 57%]
+tests/workflow/scripts/test_bpm2abf.py::test_get_abf_from_vcf[Alleles Flipped] PASSED [ 57%]
+tests/workflow/scripts/test_bpm2abf.py::test_get_abf_from_vcf[Multi-allelic] PASSED [ 57%]
+tests/workflow/scripts/test_bpm2abf.py::test_get_abf_from_vcf[Indel] PASSED [ 57%]
+tests/workflow/scripts/test_bpm2abf.py::test_get_abf_from_vcf[Wrong position] PASSED [ 57%]
+tests/workflow/scripts/test_bpm2abf.py::test_get_abf_from_vcf[Indel and Perfect Match] PASSED [ 58%]
+tests/workflow/scripts/test_bpm2abf.py::test_get_abf_from_vcf[Two Perfect Matches only use first] PASSED [ 58%]
+tests/workflow/scripts/test_bpm2abf.py::test_bpm2abf_AF PASSED           [ 58%]
+tests/workflow/scripts/test_gtc2adpc.py::test_gtc2adpc_fake_data PASSED  [ 58%]
+tests/workflow/scripts/test_gtc2adpc.py::test_gtc2adpc_issue_31 SKIPPED  [ 59%]
+tests/workflow/scripts/test_gtc2plink.py::test_gtc2plink_top PASSED      [ 59%]
+tests/workflow/scripts/test_gtc2plink.py::test_gtc2plink_fwd PASSED      [ 59%]
+tests/workflow/scripts/test_gtc2plink.py::test_gtc2plink_threshold PASSED [ 59%]
+tests/workflow/scripts/test_plot_ancestry.py::test_plot_ancestry SKIPPED [ 59%]
+tests/workflow/scripts/test_plot_ancestry.py::test_plot_ancestry_no_case SKIPPED [ 60%]
+tests/workflow/scripts/test_plot_ancestry.py::test_plot_ancestry_no_controls SKIPPED [ 60%]
+tests/workflow/scripts/test_plot_autosomal_heterozygosity.py::test_plot SKIPPED [ 60%]
+tests/workflow/scripts/test_population_qc_table.py::test_expand_related PASSED [ 60%]
+tests/workflow/scripts/test_population_qc_table.py::test_main SKIPPED    [ 61%]
+tests/workflow/scripts/test_qc_report.py::test_qc_report SKIPPED (ne...) [ 61%]
+tests/workflow/scripts/test_qc_report_table.py::test_sample_qc SKIPPED   [ 61%]
+tests/workflow/scripts/test_qc_report_table.py::test_ancestry SKIPPED    [ 61%]
+tests/workflow/scripts/test_qc_report_table.py::test_sample_concordance SKIPPED [ 61%]
+tests/workflow/scripts/test_qc_report_table.py::test_population_concordance SKIPPED [ 62%]
+tests/workflow/scripts/test_qc_report_table.py::test_pca SKIPPED (ne...) [ 62%]
+tests/workflow/scripts/test_qc_report_table.py::test_het SKIPPED (ne...) [ 62%]
+tests/workflow/scripts/test_related_subjects.py::test_create_prune_list PASSED [ 62%]
+tests/workflow/scripts/test_related_subjects.py::test_summarize_relatives PASSED [ 63%]
+tests/workflow/scripts/test_sample_concordance.py::test_build PASSED     [ 63%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_subject PASSED [ 63%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_case_control PASSED [ 63%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_internal_control PASSED [ 63%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_expected_replicate PASSED [ 64%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_expected_replicate_missing_pair PASSED [ 64%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_replicate PASSED [ 64%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_replicate_missing_pair PASSED [ 64%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-False-True-ID-ID] PASSED [ 65%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-True-ID-ID] PASSED [ 65%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-True-UN-UN] PASSED [ 65%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-True-graf3-king3] PASSED [ 65%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[True-True-False-ID-UN] PASSED [ 65%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[True-True-False-UN-ID] PASSED [ 66%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[True-True-False-graf6-king6] PASSED [ 66%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[True-True-False-UN-UN] PASSED [ 66%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-plink8-ID-ID] PASSED [ 66%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-plink9-ID-UN] PASSED [ 67%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-plink10-UN-ID] PASSED [ 67%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-plink11-ID-king11] PASSED [ 67%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-plink12-graf12-ID] PASSED [ 67%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[True-True-plink13-UN-king13] PASSED [ 67%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[True-True-plink14-graf14-UN] PASSED [ 68%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_discordant_logic[False-True-plink15-graf15-king15] PASSED [ 68%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_replicate_none PASSED [ 68%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_replicate_one PASSED [ 68%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[False-True-True-ID-ID] PASSED [ 69%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[True-False-True-ID-ID] PASSED [ 69%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[True-False-True-UN-UN] PASSED [ 69%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[True-False-False-ID-UN] PASSED [ 69%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[True-False-False-UN-ID] PASSED [ 69%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[True-False-True-graf5-king5] PASSED [ 70%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[True-False-plink6-ID-king6] PASSED [ 70%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[True-False-plink7-graf7-ID] PASSED [ 70%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[False-False-False-UN-UN] PASSED [ 70%]
+tests/workflow/scripts/test_sample_concordance.py::test_add_unexpected_logic[False-False-plink9-graf9-king9] PASSED [ 71%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_imiss_start SKIPPED [ 71%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_imiss_cr1 SKIPPED [ 71%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_imiss_cr2 SKIPPED [ 71%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_sexcheck_cr1_w_missing SKIPPED [ 71%]
+tests/workflow/scripts/test_sample_qc_table.py::test_sexcheck_cr1_legacy SKIPPED [ 72%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_ancestry_GRAF SKIPPED [ 72%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_concordance SKIPPED [ 72%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_contam SKIPPED [ 72%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_contam_file_name_none SKIPPED [ 73%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_intensity SKIPPED [ 73%]
+tests/workflow/scripts/test_sample_qc_table.py::test_read_intensity_file_name_none SKIPPED [ 73%]
+tests/workflow/scripts/test_sample_qc_table.py::test_identifiler_reason PASSED [ 73%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_analytic_exclusion[False-False-1] PASSED [ 73%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_analytic_exclusion[True-False-2] PASSED [ 74%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_analytic_exclusion[False-True-5] PASSED [ 74%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_analytic_exclusion[True-True-5] PASSED [ 74%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_subject_representative[False-False-8] PASSED [ 74%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_subject_representative[True-False-8] PASSED [ 75%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_subject_representative[False-True-6] PASSED [ 75%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_subject_representative[True-True-6] PASSED [ 75%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_subject_dropped_from_study[False-False-1] PASSED [ 75%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_subject_dropped_from_study[True-False-1] PASSED [ 75%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_subject_dropped_from_study[False-True-3] PASSED [ 76%]
+tests/workflow/scripts/test_sample_qc_table.py::test_add_subject_dropped_from_study[True-True-3] PASSED [ 76%]
+tests/workflow/scripts/test_snp_qc_table.py::test_aggregate_snp_data SKIPPED [ 76%]
+tests/workflow/scripts/test_snp_qc_table.py::test_add_call_rate_flags PASSED [ 76%]
+tests/workflow/scripts/test_split_sample_concordance.py::test_known_full SKIPPED [ 76%]
+tests/workflow/scripts/test_split_sample_concordance.py::test_known_qc SKIPPED [ 77%]
+tests/workflow/scripts/test_split_sample_concordance.py::test_known_study SKIPPED [ 77%]
+tests/workflow/scripts/test_split_sample_concordance.py::test_unknown SKIPPED [ 77%]
+tests/workflow/scripts/test_subject_qc_table.py::test_subject_qc_table SKIPPED [ 77%]
+tests/workflow/scripts/test_trim_ped_map_ids.py::test_trim_ped_ids PASSED [ 78%]
+tests/workflow/scripts/test_trim_ped_map_ids.py::test_trim_map_ids PASSED [ 78%]
+tests/workflow/scripts/test_update_snps_to_1kg_rsID.py::test_update_record_id[Update-Exact_Match] PASSED [ 78%]
+tests/workflow/scripts/test_update_snps_to_1kg_rsID.py::test_update_record_id[Update-Alleles_Flipped] PASSED [ 78%]
+tests/workflow/scripts/test_update_snps_to_1kg_rsID.py::test_update_record_id[Update-Complement] PASSED [ 78%]
+tests/workflow/scripts/test_update_snps_to_1kg_rsID.py::test_update_record_id[NoUpdate-Different_Position] PASSED [ 79%]
+tests/workflow/scripts/test_update_snps_to_1kg_rsID.py::test_update_record_id[NoUpdate-Multi_Allelic] PASSED [ 79%]
+tests/workflow/scripts/test_update_snps_to_1kg_rsID.py::test_update_record_id[NoUpdate-Not_Snp] PASSED [ 79%]
+tests/workflow/scripts/test_update_snps_to_1kg_rsID.py::test_update_record_id[Update-Even_Not_RsID] PASSED [ 79%]
+tests/workflow/sub_workflows/test_contamination.py::test_legacy_agg_median_idat_intensity SKIPPED [ 80%]
+tests/workflow/sub_workflows/test_contamination.py::test_legacy_agg_contamination SKIPPED [ 80%]
+tests/workflow/sub_workflows/test_contamination.py::test_legacy_abf SKIPPED [ 80%]
+tests/workflow/sub_workflows/test_contamination.py::test_agg_median_idat_intensity SKIPPED [ 80%]
+tests/workflow/sub_workflows/test_contamination.py::test_agg_contamination_test SKIPPED [ 80%]
+tests/workflow/sub_workflows/test_contamination.py::test_grouped_median_idat_intensity SKIPPED [ 81%]
+tests/workflow/sub_workflows/test_contamination.py::test_grouped_verifyidintensity SKIPPED [ 81%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[files_for_lab/all_sample_qc.csv] SKIPPED [ 81%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[files_for_lab/Identifiler.csv] SKIPPED [ 81%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[files_for_lab/KnownReplicates.csv] SKIPPED [ 82%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[files_for_lab/LimsUpload.csv] SKIPPED [ 82%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[files_for_lab/UnknownReplicates.csv] SKIPPED [ 82%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/samples.bed] SKIPPED [ 82%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/samples.bim] SKIPPED [ 82%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/samples.fam] SKIPPED [ 83%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/SampleUsedforSubject.csv] SKIPPED [ 83%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/subjects.bed] SKIPPED [ 83%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/subjects.bim] SKIPPED [ 83%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/subjects.fam] SKIPPED [ 84%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/qc_report.md] SKIPPED [ 84%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/QC_Report.docx] SKIPPED [ 84%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/QC_Report.xlsx] SKIPPED [ 84%]
+tests/workflow/sub_workflows/test_delivery.py::test_file_hashes_equal[delivery/HWP.zip] SKIPPED [ 84%]
+tests/workflow/sub_workflows/test_entry_points.py::test_samples_bed SKIPPED [ 85%]
+tests/workflow/sub_workflows/test_entry_points.py::test_samples_bim SKIPPED [ 85%]
+tests/workflow/sub_workflows/test_entry_points.py::test_samples_fam SKIPPED [ 85%]
+tests/workflow/sub_workflows/test_entry_points.py::test_gtc_to_ped_conversion SKIPPED [ 85%]
+tests/workflow/sub_workflows/test_entry_points.py::test_create_gtc_merge_list SKIPPED [ 86%]
+tests/workflow/sub_workflows/test_entry_points.py::test_merge_gtc_sample_peds SKIPPED [ 86%]
+tests/workflow/sub_workflows/test_entry_points.py::test_gtc_grouped_entry SKIPPED [ 86%]
+tests/workflow/sub_workflows/test_entry_points.py::test_ped_entry PASSED [ 86%]
+tests/workflow/sub_workflows/test_entry_points.py::test_bed_entry PASSED [ 86%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_bed[cr1-bed] SKIPPED [ 87%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_bed[cr2-bed] SKIPPED [ 87%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_bed[ld_pruned-bed] SKIPPED [ 87%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_bim[cr1-bim] SKIPPED [ 87%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_bim[cr2-bim] SKIPPED [ 88%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_bim[ld_pruned-bim] SKIPPED [ 88%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_fam[cr1-fam] SKIPPED [ 88%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_fam[cr2-fam] SKIPPED [ 88%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_samples_fam[ld_pruned-fam] SKIPPED [ 88%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_split_sample_concordance[KnownReplicates] SKIPPED [ 89%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_split_sample_concordance[InternalQcKnown] SKIPPED [ 89%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_split_sample_concordance[StudySampleKnown] SKIPPED [ 89%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_ancestry SKIPPED [ 89%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_sample_qc_table SKIPPED [ 90%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_compare_file_hashes[legacy_plink_ibd] SKIPPED [ 90%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_compare_file_hashes[legacy_low_cr] SKIPPED [ 90%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_compare_file_hashes[legacy_contaminated] SKIPPED [ 90%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_compare_file_hashes[legacy_sex_discord] SKIPPED [ 90%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_compare_file_hashes[legacy_rep_discord] SKIPPED [ 91%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_legacy_compare_file_hashes[legacy_internal_control] SKIPPED [ 91%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[plink_ibd] SKIPPED [ 91%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[plink_concordance] SKIPPED [ 91%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[king_concordance] SKIPPED [ 92%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[graf_concordance] SKIPPED [ 92%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[KnownReplicates] SKIPPED [ 92%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[InternalQcKnown] SKIPPED [ 92%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[StudySampleKnown] SKIPPED [ 92%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[UnknownReplicates] SKIPPED [ 93%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[snp_qc_table] SKIPPED [ 93%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[sample_qc_table] SKIPPED [ 93%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[low_cr] SKIPPED [ 93%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[contaminated] SKIPPED [ 94%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[sex_discord] SKIPPED [ 94%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[rep_discord] SKIPPED [ 94%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[internal_control] SKIPPED [ 94%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[call_rate_png] SKIPPED [ 94%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[ancestry_png0] SKIPPED [ 95%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_sample_qc_compare_hashes[ancestry_png1] SKIPPED [ 95%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_graf_ancestry SKIPPED [ 95%]
+tests/workflow/sub_workflows/test_sample_qc.py::test_summary_stats SKIPPED [ 95%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_legacy_bed[legacy-samples-bed] SKIPPED [ 96%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_legacy_bed[legacy-subjects-bed] SKIPPED [ 96%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_legacy_bim[legacy-samples-bim] SKIPPED [ 96%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_legacy_bim[legacy-subjects-bim] SKIPPED [ 96%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_legacy_fam[legacy-samples-fam] SKIPPED [ 96%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_legacy_fam[legacy-subjects-fam] SKIPPED [ 97%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_representative SKIPPED [ 97%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_european_subjects_mostly_overlap SKIPPED [ 97%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_european_autosomal_heterozygosity SKIPPED [ 97%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_european_pca SKIPPED [ 98%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_european_hwe SKIPPED [ 98%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_qc_file_hashes[samples-bed] SKIPPED [ 98%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_qc_file_hashes[samples-bim] SKIPPED [ 98%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_qc_file_hashes[samples-fam] SKIPPED [ 98%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_qc_file_hashes[subject-bed] SKIPPED [ 99%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_qc_file_hashes[subject-bim] SKIPPED [ 99%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_qc_file_hashes[subject-fam] SKIPPED [ 99%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_qc_file_hashes[concordance] SKIPPED [ 99%]
+tests/workflow/sub_workflows/test_subject_qc.py::test_subject_qc_file_hashes[population_qc] SKIPPED [100%]
+
+=================================== FAILURES ===================================
+_____________________________ test_basic_grouping ______________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping0')
+qsub = None
+
+    def test_basic_grouping(tmp_path, qsub):
+        """Check job properties of grouped jobs.
+    
+        Here is the most basic job group. The job script just runs for the output
+        of `b/1.out`.
+        """
+        shutil.copyfile(FakeData() / "job_scripts/basic_group.smk", tmp_path / "Snakefile")
+        (tmp_path / "logs").mkdir(exist_ok=True)
+        with chdir(tmp_path):
+            sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
+    
+        expected_properties = {
+            "cluster": {},
+            "groupid": "grp0",
+            "input": [],
+            "local": False,
+            "output": ["b/1.out"],
+            "resources": {},
+            "threads": 1,
+            "type": "group",
+        }
+    
+        job_properties = read_job_properties(tmp_path / "job_script.sh")
+        del job_properties["jobid"]  # this is random so ignore
+    
+>       assert expected_properties == job_properties
+E       AssertionError: assert {'cluster': {...': False, ...} == {'cluster': {...': False, ...}
+E         Omitting 7 identical items, use -vv to show
+E         Differing items:
+E         {'resources': {}} != {'resources': {'tmpdir': '/tmp'}}
+E         Full diff:
+E           {
+E            'cluster': {},
+E            'groupid': 'grp0',...
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests/test_snakemake_job_grouping.py:79: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 1
+Job stats:
+job      count    min threads    max threads
+-----  -------  -------------  -------------
+a            1              1              1
+all          1              1              1
+b            1              1              1
+total        3              1              1
+
+Select jobs to execute...
+[Fri May 20 11:11:23 2022]
+
+group job grp0 (jobs in lexicogr. order):
+
+    [Fri May 20 11:11:23 2022]
+    rule a:
+        output: a/1.out
+        jobid: 2
+        wildcards: sample=1
+        resources: tmpdir=/tmp
+
+
+    [Fri May 20 11:11:23 2022]
+    rule b:
+        input: a/1.out
+        output: b/1.out
+        jobid: 1
+        wildcards: sample=1
+        resources: tmpdir=/tmp
+
+Submitted group job eb70b25c-b1d5-59ba-ad71-00c20da0bb15 with external jobid '14598'.
+[Fri May 20 11:11:33 2022]
+Finished job 2.
+[Fri May 20 11:11:33 2022]
+Finished job 1.
+2 of 3 steps (67%) done
+Select jobs to execute...
+
+[Fri May 20 11:11:33 2022]
+localrule all:
+    input: b/1.out
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Fri May 20 11:11:33 2022]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: /tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping0/.snakemake/log/2022-05-20T111122.845857.snakemake.log
+____________________________ test_wildcard_grouping ____________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-okuharad2/pytest-0/test_wildcard_grouping0')
+qsub = None
+
+    def test_wildcard_grouping(tmp_path, qsub):
+        """Curious if you can use wildcards to group rules.
+    
+        Yes, it looks like if you use a wildcard it will just replace that as the
+        group name. This will allow general rules, that operate in multiple
+        places, to be grouped with their upstream components. I am thinking about
+        `plink --maf` which runs in multiple places, so it would be nice to group
+        it since it is a fast step.
+        """
+        make_snakefile(
+            tmp_path,
+            dedent(
+                """
+                rule all:
+                    input: expand("b/{sample}.out", sample=[1])
+    
+                rule a:
+                    output: "a/{sample}.out"
+                    group: "{sample}"
+                    shell: "touch {output}"
+    
+                rule b:
+                    input: "a/{sample}.out"
+                    output: "b/{sample}.out"
+                    group: "{sample}"
+                    shell: "touch {output}"
+                """
+            ),
+        )
+        (tmp_path / "logs").mkdir(exist_ok=True)
+        with chdir(tmp_path):
+            sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
+    
+        expected_properties = {
+            "cluster": {},
+            "groupid": "1",  # group-id is set as the value of {sample}
+            "input": [],
+            "local": False,
+            "output": ["b/1.out"],
+            "resources": {},
+            "threads": 1,
+            "type": "group",
+        }
+    
+        job_properties = read_job_properties(tmp_path / "job_script.sh")
+        del job_properties["jobid"]  # this is random so ignore
+    
+>       assert expected_properties == job_properties
+E       AssertionError: assert {'cluster': {...': False, ...} == {'cluster': {...': False, ...}
+E         Omitting 7 identical items, use -vv to show
+E         Differing items:
+E         {'resources': {}} != {'resources': {'tmpdir': '/tmp'}}
+E         Full diff:
+E           {
+E            'cluster': {},
+E            'groupid': '1',...
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests/test_snakemake_job_grouping.py:129: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 1
+Job stats:
+job      count    min threads    max threads
+-----  -------  -------------  -------------
+a            1              1              1
+all          1              1              1
+b            1              1              1
+total        3              1              1
+
+Select jobs to execute...
+[Fri May 20 11:11:50 2022]
+
+group job 1 (jobs in lexicogr. order):
+
+    [Fri May 20 11:11:50 2022]
+    rule a:
+        output: a/1.out
+        jobid: 2
+        wildcards: sample=1
+        resources: tmpdir=/tmp
+
+
+    [Fri May 20 11:11:50 2022]
+    rule b:
+        input: a/1.out
+        output: b/1.out
+        jobid: 1
+        wildcards: sample=1
+        resources: tmpdir=/tmp
+
+Submitted group job eb70b25c-b1d5-59ba-ad71-00c20da0bb15 with external jobid '8710'.
+[Fri May 20 11:12:00 2022]
+Finished job 2.
+[Fri May 20 11:12:00 2022]
+Finished job 1.
+2 of 3 steps (67%) done
+Select jobs to execute...
+
+[Fri May 20 11:12:00 2022]
+localrule all:
+    input: b/1.out
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Fri May 20 11:12:00 2022]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: /tmp/pytest-of-okuharad2/pytest-0/test_wildcard_grouping0/.snakemake/log/2022-05-20T111149.729397.snakemake.log
+____________________ test_basic_grouping_max_resource[2-1] _____________________
+
+a_mem = 2, b_mem = 1
+tmp_path = PosixPath('/tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping_max_resour0')
+qsub = None
+
+    @pytest.mark.parametrize("a_mem,b_mem", [(2, 1), (1, 2)])
+    def test_basic_grouping_max_resource(a_mem, b_mem, tmp_path, qsub):
+        """How do groups work with resources?
+    
+        Groups appear to take the maximum resource value for all resources. So if
+        a resource is defined in two rules it will use the max. If it is defined
+        in only one rule it will still use that resource.
+        """
+        make_snakefile(
+            tmp_path,
+            dedent(
+                f"""
+                rule all:
+                    input: expand("b/{{sample}}.out", sample=[1])
+    
+                rule a:
+                    output: "a/{{sample}}.out"
+                    group: 0
+                    resources:
+                        mem={a_mem},
+                        ssd=2
+                    shell: "touch {{output}}"
+    
+                rule b:
+                    input: "a/{{sample}}.out"
+                    output: "b/{{sample}}.out"
+                    group: 0
+                    resources:
+                        mem={b_mem},
+                    shell: "touch {{output}}"
+                """
+            ),
+        )
+        (tmp_path / "logs").mkdir(exist_ok=True)
+        with chdir(tmp_path):
+            sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
+    
+        expected_properties = {
+            "cluster": {},
+            "groupid": 0,
+            "input": [],
+            "local": False,
+            "output": ["b/1.out"],
+            "resources": {"mem": 2, "ssd": 2},  # max mem is always used
+            "threads": 1,
+            "type": "group",
+        }
+    
+        job_properties = read_job_properties(tmp_path / "job_script.sh")
+        del job_properties["jobid"]  # this is random so ignore
+    
+>       assert expected_properties == job_properties
+E       AssertionError: assert {'cluster': {...': False, ...} == {'cluster': {...': False, ...}
+E         Omitting 7 identical items, use -vv to show
+E         Differing items:
+E         {'resources': {'mem': 2, 'ssd': 2}} != {'resources': {'mem': 2, 'ssd': 2, 'tmpdir': '/tmp'}}
+E         Full diff:
+E           {
+E            'cluster': {},
+E            'groupid': 0,...
+E         
+E         ...Full output truncated (10 lines hidden), use '-vv' to show
+
+tests/test_snakemake_job_grouping.py:183: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 1
+Job stats:
+job      count    min threads    max threads
+-----  -------  -------------  -------------
+a            1              1              1
+all          1              1              1
+b            1              1              1
+total        3              1              1
+
+Select jobs to execute...
+[Fri May 20 11:12:15 2022]
+
+group job 0 (jobs in lexicogr. order):
+
+    [Fri May 20 11:12:15 2022]
+    rule a:
+        output: a/1.out
+        jobid: 2
+        wildcards: sample=1
+        resources: tmpdir=/tmp, mem=2, ssd=2
+
+
+    [Fri May 20 11:12:15 2022]
+    rule b:
+        input: a/1.out
+        output: b/1.out
+        jobid: 1
+        wildcards: sample=1
+        resources: tmpdir=/tmp, mem=1
+
+Submitted group job eb70b25c-b1d5-59ba-ad71-00c20da0bb15 with external jobid '2063'.
+[Fri May 20 11:12:25 2022]
+Finished job 2.
+[Fri May 20 11:12:25 2022]
+Finished job 1.
+2 of 3 steps (67%) done
+Select jobs to execute...
+
+[Fri May 20 11:12:25 2022]
+localrule all:
+    input: b/1.out
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Fri May 20 11:12:25 2022]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: /tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping_max_resour0/.snakemake/log/2022-05-20T111214.954160.snakemake.log
+____________________ test_basic_grouping_max_resource[1-2] _____________________
+
+a_mem = 1, b_mem = 2
+tmp_path = PosixPath('/tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping_max_resour1')
+qsub = None
+
+    @pytest.mark.parametrize("a_mem,b_mem", [(2, 1), (1, 2)])
+    def test_basic_grouping_max_resource(a_mem, b_mem, tmp_path, qsub):
+        """How do groups work with resources?
+    
+        Groups appear to take the maximum resource value for all resources. So if
+        a resource is defined in two rules it will use the max. If it is defined
+        in only one rule it will still use that resource.
+        """
+        make_snakefile(
+            tmp_path,
+            dedent(
+                f"""
+                rule all:
+                    input: expand("b/{{sample}}.out", sample=[1])
+    
+                rule a:
+                    output: "a/{{sample}}.out"
+                    group: 0
+                    resources:
+                        mem={a_mem},
+                        ssd=2
+                    shell: "touch {{output}}"
+    
+                rule b:
+                    input: "a/{{sample}}.out"
+                    output: "b/{{sample}}.out"
+                    group: 0
+                    resources:
+                        mem={b_mem},
+                    shell: "touch {{output}}"
+                """
+            ),
+        )
+        (tmp_path / "logs").mkdir(exist_ok=True)
+        with chdir(tmp_path):
+            sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
+    
+        expected_properties = {
+            "cluster": {},
+            "groupid": 0,
+            "input": [],
+            "local": False,
+            "output": ["b/1.out"],
+            "resources": {"mem": 2, "ssd": 2},  # max mem is always used
+            "threads": 1,
+            "type": "group",
+        }
+    
+        job_properties = read_job_properties(tmp_path / "job_script.sh")
+        del job_properties["jobid"]  # this is random so ignore
+    
+>       assert expected_properties == job_properties
+E       AssertionError: assert {'cluster': {...': False, ...} == {'cluster': {...': False, ...}
+E         Omitting 7 identical items, use -vv to show
+E         Differing items:
+E         {'resources': {'mem': 2, 'ssd': 2}} != {'resources': {'mem': 2, 'ssd': 2, 'tmpdir': '/tmp'}}
+E         Full diff:
+E           {
+E            'cluster': {},
+E            'groupid': 0,...
+E         
+E         ...Full output truncated (10 lines hidden), use '-vv' to show
+
+tests/test_snakemake_job_grouping.py:183: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 1
+Job stats:
+job      count    min threads    max threads
+-----  -------  -------------  -------------
+a            1              1              1
+all          1              1              1
+b            1              1              1
+total        3              1              1
+
+Select jobs to execute...
+[Fri May 20 11:12:41 2022]
+
+group job 0 (jobs in lexicogr. order):
+
+    [Fri May 20 11:12:41 2022]
+    rule a:
+        output: a/1.out
+        jobid: 2
+        wildcards: sample=1
+        resources: tmpdir=/tmp, mem=1, ssd=2
+
+
+    [Fri May 20 11:12:41 2022]
+    rule b:
+        input: a/1.out
+        output: b/1.out
+        jobid: 1
+        wildcards: sample=1
+        resources: tmpdir=/tmp, mem=2
+
+Submitted group job eb70b25c-b1d5-59ba-ad71-00c20da0bb15 with external jobid '25101'.
+[Fri May 20 11:12:51 2022]
+Finished job 2.
+[Fri May 20 11:12:51 2022]
+Finished job 1.
+2 of 3 steps (67%) done
+Select jobs to execute...
+
+[Fri May 20 11:12:51 2022]
+localrule all:
+    input: b/1.out
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Fri May 20 11:12:51 2022]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: /tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping_max_resour1/.snakemake/log/2022-05-20T111240.529845.snakemake.log
+_____________________ test_basic_grouping_max_threads[2-1] _____________________
+
+a_cpu = 2, b_cpu = 1
+tmp_path = PosixPath('/tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping_max_thread0')
+qsub = None
+
+    @pytest.mark.parametrize("a_cpu,b_cpu", [(2, 1), (1, 2)])
+    def test_basic_grouping_max_threads(a_cpu, b_cpu, tmp_path, qsub):
+        """How do groups work with threads?
+    
+        Theads behave the same as resources, the max value is used from all rules
+        in the group.
+        """
+        make_snakefile(
+            tmp_path,
+            dedent(
+                f"""
+                rule all:
+                    input: expand("b/{{sample}}.out", sample=[1])
+    
+                rule a:
+                    output: "a/{{sample}}.out"
+                    group: 0
+                    threads: {a_cpu}
+                    shell: "touch {{output}}"
+    
+                rule b:
+                    input: "a/{{sample}}.out"
+                    output: "b/{{sample}}.out"
+                    group: 0
+                    threads: {b_cpu}
+                    shell: "touch {{output}}"
+                """
+            ),
+        )
+        (tmp_path / "logs").mkdir(exist_ok=True)
+        with chdir(tmp_path):
+            sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
+    
+        expected_properties = {
+            "cluster": {},
+            "groupid": 0,
+            "input": [],
+            "local": False,
+            "output": ["b/1.out"],
+            "resources": {},
+            "threads": 2,  # should be the max
+            "type": "group",
+        }
+    
+        job_properties = read_job_properties(tmp_path / "job_script.sh")
+        del job_properties["jobid"]  # this is random so ignore
+    
+>       assert expected_properties == job_properties
+E       AssertionError: assert {'cluster': {...': False, ...} == {'cluster': {...': False, ...}
+E         Omitting 7 identical items, use -vv to show
+E         Differing items:
+E         {'resources': {}} != {'resources': {'tmpdir': '/tmp'}}
+E         Full diff:
+E           {
+E            'cluster': {},
+E            'groupid': 0,...
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests/test_snakemake_job_grouping.py:233: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 1
+Job stats:
+job      count    min threads    max threads
+-----  -------  -------------  -------------
+a            1              2              2
+all          1              1              1
+b            1              1              1
+total        3              1              2
+
+Select jobs to execute...
+[Fri May 20 11:13:07 2022]
+
+group job 0 (jobs in lexicogr. order):
+
+    [Fri May 20 11:13:07 2022]
+    rule a:
+        output: a/1.out
+        jobid: 2
+        wildcards: sample=1
+        threads: 2
+        resources: tmpdir=/tmp
+
+
+    [Fri May 20 11:13:07 2022]
+    rule b:
+        input: a/1.out
+        output: b/1.out
+        jobid: 1
+        wildcards: sample=1
+        resources: tmpdir=/tmp
+
+Submitted group job eb70b25c-b1d5-59ba-ad71-00c20da0bb15 with external jobid '13853'.
+[Fri May 20 11:13:16 2022]
+Finished job 2.
+[Fri May 20 11:13:16 2022]
+Finished job 1.
+2 of 3 steps (67%) done
+Select jobs to execute...
+
+[Fri May 20 11:13:16 2022]
+localrule all:
+    input: b/1.out
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Fri May 20 11:13:16 2022]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: /tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping_max_thread0/.snakemake/log/2022-05-20T111305.997351.snakemake.log
+_____________________ test_basic_grouping_max_threads[1-2] _____________________
+
+a_cpu = 1, b_cpu = 2
+tmp_path = PosixPath('/tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping_max_thread1')
+qsub = None
+
+    @pytest.mark.parametrize("a_cpu,b_cpu", [(2, 1), (1, 2)])
+    def test_basic_grouping_max_threads(a_cpu, b_cpu, tmp_path, qsub):
+        """How do groups work with threads?
+    
+        Theads behave the same as resources, the max value is used from all rules
+        in the group.
+        """
+        make_snakefile(
+            tmp_path,
+            dedent(
+                f"""
+                rule all:
+                    input: expand("b/{{sample}}.out", sample=[1])
+    
+                rule a:
+                    output: "a/{{sample}}.out"
+                    group: 0
+                    threads: {a_cpu}
+                    shell: "touch {{output}}"
+    
+                rule b:
+                    input: "a/{{sample}}.out"
+                    output: "b/{{sample}}.out"
+                    group: 0
+                    threads: {b_cpu}
+                    shell: "touch {{output}}"
+                """
+            ),
+        )
+        (tmp_path / "logs").mkdir(exist_ok=True)
+        with chdir(tmp_path):
+            sp.run(["snakemake", "--cluster", "qsub", "-j", "1"], check=True)
+    
+        expected_properties = {
+            "cluster": {},
+            "groupid": 0,
+            "input": [],
+            "local": False,
+            "output": ["b/1.out"],
+            "resources": {},
+            "threads": 2,  # should be the max
+            "type": "group",
+        }
+    
+        job_properties = read_job_properties(tmp_path / "job_script.sh")
+        del job_properties["jobid"]  # this is random so ignore
+    
+>       assert expected_properties == job_properties
+E       AssertionError: assert {'cluster': {...': False, ...} == {'cluster': {...': False, ...}
+E         Omitting 7 identical items, use -vv to show
+E         Differing items:
+E         {'resources': {}} != {'resources': {'tmpdir': '/tmp'}}
+E         Full diff:
+E           {
+E            'cluster': {},
+E            'groupid': 0,...
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests/test_snakemake_job_grouping.py:233: AssertionError
+----------------------------- Captured stderr call -----------------------------
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cluster nodes: 1
+Job stats:
+job      count    min threads    max threads
+-----  -------  -------------  -------------
+a            1              1              1
+all          1              1              1
+b            1              2              2
+total        3              1              2
+
+Select jobs to execute...
+[Fri May 20 11:13:32 2022]
+
+group job 0 (jobs in lexicogr. order):
+
+    [Fri May 20 11:13:32 2022]
+    rule a:
+        output: a/1.out
+        jobid: 2
+        wildcards: sample=1
+        resources: tmpdir=/tmp
+
+
+    [Fri May 20 11:13:32 2022]
+    rule b:
+        input: a/1.out
+        output: b/1.out
+        jobid: 1
+        wildcards: sample=1
+        threads: 2
+        resources: tmpdir=/tmp
+
+Submitted group job eb70b25c-b1d5-59ba-ad71-00c20da0bb15 with external jobid '24664'.
+[Fri May 20 11:13:42 2022]
+Finished job 2.
+[Fri May 20 11:13:42 2022]
+Finished job 1.
+2 of 3 steps (67%) done
+Select jobs to execute...
+
+[Fri May 20 11:13:42 2022]
+localrule all:
+    input: b/1.out
+    jobid: 0
+    resources: tmpdir=/tmp
+
+[Fri May 20 11:13:42 2022]
+Finished job 0.
+3 of 3 steps (100%) done
+Complete log: /tmp/pytest-of-okuharad2/pytest-0/test_basic_grouping_max_thread1/.snakemake/log/2022-05-20T111331.664101.snakemake.log
+=============================== warnings summary ===============================
+<frozen importlib._bootstrap>:219
+<frozen importlib._bootstrap>:219
+<frozen importlib._bootstrap>:219
+<frozen importlib._bootstrap>:219
+  <frozen importlib._bootstrap>:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 216 from C header, got 232 from PyObject
+
+../../../../../../data/okuharad2/QC_workflow/GwasQcPipeline/conda/envs/cgr-dev/lib/python3.8/site-packages/seaborn/rcmod.py:82
+  /data/okuharad2/QC_workflow/GwasQcPipeline/conda/envs/cgr-dev/lib/python3.8/site-packages/seaborn/rcmod.py:82: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    if LooseVersion(mpl.__version__) >= "3.0":
+
+../../../../../../data/okuharad2/QC_workflow/GwasQcPipeline/conda/envs/cgr-dev/lib/python3.8/site-packages/setuptools/_distutils/version.py:351
+  /data/okuharad2/QC_workflow/GwasQcPipeline/conda/envs/cgr-dev/lib/python3.8/site-packages/setuptools/_distutils/version.py:351: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    other = LooseVersion(other)
+
+tests/cluster_profiles/test_cgems.py::test_cgems_submission_end_to_end
+  /data/okuharad2/QC_workflow/GwasQcPipeline/conda/envs/cgr-dev/lib/python3.8/site-packages/ratelimiter.py:127: DeprecationWarning: "@coroutine" decorator is deprecated since Python 3.8, use "async def" instead
+    __aexit__ = asyncio.coroutine(__exit__)
+
+tests/cluster_profiles/test_cgems.py::test_cgems_submission_end_to_end
+tests/cluster_profiles/test_cgems.py::test_cgems_submission_end_to_end
+  /data/okuharad2/QC_workflow/GwasQcPipeline/conda/envs/cgr-dev/lib/python3.8/site-packages/snakemake/deployment/conda.py:637: DeprecationWarning: distutils Version classes are deprecated. Use packaging.version instead.
+    if StrictVersion(version) < StrictVersion("4.2"):
+
+tests/workflow/scripts/test_sample_concordance.py::test_add_expected_replicate_missing_pair
+  /gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/tests/workflow/scripts/test_sample_concordance.py:58: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    ss = ss.append(
+
+tests/workflow/scripts/test_sample_concordance.py::test_add_expected_replicate_missing_pair
+  /gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/src/cgr_gwas_qc/workflow/scripts/sample_concordance.py:173: FutureWarning: The frame.append method is deprecated and will be removed from pandas in a future version. Use pandas.concat instead.
+    df = df.append(record)
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_snakemake_job_grouping.py::test_basic_grouping - AssertionE...
+FAILED tests/test_snakemake_job_grouping.py::test_wildcard_grouping - Asserti...
+FAILED tests/test_snakemake_job_grouping.py::test_basic_grouping_max_resource[2-1]
+FAILED tests/test_snakemake_job_grouping.py::test_basic_grouping_max_resource[1-2]
+FAILED tests/test_snakemake_job_grouping.py::test_basic_grouping_max_threads[2-1]
+FAILED tests/test_snakemake_job_grouping.py::test_basic_grouping_max_threads[1-2]
+= 6 failed, 290 passed, 155 skipped, 1 xfailed, 11 warnings in 382.54s (0:06:22) =

@@ -1,0 +1,62 @@
+make: Entering directory '/gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/docs'
+Running Sphinx v3.5.4
+loading pickled environment... done
+building [mo]: targets for 0 po files that are out of date
+building [html]: targets for 17 source files that are out of date
+updating environment: 0 added, 1 changed, 0 removed
+reading sources... [100%] api/parsers
+
+/gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/src/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.py:docstring of cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_date:4: WARNING: Unexpected indentation.
+/gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/src/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.py:docstring of cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_version:4: WARNING: Unexpected indentation.
+/gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/src/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.py:docstring of cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_imaging_date:4: WARNING: Unexpected indentation.
+/gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/src/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.py:docstring of cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalized_intensities:3: WARNING: Unexpected indentation.
+/gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/src/cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.py:docstring of cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalized_intensities:4: WARNING: Block quote ends without a blank line; unexpected unindent.
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+writing output... [  5%] api/cgr_gwas_qc
+writing output... [ 11%] api/config
+writing output... [ 17%] api/parsers
+writing output... [ 23%] dev_docs/documentation
+writing output... [ 29%] dev_docs/setup
+writing output... [ 35%] dev_docs/source_code
+writing output... [ 41%] dev_docs/testing
+writing output... [ 47%] getting_started/configuration
+writing output... [ 52%] getting_started/installation
+writing output... [ 58%] getting_started/running_pipeline
+writing output... [ 64%] index
+writing output... [ 70%] reference/file_types
+writing output... [ 76%] sub_workflows/contamination
+writing output... [ 82%] sub_workflows/delivery
+writing output... [ 88%] sub_workflows/entry_points
+writing output... [ 94%] sub_workflows/sample_qc
+writing output... [100%] sub_workflows/subject_qc
+
+generating indices... genindex py-modindex done
+highlighting module code... [ 10%] cgr_gwas_qc.config
+highlighting module code... [ 20%] cgr_gwas_qc.parsers.bim
+highlighting module code... [ 30%] cgr_gwas_qc.parsers.bpm
+highlighting module code... [ 40%] cgr_gwas_qc.parsers.eigensoft
+highlighting module code... [ 50%] cgr_gwas_qc.parsers.graf
+highlighting module code... [ 60%] cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles
+highlighting module code... [ 70%] cgr_gwas_qc.parsers.illumina.adpc
+highlighting module code... [ 80%] cgr_gwas_qc.parsers.king
+highlighting module code... [ 90%] cgr_gwas_qc.parsers.plink
+highlighting module code... [100%] cgr_gwas_qc.testing.data
+
+writing additional pages... search done
+copying images... [ 20%] static/GwasQcPipelineWorkflow.svg
+copying images... [ 40%] static/contamination.png
+copying images... [ 60%] static/entry-points_gtc.png
+copying images... [ 80%] static/sample_qc.svg
+copying images... [100%] static/subject_qc.svg
+
+copying static files... done
+copying extra files... done
+dumping search index in English (code: en)... done
+dumping object inventory... done
+build succeeded, 5 warnings.
+
+The HTML pages are in _build/html.
+make: Leaving directory '/gpfs/gsfs8/users/okuharad2/QC_workflow/GwasQcPipeline/docs'

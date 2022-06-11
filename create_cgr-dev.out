@@ -1,0 +1,255 @@
+Collecting package metadata (current_repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /data/okuharad2/QC_workflow/GwasQcPipeline/conda/envs/cgr-dev
+
+  added / updated specs:
+    - make
+    - poetry
+    - python=3.8
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    _libgcc_mutex-0.1          |      conda_forge           3 KB  conda-forge
+    _openmp_mutex-4.5          |            2_gnu          23 KB  conda-forge
+    brotlipy-0.7.0             |py38h0a891b7_1004         342 KB  conda-forge
+    cachecontrol-0.12.11       |     pyhd8ed1ab_0          24 KB  conda-forge
+    cachy-0.3.0                |             py_0          19 KB  conda-forge
+    certifi-2022.5.18.1        |   py38h578d9bd_0         150 KB  conda-forge
+    cffi-1.15.0                |   py38h3931269_0         226 KB  conda-forge
+    charset-normalizer-2.0.12  |     pyhd8ed1ab_0          35 KB  conda-forge
+    cleo-0.8.1                 |     pyhd8ed1ab_2          21 KB  conda-forge
+    clikit-0.6.2               |     pyh9f0ad1d_0          56 KB  conda-forge
+    crashtest-0.3.1            |     pyhd8ed1ab_0           9 KB  conda-forge
+    cryptography-37.0.2        |   py38h2b5fc30_0         1.5 MB  conda-forge
+    dbus-1.13.6                |       h5008d03_3         604 KB  conda-forge
+    distlib-0.3.4              |     pyhd8ed1ab_0         371 KB  conda-forge
+    expat-2.4.8                |       h27087fc_0         187 KB  conda-forge
+    filelock-3.7.0             |     pyhd8ed1ab_0          12 KB  conda-forge
+    gettext-0.19.8.1           |    h73d1719_1008         3.6 MB  conda-forge
+    html5lib-1.1               |     pyh9f0ad1d_0          89 KB  conda-forge
+    idna-3.3                   |     pyhd8ed1ab_0          55 KB  conda-forge
+    importlib-metadata-4.11.3  |   py38h578d9bd_1          33 KB  conda-forge
+    importlib_metadata-4.11.3  |       hd8ed1ab_1           4 KB  conda-forge
+    jeepney-0.8.0              |     pyhd8ed1ab_0          36 KB  conda-forge
+    keyring-23.4.0             |   py38h578d9bd_2          50 KB  conda-forge
+    ld_impl_linux-64-2.36.1    |       hea4e1c9_2         667 KB  conda-forge
+    libffi-3.4.2               |       h7f98852_5          57 KB  conda-forge
+    libgcc-ng-12.1.0           |      h8d9b700_16         940 KB  conda-forge
+    libglib-2.70.2             |       h174f98d_4         3.1 MB  conda-forge
+    libgomp-12.1.0             |      h8d9b700_16         459 KB  conda-forge
+    libnsl-2.0.0               |       h7f98852_0          31 KB  conda-forge
+    libstdcxx-ng-12.1.0        |      ha89aaad_16         4.3 MB  conda-forge
+    libuuid-2.32.1             |    h7f98852_1000          28 KB  conda-forge
+    libzlib-1.2.11             |    h166bdaf_1014          60 KB  conda-forge
+    lockfile-0.12.2            |             py_1          11 KB  conda-forge
+    make-4.3                   |       hd18ef5c_1         507 KB  conda-forge
+    msgpack-python-1.0.3       |   py38h43d8883_1          90 KB  conda-forge
+    ncurses-6.3                |       h27087fc_1        1002 KB  conda-forge
+    packaging-20.9             |     pyh44b312d_0          35 KB  conda-forge
+    pastel-0.2.1               |     pyhd8ed1ab_0          10 KB  conda-forge
+    pcre-8.45                  |       h9c3ff4c_0         253 KB  conda-forge
+    pexpect-4.8.0              |     pyh9f0ad1d_2          47 KB  conda-forge
+    pip-22.0.4                 |     pyhd8ed1ab_0         1.5 MB  conda-forge
+    pkginfo-1.8.2              |     pyhd8ed1ab_0          23 KB  conda-forge
+    platformdirs-2.5.1         |     pyhd8ed1ab_0          15 KB  conda-forge
+    poetry-1.1.13              |   py38h578d9bd_1         243 KB  conda-forge
+    poetry-core-1.0.8          |   py38h578d9bd_1         657 KB  conda-forge
+    ptyprocess-0.7.0           |     pyhd3deb0d_0          16 KB  conda-forge
+    pycparser-2.21             |     pyhd8ed1ab_0         100 KB  conda-forge
+    pylev-1.4.0                |     pyhd8ed1ab_0           9 KB  conda-forge
+    pyopenssl-22.0.0           |     pyhd8ed1ab_0          49 KB  conda-forge
+    pyparsing-3.0.9            |     pyhd8ed1ab_0          79 KB  conda-forge
+    pysocks-1.7.1              |   py38h578d9bd_5          28 KB  conda-forge
+    python-3.8.13              |h582c2e5_0_cpython        25.1 MB  conda-forge
+    python_abi-3.8             |           2_cp38           4 KB  conda-forge
+    readline-8.1               |       h46c0cb4_0         295 KB  conda-forge
+    requests-2.27.1            |     pyhd8ed1ab_0          53 KB  conda-forge
+    requests-toolbelt-0.9.1    |             py_0          40 KB  conda-forge
+    secretstorage-3.3.2        |   py38h578d9bd_1          24 KB  conda-forge
+    setuptools-62.3.2          |   py38h578d9bd_0         1.3 MB  conda-forge
+    shellingham-1.4.0          |     pyh44b312d_0          11 KB  conda-forge
+    six-1.16.0                 |     pyh6c4a22f_0          14 KB  conda-forge
+    sqlite-3.38.5              |       h4ff8645_0         1.5 MB  conda-forge
+    tk-8.6.12                  |       h27826a3_0         3.3 MB  conda-forge
+    tomlkit-0.10.2             |     pyha770c72_0          31 KB  conda-forge
+    typing-3.10.0.0            |     pyhd8ed1ab_0           7 KB  conda-forge
+    urllib3-1.26.9             |     pyhd8ed1ab_0         100 KB  conda-forge
+    virtualenv-20.14.1         |   py38h578d9bd_0         8.2 MB  conda-forge
+    webencodings-0.5.1         |             py_1          12 KB  conda-forge
+    wheel-0.37.1               |     pyhd8ed1ab_0          31 KB  conda-forge
+    xz-5.2.5                   |       h516909a_1         343 KB  conda-forge
+    zipp-3.8.0                 |     pyhd8ed1ab_0          12 KB  conda-forge
+    zlib-1.2.11                |    h166bdaf_1014          88 KB  conda-forge
+    ------------------------------------------------------------
+                                           Total:        62.1 MB
+
+The following NEW packages will be INSTALLED:
+
+  _libgcc_mutex      conda-forge/linux-64::_libgcc_mutex-0.1-conda_forge
+  _openmp_mutex      conda-forge/linux-64::_openmp_mutex-4.5-2_gnu
+  brotlipy           conda-forge/linux-64::brotlipy-0.7.0-py38h0a891b7_1004
+  bzip2              conda-forge/linux-64::bzip2-1.0.8-h7f98852_4
+  ca-certificates    conda-forge/linux-64::ca-certificates-2022.5.18.1-ha878542_0
+  cachecontrol       conda-forge/noarch::cachecontrol-0.12.11-pyhd8ed1ab_0
+  cachy              conda-forge/noarch::cachy-0.3.0-py_0
+  certifi            conda-forge/linux-64::certifi-2022.5.18.1-py38h578d9bd_0
+  cffi               conda-forge/linux-64::cffi-1.15.0-py38h3931269_0
+  charset-normalizer conda-forge/noarch::charset-normalizer-2.0.12-pyhd8ed1ab_0
+  cleo               conda-forge/noarch::cleo-0.8.1-pyhd8ed1ab_2
+  clikit             conda-forge/noarch::clikit-0.6.2-pyh9f0ad1d_0
+  crashtest          conda-forge/noarch::crashtest-0.3.1-pyhd8ed1ab_0
+  cryptography       conda-forge/linux-64::cryptography-37.0.2-py38h2b5fc30_0
+  dbus               conda-forge/linux-64::dbus-1.13.6-h5008d03_3
+  distlib            conda-forge/noarch::distlib-0.3.4-pyhd8ed1ab_0
+  expat              conda-forge/linux-64::expat-2.4.8-h27087fc_0
+  filelock           conda-forge/noarch::filelock-3.7.0-pyhd8ed1ab_0
+  gettext            conda-forge/linux-64::gettext-0.19.8.1-h73d1719_1008
+  html5lib           conda-forge/noarch::html5lib-1.1-pyh9f0ad1d_0
+  idna               conda-forge/noarch::idna-3.3-pyhd8ed1ab_0
+  importlib-metadata conda-forge/linux-64::importlib-metadata-4.11.3-py38h578d9bd_1
+  importlib_metadata conda-forge/noarch::importlib_metadata-4.11.3-hd8ed1ab_1
+  jeepney            conda-forge/noarch::jeepney-0.8.0-pyhd8ed1ab_0
+  keyring            conda-forge/linux-64::keyring-23.4.0-py38h578d9bd_2
+  ld_impl_linux-64   conda-forge/linux-64::ld_impl_linux-64-2.36.1-hea4e1c9_2
+  libffi             conda-forge/linux-64::libffi-3.4.2-h7f98852_5
+  libgcc-ng          conda-forge/linux-64::libgcc-ng-12.1.0-h8d9b700_16
+  libglib            conda-forge/linux-64::libglib-2.70.2-h174f98d_4
+  libgomp            conda-forge/linux-64::libgomp-12.1.0-h8d9b700_16
+  libiconv           conda-forge/linux-64::libiconv-1.16-h516909a_0
+  libnsl             conda-forge/linux-64::libnsl-2.0.0-h7f98852_0
+  libstdcxx-ng       conda-forge/linux-64::libstdcxx-ng-12.1.0-ha89aaad_16
+  libuuid            conda-forge/linux-64::libuuid-2.32.1-h7f98852_1000
+  libzlib            conda-forge/linux-64::libzlib-1.2.11-h166bdaf_1014
+  lockfile           conda-forge/noarch::lockfile-0.12.2-py_1
+  make               conda-forge/linux-64::make-4.3-hd18ef5c_1
+  msgpack-python     conda-forge/linux-64::msgpack-python-1.0.3-py38h43d8883_1
+  ncurses            conda-forge/linux-64::ncurses-6.3-h27087fc_1
+  openssl            conda-forge/linux-64::openssl-1.1.1o-h166bdaf_0
+  packaging          conda-forge/noarch::packaging-20.9-pyh44b312d_0
+  pastel             conda-forge/noarch::pastel-0.2.1-pyhd8ed1ab_0
+  pcre               conda-forge/linux-64::pcre-8.45-h9c3ff4c_0
+  pexpect            conda-forge/noarch::pexpect-4.8.0-pyh9f0ad1d_2
+  pip                conda-forge/noarch::pip-22.0.4-pyhd8ed1ab_0
+  pkginfo            conda-forge/noarch::pkginfo-1.8.2-pyhd8ed1ab_0
+  platformdirs       conda-forge/noarch::platformdirs-2.5.1-pyhd8ed1ab_0
+  poetry             conda-forge/linux-64::poetry-1.1.13-py38h578d9bd_1
+  poetry-core        conda-forge/linux-64::poetry-core-1.0.8-py38h578d9bd_1
+  ptyprocess         conda-forge/noarch::ptyprocess-0.7.0-pyhd3deb0d_0
+  pycparser          conda-forge/noarch::pycparser-2.21-pyhd8ed1ab_0
+  pylev              conda-forge/noarch::pylev-1.4.0-pyhd8ed1ab_0
+  pyopenssl          conda-forge/noarch::pyopenssl-22.0.0-pyhd8ed1ab_0
+  pyparsing          conda-forge/noarch::pyparsing-3.0.9-pyhd8ed1ab_0
+  pysocks            conda-forge/linux-64::pysocks-1.7.1-py38h578d9bd_5
+  python             conda-forge/linux-64::python-3.8.13-h582c2e5_0_cpython
+  python_abi         conda-forge/linux-64::python_abi-3.8-2_cp38
+  readline           conda-forge/linux-64::readline-8.1-h46c0cb4_0
+  requests           conda-forge/noarch::requests-2.27.1-pyhd8ed1ab_0
+  requests-toolbelt  conda-forge/noarch::requests-toolbelt-0.9.1-py_0
+  secretstorage      conda-forge/linux-64::secretstorage-3.3.2-py38h578d9bd_1
+  setuptools         conda-forge/linux-64::setuptools-62.3.2-py38h578d9bd_0
+  shellingham        conda-forge/noarch::shellingham-1.4.0-pyh44b312d_0
+  six                conda-forge/noarch::six-1.16.0-pyh6c4a22f_0
+  sqlite             conda-forge/linux-64::sqlite-3.38.5-h4ff8645_0
+  tk                 conda-forge/linux-64::tk-8.6.12-h27826a3_0
+  tomlkit            conda-forge/noarch::tomlkit-0.10.2-pyha770c72_0
+  typing             conda-forge/noarch::typing-3.10.0.0-pyhd8ed1ab_0
+  urllib3            conda-forge/noarch::urllib3-1.26.9-pyhd8ed1ab_0
+  virtualenv         conda-forge/linux-64::virtualenv-20.14.1-py38h578d9bd_0
+  webencodings       conda-forge/noarch::webencodings-0.5.1-py_1
+  wheel              conda-forge/noarch::wheel-0.37.1-pyhd8ed1ab_0
+  xz                 conda-forge/linux-64::xz-5.2.5-h516909a_1
+  zipp               conda-forge/noarch::zipp-3.8.0-pyhd8ed1ab_0
+  zlib               conda-forge/linux-64::zlib-1.2.11-h166bdaf_1014
+
+
+
+Downloading and Extracting Packages
+virtualenv-20.14.1   | 8.2 MB    |            |   0% virtualenv-20.14.1   | 8.2 MB    | 2          |   2% virtualenv-20.14.1   | 8.2 MB    | ########## | 100% virtualenv-20.14.1   | 8.2 MB    | ########## | 100% 
+libzlib-1.2.11       | 60 KB     |            |   0% libzlib-1.2.11       | 60 KB     | ########## | 100% 
+dbus-1.13.6          | 604 KB    |            |   0% dbus-1.13.6          | 604 KB    | ########## | 100% dbus-1.13.6          | 604 KB    | ########## | 100% 
+clikit-0.6.2         | 56 KB     |            |   0% clikit-0.6.2         | 56 KB     | ########## | 100% clikit-0.6.2         | 56 KB     | ########## | 100% 
+tk-8.6.12            | 3.3 MB    |            |   0% tk-8.6.12            | 3.3 MB    | ########## | 100% tk-8.6.12            | 3.3 MB    | ########## | 100% 
+ld_impl_linux-64-2.3 | 667 KB    |            |   0% ld_impl_linux-64-2.3 | 667 KB    | ########## | 100% ld_impl_linux-64-2.3 | 667 KB    | ########## | 100% 
+libstdcxx-ng-12.1.0  | 4.3 MB    |            |   0% libstdcxx-ng-12.1.0  | 4.3 MB    | ########## | 100% libstdcxx-ng-12.1.0  | 4.3 MB    | ########## | 100% 
+certifi-2022.5.18.1  | 150 KB    |            |   0% certifi-2022.5.18.1  | 150 KB    | ########## | 100% 
+html5lib-1.1         | 89 KB     |            |   0% html5lib-1.1         | 89 KB     | ########## | 100% 
+libgcc-ng-12.1.0     | 940 KB    |            |   0% libgcc-ng-12.1.0     | 940 KB    | ########## | 100% libgcc-ng-12.1.0     | 940 KB    | ########## | 100% 
+pysocks-1.7.1        | 28 KB     |            |   0% pysocks-1.7.1        | 28 KB     | ########## | 100% 
+msgpack-python-1.0.3 | 90 KB     |            |   0% msgpack-python-1.0.3 | 90 KB     | ########## | 100% 
+typing-3.10.0.0      | 7 KB      |            |   0% typing-3.10.0.0      | 7 KB      | ########## | 100% 
+crashtest-0.3.1      | 9 KB      |            |   0% crashtest-0.3.1      | 9 KB      | ########## | 100% 
+pip-22.0.4           | 1.5 MB    |            |   0% pip-22.0.4           | 1.5 MB    | ########## | 100% pip-22.0.4           | 1.5 MB    | ########## | 100% 
+urllib3-1.26.9       | 100 KB    |            |   0% urllib3-1.26.9       | 100 KB    | ########## | 100% urllib3-1.26.9       | 100 KB    | ########## | 100% 
+sqlite-3.38.5        | 1.5 MB    |            |   0% sqlite-3.38.5        | 1.5 MB    | ########## | 100% sqlite-3.38.5        | 1.5 MB    | ########## | 100% 
+importlib-metadata-4 | 33 KB     |            |   0% importlib-metadata-4 | 33 KB     | ########## | 100% importlib-metadata-4 | 33 KB     | ########## | 100% 
+wheel-0.37.1         | 31 KB     |            |   0% wheel-0.37.1         | 31 KB     | ########## | 100% 
+zipp-3.8.0           | 12 KB     |            |   0% zipp-3.8.0           | 12 KB     | ########## | 100% 
+six-1.16.0           | 14 KB     |            |   0% six-1.16.0           | 14 KB     | ########## | 100% six-1.16.0           | 14 KB     | ########## | 100% 
+python-3.8.13        | 25.1 MB   |            |   0% python-3.8.13        | 25.1 MB   | ##9        |  30% python-3.8.13        | 25.1 MB   | #########  |  91% python-3.8.13        | 25.1 MB   | ########## | 100% 
+secretstorage-3.3.2  | 24 KB     |            |   0% secretstorage-3.3.2  | 24 KB     | ########## | 100% secretstorage-3.3.2  | 24 KB     | ########## | 100% 
+requests-toolbelt-0. | 40 KB     |            |   0% requests-toolbelt-0. | 40 KB     | ########## | 100% 
+zlib-1.2.11          | 88 KB     |            |   0% zlib-1.2.11          | 88 KB     | ########## | 100% 
+libuuid-2.32.1       | 28 KB     |            |   0% libuuid-2.32.1       | 28 KB     | ########## | 100% libuuid-2.32.1       | 28 KB     | ########## | 100% 
+pylev-1.4.0          | 9 KB      |            |   0% pylev-1.4.0          | 9 KB      | ########## | 100% 
+libglib-2.70.2       | 3.1 MB    |            |   0% libglib-2.70.2       | 3.1 MB    | ########## | 100% libglib-2.70.2       | 3.1 MB    | ########## | 100% 
+pexpect-4.8.0        | 47 KB     |            |   0% pexpect-4.8.0        | 47 KB     | ########## | 100% 
+ncurses-6.3          | 1002 KB   |            |   0% ncurses-6.3          | 1002 KB   | ########## | 100% ncurses-6.3          | 1002 KB   | ########## | 100% 
+libnsl-2.0.0         | 31 KB     |            |   0% libnsl-2.0.0         | 31 KB     | ########## | 100% 
+cleo-0.8.1           | 21 KB     |            |   0% cleo-0.8.1           | 21 KB     | ########## | 100% 
+brotlipy-0.7.0       | 342 KB    |            |   0% brotlipy-0.7.0       | 342 KB    | ########## | 100% brotlipy-0.7.0       | 342 KB    | ########## | 100% 
+_openmp_mutex-4.5    | 23 KB     |            |   0% _openmp_mutex-4.5    | 23 KB     | ########## | 100% 
+importlib_metadata-4 | 4 KB      |            |   0% importlib_metadata-4 | 4 KB      | ########## | 100% 
+_libgcc_mutex-0.1    | 3 KB      |            |   0% _libgcc_mutex-0.1    | 3 KB      | ########## | 100% 
+filelock-3.7.0       | 12 KB     |            |   0% filelock-3.7.0       | 12 KB     | ########## | 100% filelock-3.7.0       | 12 KB     | ########## | 100% 
+shellingham-1.4.0    | 11 KB     |            |   0% shellingham-1.4.0    | 11 KB     | ########## | 100% 
+requests-2.27.1      | 53 KB     |            |   0% requests-2.27.1      | 53 KB     | ########## | 100% 
+expat-2.4.8          | 187 KB    |            |   0% expat-2.4.8          | 187 KB    | ########## | 100% expat-2.4.8          | 187 KB    | ########## | 100% 
+keyring-23.4.0       | 50 KB     |            |   0% keyring-23.4.0       | 50 KB     | ########## | 100% keyring-23.4.0       | 50 KB     | ########## | 100% 
+pastel-0.2.1         | 10 KB     |            |   0% pastel-0.2.1         | 10 KB     | ########## | 100% 
+ptyprocess-0.7.0     | 16 KB     |            |   0% ptyprocess-0.7.0     | 16 KB     | ########## | 100% 
+packaging-20.9       | 35 KB     |            |   0% packaging-20.9       | 35 KB     | ########## | 100% packaging-20.9       | 35 KB     | ########## | 100% 
+libffi-3.4.2         | 57 KB     |            |   0% libffi-3.4.2         | 57 KB     | ########## | 100% 
+xz-5.2.5             | 343 KB    |            |   0% xz-5.2.5             | 343 KB    | ########## | 100% xz-5.2.5             | 343 KB    | ########## | 100% 
+lockfile-0.12.2      | 11 KB     |            |   0% lockfile-0.12.2      | 11 KB     | ########## | 100% 
+pycparser-2.21       | 100 KB    |            |   0% pycparser-2.21       | 100 KB    | ########## | 100% pycparser-2.21       | 100 KB    | ########## | 100% 
+libgomp-12.1.0       | 459 KB    |            |   0% libgomp-12.1.0       | 459 KB    | ########## | 100% libgomp-12.1.0       | 459 KB    | ########## | 100% 
+cffi-1.15.0          | 226 KB    |            |   0% cffi-1.15.0          | 226 KB    | ########## | 100% cffi-1.15.0          | 226 KB    | ########## | 100% 
+setuptools-62.3.2    | 1.3 MB    |            |   0% setuptools-62.3.2    | 1.3 MB    | ########## | 100% setuptools-62.3.2    | 1.3 MB    | ########## | 100% 
+cryptography-37.0.2  | 1.5 MB    |            |   0% cryptography-37.0.2  | 1.5 MB    | ########## | 100% cryptography-37.0.2  | 1.5 MB    | ########## | 100% 
+poetry-1.1.13        | 243 KB    |            |   0% poetry-1.1.13        | 243 KB    | ########## | 100% poetry-1.1.13        | 243 KB    | ########## | 100% 
+pkginfo-1.8.2        | 23 KB     |            |   0% pkginfo-1.8.2        | 23 KB     | ########## | 100% 
+make-4.3             | 507 KB    |            |   0% make-4.3             | 507 KB    | ########## | 100% make-4.3             | 507 KB    | ########## | 100% 
+pyopenssl-22.0.0     | 49 KB     |            |   0% pyopenssl-22.0.0     | 49 KB     | ########## | 100% pyopenssl-22.0.0     | 49 KB     | ########## | 100% 
+gettext-0.19.8.1     | 3.6 MB    |            |   0% gettext-0.19.8.1     | 3.6 MB    | ########## | 100% gettext-0.19.8.1     | 3.6 MB    | ########## | 100% 
+jeepney-0.8.0        | 36 KB     |            |   0% jeepney-0.8.0        | 36 KB     | ########## | 100% jeepney-0.8.0        | 36 KB     | ########## | 100% 
+readline-8.1         | 295 KB    |            |   0% readline-8.1         | 295 KB    | ########## | 100% readline-8.1         | 295 KB    | ########## | 100% 
+python_abi-3.8       | 4 KB      |            |   0% python_abi-3.8       | 4 KB      | ########## | 100% 
+distlib-0.3.4        | 371 KB    |            |   0% distlib-0.3.4        | 371 KB    | ########## | 100% distlib-0.3.4        | 371 KB    | ########## | 100% 
+poetry-core-1.0.8    | 657 KB    |            |   0% poetry-core-1.0.8    | 657 KB    | ########## | 100% poetry-core-1.0.8    | 657 KB    | ########## | 100% 
+cachecontrol-0.12.11 | 24 KB     |            |   0% cachecontrol-0.12.11 | 24 KB     | ########## | 100% cachecontrol-0.12.11 | 24 KB     | ########## | 100% 
+cachy-0.3.0          | 19 KB     |            |   0% cachy-0.3.0          | 19 KB     | ########## | 100% 
+charset-normalizer-2 | 35 KB     |            |   0% charset-normalizer-2 | 35 KB     | ########## | 100% charset-normalizer-2 | 35 KB     | ########## | 100% 
+webencodings-0.5.1   | 12 KB     |            |   0% webencodings-0.5.1   | 12 KB     | ########## | 100% 
+idna-3.3             | 55 KB     |            |   0% idna-3.3             | 55 KB     | ########## | 100% 
+tomlkit-0.10.2       | 31 KB     |            |   0% tomlkit-0.10.2       | 31 KB     | ########## | 100% tomlkit-0.10.2       | 31 KB     | ########## | 100% 
+pyparsing-3.0.9      | 79 KB     |            |   0% pyparsing-3.0.9      | 79 KB     | ########## | 100% 
+pcre-8.45            | 253 KB    |            |   0% pcre-8.45            | 253 KB    | ########## | 100% 
+platformdirs-2.5.1   | 15 KB     |            |   0% platformdirs-2.5.1   | 15 KB     | ########## | 100% platformdirs-2.5.1   | 15 KB     | ########## | 100% 
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+#
+# To activate this environment, use
+#
+#     $ conda activate cgr-dev
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
