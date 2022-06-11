@@ -63,3 +63,10 @@ deploy_docs.sh
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# misc outputs
+create_cgr-dev.out
+docs.out
+poetryinstall.out
+pytest.out
+
