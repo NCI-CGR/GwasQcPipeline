@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Running the Pipeline &mdash; GwasQcPipeline 1.0.0 documentation</title>
   
@@ -17,7 +17,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -30,7 +33,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +54,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
           
 
           
@@ -169,6 +171,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -180,7 +184,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/getting_started/running_pipeline.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -241,19 +245,19 @@ it is not.</p>
 <p class="rubric">Options</p>
 <dl class="std option">
 <dt id="cmdoption-cgr-config-s">
-<span id="cmdoption-cgr-config-sample-sheet"></span><code class="sig-name descname">-s</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--sample-sheet</code><code class="sig-prename descclassname"> &lt;sample_sheet&gt;</code><a class="headerlink" href="#cmdoption-cgr-config-s" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-cgr-config-sample-sheet"></span><code class="sig-name descname"><span class="pre">-s</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--sample-sheet</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;sample_sheet&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-config-s" title="Permalink to this definition">¶</a></dt>
 <dd><p><strong>Required</strong> Path to a sample sheet or CGR LIMs manifest file.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-config-bpm-file">
-<code class="sig-name descname">--bpm-file</code><code class="sig-prename descclassname"> &lt;bpm_file&gt;</code><a class="headerlink" href="#cmdoption-cgr-config-bpm-file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--bpm-file</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;bpm_file&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-config-bpm-file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to the Illumina BPM file used to generate the data.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-config-genome-build">
-<code class="sig-name descname">--genome-build</code><code class="sig-prename descclassname"> &lt;genome_build&gt;</code><a class="headerlink" href="#cmdoption-cgr-config-genome-build" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--genome-build</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;genome_build&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-config-genome-build" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the human genome build to use.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -267,13 +271,13 @@ it is not.</p>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-config-project-name">
-<code class="sig-name descname">--project-name</code><code class="sig-prename descclassname"> &lt;project_name&gt;</code><a class="headerlink" href="#cmdoption-cgr-config-project-name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--project-name</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;project_name&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-config-project-name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The project name to use for this QC run.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-config-u">
-<span id="cmdoption-cgr-config-include-unused-settings"></span><code class="sig-name descname">-u</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--include-unused-settings</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-config-u" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-cgr-config-include-unused-settings"></span><code class="sig-name descname"><span class="pre">-u</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--include-unused-settings</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-config-u" title="Permalink to this definition">¶</a></dt>
 <dd><p>Include unused settings in the config. To keep the config file tidy, we do not output non-required settings that are set as <code class="docutils literal notranslate"><span class="pre">None</span></code>. With this option, we will output all settings, which maybe especially useful for new users.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -284,7 +288,7 @@ it is not.</p>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-config-cgems">
-<code class="sig-name descname">--cgems</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-config-cgems" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--cgems</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-config-cgems" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create folder structure for a production run on CGEMs/CCAD. Then use standard paths for CGEMs/CCAD.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -295,7 +299,7 @@ it is not.</p>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-config-cgems-dev">
-<code class="sig-name descname">--cgems-dev</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-config-cgems-dev" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--cgems-dev</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-config-cgems-dev" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use CGEMs/CCAD standard paths but create the config in the current working directory. This is particularly useful for testing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -306,7 +310,7 @@ it is not.</p>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-config-y">
-<code class="sig-name descname">-y</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-config-y" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">-y</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-config-y" title="Permalink to this definition">¶</a></dt>
 <dd><p>Don’t prompt during CGEMs/CCAD folder creation. Note: this option is only used with <code class="docutils literal notranslate"><span class="pre">--cgems</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -392,7 +396,7 @@ This include all of the columns in the sample sheet as well as the following add
 <p class="rubric">Options</p>
 <dl class="std option">
 <dt id="cmdoption-cgr-pre-flight-config-file">
-<code class="sig-name descname">--config-file</code><code class="sig-prename descclassname"> &lt;config_file&gt;</code><a class="headerlink" href="#cmdoption-cgr-pre-flight-config-file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--config-file</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;config_file&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-config-file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to the configuration file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -403,7 +407,7 @@ This include all of the columns in the sample sheet as well as the following add
 
 <dl class="std option">
 <dt id="cmdoption-cgr-pre-flight-no-reference-files-check">
-<code class="sig-name descname">--no-reference-files-check</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-no-reference-files-check" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--no-reference-files-check</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-no-reference-files-check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Skip checks of reference files. Not suggested.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -414,7 +418,7 @@ This include all of the columns in the sample sheet as well as the following add
 
 <dl class="std option">
 <dt id="cmdoption-cgr-pre-flight-no-user-files-check">
-<code class="sig-name descname">--no-user-files-check</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-no-user-files-check" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--no-user-files-check</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-no-user-files-check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Skip checks of user files. Not suggested.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -425,7 +429,7 @@ This include all of the columns in the sample sheet as well as the following add
 
 <dl class="std option">
 <dt id="cmdoption-cgr-pre-flight-no-update-config">
-<code class="sig-name descname">--no-update-config</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-no-update-config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--no-update-config</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-no-update-config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do not update the config file. Not suggested.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -436,7 +440,7 @@ This include all of the columns in the sample sheet as well as the following add
 
 <dl class="std option">
 <dt id="cmdoption-cgr-pre-flight-j">
-<span id="cmdoption-cgr-pre-flight-threads"></span><code class="sig-name descname">-j</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--threads</code><code class="sig-prename descclassname"> &lt;threads&gt;</code><a class="headerlink" href="#cmdoption-cgr-pre-flight-j" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-cgr-pre-flight-threads"></span><code class="sig-name descname"><span class="pre">-j</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--threads</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;threads&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-j" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of theads to use when checking user files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -447,7 +451,7 @@ This include all of the columns in the sample sheet as well as the following add
 
 <dl class="std option">
 <dt id="cmdoption-cgr-pre-flight-cluster-group-size">
-<code class="sig-name descname">--cluster-group-size</code><code class="sig-prename descclassname"> &lt;cluster_group_size&gt;</code><a class="headerlink" href="#cmdoption-cgr-pre-flight-cluster-group-size" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--cluster-group-size</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;cluster_group_size&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-pre-flight-cluster-group-size" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of samples to group to gether when running in cluster mode.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -547,7 +551,7 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 <p class="rubric">Options</p>
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-cgems">
-<span id="cmdoption-cgr-submit-no-cgems"></span><code class="sig-name descname">--cgems</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--no-cgems</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-cgems" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-cgr-submit-no-cgems"></span><code class="sig-name descname"><span class="pre">--cgems</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--no-cgems</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-cgems" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the workflow using the CGEMs/CCAD cluster profile.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -558,7 +562,7 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-biowulf">
-<span id="cmdoption-cgr-submit-no-biowulf"></span><code class="sig-name descname">--biowulf</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--no-biowulf</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-biowulf" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-cgr-submit-no-biowulf"></span><code class="sig-name descname"><span class="pre">--biowulf</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--no-biowulf</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-biowulf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the workflow using the Biowulf cluster profile.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -569,19 +573,19 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-cluster-profile">
-<code class="sig-name descname">--cluster-profile</code><code class="sig-prename descclassname"> &lt;cluster_profile&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-cluster-profile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--cluster-profile</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;cluster_profile&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-submit-cluster-profile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to a custom cluster profile. See <a class="reference external" href="https://github.com/snakemake-profiles/doc">https://github.com/snakemake-profiles/doc</a>.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-subworkflow">
-<code class="sig-name descname">--subworkflow</code><code class="sig-prename descclassname"> &lt;subworkflow&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-subworkflow" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--subworkflow</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;subworkflow&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-submit-subworkflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a sub-workflow instead of the full workflow.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-time-hr">
-<code class="sig-name descname">--time-hr</code><code class="sig-prename descclassname"> &lt;time_hr&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-time-hr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--time-hr</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;time_hr&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-submit-time-hr" title="Permalink to this definition">¶</a></dt>
 <dd><p>The walltime limit (in hours) for the main snakemake process. Ignored if using <code class="docutils literal notranslate"><span class="pre">--cgems</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -592,19 +596,19 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-queue">
-<code class="sig-name descname">--queue</code><code class="sig-prename descclassname"> &lt;queue&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-queue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--queue</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;queue&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-submit-queue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the queue for the main process to use. This option is required if you are using <code class="docutils literal notranslate"><span class="pre">--cluster-profile</span></code>. CGEMs/CCAD and Biowulf users may want to use this to override which queue to use for the main process.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-submission-cmd">
-<code class="sig-name descname">--submission-cmd</code><code class="sig-prename descclassname"> &lt;submission_cmd&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-submission-cmd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--submission-cmd</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;submission_cmd&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-submit-submission-cmd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Name of the command to use for submission (i.e., qsub, sbatch). This is required if you are using <code class="docutils literal notranslate"><span class="pre">--cluster-profile</span></code>. Ignored if using <code class="docutils literal notranslate"><span class="pre">--cgems</span></code> or <code class="docutils literal notranslate"><span class="pre">--biowulf</span></code>.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-dry-run">
-<span id="cmdoption-cgr-submit-no-dry-run"></span><code class="sig-name descname">--dry-run</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--no-dry-run</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-dry-run" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-cgr-submit-no-dry-run"></span><code class="sig-name descname"><span class="pre">--dry-run</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--no-dry-run</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-dry-run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the submission script but do not send to the schedular. The generate submission script is in <code class="docutils literal notranslate"><span class="pre">.snakemake/GwasQcPipeline_submission.sh</span></code>. This file can be edited and submitted directly to the cluster.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -615,7 +619,7 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-notemp">
-<span id="cmdoption-cgr-submit-no-notemp"></span><code class="sig-name descname">--notemp</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--no-notemp</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-notemp" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-cgr-submit-no-notemp"></span><code class="sig-name descname"><span class="pre">--notemp</span></code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname"><span class="pre">,</span> </code><code class="sig-name descname"><span class="pre">--no-notemp</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-notemp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do not delete temporary files. This option runs the workflow using <code class="docutils literal notranslate"><span class="pre">snakemake</span> <span class="pre">--notemp</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -626,7 +630,7 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-local-mem-mb">
-<code class="sig-name descname">--local-mem-mb</code><code class="sig-prename descclassname"> &lt;local_mem_mb&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-local-mem-mb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--local-mem-mb</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;local_mem_mb&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-submit-local-mem-mb" title="Permalink to this definition">¶</a></dt>
 <dd><p>The amount of memory to use for main snakemake process and local rules [default 8GB]. There are a number of rules that are run along side of the main snakemake process instead of submitting a new job. If you have a very large project &gt;50k samples, you may want to increase the amount of memory used for this job. Ignored if using <code class="docutils literal notranslate"><span class="pre">--cgems</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -637,7 +641,7 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 
 <dl class="std option">
 <dt id="cmdoption-cgr-submit-local-tasks">
-<code class="sig-name descname">--local-tasks</code><code class="sig-prename descclassname"> &lt;local_tasks&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-local-tasks" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">--local-tasks</span></code><code class="sig-prename descclassname"> <span class="pre">&lt;local_tasks&gt;</span></code><a class="headerlink" href="#cmdoption-cgr-submit-local-tasks" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of threads for the main snakemake process and local rules.There are a number of rules that are run along side of the main snakemake process instead of submitting a new job. If you have a very large project &gt;50k samples, you may want to increase the number of CPUs used for this job. Ignored if using <code class="docutils literal notranslate"><span class="pre">--cgems</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default</dt>
@@ -667,37 +671,29 @@ Logs for each submitted job can be found in <code class="docutils literal notran
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="installation.html" class="btn btn-neutral float-left" title="Installing GwasQcPipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installing GwasQcPipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Configuration Files &mdash; GwasQcPipeline 1.0.0 documentation</title>
   
@@ -17,7 +17,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -30,7 +33,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -52,7 +54,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
           
 
           
@@ -165,6 +167,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -176,7 +180,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/getting_started/configuration.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -242,18 +246,18 @@ I will walk through each section below and end this page with a full example.</p
 </colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p><code class="docutils literal notranslate"><span class="pre">config.yml</span></code> data model.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v1.0.0</span>
-<span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span>
-<span class="nt">sample_sheet</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span>
-<span class="nt">genome_build</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hg37</span>
-<span class="nt">snp_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span>
-<span class="nt">num_samples</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6336</span>
-<span class="nt">num_snps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">700078</span>
-<span class="nt">reference_files</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">...</span>  <span class="c1"># Reference file namesapace</span>
-<span class="nt">user_files</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">...</span>  <span class="c1"># User file namespace</span>
-<span class="nt">software_params</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">...</span>  <span class="c1"># Software parameter namespace</span>
-<span class="nt">workflow_params</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">...</span>  <span class="c1"># Workflow parameter namespace</span>
-<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.0.0</span><span class="w"></span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span><span class="w"></span>
+<span class="nt">sample_sheet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span><span class="w"></span>
+<span class="nt">genome_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hg37</span><span class="w"></span>
+<span class="nt">snp_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span><span class="w"></span>
+<span class="nt">num_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6336</span><span class="w"></span>
+<span class="nt">num_snps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">700078</span><span class="w"></span>
+<span class="nt">reference_files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Reference file namesapace</span><span class="w"></span>
+<span class="nt">user_files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># User file namespace</span><span class="w"></span>
+<span class="nt">software_params</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Software parameter namespace</span><span class="w"></span>
+<span class="nt">workflow_params</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Workflow parameter namespace</span><span class="w"></span>
+<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span><span class="w"></span>
 </pre></div>
 </div>
 </td>
@@ -419,10 +423,10 @@ You should not need to edit this section unless you want to
 </colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p>A list of reference files used by the pipeline.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">reference_files</span><span class="p">:</span>
-    <span class="nt">illumina_manifest_file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
-    <span class="nt">thousand_genome_vcf</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
-    <span class="nt">thousand_genome_tbi</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">reference_files</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span><span class="w"></span>
+<span class="w">    </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span><span class="w"></span>
+<span class="w">    </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span><span class="w"></span>
 </pre></div>
 </div>
 </td>
@@ -521,27 +525,27 @@ Though in reality as long as <code class="docutils literal notranslate"><span cl
 </colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p>A list of user provided files or naming patterns.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
-    <span class="nt">output_pattern</span><span class="p">:</span> <span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
-    <span class="nt">idat_pattern</span><span class="p">:</span>
-        <span class="nt">red</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span>
-        <span class="nt">green</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span>
-    <span class="nt">gtc_pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">idat_pattern</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">red</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span><span class="w"></span>
+<span class="w">        </span><span class="nt">green</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span><span class="w"></span>
+<span class="w">    </span><span class="nt">gtc_pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span><span class="w"></span>
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
-    <span class="nt">output_pattern</span><span class="p">:</span> <span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
-    <span class="nt">ped</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.ped</span>
-    <span class="nt">map</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.map</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ped</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.ped</span><span class="w"></span>
+<span class="w">    </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.map</span><span class="w"></span>
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
-    <span class="nt">output_pattern</span><span class="p">:</span> <span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
-    <span class="nt">bed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bed</span>
-    <span class="nt">bim</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bim</span>
-    <span class="nt">fam</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/samples.fam</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span><span class="w"></span>
+<span class="w">    </span><span class="nt">bed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bed</span><span class="w"></span>
+<span class="w">    </span><span class="nt">bim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bim</span><span class="w"></span>
+<span class="w">    </span><span class="nt">fam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.fam</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -685,28 +689,28 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 </colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p>Software parameters used by various tools in the workflow.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">software_params</span><span class="p">:</span>
-    <span class="nt">strand</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">top</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">software_params</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">strand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">top</span><span class="w"></span>
 
-    <span class="nt">sample_call_rate_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
-    <span class="nt">snp_call_rate_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
-    <span class="nt">sample_call_rate_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
-    <span class="nt">snp_call_rate_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
+<span class="w">    </span><span class="nt">sample_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w"></span>
+<span class="w">    </span><span class="nt">snp_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w"></span>
+<span class="w">    </span><span class="nt">sample_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
+<span class="w">    </span><span class="nt">snp_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
 
-    <span class="nt">intensity_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6000</span>
-    <span class="nt">contam_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
-    <span class="nt">contam_population</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">AF</span>
+<span class="w">    </span><span class="nt">intensity_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000</span><span class="w"></span>
+<span class="w">    </span><span class="nt">contam_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
+<span class="w">    </span><span class="nt">contam_population</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AF</span><span class="w"></span>
 
-    <span class="nt">ld_prune_r2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
-    <span class="nt">maf_for_ibd</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
-    <span class="nt">maf_for_hwe</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">    </span><span class="nt">ld_prune_r2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
+<span class="w">    </span><span class="nt">maf_for_ibd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
+<span class="w">    </span><span class="nt">maf_for_hwe</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
 
-    <span class="nt">ibd_pi_hat_min</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
-    <span class="nt">ibd_pi_hat_max</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
-    <span class="nt">dup_concordance_cutoff</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
-    <span class="nt">pi_hat_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<span class="w">    </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ibd_pi_hat_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
+<span class="w">    </span><span class="nt">dup_concordance_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
+<span class="w">    </span><span class="nt">pi_hat_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
 
-    <span class="nt">autosomal_het_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">autosomal_het_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
 </pre></div>
 </div>
 </td>
@@ -1034,15 +1038,15 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 </colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p>This set of parameters control what parts and how the workflow is run.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">workflow_params</span><span class="p">:</span>
-    <span class="nt">subject_id_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Group_By</span>
-    <span class="nt">expected_sex_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span>
-    <span class="nt">case_control_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span>
-    <span class="nt">remove_contam</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-    <span class="nt">remove_rep_discordant</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-    <span class="nt">minimum_pop_subjects</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
-    <span class="nt">control_hwp_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
-    <span class="nt">lims_upload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">workflow_params</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">subject_id_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group_By</span><span class="w"></span>
+<span class="w">    </span><span class="nt">expected_sex_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span><span class="w"></span>
+<span class="w">    </span><span class="nt">case_control_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span><span class="w"></span>
+<span class="w">    </span><span class="nt">remove_contam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">    </span><span class="nt">remove_rep_discordant</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">    </span><span class="nt">minimum_pop_subjects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="w">    </span><span class="nt">control_hwp_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="w">    </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
 </pre></div>
 </div>
 </td>
@@ -1177,58 +1181,58 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <h3>Sample IDs to Remove<a class="headerlink" href="#sample-ids-to-remove" title="Permalink to this headline">¶</a></h3>
 <p>This is an optional section where you can list <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> that you do not want to include in the QC run.
 These samples will be indicated as <code class="docutils literal notranslate"><span class="pre">is_user_exclusion</span> <span class="pre">=</span> <span class="pre">True</span></code> in the sample level QC table.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
-   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Sample0001</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">Sample_IDs_to_remove</span><span class="p">:</span><span class="w"></span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sample0001</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="full-example">
 <h3>Full Example<a class="headerlink" href="#full-example" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">v1.0.0</span>
-<span class="nt">project_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span>
-<span class="nt">sample_sheet</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span>
-<span class="nt">genome_build</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hg37</span>
-<span class="nt">snp_array</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span>
-<span class="nt">num_samples</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6336</span>
-<span class="nt">num_snps</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">700078</span>
-<span class="nt">reference_files</span><span class="p">:</span>
-   <span class="nt">illumina_manifest_file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
-   <span class="nt">thousand_genome_vcf</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
-   <span class="nt">thousand_genome_tbi</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
-<span class="nt">user_files</span><span class="p">:</span>
-   <span class="nt">output_pattern</span><span class="p">:</span> <span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
-   <span class="nt">idat_pattern</span><span class="p">:</span>
-      <span class="nt">red</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span>
-      <span class="nt">green</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span>
-   <span class="nt">gtc_pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span>
-<span class="nt">software_params</span><span class="p">:</span>
-   <span class="nt">sample_call_rate_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
-   <span class="nt">snp_call_rate_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
-   <span class="nt">sample_call_rate_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
-   <span class="nt">snp_call_rate_2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
-   <span class="nt">ld_prune_r2</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
-   <span class="nt">maf_for_ibd</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
-   <span class="nt">maf_for_hwe</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
-   <span class="nt">ibd_pi_hat_min</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
-   <span class="nt">ibd_pi_hat_max</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
-   <span class="nt">dup_concordance_cutoff</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
-   <span class="nt">intensity_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6000</span>
-   <span class="nt">contam_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
-   <span class="nt">contam_population</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">AF</span>
-   <span class="nt">pi_hat_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
-   <span class="nt">autosomal_het_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
-   <span class="nt">strand</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">top</span>
-<span class="nt">workflow_params</span><span class="p">:</span>
-   <span class="nt">subject_id_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Group_By</span>
-   <span class="nt">expected_sex_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span>
-   <span class="nt">case_control_column</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span>
-   <span class="nt">remove_contam</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-   <span class="nt">remove_rep_discordant</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-   <span class="nt">minimum_pop_subjects</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
-   <span class="nt">control_hwp_threshold</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
-   <span class="nt">lims_upload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
-   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Sample0001</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.0.0</span><span class="w"></span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span><span class="w"></span>
+<span class="nt">sample_sheet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span><span class="w"></span>
+<span class="nt">genome_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hg37</span><span class="w"></span>
+<span class="nt">snp_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span><span class="w"></span>
+<span class="nt">num_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6336</span><span class="w"></span>
+<span class="nt">num_snps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">700078</span><span class="w"></span>
+<span class="nt">reference_files</span><span class="p">:</span><span class="w"></span>
+<span class="w">   </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span><span class="w"></span>
+<span class="w">   </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span><span class="w"></span>
+<span class="w">   </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span><span class="w"></span>
+<span class="nt">user_files</span><span class="p">:</span><span class="w"></span>
+<span class="w">   </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span><span class="w"></span>
+<span class="w">   </span><span class="nt">idat_pattern</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">red</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span><span class="w"></span>
+<span class="w">      </span><span class="nt">green</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span><span class="w"></span>
+<span class="w">   </span><span class="nt">gtc_pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span><span class="w"></span>
+<span class="nt">software_params</span><span class="p">:</span><span class="w"></span>
+<span class="w">   </span><span class="nt">sample_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w"></span>
+<span class="w">   </span><span class="nt">snp_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w"></span>
+<span class="w">   </span><span class="nt">sample_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
+<span class="w">   </span><span class="nt">snp_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
+<span class="w">   </span><span class="nt">ld_prune_r2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
+<span class="w">   </span><span class="nt">maf_for_ibd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
+<span class="w">   </span><span class="nt">maf_for_hwe</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
+<span class="w">   </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
+<span class="w">   </span><span class="nt">ibd_pi_hat_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
+<span class="w">   </span><span class="nt">dup_concordance_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
+<span class="w">   </span><span class="nt">intensity_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000</span><span class="w"></span>
+<span class="w">   </span><span class="nt">contam_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
+<span class="w">   </span><span class="nt">contam_population</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AF</span><span class="w"></span>
+<span class="w">   </span><span class="nt">pi_hat_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
+<span class="w">   </span><span class="nt">autosomal_het_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
+<span class="w">   </span><span class="nt">strand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">top</span><span class="w"></span>
+<span class="nt">workflow_params</span><span class="p">:</span><span class="w"></span>
+<span class="w">   </span><span class="nt">subject_id_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group_By</span><span class="w"></span>
+<span class="w">   </span><span class="nt">expected_sex_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span><span class="w"></span>
+<span class="w">   </span><span class="nt">case_control_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span><span class="w"></span>
+<span class="w">   </span><span class="nt">remove_contam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">   </span><span class="nt">remove_rep_discordant</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="w">   </span><span class="nt">minimum_pop_subjects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="w">   </span><span class="nt">control_hwp_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="w">   </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
+<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span><span class="w"></span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sample0001</span><span class="w"></span>
 </pre></div>
 </div>
 </div>
@@ -1240,37 +1244,29 @@ These samples will be indicated as <code class="docutils literal notranslate"><s
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../sub_workflows/entry_points.html" class="btn btn-neutral float-right" title="Entry Points Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="running_pipeline.html" class="btn btn-neutral float-left" title="Running the Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../sub_workflows/entry_points.html" class="btn btn-neutral float-right" title="Entry Points Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="running_pipeline.html" class="btn btn-neutral float-left" title="Running the Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
+        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
