@@ -45,7 +45,7 @@ To update the latest version of ``GwasQcPipeline``:
 Installing on NIH Biowulf
 -------------------------
 
-Comming soon
+Comming soon ...
 
 Installing on other systems
 ---------------------------
