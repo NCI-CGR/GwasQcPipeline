@@ -45,7 +45,30 @@ To update the latest version of ``GwasQcPipeline``:
 Installing on NIH Biowulf
 -------------------------
 
-Coming soon ...
+Running the workflow on Biowulf requires installing miniconda and mamba
+
+.. code-block::
+
+   $ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-x86_64.sh
+
+   # Start an interactive session to access tmp folder. Otherwise installation will fail
+   $ sinteractive --mem=20g --gres=lscratch:20
+   $ bash Miniconda3-py39_4.11.0-Linux-x86_64.sh -p /<location of minicoda installation>/conda -b
+   $ source /<location of minicoda installation>/conda/bin/activate base
+   $ conda update -n base -c defaults conda
+   $ conda install -n base -c conda-forge mamba
+   $ conda create -n GwasQcPipeline -y python=3.8 pip
+   $ conda deactivate
+
+Next install the latest version of ``GwasQcPipeline environment``:
+
+.. code-block::
+    :substitutions:
+
+   $ source /<location of miniconda installation>/conda/bin/activate GwasQcPipeline
+   $ pip install --force-reinstall |pkgurl|
+   $ pip3 install markupsafe==2.0.1
+   $ cgr --help
 
 Installing on other systems
 ---------------------------

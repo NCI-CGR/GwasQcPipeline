@@ -217,7 +217,26 @@ $ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releas
 </div>
 <div class="section" id="installing-on-nih-biowulf">
 <h2>Installing on NIH Biowulf<a class="headerlink" href="#installing-on-nih-biowulf" title="Permalink to this headline">¶</a></h2>
-<p>Coming soon …</p>
+<p>Running the workflow on Biowulf requires installing miniconda and mamba</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-x86_64.sh
+
+# Start an interactive session to access tmp folder. Otherwise installation will fail
+$ sinteractive --mem=20g --gres=lscratch:20
+$ bash Miniconda3-py39_4.11.0-Linux-x86_64.sh -p /&lt;location of minicoda installation&gt;/conda -b
+$ source /&lt;location of minicoda installation&gt;/conda/bin/activate base
+$ conda update -n base -c defaults conda
+$ conda install -n base -c conda-forge mamba
+$ conda create -n GwasQcPipeline -y python=3.8 pip
+$ conda deactivate
+</pre></div>
+</div>
+<p>Next install the latest version of <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span> <span class="pre">environment</span></code>:</p>
+<div class="highlight-:substitutions: notranslate"><div class="highlight"><pre><span></span>$ source /&lt;location of miniconda installation&gt;/conda/bin/activate GwasQcPipeline
+$ pip install --force-reinstall |pkgurl|
+$ pip3 install markupsafe==2.0.1
+$ cgr --help
+</pre></div>
+</div>
 </div>
 <div class="section" id="installing-on-other-systems">
 <h2>Installing on other systems<a class="headerlink" href="#installing-on-other-systems" title="Permalink to this headline">¶</a></h2>
