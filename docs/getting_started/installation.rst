@@ -57,8 +57,8 @@ description is provided on the `Biowulf python env website`_.
 
    # Start an interactive session to access tmp folder. Otherwise installation will fail.
    $ sinteractive --mem=20g --gres=lscratch:20
-   $ bash Miniconda3-py39_4.11.0-Linux-x86_64.sh -p /<location of minicoda installation>/conda -b
-   $ source /<location of minicoda installation>/conda/bin/activate base
+   $ bash Miniconda3-py39_4.11.0-Linux-x86_64.sh -p /<location of miniconda installation>/conda -b
+   $ source /<location of miniconda installation>/conda/bin/activate base
    $ conda update -n base -c defaults conda
    $ conda install -n base -c conda-forge mamba
    $ conda create -n GwasQcPipeline -y python=3.8 pip
