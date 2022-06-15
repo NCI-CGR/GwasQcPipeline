@@ -217,10 +217,11 @@ $ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releas
 </div>
 <div class="section" id="installing-on-nih-biowulf">
 <h2>Installing on NIH Biowulf<a class="headerlink" href="#installing-on-nih-biowulf" title="Permalink to this headline">¶</a></h2>
-<p>Running the workflow on Biowulf requires installing miniconda and mamba</p>
+<p>Running the workflow on Biowulf requires installing miniconda and mamba. A detailed
+description is provided on the <a class="reference external" href="https://hpc.nih.gov/apps/python.html#envs">Biowulf python env website</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-x86_64.sh
 
-# Start an interactive session to access tmp folder. Otherwise installation will fail
+# Start an interactive session to access tmp folder. Otherwise installation will fail.
 $ sinteractive --mem=20g --gres=lscratch:20
 $ bash Miniconda3-py39_4.11.0-Linux-x86_64.sh -p /&lt;location of minicoda installation&gt;/conda -b
 $ source /&lt;location of minicoda installation&gt;/conda/bin/activate base
@@ -230,9 +231,9 @@ $ conda create -n GwasQcPipeline -y python=3.8 pip
 $ conda deactivate
 </pre></div>
 </div>
-<p>Next install the latest version of <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span> <span class="pre">environment</span></code>:</p>
-<div class="highlight-:substitutions: notranslate"><div class="highlight"><pre><span></span>$ source /&lt;location of miniconda installation&gt;/conda/bin/activate GwasQcPipeline
-$ pip install --force-reinstall |pkgurl|
+<p>Next install the latest version of the GwasQcPipeline environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ source /&lt;location of miniconda installation&gt;/conda/bin/activate GwasQcPipeline
+$ pip install --force-reinstall  https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0/cgr_gwas_qc-1.0.0-py3-none-any.whl
 $ pip3 install markupsafe==2.0.1
 $ cgr --help
 </pre></div>
