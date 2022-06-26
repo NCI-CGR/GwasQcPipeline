@@ -1,6 +1,8 @@
 from cgr_gwas_qc import load_config
+
 cfg = load_config()
 output_pattern = cfg.config.user_files.output_pattern
+
 
 localrules:
     all_delivery,
@@ -133,10 +135,7 @@ rule deliver_manifest:
     output:
         "delivery/{deliver_prefix}AnalysisManifest{deliver_suffix}.csv",
     shell:
-        """
-        echo "manifest"
-        cp {input[0]} {output[0]
-        """
+        "cp {input[0]} {output[0]}"
 
 
 rule deliver_hwp:
