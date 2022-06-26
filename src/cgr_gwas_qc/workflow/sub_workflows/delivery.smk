@@ -1,8 +1,6 @@
 from cgr_gwas_qc import load_config
-import shutil
 cfg = load_config()
 output_pattern = cfg.config.user_files.output_pattern
-manifest_file = cfg.config.sample_sheet
 
 localrules:
     all_delivery,
@@ -132,13 +130,12 @@ rule lab_unknown_replicates:
 rule deliver_manifest:
     input:
         cfg.sample_sheet_file.as_posix(),
-        manifest_file,
     output:
         "delivery/{deliver_prefix}AnalysisManifest{deliver_suffix}.csv",
     shell:
         """
-        cp {input[0]} {output[0]}
-        echo {input[1]}
+        echo "manifest"
+        cp {input[0]} {output[0]
         """
 
 
