@@ -171,12 +171,33 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
         if pair in df.index:
             df.loc[pair, "is_expected_replicate"] = True
         else:
-            print(### issue 234 fix ###)
+            #df.to_csv('/data/okuharad2/cgr-dev/issues/221/df.csv')
+            #print("pair")
+            #print(pair)       
+            #record = pd.Series({"is_expected_replicate": True}, name=pair)
             d = {'is_expected_replicate': True}
             record_df = pd.DataFrame(d,index=pd.MultiIndex.from_tuples([pair]))
             record_df = record_df.rename_axis(["Sample_ID1","Sample_ID2"])
+            print("record_df")
             #print(record_df)
+            #print("df before concat")
+            #print(df)
+            #print("index")
+            #print(df.index)
             df = pd.concat([df,record_df],axis = 0)
+            #print("df after concat")
+            #print(df)
+            #print("df.shape")
+            #print(df.shape)
+            #print("df before append")
+            #print(df)
+            #print("index")
+            #print(df.index)
+            #print("record")
+            #print(record)
+            #df = df.append(record)
+            #print("df after append")
+            #print(df)
     return df
 
 

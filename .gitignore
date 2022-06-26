@@ -70,3 +70,7 @@ docs.out
 poetryinstall.out
 pytest.out
 
+#backup codes
+src/cgr_gwas_qc/workflow/scripts/orig/
+src/cgr_gwas_qc/workflow/sub_workflows/orig
+
