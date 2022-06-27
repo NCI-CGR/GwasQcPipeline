@@ -151,7 +151,7 @@ Ancestry results can be found in the "ANCESTRY" tab of " {{ excel_file_name }}."
 
 ## Subject Relatedness (per ancestry group)
 
-[GRAF](https://github.com/ncbi/graf) and [KING](https://people.virginia.edu/~wc9c/KING/) relationship estimates are robust to population structure. However, IBD requires accurate MAFs and should be estimated separately for each population. For each ancestry group we used [PLINK](https://www.cog-genomics.org/plink2) to estimate `PI_HAT` (proportion IBD). We consider two subjects closely related (1st or 2nd degree) if they have `PI_HAT` (proportion IBD) > {{ config.software_params.pi_hat_threshold | toPct | numFormat(0) }}%.
+[GRAF](https://github.com/ncbi/graf) and [KING](https://people.virginia.edu/~wc9c/KING/) relationship estimates are robust to population structure. However, IBD requires accurate MAFs and should be estimated separately for each population. For each ancestry group we used [PLINK](https://www.cog-genomics.org/plink2) to estimate `PI_HAT` (proportion IBD). We consider two subjects closely related (1st or 2nd degree) if they have `PI_HAT` (proportion IBD) > {{ config.software_params.pi_hat_threshold }}.
 A total of {{ subject_qc.relatives.num_related_subjects | numFormat }} subjects were found to be related at the 1st or 2nd degree level.
 These subjects can be split into {{ subject_qc.relatives.num_qc_families | numFormat }} families. Subjects with family IDs can be found in "FAMILIES" tab of "{{ excel_file_name }}".
 See the "*_IBD" tab(s) of "{{ excel_file_name }}" for more details.
