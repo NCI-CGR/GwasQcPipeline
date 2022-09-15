@@ -31,10 +31,8 @@ class BiowulfOptions(ClusterOptions):
             " --time={time}"
             " --output={log}"
         )
-
         if self.time > timedelta(hours=4):
             self.queue.discard("quick")
-
         return cmd.format(
             queue=",".join(self.queue),
             mem_gb=self.mem_gb,

@@ -574,7 +574,7 @@ checkpoint population_controls_checkpoint:
             .pipe(lambda x: x[x >= params.min_num_subjects])
             .index.tolist()
         )
-        #print(populations1)
+        print(populations1)
         populations2 = (
             subject_qc_table.read(input[0])
             .query("case_control == 'Case'")
@@ -583,7 +583,16 @@ checkpoint population_controls_checkpoint:
             .pipe(lambda x: x[x >= params.min_num_subjects])
             .index.tolist()
         )
-        #print(populations2)
+        print(populations2)
+        populations3 = (
+            subject_qc_table.read(input[0])
+            .query("case_control == 'Unknown'")
+            .groupby("Ancestry")
+            .size()
+            .pipe(lambda x: x[x >= params.min_num_subjects])
+            .index.tolist()
+        )
+        print(populations3)
         populations = populations1 + populations2
         populations = list(set(populations))
         print(populations)
@@ -612,8 +621,12 @@ rule population_controls_Subject_IDs:
     params:
         "subject_level/{population}/test_controls.txt",
         "subject_level/{population}/test_case.txt",
+        "subject_level/{population}/test_controlscase.txt",
+        "subject_level/{population}/unknown.txt",
+        cfg.config.workflow_params.control_hwp_threshold,
+        
     run:
-        print("### issue 221 fix  ###")
+        print("### issue 221,235 fix  ###")
         (
             subject_qc_table.read(input[0])
             .query("Ancestry == @wildcards.population & case_control == 'Control'")
@@ -621,22 +634,49 @@ rule population_controls_Subject_IDs:
             .to_csv(params[0], sep=" ", index=False, header=False)
         )
         (
-           subject_qc_table.read(input[0])
-           .query("Ancestry == @wildcards.population & case_control == 'Case'")
-           .reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1)
-           .to_csv(params[1], sep=" ", index=False, header=False)
+            subject_qc_table.read(input[0])
+            .query("Ancestry == @wildcards.population & case_control == 'Case'")
+            .reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1)
+            .to_csv(params[1], sep=" ", index=False, header=False)
         )
+        (
+           subject_qc_table.read(input[0])
+           .query("Ancestry == @wildcards.population & (case_control == 'Case'| case_control == 'Control')")
+           .reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1)
+           .to_csv(params[2], sep=" ", index=False, header=False)
+        )
+        (
+           subject_qc_table.read(input[0])
+           .query("Ancestry == @wildcards.population & case_control == 'Unknown'")
+           .reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1)
+           .to_csv(params[3], sep=" ", index=False, header=False)
+        )
+
+        min_num_subjects = int(params[4])
+        print("minimum min_num_subjects:", min_num_subjects)
+        # Controls 
         print(params[0])
-        num_lines1 = sum(1 for line in open(params[0]))
-        print(num_lines1)
+        num_lines0 = sum(1 for line in open(params[0]))
+        print(num_lines0)
+        # Case
         print(params[1])
-        num_lines2 = sum(1 for line in open(params[1]))
-        print(num_lines2)      
-        if num_lines1 < 2:
-            print("no controls samples, using case samples for HWE")
-            shutil.copyfile(params[1], output[0])
+        num_lines1 = sum(1 for line in open(params[1]))
+        print(num_lines1)
+        # Controls + Case
+        print(params[2])
+        num_lines2 = sum(1 for line in open(params[2]))
+        print(num_lines2)
+        # Unknown
+        print(params[3])
+        num_lines3 = sum(1 for line in open(params[3]))
+        print(num_lines3)
+
+      
+        if num_lines0 <  min_num_subjects:
+            print(num_lines0, "controls samples less than", min_num_subjects, "threshold, using control and case samples for HWE")
+            shutil.copyfile(params[2], output[0])
         else:
-            print("controls samples present for HWE")
+            print(num_lines0, "control samples present and above the ", min_num_subjects, "threshold for HWE")
             shutil.copyfile(params[0], output[0])
 
 use rule keep_ids from plink as pull_population_unrelated_controls with:
