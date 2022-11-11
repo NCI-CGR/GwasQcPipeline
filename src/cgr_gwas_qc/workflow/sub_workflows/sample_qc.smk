@@ -433,16 +433,43 @@ rule snp_qc_table:
 # -------------------------------------------------------------------------------
 # Sample Summary Table
 # -------------------------------------------------------------------------------
-use rule sexcheck from plink as sample_level_sexcheck with:
-    input:
-        bed=rules.snp_call_rate_filter_1.output.bed,
-        bim=rules.snp_call_rate_filter_1.output.bim,
-        fam=rules.snp_call_rate_filter_1.output.fam,
-    params:
-        out_prefix="sample_level/call_rate_1/samples",
-    output:
-        "sample_level/call_rate_1/samples.sexcheck",
+#use rule sexcheck from plink as sample_level_sexcheck with:
+#    input:
+#        bed=rules.snp_call_rate_filter_1.output.bed,
+#        bim=rules.snp_call_rate_filter_1.output.bim,
+#        fam=rules.snp_call_rate_filter_1.output.fam,
+#    params:
+#        out_prefix="sample_level/call_rate_1/samples",
+#    output:
+#        "sample_level/call_rate_1/samples.sexcheck",
 
+#### i2212 ####
+sex_chr_included = cfg.config.workflow_params.sex_chr_included
+if sex_chr_included:
+    print("sex_chr_included ", sex_chr_included)
+    use rule sexcheck from plink as sample_level_sexcheck with:
+        input:
+            bed=rules.snp_call_rate_filter_1.output.bed,
+            bim=rules.snp_call_rate_filter_1.output.bim,
+            fam=rules.snp_call_rate_filter_1.output.fam,
+        params:
+            out_prefix="sample_level/call_rate_1/samples",
+        output:
+            "sample_level/call_rate_1/samples.sexcheck",
+else:
+    print("sex_chr_included ", sex_chr_included)
+    rule sample_level_sexcheck:
+        input:
+            bed=rules.snp_call_rate_filter_1.output.bed,
+            bim=rules.snp_call_rate_filter_1.output.bim,
+            fam=rules.snp_call_rate_filter_1.output.fam,
+        output:
+            "sample_level/call_rate_1/samples.sexcheck",
+        shell:
+            """
+            touch sample_level/call_rate_1/samples.sexcheck
+            echo "FID IID PEDSEX SNPSEX STATUS F" >> sample_level/call_rate_1/samples.sexcheck
+            """
 
 def _contam(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
@@ -521,6 +548,8 @@ rule plot_call_rate:
 rule plot_chrx_inbreeding:
     input:
         rules.sample_qc_table.output[0],
+    params:
+        sex_chr_included,
     output:
         "sample_level/chrx_inbreeding.png",
     script:
