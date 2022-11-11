@@ -433,17 +433,10 @@ rule snp_qc_table:
 # -------------------------------------------------------------------------------
 # Sample Summary Table
 # -------------------------------------------------------------------------------
-#use rule sexcheck from plink as sample_level_sexcheck with:
-#    input:
-#        bed=rules.snp_call_rate_filter_1.output.bed,
-#        bim=rules.snp_call_rate_filter_1.output.bim,
-#        fam=rules.snp_call_rate_filter_1.output.fam,
-#    params:
-#        out_prefix="sample_level/call_rate_1/samples",
-#    output:
-#        "sample_level/call_rate_1/samples.sexcheck",
 
-#### i2212 ####
+#### i212 ####
+# create empty table if sex chromosome is not inicluded
+
 sex_chr_included = cfg.config.workflow_params.sex_chr_included
 if sex_chr_included:
     print("sex_chr_included ", sex_chr_included)
