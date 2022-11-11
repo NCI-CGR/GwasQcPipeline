@@ -97,8 +97,6 @@ def read(filename: PathLike):
         - KING_Kinship
         - KING_relationship
     """
-    print("filename")
-    print(filename)
     return pd.read_csv(filename, dtype=DTYPES)
 
 
@@ -171,11 +169,10 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
         if pair in df.index:
             df.loc[pair, "is_expected_replicate"] = True
         else:
-            print("### issue 234 fix ###")
+            # issue 234 fix ####
             d = {'is_expected_replicate': True}
             record_df = pd.DataFrame(d,index=pd.MultiIndex.from_tuples([pair]))
             record_df = record_df.rename_axis(["Sample_ID1","Sample_ID2"])
-            #print(record_df)
             df = pd.concat([df,record_df],axis = 0)
     return df
 
