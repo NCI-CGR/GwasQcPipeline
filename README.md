@@ -26,3 +26,6 @@ QC pipeline for Illumina SNP Array data generated at [CGR](https://dceg.cancer.g
 If you use this workflow in a paper, please cite the URL of this repository (https://github.com/NCI-CGR/GwasQcPipeline).
 
 The documentation of this pipeline is at https://nci-cgr.github.io/GwasQcPipeline/
+
+### LOG
+add new parameter to config.yml sex_chr_included to skip sex concordance check step if no sex chromosome is included
