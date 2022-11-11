@@ -1,4 +1,4 @@
-"""
+"""outfile: Optional[os.PathLike]
 plot_chrx_inbreeding.py
 -----------------------
 
@@ -25,9 +25,10 @@ app = typer.Typer(add_completion=False)
 
 
 @app.command()
-def main(sample_qc: Path, outfile: Path):
+def main(sample_qc: Path, outfile: Path, xchr: str):
     sample = load_sample_data(sample_qc)
-    plot(sample, outfile)
+    xchr = str(snakemake.params)
+    plot(sample, outfile, xchr)
 
 
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
@@ -51,7 +52,7 @@ def _update_categories(sr: pd.DataFrame):
     return sr
 
 
-def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
+def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None, xchr: bool = True):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
 
     # Create plots
@@ -68,8 +69,18 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
     plt.setp(ax.lines, color="k")
 
     # Rename Axes
-    ax.set_xlabel("Reported Sex")
+    #ax.set_xlabel("Reported Sex")
     ax.set_ylabel("ChrX Inbreeding Coeff")
+    
+    xchr = xchr.strip().lower() == "true"
+    print(type(xchr), " " ,xchr)
+    if xchr:
+        print("sex chr included", xchr)
+        ax.set_xlabel("Reported Sex")
+    else:
+        print("No sex chromosome ", xchr)
+        ax.set_xlabel("No sex chromosome \nSkipping sex condordace")
+
 
     # Add line at 0.5
     line_defaults = dict(color="k", ls="--")
@@ -88,6 +99,7 @@ if __name__ == "__main__":
         defaults = {}
         defaults.update({"sample_qc": Path(snakemake.input[0])})  # type: ignore # noqa
         defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
+        defaults.update({"xchr": snakemake.params})  # type: ignore # noqa
         main(**defaults)
     else:
         app()
