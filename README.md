@@ -28,4 +28,4 @@ If you use this workflow in a paper, please cite the URL of this repository (htt
 The documentation of this pipeline is at https://nci-cgr.github.io/GwasQcPipeline/
 
 ### LOG
-add new parameter to config.yml sex_chr_included to skip sex concordance check step if no sex chromosome is included
+- add `sex_chr_included` parameter to config.yml. If `false` sex concordance check step is skipped.
