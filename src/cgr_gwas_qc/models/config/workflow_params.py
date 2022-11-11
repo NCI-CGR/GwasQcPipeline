@@ -9,6 +9,7 @@ class WorkflowParams(BaseModel):
         workflow_params:
             subject_id_column: Group_By
             expected_sex_column: Expected_Sex
+            sex_chr_included: true
             case_control_column: Case/Control_Status
             remove_contam: true
             remove_rep_discordant: true
@@ -32,6 +33,11 @@ class WorkflowParams(BaseModel):
         "Allowed values in this columns are [``F`` | ``M`` | ``U``]",
     )
 
+    sex_chr_included: bool = Field(
+        True,
+        description="True if the sex chromosome is included in the microarray and a sex concordance check can be performed.",
+    )
+
     case_control_column: str = Field(
         "Case/Control_Status",
         description="The name of the colun in the sample sheet which identifies Case/Control status. "
@@ -42,6 +48,7 @@ class WorkflowParams(BaseModel):
         True,
         description="True if you want to remove contaminated samples before running the subject level QC.",
     )
+
     remove_rep_discordant: bool = Field(
         True,
         description="True if you want to remove discordant replicates before running the subject level QC.",
@@ -52,6 +59,7 @@ class WorkflowParams(BaseModel):
         gt=0,
         description="The minimum number of samples needed to use a population for population level QC (PCA, Autosomal Heterozygosity).",
     )
+
     control_hwp_threshold: int = Field(
         50,
         gt=0,
