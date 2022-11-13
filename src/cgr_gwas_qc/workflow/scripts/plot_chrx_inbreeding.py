@@ -30,23 +30,33 @@ def main(sample_qc: Path, outfile: Path, xchr: str):
     xchr = str(snakemake.params)
     plot(sample, outfile, xchr)
 
-
+"""
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     return (
         sample_qc_table.read(sample_qc)
         .query("expected_sex != 'U' and is_subject_representative")  # Don't plot unknown sex
         .transform(_update_categories)
     )
+"""
 
+def load_sample_data(sample_qc: Path) -> pd.DataFrame:
+    return (
+        sample_qc_table.read(sample_qc)
+        .query("is_subject_representative")
+        .transform(_update_categories)
+    )
 
 def _update_categories(sr: pd.DataFrame):
     """Update categorical data types for nicer plots"""
     if sr.name == "case_control":
-        # Drop unused categories
+        print("sr.name == case_control")
         return sr.cat.remove_unused_categories()
 
     if sr.name == "expected_sex":
         # Drop the 'U' category and re-order to put females first.
+        print("sr.name == expected_sex")
+        temp = sr.cat.remove_unused_categories()
+        print(temp.unique())
         return sr.cat.remove_unused_categories()
 
     return sr

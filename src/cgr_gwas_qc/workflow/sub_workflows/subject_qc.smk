@@ -565,7 +565,7 @@ checkpoint population_controls_checkpoint:
     output:
         directory("subject_level/controls"),
     run:
-        print("### issue 221 fix  ###")   
+        # issue 221  
         populations1 = (
             subject_qc_table.read(input[0])
             .query("case_control == 'Control'")
@@ -626,7 +626,7 @@ rule population_controls_Subject_IDs:
         cfg.config.workflow_params.control_hwp_threshold,
         
     run:
-        print("### issue 221,235 fix  ###")
+        # issue 221,235 fix
         (
             subject_qc_table.read(input[0])
             .query("Ancestry == @wildcards.population & case_control == 'Control'")
