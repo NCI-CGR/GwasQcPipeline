@@ -99,7 +99,7 @@ See the "SAMPLE_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
 Subject sex is verified by comparing the reported sex with the observed sex based on X chromosome method-of-moments F coefficient ([observed hom. count] - [expected count]) / ([total observations] - [expected count]) using [PLINK](https://www.cog-genomics.org/plink2).
 The F coefficient is expected to be close to 0.0 and 1.0 for females and males, respectively.
 To assign the observed sex, we used a threshold of 0.5 (i.e., the midpoint between expected values).
-Sex check results can be found in the "SUBJECT_QC" tab of "{{ excel_file_name }}", including any sex discrepancies (**Figure 2**). There were {{ subject_qc.sex_verification.num_sex_discordant | numFormat }} sex discordant subjects.
+Sex check results can be found in the "SUBJECT_QC" tab of "{{ excel_file_name }}", including any sex discrepancies (**Figure 2**). Expected sex is labelled as M (male), F (female) and U (unknown). There were {{ subject_qc.sex_verification.num_sex_discordant | numFormat }} sex discordant subjects.
 
 NOTE: Samples that fail the sex concordance check may be eligible for recovery efforts, including screening for sex chromosome aneuploidies by STR profiling and confirmation of reported sex with the investigator. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
 
