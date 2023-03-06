@@ -598,3 +598,34 @@ rule het:
         "--threads {threads} "
         "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
+
+rule gwas:
+    """logistic regression gwas"""
+    input:
+        bed="{prefix}.bed",
+        bim="{prefix}.bim",
+        fam="{prefix}.fam",
+    params:
+        "delivery/gwas",
+    output:
+        "delivery/gwas.assoc",
+    threads: lambda wildcards, attempt: attempt * 2
+    resources:
+        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+    conda:
+        cfg.conda("plink2")
+    shell:
+        """
+        sleep 10 && plink \
+	--bed {input.bed} \
+        --bim {input.bim} \
+        --fam {input.fam} \
+	--pheno subject_level/gwas.txt \
+        --ci 0.95 \
+        --assoc \
+        --out delivery/gwas \
+        --memory 20000 \
+        --threads 2 \
+        --allow-no-sex
+        """
+

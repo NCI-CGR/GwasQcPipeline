@@ -540,6 +540,7 @@ use rule gwas from plink as gwas with:
         fam="sample_level/samples.fam",
     params:
         out_prefix="delivery/gwas",
+        case_control_gwas=cfg.config.workflow_params.case_control_gwas,
     output:
         "delivery/gwas.assoc",
 
