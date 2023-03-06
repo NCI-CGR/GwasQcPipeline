@@ -533,16 +533,31 @@ rule agg_population_qc_tables:
         "../scripts/agg_population_qc_tables.py"
 
 # gwas  (see plink_stats.smk 'gwas')
-use rule gwas from plink as gwas with:
-    input:
-        bed="sample_level/samples.bed",
-        bim="sample_level/samples.bim",
-        fam="sample_level/samples.fam",
-    params:
-        out_prefix="delivery/gwas",
-        case_control_gwas=cfg.config.workflow_params.case_control_gwas,
-    output:
-        "delivery/gwas.assoc",
+print("gwas=",cfg.config.workflow_params.case_control_gwas)
+
+if cfg.config.workflow_params.case_control_gwas=='TRUE':
+    use rule gwas from plink as gwas with:
+        input:
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+        params:
+            out_prefix="delivery/gwas",
+        output:
+            "delivery/gwas.assoc",
+else:
+    rule gwas:
+        input:
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+        output:
+            "delivery/gwas.assoc",
+        shell:
+            """
+            touch delivery/gwas.assoc
+            echo "gwas not selected" > delivery/gwas.assoc
+            """
 
 def _population_plots(wildcards):
     populations = _get_populations(wildcards)
