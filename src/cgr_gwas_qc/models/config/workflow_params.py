@@ -16,7 +16,7 @@ class WorkflowParams(BaseModel):
             minimum_pop_subjects: 50
             control_hwp_threshold: 50
             lims_upload: false
-
+            case_control_gwas: true
     """
 
     subject_id_column: str = Field(
@@ -69,6 +69,11 @@ class WorkflowParams(BaseModel):
     lims_upload: bool = Field(
         False,
         description="For ``CGEMS/CCAD`` use only, will place a copy of the LimsUpload file in the root directory.",
+    )
+
+    case_control_gwas: bool = Field(
+        True,
+        description="A plink logistic regression gwas will be performed with case_control phenotype.",
     )
 
     @staticmethod
