@@ -25,8 +25,7 @@ localrules:
     population_controls_checkpoint,
     population_controls_Subject_IDs,
     plot_hwe,
-    agg_control_plots,
-
+    agg_control_plots,    
 
 wildcard_constraints:
     population="[\w_]+",
@@ -47,6 +46,7 @@ targets = [
     "subject_level/population_qc.csv",
     "subject_level/.population_plots.done",
     "subject_level/.control_plots.done",
+    "delivery/gwas.assoc",
 ]
 
 
@@ -532,6 +532,16 @@ rule agg_population_qc_tables:
     script:
         "../scripts/agg_population_qc_tables.py"
 
+# gwas  (see plink_stats.smk 'gwas')
+use rule gwas from plink as gwas with:
+    input:
+        bed="sample_level/samples.bed",
+        bim="sample_level/samples.bim",
+        fam="sample_level/samples.fam",
+    params:
+        out_prefix="delivery/gwas",
+    output:
+        "delivery/gwas.assoc",
 
 def _population_plots(wildcards):
     populations = _get_populations(wildcards)
