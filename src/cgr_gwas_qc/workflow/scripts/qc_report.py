@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Text
 
 import typer
+import os
 
 from cgr_gwas_qc.config import Config
 from cgr_gwas_qc.parsers import sample_sheet
@@ -84,7 +85,6 @@ def main(
 
     report = create_report(payload)
     outfile.write_text(report)
-
 
 def create_report(payload: Dict) -> Text:
     template = env.get_template("qc_report.md.j2")
