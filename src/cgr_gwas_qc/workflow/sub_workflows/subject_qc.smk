@@ -533,7 +533,7 @@ rule agg_population_qc_tables:
         "../scripts/agg_population_qc_tables.py"
 
 # gwas  (see plink_stats.smk 'gwas')
-print("gwas=",cfg.config.workflow_params.case_control_gwas)
+print("gwas =",cfg.config.workflow_params.case_control_gwas)
 
 if cfg.config.workflow_params.case_control_gwas=='TRUE':
     use rule gwas from plink as gwas with:
