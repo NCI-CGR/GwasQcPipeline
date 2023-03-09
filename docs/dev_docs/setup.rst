@@ -61,9 +61,16 @@ Now lets make sure everything is working::
     $ make -C docs html           # This will build documentation into docs/_build/html
     $ pytest -v                   # This will run the test suite
 
-The main reason we are using poetry is because it makes building python packages easy::
+The main reason we are using poetry is because it makes building python packages easy.
+In order to match the new config.yaml version line with the new QwasQcPipeline version
+edit and update the ``version = "0.1.2"`` line in the ``pyproject.toml`` file::
 
     $ poetry build                # Build artifacts are in ./dist
+
+Once the changes are pushed to Github, tag the new version for release. While Github is building
+the new release, a drop and drag box will appear for additional assets. Add the new 
+cgr_gwas_qc-X.X.X.tar.gz and cgr_gwas_qc-X.X.X-py3-none-any.whl files to the box. 
+
 
 Install pre-commit hooks for consistent development
 ---------------------------------------------------
