@@ -250,22 +250,7 @@ rule qc_report_docx:
     conda:
         cfg.conda("pandoc")
     shell:
-        """
-        pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}
-        #ml  plink/1.9
-	#plink \
-	#--bfile sample_level/samples \
-	#--pheno subject_level/gwas.txt \
-	#--ci 0.95 \
-	#--assoc \
-	#--out delivery/gwas_subjects \
-	#--memory 20000 \
-	#--threads 2 \
-	#--allow-no-sex
-	#ml -plink/1.9
-
-        """
-
+        "pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}"
 
 rule qc_report_xlsx:
     input:
