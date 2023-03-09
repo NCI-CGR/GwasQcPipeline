@@ -605,6 +605,7 @@ rule gwas:
         bed="{prefix}.bed",
         bim="{prefix}.bim",
         fam="{prefix}.fam",
+        gwasfile="subject_level/gwas.txt",
     params:
         "delivery/gwas",
     output:
@@ -620,12 +621,12 @@ rule gwas:
 	--bed {input.bed} \
         --bim {input.bim} \
         --fam {input.fam} \
-	--pheno subject_level/gwas.txt \
+	--pheno {input.gwasfile} \
         --ci 0.95 \
         --assoc \
         --out delivery/gwas \
-        --memory 20000 \
-        --threads 2 \
+        --memory {resources.mem_mb} \
+        --threads {threads} \
         --allow-no-sex
         """
 
