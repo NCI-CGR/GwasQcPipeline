@@ -622,6 +622,7 @@ rule gwas:
         --bim {input.bim} \
         --fam {input.fam} \
 	--pheno {input.gwasfile} \
+        --pheno-name case \
         --ci 0.95 \
         --assoc \
         --out delivery/gwas \
