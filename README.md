@@ -28,6 +28,7 @@ If you use this workflow in a paper, please cite the URL of this repository (htt
 The documentation of this pipeline is at https://nci-cgr.github.io/GwasQcPipeline/
 
 ### LOG
+- add Plink GWAS for case-controls
 - add `sex_chr_included` parameter to config.yml. If `false` sex concordance check step is skipped.
 - F, M and U are plotted by plot_chrx_inbreeding.py
 - Add plink case/control gwas
