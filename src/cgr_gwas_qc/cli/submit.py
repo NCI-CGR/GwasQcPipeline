@@ -50,7 +50,7 @@ def main(
         None,
         help="Name of the command to use for submission (i.e., qsub, sbatch). "
         "This is required if you are using ``--cluster-profile``. "
-        "Ignored if using ``--cgems`` or ``--biowulf`` or ``--ccad_slurm``.",
+        "Ignored if using ``--cgems`` or ``--biowulf`` or ``--ccad2``.",
     ),
     dry_run: bool = typer.Option(
         False,
