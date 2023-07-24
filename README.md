@@ -27,6 +27,25 @@ If you use this workflow in a paper, please cite the URL of this repository (htt
 
 The documentation of this pipeline is at https://nci-cgr.github.io/GwasQcPipeline/
 
+### Deploying with Docker
+Build docker image from within GwasQcPipeline directory
+```
+docker build -t gwas_qc_pipe .
+```
+
+Test docker image if you have test data
+```
+docker run -v $(pwd):/home/data -i -t gwas_qc_pipe snakemake -k --use-conda -npr
+```
+
+Pull docker image into a singularity image file (assumes singlurity is installed)
+```
+docker run -d -p 5000:5000 --restart=always --name registry registry:2
+docker tag gwas_qc_pipe localhost:5000/gwas_qc_pipe
+docker push localhost:5000/gwas_qc_pipe
+SINGULARITY_NOHTTPS=1 singularity pull cgr_gwas_qc_pipe.sif docker://localhost:5000/gwas_qc_pipe:latest
+```
+
 ### LOG
 - add Plink GWAS for case-controls
 - add `sex_chr_included` parameter to config.yml. If `false` sex concordance check step is skipped.
