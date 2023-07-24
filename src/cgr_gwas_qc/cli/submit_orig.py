@@ -20,15 +20,8 @@ def main(
     cgems: bool = typer.Option(
         False, help="Run the workflow using the CGEMs/CCAD cluster profile."
     ),
-    biowulf: bool = typer.Option(
-        False, help="Run the workflow using the cli Biowulf cluster profile."
-    ),
+    biowulf: bool = typer.Option(False, help="Run the workflow using the Biowulf cluster profile."),
     cluster_profile: Optional[Path] = typer.Option(
-        None,
-        help="Path to a custom cluster profile. See https://github.com/snakemake-profiles/doc.",
-    ),
-    ccad2: bool = typer.Option(False, help="Run the workflow using the cli ccad2 cluster profile."),
-    cluster_profile2: Optional[Path] = typer.Option(
         None,
         help="Path to a custom cluster profile. See https://github.com/snakemake-profiles/doc.",
     ),
@@ -44,13 +37,13 @@ def main(
         None,
         help="Name of the queue for the main process to use. "
         "This option is required if you are using ``--cluster-profile``. "
-        "CGEMs/CCAD, CCAD2, and Biowulf users may want to use this to override which queue to use for the main process.",
+        "CGEMs/CCAD and Biowulf users may want to use this to override which queue to use for the main process.",
     ),
     submission_cmd: Optional[str] = typer.Option(
         None,
         help="Name of the command to use for submission (i.e., qsub, sbatch). "
         "This is required if you are using ``--cluster-profile``. "
-        "Ignored if using ``--cgems`` or ``--biowulf`` or ``--ccad_slurm``.",
+        "Ignored if using ``--cgems`` or ``--biowulf``.",
     ),
     dry_run: bool = typer.Option(
         False,
@@ -79,35 +72,22 @@ def main(
     ),
 ):
     """Submit the CGR GwasQcPipeline to a cluster for execution.
-
     The ``cgr submit`` command will create a submission script and submit it to the cluster.
-    We will create an optimized submission script for users of CGEMs/CCAD, CCAD2 and Biowulf.
+    We will create an optimized submission script for users of CGEMs/CCAD and Biowulf.
     For other systems you will need to provide a snakemake cluster profile to tell snakemake how use your system.
-
     Users running on CGEMs/CCAD will typically run::
-
         cgr submit --cgems
-
     Users running on Biowulf will typically run::
-
         cgr submit --biowulf
-
-    Users running on CCAD2 will typically run::
-
-        cgr submit --ccad2
-
     Users running on other systems will typically run::
-
         cgr submit --profile <path to custom cluster profile> --queue <name of the queue to submit main job> --submission-cmd <tool used for submit such as sbatch or qsub>
-
     .. note::
         Sometimes it may be useful to edit the submission script before submitting it to the cluster.
         In that case you can add the ``--dry-run`` option and edit the generated file in ``.snakemake/GwasQcPipeline_submission.sh``.
         You would then submit this script directly to your cluster (i.e., ``qsub .snakemake/GwasQcPipeline_submission.sh``).
-
     """
 
-    check_exclusive_options(cgems, biowulf, ccad2, cluster_profile)
+    check_exclusive_options(cgems, biowulf, cluster_profile)
 
     payload = {
         "python_executable": sys.executable,
@@ -116,7 +96,6 @@ def main(
         "version": __version__,
         "cgems": cgems,
         "biowulf": biowulf,
-        "ccad2": ccad2,
         "time_hr": time_hr,
         "local_mem_mb": local_mem_mb,
         "local_tasks": local_tasks,
@@ -149,10 +128,6 @@ def main(
         payload["profile"] = get_profile("biowulf")
         payload["queue"] = queue or ("quick,norm" if time_hr <= 4 else "norm")
         submission_cmd = "sbatch"
-    elif ccad2:
-        payload["profile"] = get_profile("ccad2")
-        payload["queue"] = queue or ("quick,norm" if time_hr <= 4 else "norm")
-        submission_cmd = "sbatch"
     else:
         payload["profile"] = check_custom_cluster_profile(cluster_profile, queue, submission_cmd)
         payload["queue"] = queue
@@ -163,12 +138,12 @@ def main(
         print(f"Submitted {job_id}")
 
 
-def check_exclusive_options(cgems, biowulf, ccad2, cluster_profile):
-    if sum([cgems, biowulf, ccad2, (cluster_profile is not None)]) > 1:
+def check_exclusive_options(cgems, biowulf, cluster_profile):
+    if sum([cgems, biowulf, (cluster_profile is not None)]) > 1:
         typer.echo(
             "\n".join(
                 wrap(
-                    "Please only provide one of `--cgems`, `--biowulf`, `--ccad2, or `--cluster_profile`. "
+                    "Please only provide one of `--cgems`, `--biowulf`, or `--cluster_profile`. "
                     "Run `cgr submit --help` for more information.",
                     width=100,
                 )
@@ -206,9 +181,6 @@ def get_profile(cluster: str):
 
     if cluster == "biowulf":
         return (cgr_profiles / "biowulf").as_posix()
-
-    if cluster == "ccad2":
-        return (cgr_profiles / "ccad2").as_posix()
 
 
 def create_submission_script(payload) -> str:

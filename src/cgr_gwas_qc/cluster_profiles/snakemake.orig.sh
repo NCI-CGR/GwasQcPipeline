@@ -20,21 +20,7 @@ unset module
 
 CLUSTER_JOB_ID=${JOB_ID}
 {% endif %}
-
 {% if biowulf %}
-#SBATCH --job-name="GwasQcPipeline"
-#SBATCH --partition="{{ queue }}"
-#SBATCH --output=gwas_qc_log.%j
-#SBATCH --time={{ time_hr }}:00:00
-#SBATCH --nodes=1
-#SBATCH --ntasks={{ local_tasks }}
-#SBATCH --cpus-per-task=1
-#SBATCH --mem={{ local_mem_mb }}
-
-CLUSTER_JOB_ID=${SLURM_JOB_ID}
-{% endif %}
-
-{% if ccad2 %}
 #SBATCH --job-name="GwasQcPipeline"
 #SBATCH --partition="{{ queue }}"
 #SBATCH --output=gwas_qc_log.%j
