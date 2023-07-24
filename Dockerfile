@@ -1,14 +1,15 @@
-FROM continuumio/miniconda3
+FROM continuumio/miniconda3:4.11.0
 RUN apt-get update
 
 #NOTE: I don't know whether the --fix-broken is actually needed
-RUN apt-get -y install gcc libdeflate-dev libcurl4-openssl-dev --fix-broken
+RUN apt-get -y install gcc zip libdeflate-dev libcurl4-openssl-dev --fix-broken
 
-WORKDIR /cgr-dev
+WORKDIR /home
 
 RUN mkdir GwasQcPipeline
+RUN mkdir data
 
-WORKDIR /cgr-dev/GwasQcPipeline
+WORKDIR /home/GwasQcPipeline
 
 ENV PYTHONPATH=${PYTHONPATH}:${PWD}
 
@@ -30,6 +31,7 @@ RUN poetry install --without dev
 #RUN pre-commit install
 #RUN pre-commit run
 
-WORKDIR /cgr-dev
+
+WORKDIR /home/data
 
 ENTRYPOINT [ "cgr" ]

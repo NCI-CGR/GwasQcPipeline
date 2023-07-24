@@ -27,6 +27,16 @@ If you use this workflow in a paper, please cite the URL of this repository (htt
 
 The documentation of this pipeline is at https://nci-cgr.github.io/GwasQcPipeline/
 
+### Deploying with Docker
+
+```
+docker build -t gwas_qc_pipe .
+```
+
+```
+docker run -v $(pwd):/home/data -i -t gwas_qc_pipe snakemake -k --use-conda -npr
+```
+
 ### LOG
 - add Plink GWAS for case-controls
 - add `sex_chr_included` parameter to config.yml. If `false` sex concordance check step is skipped.
