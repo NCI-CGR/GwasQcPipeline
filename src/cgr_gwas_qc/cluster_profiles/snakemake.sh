@@ -43,6 +43,7 @@ CLUSTER_JOB_ID=${SLURM_JOB_ID}
 #SBATCH --ntasks={{ local_tasks }}
 #SBATCH --cpus-per-task=1
 #SBATCH --mem={{ local_mem_mb }}
+#SBATCH --parsable
 
 CLUSTER_JOB_ID=${SLURM_JOB_ID}
 {% endif %}
@@ -176,6 +177,9 @@ trap cgr_cluster_killed USR1
 trap cgr_cluster_killed USR2
 {% endif %}
 {% if biowulf %}
+trap cgr_cluster_killed TERM
+{% endif %}
+{% if ccad2 %}
 trap cgr_cluster_killed TERM
 {% endif %}
 

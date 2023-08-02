@@ -151,7 +151,7 @@ def main(
         submission_cmd = "sbatch"
     elif ccad2:
         payload["profile"] = get_profile("ccad2")
-        payload["queue"] = queue or ("quick,norm" if time_hr <= 4 else "norm")
+        payload["queue"] = queue or ("defq,defq" if time_hr <= 4 else "defq")
         submission_cmd = "sbatch"
     else:
         payload["profile"] = check_custom_cluster_profile(cluster_profile, queue, submission_cmd)
