@@ -15,7 +15,7 @@ jobs:
     if: "!startsWith(github.event.head_commit.message, 'noci') && startsWith(github.event.head_commit.message, 'docs')"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -24,7 +24,7 @@ jobs:
       uses: WyriHaximus/github-action-get-previous-tag@v1
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
 
@@ -49,11 +49,11 @@ jobs:
     if: "!startsWith(github.event.head_commit.message, 'noci') && !startsWith(github.event.head_commit.message, 'docs')"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: "recursive"
     - name: setup-conda
-      uses: s-weigand/setup-conda@v1.0.5
+      uses: s-weigand/setup-conda@v1
       with:
         # Whether to activate the conda base env (Default: 'true')
         activate-conda: true
