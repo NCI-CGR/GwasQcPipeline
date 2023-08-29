@@ -68,6 +68,8 @@ jobs:
         conda install -y mamba
         python -m pip install --upgrade pip
         python -m pip install poetry
+        # poetry config virtualenv.path ~/miniconda3/envs/cgr-dev
+        poetry env info
         poetry install
     - name: Lint with flake8
       run: |
