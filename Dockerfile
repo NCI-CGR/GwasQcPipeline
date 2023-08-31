@@ -1,5 +1,4 @@
-#FROM continuumio/miniconda3:4.11.0
-FROM condaforge/mambaforge:4.11.0-0
+FROM python:3.9
 
 RUN apt-get update
 
@@ -7,6 +6,13 @@ RUN apt-get update
 RUN apt-get -y install gcc make zip libdeflate-dev libcurl4-openssl-dev curl --fix-broken
 
 WORKDIR /home
+
+SHELL ["/bin/bash", "-c"]
+RUN wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
+RUN bash Mambaforge-$(uname)-$(uname -m).sh -p /home/conda -b
+ENV PATH=/home/conda/bin:$PATH
+ENV CONDA_EXE=/home/conda/bin/conda
+RUN source /home/conda/etc/profile.d/conda.sh && conda activate
 
 RUN mkdir GwasQcPipeline
 RUN mkdir data
