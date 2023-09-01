@@ -73,7 +73,7 @@ def run_plink_merge(merge_list, out_prefix, conda_env, threads, mem_mb):
         f" --threads {threads}"
         f" --memory {mem_mb}"
     )
-    return sp.check_output(cmd, shell=True)
+    return sp.check_output(cmd, shell=True, executable="/bin/bash")
 
 
 if __name__ == "__main__" and "snakemake" in locals():

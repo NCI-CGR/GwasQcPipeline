@@ -13,7 +13,7 @@ def main(adpc: PathLike, abf: PathLike, outfile: PathLike, snps: int, conda_env:
         f" -i {adpc}"
         f" > {outfile}"
     )
-    sp.check_output(cmd, shell=True)
+    sp.check_output(cmd, shell=True, executable="/bin/bash")
 
 
 if __name__ == "__main__" and "snakemake" in locals():
