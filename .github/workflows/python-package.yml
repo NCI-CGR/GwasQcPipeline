@@ -29,12 +29,14 @@ jobs:
         python-version: 3.8
 
     - name: Install dependencies
+      shell: bash
       run: |
         python -m pip install --upgrade pip poetry
         poetry version ${{ steps.current_tag.outputs.tag }}
         poetry install
 
     - name: Build Docs
+      shell: bash
       run: |
         poetry run make -C docs html
 
@@ -64,6 +66,7 @@ jobs:
         # Additional channels like 'conda-forge' which can be used to install packages
         conda-channels: conda-forge, bioconda, default
     - name: Install dependencies
+      shell: bash
       run: |
         conda install -y mamba
         python -m pip install --upgrade pip
@@ -71,6 +74,7 @@ jobs:
         poetry env info
         poetry install
     - name: Lint with flake8
+      shell: bash
       run: |
         echo "pass"
         poetry run flake8 .
@@ -80,12 +84,14 @@ jobs:
         # poetry run flake8 . --count --exit-zero --statistics
 
     - name: Run black --check --exclude=tests/data .
+      shell: bash
       run: |
         echo "pass"
         # poetry run black --check --exclude=tests/data .
 
     - name: If needed, commit black changes to the pull request
       if: failure()
+      shell: bash
       run: |
         echo "pass"
         # poetry run black --exclude=tests/data .
@@ -97,6 +103,7 @@ jobs:
         # git push
 
     - name: Test with pytest
+      shell: bash
       run: |
         echo "pass"
         # poetry run pytest
