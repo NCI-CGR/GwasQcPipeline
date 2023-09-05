@@ -38,7 +38,7 @@ markupsafe = "~2.0.1"
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
 # flake8 = "^3.9.2"
-flake8 = "~4.0.0"
+flake8 = "5.0.4"
 snakefmt = "^0.4.0"
 pytest = "^6.2.4"
 sphinx = "^3.2.1"
@@ -59,16 +59,16 @@ sphinx-jsonschema = "1.15"
 Pillow = "^9.0.1"
 Sphinx-Substitution-Extensions = "^2020.9.30"
 sphinx-click = "^3.0.1"
-tomli = "^2.0.1"
+# tomli = "^2.0.1"
 
 [tool.poetry.scripts]
 cgr = "cgr_gwas_qc.cli:app"
 legacy_compare = "cgr_gwas_qc.scripts.legacy_compare:app"
 
-[tool.codespell]
-skip = "*.po,*.ts,poetry.lock"
-# count =
-quiet-level = 3
+# [tool.codespell]
+# skip = "*.po,*.ts,poetry.lock"
+# # count =
+# quiet-level = 3
 
 [tool.isort]
 profile = "black"
