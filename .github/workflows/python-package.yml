@@ -68,7 +68,6 @@ jobs:
         conda install -y mamba
         python -m pip install --upgrade pip
         python -m pip install poetry
-        # poetry config virtualenv.path ~/miniconda3/envs/cgr-dev
         poetry env info
         poetry install
     - name: Lint with flake8
@@ -81,16 +80,16 @@ jobs:
     - name: Run black --check --exclude=tests/data .
       run: poetry run black --check --exclude=tests/data .
 
-    - name: If needed, commit black changes to the pull request
-      if: failure()
-      run: |
-        poetry run black --exclude=tests/data .
-        git config --global user.name 'autoblack'
-        git config --global user.email '1240432+jfear@users.noreply.github.com'
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-        git checkout $GITHUB_HEAD_REF
-        git commit -am "fixup: Format Python code with Black"
-        git push
+    # - name: If needed, commit black changes to the pull request
+    #   if: failure()
+    #   run: |
+    #     poetry run black --exclude=tests/data .
+    #     git config --global user.name 'autoblack'
+    #     git config --global user.email '1240432+jfear@users.noreply.github.com'
+    #     git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+    #     git checkout $GITHUB_HEAD_REF
+    #     git commit -am "fixup: Format Python code with Black"
+    #     git push
 
     - name: Test with pytest
       run: |
