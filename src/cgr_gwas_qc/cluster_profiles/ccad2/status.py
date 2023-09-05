@@ -43,9 +43,7 @@ def main():
 
 def check_sacct(job_id: int) -> Optional[str]:
     try:
-        job_info = sp.check_output(shlex.split(f"sacct -P -b -j {job_id} -n"))
-        with open('/scratch/okuharad2/ccad2/test2/check_sacct_job_info', 'a') as the_file:
-            the_file.write('job_info: ' + str(job_info) + '\n')        
+        job_info = sp.check_output(shlex.split(f"sacct -P -b -j {job_id} -n"))      
     except sp.CalledProcessError as err:
         logger.error("sacct process error")
         logger.error(err)
