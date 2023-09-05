@@ -170,10 +170,10 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
             df.loc[pair, "is_expected_replicate"] = True
         else:
             # issue 234 fix ####
-            d = {'is_expected_replicate': True}
-            record_df = pd.DataFrame(d,index=pd.MultiIndex.from_tuples([pair]))
-            record_df = record_df.rename_axis(["Sample_ID1","Sample_ID2"])
-            df = pd.concat([df,record_df],axis = 0)
+            d = {"is_expected_replicate": True}
+            record_df = pd.DataFrame(d, index=pd.MultiIndex.from_tuples([pair]))
+            record_df = record_df.rename_axis(["Sample_ID1", "Sample_ID2"])
+            df = pd.concat([df, record_df], axis=0)
     return df
 
 

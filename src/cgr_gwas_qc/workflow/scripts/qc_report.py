@@ -86,6 +86,7 @@ def main(
     report = create_report(payload)
     outfile.write_text(report)
 
+
 def create_report(payload: Dict) -> Text:
     template = env.get_template("qc_report.md.j2")
     return template.render(**payload)

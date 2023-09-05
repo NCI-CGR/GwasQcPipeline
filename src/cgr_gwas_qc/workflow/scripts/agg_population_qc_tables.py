@@ -93,12 +93,13 @@ def main(subject_qc_table: Path, population_qc_tables: List[Path], outfile: Path
     )
 
     df.to_csv(outfile, index=False)
-    #i217####
+    # i217####
     gwas_df = create_gwas(df)
     gwas_outfile = "subject_level/gwas.txt"
-    gwas_df.to_csv(gwas_outfile, sep = " ", index=False)
+    gwas_df.to_csv(gwas_outfile, sep=" ", index=False)
     print(gwas_outfile + " complete")
-    #i217####
+    # i217####
+
 
 def aggregate_qc_tables(population_files: List[Path]) -> pd.DataFrame:
     return pd.concat(
@@ -122,18 +123,21 @@ def add_metadata(df: pd.DataFrame, filename: Path):
 def read_agg_population_qc_tables(filename: Path):
     return pd.read_csv(filename, dtype=DTYPES)
 
-#i217####
+
+# i217####
 def create_gwas(df1):
-    temp_df = df1[['Sample_ID','case_control']].copy()
-    temp_df['case_control'] = temp_df['case_control'].str.lower()
-    temp_df = temp_df.loc[temp_df.case_control.str.contains('case|control'),:] 
-    temp_df['case'] = temp_df['case_control'].map({'case':'2','control':'1'})
-    temp_df['IID'] = temp_df['Sample_ID']
-    temp_df.rename(columns={'Sample_ID': 'FID'}, inplace=True)
-    temp_df = temp_df[['FID','IID','case','case_control']]
+    temp_df = df1[["Sample_ID", "case_control"]].copy()
+    temp_df["case_control"] = temp_df["case_control"].str.lower()
+    temp_df = temp_df.loc[temp_df.case_control.str.contains("case|control"), :]
+    temp_df["case"] = temp_df["case_control"].map({"case": "2", "control": "1"})
+    temp_df["IID"] = temp_df["Sample_ID"]
+    temp_df.rename(columns={"Sample_ID": "FID"}, inplace=True)
+    temp_df = temp_df[["FID", "IID", "case", "case_control"]]
     gwas_df = temp_df.dropna().copy()
-    return(gwas_df)
-#i217####
+    return gwas_df
+
+
+# i217####
 
 if __name__ == "__main__":
     if "snakemake" in locals():

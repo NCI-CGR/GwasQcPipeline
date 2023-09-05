@@ -31,6 +31,7 @@ def main(sample_qc: Path, outfile: Path, xchr: str):
     xchr = str(snakemake.params)
     plot(sample, outfile, xchr)
 
+
 """
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     return (
@@ -40,12 +41,14 @@ def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     )
 """
 
+
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
     return (
         sample_qc_table.read(sample_qc)
         .query("is_subject_representative")
         .transform(_update_categories)
     )
+
 
 def _update_categories(sr: pd.DataFrame):
     """Update categorical data types for nicer plots"""
@@ -80,18 +83,17 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None, xchr: bool
     plt.setp(ax.lines, color="k")
 
     # Rename Axes
-    #ax.set_xlabel("Reported Sex")
+    # ax.set_xlabel("Reported Sex")
     ax.set_ylabel("ChrX Inbreeding Coeff")
-    
+
     xchr = xchr.strip().lower() == "true"
-    print(type(xchr), " " ,xchr)
+    print(type(xchr), " ", xchr)
     if xchr:
         print("sex chr included", xchr)
         ax.set_xlabel("Reported Sex")
     else:
         print("No sex chromosome ", xchr)
         ax.set_xlabel("No sex chromosome \nSkipping sex condordace")
-
 
     # Add line at 0.5
     line_defaults = dict(color="k", ls="--")
