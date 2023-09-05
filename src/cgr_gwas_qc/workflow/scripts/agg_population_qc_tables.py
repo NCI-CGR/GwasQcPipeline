@@ -46,9 +46,7 @@ from typing import List
 
 import pandas as pd
 import typer
-import os
 
-from subprocess import Popen
 from cgr_gwas_qc.reporting import CASE_CONTROL_DTYPE
 from cgr_gwas_qc.workflow.scripts import population_qc_table, subject_qc_table
 

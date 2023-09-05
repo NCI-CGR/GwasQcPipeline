@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Dict, Text
 
 import typer
-import os
 
 from cgr_gwas_qc.config import Config
 from cgr_gwas_qc.parsers import sample_sheet
