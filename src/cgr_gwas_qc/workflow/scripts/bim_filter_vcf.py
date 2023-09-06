@@ -20,10 +20,7 @@ def main(
     ),
     vcf_file: Path = typer.Argument(..., help="The 1KG VCF file.", exists=True, readable=True),
     snp_removal_list: Path = typer.Argument(
-        ...,
-        help="Text file to save the list of makers to remove.",
-        file_okay=True,
-        writable=True,
+        ..., help="Text file to save the list of makers to remove.", file_okay=True, writable=True,
     ),
     output_bim: Optional[Path] = typer.Argument(
         None,

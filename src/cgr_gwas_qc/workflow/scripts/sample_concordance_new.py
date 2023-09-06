@@ -104,11 +104,7 @@ def read(filename: PathLike):
 
 @app.command()
 def main(
-    sample_sheet_csv: Path,
-    plink_file: Path,
-    graf_file: Path,
-    king_file: Path,
-    outfile: Path,
+    sample_sheet_csv: Path, plink_file: Path, graf_file: Path, king_file: Path, outfile: Path,
 ):
     ss = sample_sheet.read(sample_sheet_csv)
     concordance = (
@@ -273,8 +269,7 @@ def _graf(filename: PathLike):
         .set_index(["ID1", "ID2"])
         .reindex(["HGMR", "AGMR", "relationship"], axis=1)
         .rename(
-            {"HGMR": "GRAF_HGMR", "AGMR": "GRAF_AGMR", "relationship": "GRAF_relationship"},
-            axis=1,
+            {"HGMR": "GRAF_HGMR", "AGMR": "GRAF_AGMR", "relationship": "GRAF_relationship"}, axis=1,
         )
     )
 
