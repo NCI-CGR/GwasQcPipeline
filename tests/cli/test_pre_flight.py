@@ -88,7 +88,7 @@ def test_check_reference_files_bpm_error(fake_cfg: ConfigMgr, capsys):
     # GIVEN: a working directory
     with chdir(fake_cfg.root):
         # WHEN: Run `cgr pre-flight`
-        reference_files = fake_cfg.config.reference_files.copy()
+        reference_files = fake_cfg.config.reference_files.model_copy()
         reference_files.illumina_manifest_file = "missing.bpm"
         pre_flight.check_reference_files(reference_files)
         # THEN: No errors and `cgr_sample_sheet.csv` exists
@@ -100,7 +100,7 @@ def test_check_reference_files_vcf_error(fake_cfg: ConfigMgr, capsys):
     # GIVEN: a working directory
     with chdir(fake_cfg.root):
         # WHEN: Run `cgr pre-flight`
-        reference_files = fake_cfg.config.reference_files.copy()
+        reference_files = fake_cfg.config.reference_files.model_copy()
         reference_files.thousand_genome_vcf = "missing.vfc"
         pre_flight.check_reference_files(reference_files)
         # THEN: No errors and `cgr_sample_sheet.csv` exists
@@ -112,7 +112,7 @@ def test_check_reference_files_tbi_error(fake_cfg: ConfigMgr, capsys):
     # GIVEN: a working directory
     with chdir(fake_cfg.root):
         # WHEN: Run `cgr pre-flight`
-        reference_files = fake_cfg.config.reference_files.copy()
+        reference_files = fake_cfg.config.reference_files.model_copy()
         reference_files.thousand_genome_tbi = "missing.vfc.tbi"
         pre_flight.check_reference_files(reference_files)
         # THEN: No errors and `cgr_sample_sheet.csv` exists
