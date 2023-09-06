@@ -124,26 +124,25 @@ files = [
 
 [[package]]
 name = "black"
-version = "20.8b1"
+version = "19.10b0"
 description = "The uncompromising code formatter."
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "black-20.8b1.tar.gz", hash = "sha256:1c02557aa099101b9d21496f8a914e9ed2222ef70336404eeeac8edba836fbea"},
+    {file = "black-19.10b0-py36-none-any.whl", hash = "sha256:1b30e59be925fafc1ee4565e5e08abef6b03fe455102883820fe5ee2e4734e0b"},
+    {file = "black-19.10b0.tar.gz", hash = "sha256:c2edb73a08e9e0e6f65a0e6af18b059b8b1cdd5bef997d7a0b181df93dc81539"},
 ]
 
 [package.dependencies]
 appdirs = "*"
-click = ">=7.1.2"
-mypy-extensions = ">=0.4.3"
+attrs = ">=18.1.0"
+click = ">=6.5"
 pathspec = ">=0.6,<1"
-regex = ">=2020.1.8"
-toml = ">=0.10.1"
+regex = "*"
+toml = ">=0.9.4"
 typed-ast = ">=1.4.0"
-typing-extensions = ">=3.7.4"
 
 [package.extras]
-colorama = ["colorama (>=0.4.3)"]
 d = ["aiohttp (>=3.3.2)", "aiohttp-cors"]
 
 [[package]]
@@ -2959,20 +2958,20 @@ files = [
 
 [[package]]
 name = "snakefmt"
-version = "0.4.2"
+version = "0.2.6"
 description = "The uncompromising Snakemake code formatter"
 optional = false
 python-versions = ">=3.6.1,<4.0.0"
 files = [
-    {file = "snakefmt-0.4.2-py3-none-any.whl", hash = "sha256:906739b3084f7040d7272ee778441046c64818763c93dfc1238722cc14175fb6"},
-    {file = "snakefmt-0.4.2.tar.gz", hash = "sha256:6dc37e36091dfacac7b9682576422fdc4ed75b099a19165933fd2317927a0669"},
+    {file = "snakefmt-0.2.6-py3-none-any.whl", hash = "sha256:4b08b77031b95145b8e2a092e6f57f1cd4c922e39735f1f6f881f4f80fca4da1"},
+    {file = "snakefmt-0.2.6.tar.gz", hash = "sha256:90f2b2bdf012bb514f4e3649a3e33d2edae72d202278930901d19a5d744b6f14"},
 ]
 
 [package.dependencies]
-black = ">=20.8.b1,<21.0"
-click = ">=7.1.2,<8.0.0"
+black = ">=19.10b0,<20.0"
+click = ">=7.1.1,<8.0.0"
 importlib_metadata = ">=1.7.0,<2.0.0"
-toml = ">=0.10.2,<0.11.0"
+toml = ">=0.10.0,<0.11.0"
 
 [[package]]
 name = "snakemake"
@@ -3680,4 +3679,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "a7785de46bc0aa9b2324601d3bff0179c1874ad2cff1bd306e7816426fc2cc4c"
+content-hash = "d67ba5124f5b694c5bb0446e0fb0ba8b74cf3ade19c526e7ccd58aacf7a0a0c9"
