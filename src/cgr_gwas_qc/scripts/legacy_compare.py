@@ -161,7 +161,11 @@ def compare_config(config: Config, legacy_dir: Path, ignored_config: bool):
             config.software_params.contam_population,
             "B Allele Frequency Population (contamination check)",
         ),
-        (legacy_config["strand"].lower(), config.software_params.strand, "Strand",),
+        (
+            legacy_config["strand"].lower(),
+            config.software_params.strand,
+            "Strand",
+        ),
         (
             legacy_config["pi_hat_threshold"],
             config.software_params.pi_hat_threshold,
@@ -218,7 +222,8 @@ def _file_comparison(cmp):
         typer.secho(f"{cmp.message} did not match ({cmp.legacy} vs {cmp.current}).", fg=RED)
     except NotImplementedError:
         typer.secho(
-            f"Cannot currently compare {cmp.message}", fg=YELLOW,
+            f"Cannot currently compare {cmp.message}",
+            fg=YELLOW,
         )
 
 
@@ -444,8 +449,11 @@ def compare_contamination(legacy_dir: Path, mix_atol: float, llk_atol: float, ll
 def _parse_snpweights(filename):
     return (
         pd.read_csv(filename, dtype={"ID": str}, low_memory=False)
-        .rename({"ID": "Sample_ID", "AFR": "Pct_AFR", "ASN": "Pct_ASN", "EUR": "Pct_EUR",}, axis=1,)
-        .replace({"EUR": "European", "AFR": "African", "ASN": "East Asian",})
+        .rename(
+            {"ID": "Sample_ID", "AFR": "Pct_AFR", "ASN": "Pct_ASN", "EUR": "Pct_EUR"},
+            axis=1,
+        )
+        .replace({"EUR": "European", "AFR": "African", "ASN": "East Asian"})
         .set_index("Sample_ID")
         .sort_index()
     )
