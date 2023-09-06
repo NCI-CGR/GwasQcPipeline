@@ -176,16 +176,13 @@ def gtc_grouped_entry(pytestconfig, tmp_path_factory, conda_envs):
 def test_gtc_grouped_entry(gtc_entry, gtc_grouped_entry):
     # The merged samples files should exist.
     assert file_hashes_equal(
-        gtc_entry / "sample_level/samples.bed",
-        gtc_grouped_entry / "sample_level/samples.bed",
+        gtc_entry / "sample_level/samples.bed", gtc_grouped_entry / "sample_level/samples.bed",
     )
     assert file_hashes_equal(
-        gtc_entry / "sample_level/samples.bim",
-        gtc_grouped_entry / "sample_level/samples.bim",
+        gtc_entry / "sample_level/samples.bim", gtc_grouped_entry / "sample_level/samples.bim",
     )
     assert file_hashes_equal(
-        gtc_entry / "sample_level/samples.fam",
-        gtc_grouped_entry / "sample_level/samples.fam",
+        gtc_entry / "sample_level/samples.fam", gtc_grouped_entry / "sample_level/samples.fam",
     )
 
 

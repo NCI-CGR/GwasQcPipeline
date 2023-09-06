@@ -102,11 +102,7 @@ def read(filename: PathLike):
 
 @app.command()
 def main(
-    sample_sheet_csv: Path,
-    plink_file: Path,
-    graf_file: Path,
-    king_file: Path,
-    outfile: Path,
+    sample_sheet_csv: Path, plink_file: Path, graf_file: Path, king_file: Path, outfile: Path,
 ):
     ss = sample_sheet.read(sample_sheet_csv)
     concordance = (
@@ -170,10 +166,10 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
             df.loc[pair, "is_expected_replicate"] = True
         else:
             # issue 234 fix ####
-            d = {'is_expected_replicate': True}
-            record_df = pd.DataFrame(d,index=pd.MultiIndex.from_tuples([pair]))
-            record_df = record_df.rename_axis(["Sample_ID1","Sample_ID2"])
-            df = pd.concat([df,record_df],axis = 0)
+            d = {"is_expected_replicate": True}
+            record_df = pd.DataFrame(d, index=pd.MultiIndex.from_tuples([pair]))
+            record_df = record_df.rename_axis(["Sample_ID1", "Sample_ID2"])
+            df = pd.concat([df, record_df], axis=0)
     return df
 
 
@@ -249,8 +245,7 @@ def _graf(filename: PathLike):
         .set_index(["ID1", "ID2"])
         .reindex(["HGMR", "AGMR", "relationship"], axis=1)
         .rename(
-            {"HGMR": "GRAF_HGMR", "AGMR": "GRAF_AGMR", "relationship": "GRAF_relationship"},
-            axis=1,
+            {"HGMR": "GRAF_HGMR", "AGMR": "GRAF_AGMR", "relationship": "GRAF_relationship"}, axis=1,
         )
     )
 

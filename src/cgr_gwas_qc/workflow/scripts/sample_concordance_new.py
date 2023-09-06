@@ -104,11 +104,7 @@ def read(filename: PathLike):
 
 @app.command()
 def main(
-    sample_sheet_csv: Path,
-    plink_file: Path,
-    graf_file: Path,
-    king_file: Path,
-    outfile: Path,
+    sample_sheet_csv: Path, plink_file: Path, graf_file: Path, king_file: Path, outfile: Path,
 ):
     ss = sample_sheet.read(sample_sheet_csv)
     concordance = (
@@ -171,33 +167,33 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
         if pair in df.index:
             df.loc[pair, "is_expected_replicate"] = True
         else:
-            #df.to_csv('/data/okuharad2/cgr-dev/issues/221/df.csv')
-            #print("pair")
-            #print(pair)       
-            #record = pd.Series({"is_expected_replicate": True}, name=pair)
-            d = {'is_expected_replicate': True}
-            record_df = pd.DataFrame(d,index=pd.MultiIndex.from_tuples([pair]))
-            record_df = record_df.rename_axis(["Sample_ID1","Sample_ID2"])
+            # df.to_csv('/data/okuharad2/cgr-dev/issues/221/df.csv')
+            # print("pair")
+            # print(pair)
+            # record = pd.Series({"is_expected_replicate": True}, name=pair)
+            d = {"is_expected_replicate": True}
+            record_df = pd.DataFrame(d, index=pd.MultiIndex.from_tuples([pair]))
+            record_df = record_df.rename_axis(["Sample_ID1", "Sample_ID2"])
             print("record_df")
-            #print(record_df)
-            #print("df before concat")
-            #print(df)
-            #print("index")
-            #print(df.index)
-            df = pd.concat([df,record_df],axis = 0)
-            #print("df after concat")
-            #print(df)
-            #print("df.shape")
-            #print(df.shape)
-            #print("df before append")
-            #print(df)
-            #print("index")
-            #print(df.index)
-            #print("record")
-            #print(record)
-            #df = df.append(record)
-            #print("df after append")
-            #print(df)
+            # print(record_df)
+            # print("df before concat")
+            # print(df)
+            # print("index")
+            # print(df.index)
+            df = pd.concat([df, record_df], axis=0)
+            # print("df after concat")
+            # print(df)
+            # print("df.shape")
+            # print(df.shape)
+            # print("df before append")
+            # print(df)
+            # print("index")
+            # print(df.index)
+            # print("record")
+            # print(record)
+            # df = df.append(record)
+            # print("df after append")
+            # print(df)
     return df
 
 
@@ -273,8 +269,7 @@ def _graf(filename: PathLike):
         .set_index(["ID1", "ID2"])
         .reindex(["HGMR", "AGMR", "relationship"], axis=1)
         .rename(
-            {"HGMR": "GRAF_HGMR", "AGMR": "GRAF_AGMR", "relationship": "GRAF_relationship"},
-            axis=1,
+            {"HGMR": "GRAF_HGMR", "AGMR": "GRAF_AGMR", "relationship": "GRAF_relationship"}, axis=1,
         )
     )
 

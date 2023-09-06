@@ -42,10 +42,7 @@ def main(
         writable=True,
     ),
     id_map_out: Path = typer.Argument(
-        ...,
-        help="CSV mapping array ids to thousand genome ids.",
-        file_okay=True,
-        writable=True,
+        ..., help="CSV mapping array ids to thousand genome ids.", file_okay=True, writable=True,
     ),
 ):
     """Compares a plink BIM file with a VCF and updates IDs to match VCF.

@@ -125,7 +125,7 @@ def main(
 def check_config(filename: Path) -> Config:
     try:
         data = yaml.load(filename)
-        config = Config.parse_obj(data)
+        config = Config.model_validate(data)
     except Exception as err:
         if isinstance(err, OSError):
             msg = err.args[1]

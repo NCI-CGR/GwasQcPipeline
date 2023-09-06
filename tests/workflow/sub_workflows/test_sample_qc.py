@@ -339,8 +339,7 @@ def sample_qc_workflow(pytestconfig, tmp_path_factory, conda_envs):
 @pytest.mark.workflow
 def test_sample_qc_compare_hashes(real_data_cache, sample_qc_workflow, filename):
     assert comparison.file_hashes_equal(
-        real_data_cache / "dev_outputs" / filename,
-        sample_qc_workflow / filename,
+        real_data_cache / "dev_outputs" / filename, sample_qc_workflow / filename,
     )
 
 
