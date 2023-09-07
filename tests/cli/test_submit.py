@@ -5,42 +5,30 @@ from cgr_gwas_qc.testing import chdir
 from cgr_gwas_qc.testing.data import FakeData
 
 
-# [(True, False, None), (False, True, None), (False, False, "./test")],
 @pytest.mark.parametrize(
-    "cgems,biowulf,ccad2,cluster_profile",
-    [
-        (True, False, False, None),
-        (False, True, False, None),
-        (False, False, True, None),
-        (False, False, False, "./test"),
-    ],
+    "cgems,biowulf,cluster_profile",
+    [(True, False, None), (False, True, None), (False, False, "./test")],
 )
-def test_check_exclusive_options_no_error(cgems, biowulf, ccad2, cluster_profile):
+def test_check_exclusive_options_no_error(cgems, biowulf, cluster_profile):
     from cgr_gwas_qc.cli.submit import check_exclusive_options
 
-    check_exclusive_options(cgems, biowulf, ccad2, cluster_profile)
+    check_exclusive_options(cgems, biowulf, cluster_profile)
 
 
-# [(True, True, "./test"), (True, True, None), (True, False, "./test"), (False, True, "./test")],
 @pytest.mark.parametrize(
-    "cgems,biowulf,ccad2,cluster_profile",
-    [
-        (True, True, True, "./test"),
-        (True, True, True, None),
-        (True, False, False, "./test"),
-        (False, True, False, "./test"),
-    ],
+    "cgems,biowulf,cluster_profile",
+    [(True, True, "./test"), (True, True, None), (True, False, "./test"), (False, True, "./test")],
 )
-def test_check_exclusive_options_raises_error(cgems, biowulf, ccad2, cluster_profile):
+def test_check_exclusive_options_raises_error(cgems, biowulf, cluster_profile):
     from click.exceptions import Exit as ClickExit
 
     from cgr_gwas_qc.cli.submit import check_exclusive_options
 
     with pytest.raises(ClickExit):
-        check_exclusive_options(cgems, biowulf, ccad2, cluster_profile)
+        check_exclusive_options(cgems, biowulf, cluster_profile)
 
 
-@pytest.mark.parametrize("cluster", ["cgems", "biowulf", "ccad2"])
+@pytest.mark.parametrize("cluster", ["cgems", "biowulf"])
 def test_get_profile(cluster):
     from pathlib import Path
 
@@ -144,44 +132,19 @@ def test_create_submission_script_biowulf(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "cluster,cmd",
-    [("cgems", "qsub"), ("biowulf", "sbatch"), ("ccad2", "sbatch"), ("custom", "pbs")],
+    "cluster,cmd", [("cgems", "qsub"), ("biowulf", "sbatch"), ("custom", "pbs")]
 )
 def test_run_submit_with_right_command(cluster, cmd, tmp_path, mocker: MockerFixture):
     from cgr_gwas_qc.cli import submit
 
     if cluster == "cgems":
-        cgems, biowulf, ccad2, cluster_profile, queue, submission_cmd = (
-            True,
-            False,
-            False,
-            None,
-            None,
-            None,
-        )
+        cgems, biowulf, cluster_profile, queue, submission_cmd = True, False, None, None, None
     elif cluster == "biowulf":  # Biowulf
-        cgems, biowulf, ccad2, cluster_profile, queue, submission_cmd = (
-            False,
-            True,
-            False,
-            None,
-            None,
-            None,
-        )
-    elif cluster == "ccad2":
-        cgems, biowulf, ccad2, cluster_profile, queue, submission_cmd = (
-            False,
-            False,
-            True,
-            None,
-            None,
-            None,
-        )
+        cgems, biowulf, cluster_profile, queue, submission_cmd = False, True, None, None, None
     else:
         profile_dir = tmp_path / "test_profile"
         profile_dir.mkdir()
-        cgems, biowulf, ccad2, cluster_profile, queue, submission_cmd = (
-            False,
+        cgems, biowulf, cluster_profile, queue, submission_cmd = (
             False,
             False,
             profile_dir,
@@ -195,7 +158,6 @@ def test_run_submit_with_right_command(cluster, cmd, tmp_path, mocker: MockerFix
         submit.main(
             cgems=cgems,
             biowulf=biowulf,
-            ccad2=ccad2,
             cluster_profile=cluster_profile,
             subworkflow=None,
             time_hr=12,
