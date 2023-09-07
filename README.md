@@ -47,6 +47,7 @@ SINGULARITY_NOHTTPS=1 singularity pull cgr_gwas_qc_pipe.sif docker://localhost:5
 ```
 
 ### LOG
+- add ccad-slurm profile in work
 - add Plink GWAS for case-controls
 - add `sex_chr_included` parameter to config.yml. If `false` sex concordance check step is skipped.
 - F, M and U are plotted by plot_chrx_inbreeding.py
