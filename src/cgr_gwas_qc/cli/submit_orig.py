@@ -57,7 +57,7 @@ def main(
         "This option runs the workflow using ``snakemake --notemp``.",
     ),
     local_mem_mb: int = typer.Option(
-        1024**8,
+        1024 ** 8,
         help="The amount of memory to use for main snakemake process and local rules [default 8GB]. "
         "There are a number of rules that are run along side of the main snakemake process instead of submitting a new job. "
         "If you have a very large project >50k samples, you may want to increase the amount of memory used for this job. "

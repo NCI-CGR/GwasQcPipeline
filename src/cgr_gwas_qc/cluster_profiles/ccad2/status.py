@@ -30,6 +30,7 @@ STATUS_CODES = {
     "TIMEOUT": "failed",
 }
 
+
 def main():
     job_id = int(sys.argv[1])
     for _ in range(MAX_STATUS_ATTEMPTS):
@@ -43,7 +44,7 @@ def main():
 
 def check_sacct(job_id: int) -> Optional[str]:
     try:
-        job_info = sp.check_output(shlex.split(f"sacct -P -b -j {job_id} -n"))      
+        job_info = sp.check_output(shlex.split(f"sacct -P -b -j {job_id} -n"))
     except sp.CalledProcessError as err:
         logger.error("sacct process error")
         logger.error(err)
