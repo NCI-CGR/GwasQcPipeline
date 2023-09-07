@@ -138,7 +138,7 @@ class DataRepo(ABC):
 
         Raises:
             ValueError: You must have provided a working directory when
-              instantiating the object.
+                        instantiating the object.
 
         Returns:
             Creates a file ``working_dir/cgr_sample_sheet.csv`` and returns
@@ -169,7 +169,7 @@ class DataRepo(ABC):
 
         Args:
             entry_point: Which entry point to use ("gtc", "ped", or "bed").
-              Defaults to "bed".
+                            Defaults to "bed".
 
         """
         if self.working_dir and copy:

@@ -105,7 +105,7 @@ class UserFiles(BaseModel):
 
         return v
 
-    @root_validator(skip_on_failure=True)
+    @root_validator
     def check_ped_map(cls, values):
         ped, map_ = values.get("ped"), values.get("map")
         if ped is not None and map_ is None:
@@ -116,7 +116,7 @@ class UserFiles(BaseModel):
 
         return values
 
-    @root_validator(skip_on_failure=True)
+    @root_validator
     def check_bed_bim_fam(cls, values):
         bed, bim, fam = values.get("bed"), values.get("bim"), values.get("fam")
 

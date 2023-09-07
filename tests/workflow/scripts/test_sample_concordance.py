@@ -55,12 +55,14 @@ def test_add_expected_replicate_missing_pair(fake_cfg, concordance):
     # GIVEN: That I have an expected replicate that is not in the concordance table
     ss = fake_cfg.ss.copy()
     ss.loc[0, "replicate_ids"] = "SP00001|SP10000"  # Add an expected replicate
-    ss = ss.append(
-        pd.Series({"Sample_ID": "SP10000", "replicate_ids": "SP00001|SP10000"}), ignore_index=True
-    )
+    pseudo_data = pd.DataFrame({"Sample_ID": ["SP10000"], "replicate_ids": ["SP00001|SP10000"]})
+    ss = pd.concat([ss, pseudo_data], ignore_index=True)
 
     # THEN: I should add that pair and flag them as an expected_replicate
     df = concordance.pipe(sample_concordance._add_expected_replicates, ss)
+    print("!!!!!!!!")
+    print(df["is_expected_replicate"].values)
+    print("!!!!!!!!")
     assert 2 == df.is_expected_replicate.sum()
 
 

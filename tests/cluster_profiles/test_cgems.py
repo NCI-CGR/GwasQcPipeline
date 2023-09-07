@@ -9,6 +9,10 @@ import snakemake
     os.environ.get("GITHUB_ACTIONS", "false") == "true", reason="Broken on GitHub Actions"
 )
 def test_cgems_submission_end_to_end(tmp_path, qsub):
+    # tmp_path = "src/cgr_gwas_qc/testing"
+    print("!!!!!!!!!")
+    print(tmp_path)
+    print("!!!!!!!!!")
     with pytest.raises(SystemExit) as exc:
         args = [
             "-j",
