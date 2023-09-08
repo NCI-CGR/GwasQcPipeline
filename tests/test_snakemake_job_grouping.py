@@ -1,5 +1,6 @@
 import shutil
 import subprocess as sp
+import tempfile
 from textwrap import dedent
 
 import pytest
@@ -68,7 +69,7 @@ def test_basic_grouping(tmp_path, qsub):
         "input": [],
         "local": False,
         "output": ["b/1.out"],
-        "resources": {},
+        "resources": {"tmpdir": tempfile.gettempdir()},
         "threads": 1,
         "type": "group",
     }
@@ -118,7 +119,7 @@ def test_wildcard_grouping(tmp_path, qsub):
         "input": [],
         "local": False,
         "output": ["b/1.out"],
-        "resources": {},
+        "resources": {"tmpdir": tempfile.gettempdir()},
         "threads": 1,
         "type": "group",
     }
@@ -172,7 +173,11 @@ def test_basic_grouping_max_resource(a_mem, b_mem, tmp_path, qsub):
         "input": [],
         "local": False,
         "output": ["b/1.out"],
-        "resources": {"mem": 2, "ssd": 2},  # max mem is always used
+        "resources": {
+            "mem": 2,
+            "ssd": 2,
+            "tmpdir": tempfile.gettempdir(),
+        },  # max mem is always used
         "threads": 1,
         "type": "group",
     }
@@ -222,7 +227,7 @@ def test_basic_grouping_max_threads(a_cpu, b_cpu, tmp_path, qsub):
         "input": [],
         "local": False,
         "output": ["b/1.out"],
-        "resources": {},
+        "resources": {"tmpdir": tempfile.gettempdir()},
         "threads": 2,  # should be the max
         "type": "group",
     }
