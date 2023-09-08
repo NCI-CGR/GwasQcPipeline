@@ -32,7 +32,7 @@ class Ccad2Options(ClusterOptions):
             " --output={log}"
             " --parsable"
         )
-        #if self.time > timedelta(hours=4):
+        # if self.time > timedelta(hours=4):
         #    self.queue.discard("defq")
         return cmd.format(
             queue=",".join(self.queue),
