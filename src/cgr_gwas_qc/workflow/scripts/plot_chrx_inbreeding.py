@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import typer
-import snakemake
+#import snakemake
 
 from cgr_gwas_qc.reporting import CASE_CONTROL_COLORS
 from cgr_gwas_qc.workflow.scripts import sample_qc_table
