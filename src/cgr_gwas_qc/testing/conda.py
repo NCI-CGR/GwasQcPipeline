@@ -24,7 +24,6 @@ from cgr_gwas_qc.conda import get_snakemake_conda_env
 
 
 class CondaEnv:
-
     conda_env_path = Path(__file__).absolute().parents[1] / "workflow/conda"
 
     def __init__(self, cache_path: Optional[Union[str, Path]] = None):
@@ -128,4 +127,6 @@ class CondaEnv:
                 build_path,
             ]
         )
-        subprocess.run(cmd, shell=True, check=True, stderr=subprocess.STDOUT)
+        subprocess.run(
+            cmd, shell=True, check=True, stderr=subprocess.STDOUT, executable="/bin/bash"
+        )

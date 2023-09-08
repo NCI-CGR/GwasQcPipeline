@@ -498,7 +498,9 @@ class RealData(DataRepo):
             ]
         )
         try:
-            subprocess.run(cmd, shell=True, check=True, stderr=subprocess.STDOUT)
+            subprocess.run(
+                cmd, shell=True, check=True, stderr=subprocess.STDOUT, executable="/bin/bash"
+            )
         except subprocess.SubprocessError:
             warn(
                 f"Could not connect to {user}@{server}:{remote_path}. To "

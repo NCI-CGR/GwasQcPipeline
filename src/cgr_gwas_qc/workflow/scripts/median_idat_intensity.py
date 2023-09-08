@@ -15,7 +15,7 @@ def main(
 ):
     Rscript = Path(get_snakemake_conda_env(conda_env)) / "bin/Rscript"
     cmd = f"{Rscript} --vanilla {rscript} {sample_id} {red} {green} {outfile}"
-    sp.check_output(cmd, shell=True)
+    sp.check_output(cmd, shell=True, executable="/bin/bash")
 
 
 if __name__ == "__main__" and "snakemake" in locals():
