@@ -28,7 +28,7 @@ app = typer.Typer(add_completion=False)
 @app.command()
 def main(sample_qc: Path, outfile: Path, xchr: str):
     sample = load_sample_data(sample_qc)
-    xchr = str(snakemake.params)
+    xchr = str(snakemake.params) # type: ignore # noqa
     plot(sample, outfile, xchr)
 
 
@@ -112,7 +112,7 @@ if __name__ == "__main__":
         defaults = {}
         defaults.update({"sample_qc": Path(snakemake.input[0])})  # type: ignore # noqa
         defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
-        defaults.update({"xchr": snakemake.params})  # type: ignore # noqa
+        defaults.update({"xchr": snakemake.params}) # type: ignore # noqa
         main(**defaults)
     else:
         app()

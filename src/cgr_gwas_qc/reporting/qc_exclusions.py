@@ -95,7 +95,8 @@ def subject_exclusion_counts(subject: DataFrameOrFile, population: DataFrameOrFi
     )
     population_exclusions = _create_population_exclusion_counts_table(population_df)
 
-    return subject_exclusions.append(population_exclusions).fillna(0)
+    return pd.concat([subject_exclusions,population_exclusions],axis=0, join='outer').fillna(0)
+    #return subject_exclusions.append(population_exclusions).fillna(0)
 
 
 def _create_subject_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
