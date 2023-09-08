@@ -1,10 +1,12 @@
 import os
 from pathlib import Path
+from shutil import which
 
 import pytest
 import snakemake
 
 
+@pytest.mark.skipif(which("qsub") is None, reason="Not an SGE system with qsub command to test")
 @pytest.mark.skipif(
     os.environ.get("GITHUB_ACTIONS", "false") == "true", reason="Broken on GitHub Actions"
 )
