@@ -29,8 +29,8 @@ $ poetry --version
     If poetry version not accesible, check your PATH and ensure poetry's install location is findable.
     If default python version is not 3.8, then follow these `instructions`_.
 
-.. _Poetry installer https://python-poetry.org/docs/#installation
-.. _instructions https://www.baeldung.com/linux/default-python3
+.. _Poetry installer: https://python-poetry.org/docs/#installation
+.. _instructions: https://www.baeldung.com/linux/default-python3
 
 Create a virtual environment (``conda``)
 ----------------------------------------
