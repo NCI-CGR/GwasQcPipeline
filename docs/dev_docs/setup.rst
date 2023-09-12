@@ -3,23 +3,11 @@
 Development Environment Set-up
 ==============================
 
-Download GwasQcPipeline
------------------------
 
-First we need to download the development version of GwasQcPipeline.::
+Install ``poetry``
+------------------
 
-    $ git clone --recursive https://github.com/NCI-CGR/GwasQcPipeline.git
-    $ cd GwasQcPipeline
-
-.. note::
-
-    Our test data (``tests/data``) is stored in a separate git repository.
-    This repository is embedded as a git submodule. The ``--recursive`` tells git to go ahead and download ``tests/data``.
-
-Install poetry
---------------
-
-Use official `Poetry installer`_.
+First we need to download poetrys by using the official `Poetry installer`_.
 
 $ curl -sSL https://install.python-poetry.org | python3 –
 $ poetry --version
@@ -67,6 +55,20 @@ Next, To create our ``conda`` environment run::
     ``psutil`` and ``pysam`` are also runtime requirements.
     If you have ``gcc`` installed, they should be automatically built during the installation step below.
     However, if you have problems you may want to install them with ``conda activate cgr-dev && conda install psutil pysam``.
+
+Download GwasQcPipeline
+-----------------------
+
+Download the development version of GwasQcPipeline.::
+
+    $ git clone --recursive https://github.com/NCI-CGR/GwasQcPipeline.git
+    $ cd GwasQcPipeline
+
+.. note::
+
+    Our test data (``tests/data``) is stored in a separate git repository.
+    This repository is embedded as a git submodule. The ``--recursive`` tells git to go ahead and download ``tests/data``.
+
 
 Install dependencies and GwasQcPipeline (``poetry``)
 ----------------------------------------------------
