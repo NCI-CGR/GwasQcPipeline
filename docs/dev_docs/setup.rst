@@ -91,7 +91,7 @@ Now lets make sure everything is working::
 
     $ cgr --help                  # This is our main entry point to running the workflow
     $ make -C docs html           # This will build documentation into docs/_build/html
-    $ pytest -v                   # This will run the test suite
+    $ poetry run pytest -vvv      # This will run the test suite
 
 The main reason we are using poetry is because it makes building python packages easy.
 In order to match the new config.yaml version line with the new QwasQcPipeline version
