@@ -7,10 +7,10 @@ Development Environment Set-up
 Install ``poetry``
 ------------------
 
-First we need to download poetrys by using the official `Poetry installer`_.
+First we need to download poetry by using the official `Poetry installer`_.
 
-$ curl -sSL https://install.python-poetry.org | python3 –
-$ poetry --version
+    $ curl -sSL https://install.python-poetry.org | python3 –
+    $ poetry --version
 
 .. note::
 
