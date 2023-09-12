@@ -7,25 +7,24 @@ Development Environment Set-up
 Install ``poetry``
 ------------------
 
-First we need to download poetry by using the official `Poetry installer`_.
+First we need to download poetry by using the official `Poetry installer`_.::
 
-    $ curl -sSL https://install.python-poetry.org | python3
-    $
+    $ curl -sSL https://install.python-poetry.org | python -
     $ poetry --version
+
+.. _Poetry installer: https://python-poetry.org/docs/#installation
+.. _instructions: https://www.baeldung.com/linux/default-python3
 
 .. note::
 
     If poetry version not accesible, check your PATH and ensure poetry's install location is findable.
     If default python version is not 3.8, then follow these `instructions`_.
 
-.. _Poetry installer: https://python-poetry.org/docs/#installation
-.. _instructions: https://www.baeldung.com/linux/default-python3
-
 Create a virtual environment (``conda``)
 ----------------------------------------
 
 We are going to create a ``conda`` virtual environment to store the development environment.
-If you need to install ``conda`` see the `Miniconda website`_. We reccomend installing conda locally
+If you need to install ``conda`` see the `Miniconda website`_. We reccomend installing conda locally::
 
     $ wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
     $ bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -p miniconda3 -b
