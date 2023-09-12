@@ -10,6 +10,7 @@ Install ``poetry``
 First we need to download poetry by using the official `Poetry installer`_.
 
     $ curl -sSL https://install.python-poetry.org | python3 -
+    $
     $ poetry --version
 
 .. note::
