@@ -38,9 +38,30 @@ Test docker image if you have test data
 docker run -v $(pwd):/home/data -i -t gwas_qc_pipe snakemake -k --use-conda -npr
 ```
 
-### LOG
-- add ccad-slurm profile in work
-- add Plink GWAS for case-controls
-- add `sex_chr_included` parameter to config.yml. If `false` sex concordance check step is skipped.
-- F, M and U are plotted by plot_chrx_inbreeding.py
-- Add plink case/control gwas
+# Installing GwasQcPipeline on ccad2
+- Install miniconda and then create GwasQcPipeline production environment
+```
+$ mkdir /scratch/myfolder/GwasQcPipeline_v1.2
+$ cd /scratch/myfolder/GwasQcPipeline_v1.2
+$ wget https://repo.anaconda.com/miniconda/ Miniconda3-py39_4.12.0-Linux-x86_64.sh
+$ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -p /scratch/myfolder/GwasQcPipeline_v1.2/conda -b
+$ source conda/bin/activate base
+(base) $ conda update -n base -c defaults conda
+(base) $ conda install -n base -c conda-forge mamba
+(base) $ conda create -n GwasQcPipeline -y python=3.8 pip
+(base) $ conda deactivate
+```
+- Install GwasQcPipeline source code
+```
+$ source /scratch/myfolder/GwasQcPipeline_v1.2/conda/bin/activate GwasQcPipeline 
+(GwasQcPipeline) $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
+(GwasQcPipeline) $ cgr --help
+(GwasQcPipeline) $ cgr version
+v1.2.0
+```
+## Usage
+```cgr submit --ccad2 --local-mem-mb 8000```
+
+### LOG v1.2.0
+- add ccad2-slurm profile
+
