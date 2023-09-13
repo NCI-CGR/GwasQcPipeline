@@ -43,7 +43,7 @@ docker run -v $(pwd):/home/data -i -t gwas_qc_pipe snakemake -k --use-conda -npr
 ```
 $ mkdir /scratch/myfolder/GwasQcPipeline_v1.2
 $ cd /scratch/myfolder/GwasQcPipeline_v1.2
-$ wget https://repo.anaconda.com/miniconda/ Miniconda3-py39_4.12.0-Linux-x86_64.sh
+$ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
 $ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -p /scratch/myfolder/GwasQcPipeline_v1.2/conda -b
 $ source conda/bin/activate base
 (base) $ conda update -n base -c defaults conda
