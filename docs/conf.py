@@ -63,6 +63,7 @@ extensions = [
     "sphinx-prompt",
     "sphinx_substitution_extensions",
     "sphinx_click",
+    "sphinx-jsonschema",
 ]
 
 todo_include_todos = True
