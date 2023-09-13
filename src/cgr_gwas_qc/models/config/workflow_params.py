@@ -16,7 +16,7 @@ class WorkflowParams(BaseModel):
             minimum_pop_subjects: 50
             control_hwp_threshold: 50
             lims_upload: false
-            case_control_gwas: true
+            case_control_gwas: false
     """
 
     subject_id_column: str = Field(
@@ -72,7 +72,7 @@ class WorkflowParams(BaseModel):
     )
 
     case_control_gwas: bool = Field(
-        True,
+        False,
         description="A plink logistic regression gwas will be performed with case_control phenotype.",
     )
 

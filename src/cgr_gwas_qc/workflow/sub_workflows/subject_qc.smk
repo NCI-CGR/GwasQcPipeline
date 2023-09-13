@@ -46,7 +46,6 @@ targets = [
     "subject_level/population_qc.csv",
     "subject_level/.population_plots.done",
     "subject_level/.control_plots.done",
-    "subject_level/gwas.txt",
     "delivery/gwas.assoc",
 ]
 
@@ -524,18 +523,15 @@ def _population_qc_tables(wildcards):
     return expand(rules.per_population_qc_table.output[0], population=populations)
 
 
-# issue 217 temp fix. need to create rule for gwas.txt
 rule agg_population_qc_tables:
     input:
         subject_qc_table=rules.subject_qc_table.output[0],
         population_qc_tables=_population_qc_tables,
     output:
         "subject_level/population_qc.csv",
-        "subject_level/gwas.txt",
     script:
         "../scripts/agg_population_qc_tables.py"
 
-# gwas  (see plink_stats.smk 'gwas')
 print("gwas =",cfg.config.workflow_params.case_control_gwas)
 
 if cfg.config.workflow_params.case_control_gwas:
