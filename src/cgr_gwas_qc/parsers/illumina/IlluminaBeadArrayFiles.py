@@ -329,7 +329,7 @@ class GenotypeCalls:
                 "The number of reference strand annotations must match the number of loci in the GTC file"
             )
 
-        for (genotype, snp, strand_annotation) in zip(genotypes, snps, strand_annotations):
+        for genotype, snp, strand_annotation in zip(genotypes, snps, strand_annotations):
             ab_genotype = code2genotype[genotype]
             a_nucleotide = snp[1]
             b_nucleotide = snp[-2]
@@ -572,6 +572,7 @@ class GenotypeCalls:
         Return:
             The normalized intensities for the sample as a list of (x,y) float tuples
         """
+
         normalization_transforms = self.get_normalization_transforms()
         return [
             normalization_transforms[lookup].normalize_intensities(x_raw, y_raw)
