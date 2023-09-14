@@ -95,7 +95,7 @@ Now lets make sure everything is working::
 
 The main reason we are using poetry is because it makes building python packages easy.
 In order to match the new config.yaml version line with the new QwasQcPipeline version
-edit and update the ``version = "0.1.2"`` line in the ``pyproject.toml`` file::
+edit and update the ``version = "1.2.0"`` line in the ``pyproject.toml`` file::
 
     $ poetry build                # Build artifacts are in ./dist
 
