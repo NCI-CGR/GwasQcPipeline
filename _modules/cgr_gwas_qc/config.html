@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.config &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>cgr_gwas_qc.config &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +17,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +30,7 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -52,7 +50,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -83,13 +81,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -97,18 +95,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -136,8 +134,6 @@
         <div class="rst-content">
         
           
-
-
 
 
 
@@ -195,7 +191,7 @@
 
 
 <div class="viewcode-block" id="ConfigMgr"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr">[docs]</a><span class="k">class</span> <span class="nc">ConfigMgr</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Manage all things config.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manage all things config.</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; from cgr_gwas_qc import load_config</span>
@@ -249,7 +245,7 @@
 
 <div class="viewcode-block" id="ConfigMgr.instance"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.instance">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pytest</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the active ConfigMgr instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the active ConfigMgr instance.</span>
 
 <span class="sd">        This ensures that only 1 ConfigMgr is created per python session.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -266,7 +262,7 @@
     <span class="c1">################################################################################</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The user&#39;s config settings from ``config.yml``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The user&#39;s config settings from ``config.yml``.</span>
 
 <span class="sd">        Example:</span>
 <span class="sd">            &gt;&gt;&gt; from cgr_gwas_qc import load_config</span>
@@ -278,7 +274,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ss</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The user&#39;s sample sheet data.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The user&#39;s sample sheet data.</span>
 
 <span class="sd">        Example:</span>
 <span class="sd">            &gt;&gt;&gt; cfg = load_config()</span>
@@ -291,7 +287,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cluster_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;List of the cluster group names from ``cgr_sample_sheet.csv``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List of the cluster group names from ``cgr_sample_sheet.csv``.</span>
 
 <span class="sd">        Example:</span>
 <span class="sd">            &gt;&gt;&gt; cfg = load_config()</span>
@@ -306,7 +302,7 @@
 <div class="viewcode-block" id="ConfigMgr.expand"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr.expand">[docs]</a>    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">file_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">combination</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Use sample sheet columns to fill in file pattern</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Use sample sheet columns to fill in file pattern</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file_pattern: A snakemake compatible file name pattern.</span>
@@ -330,7 +326,7 @@
 
 <div class="viewcode-block" id="ConfigMgr.conda"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr.conda">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">conda</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return path to a conda env file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return path to a conda env file.</span>
 
 <span class="sd">        Given a conda env file_name, prepends the full path to that file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -338,7 +334,7 @@
 
 <div class="viewcode-block" id="ConfigMgr.modules"><a class="viewcode-back" href="../../api/config.html#cgr_gwas_qc.config.ConfigMgr.modules">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">modules</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the path to a module file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the path to a module file.</span>
 
 <span class="sd">        Given a rule file_name, prepends the full path to that module.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -346,7 +342,7 @@
 
 <div class="viewcode-block" id="ConfigMgr.scripts"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr.scripts">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">scripts</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the path to an internal script.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the path to an internal script.</span>
 
 <span class="sd">        Given a script file_name, prepends the full path to that script.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -354,7 +350,7 @@
 
 <div class="viewcode-block" id="ConfigMgr.subworkflow"><a class="viewcode-back" href="../../dev_docs/source_code.html#cgr_gwas_qc.config.ConfigMgr.subworkflow">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">subworkflow</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">workflow</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the path to a sub-workflow.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the path to a sub-workflow.</span>
 
 <span class="sd">        Given a sub-workflow name, give the full path to the snakefile.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -362,7 +358,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">docx_template</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the path to the docx template.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the path to the docx template.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_DIR</span> <span class="o">/</span> <span class="s2">&quot;cgr_reference.docx&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
 
@@ -370,7 +366,7 @@
 <span class="c1"># Helper functions for Set-up</span>
 <span class="c1">################################################################################</span>
 <span class="k">def</span> <span class="nf">scan_for_yaml</span><span class="p">(</span><span class="n">base_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Scans a directory for Yaml configs.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scans a directory for Yaml configs.</span>
 
 <span class="sd">    The Yaml format commonly has ``*.yml`` or ``*.yaml`` file extensions.</span>
 <span class="sd">    This will search for ``{base_dir}/{name}.{yml,yaml}`` and returns</span>
@@ -410,7 +406,7 @@
     <span class="n">cfg</span><span class="p">:</span> <span class="n">Config</span><span class="p">,</span> <span class="n">yaml_file</span><span class="p">:</span> <span class="n">PathLike</span> <span class="o">=</span> <span class="s2">&quot;config.yml&quot;</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Scan for path objects and convert to strings.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scan for path objects and convert to strings.&quot;&quot;&quot;</span>
         <span class="n">cleaned</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -430,25 +426,28 @@
            
           </div>
           <footer>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

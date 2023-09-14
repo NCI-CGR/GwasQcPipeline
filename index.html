@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>GwasQcPipeline Documentation &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>GwasQcPipeline Documentation &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +18,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +31,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -53,7 +52,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> GwasQcPipeline
+            <a href="#" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -84,13 +83,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -98,18 +97,18 @@
 <li class="toctree-l1"><a class="reference internal" href="sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -152,8 +151,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -165,7 +162,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -179,16 +176,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="gwasqcpipeline-documentation">
+  <section id="gwasqcpipeline-documentation">
 <h1>GwasQcPipeline Documentation<a class="headerlink" href="#gwasqcpipeline-documentation" title="Permalink to this headline">¶</a></h1>
 <p>The <em>CGR GwasQcPipeline</em> generates a number of sample level QC metrics followed by several filtering criteria.
 Samples are then split into ancestral populations and examined for relatedness, population structure, and genotyping errors.
 The full workflow is pictured in <a class="reference internal" href="#fig-full-pipeline"><span class="std std-numref">Fig. 1</span></a>.</p>
-<div class="figure align-default" id="fig-full-pipeline">
-<img alt="_images/GwasQcPipelineWorkflow.svg" src="_images/GwasQcPipelineWorkflow.svg" /><p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">The <em>CGR GwasQcPipeline</em>.</span><a class="headerlink" href="#fig-full-pipeline" title="Permalink to this image">¶</a></p>
-</div>
+<figure class="align-default" id="fig-full-pipeline">
+<img alt="_images/GwasQcPipelineWorkflow.svg" src="_images/GwasQcPipelineWorkflow.svg" /><figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">The <em>CGR GwasQcPipeline</em>.</span><a class="headerlink" href="#fig-full-pipeline" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 <div class="toctree-wrapper compound" id="getting-started">
-<p class="caption"><span class="caption-text">Getting Started</span></p>
+<p><span class="caption-text">Getting Started</span><a class="headerlink" href="#getting-started" title="Permalink to this toctree">¶</a></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started/running_pipeline.html">Running the Pipeline</a></li>
@@ -199,7 +198,7 @@ The full workflow is pictured in <a class="reference internal" href="#fig-full-p
 It is built on top of <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a> but packaged into as an easy to install python utility.
 This lets us take advantage of <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">snakemake</a>’s amazing workflow management system, while adding a custom library of helper tools.</p>
 <div class="toctree-wrapper compound" id="sub-workflows">
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span><a class="headerlink" href="#sub-workflows" title="Permalink to this toctree">¶</a></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -213,13 +212,13 @@ Each sub-workflow can be run independently, as long as all previous sub-workflow
 For example, the <em>Sample QC</em> sub-workflow requires the <em>Entry Points</em> sub-workflow (and optionally the <em>Contamination</em>) to be complete.
 Here we describe the various steps that each sub-workflow runs, the config options, and a summary of the generated outputs.</p>
 <div class="toctree-wrapper compound" id="module-reference">
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span><a class="headerlink" href="#module-reference" title="Permalink to this toctree">¶</a></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="reference/file_types.html">File Type Reference</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound" id="dev-docs">
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span><a class="headerlink" href="#dev-docs" title="Permalink to this toctree">¶</a></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dev_docs/documentation.html">Working with Documentation</a></li>
@@ -228,43 +227,50 @@ Here we describe the various steps that each sub-workflow runs, the config optio
 </ul>
 </div>
 <div class="toctree-wrapper compound" id="api">
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span><a class="headerlink" href="#api" title="Permalink to this toctree">¶</a></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
 </div>
-<div class="section" id="to-do">
+<section id="to-do">
 <h2>To Do<a class="headerlink" href="#to-do" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="getting_started/installation.html" class="btn btn-neutral float-right" title="Installing GwasQcPipeline" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+      
+        <a href="getting_started/installation.html" class="btn btn-neutral float-right" title="Installing GwasQcPipeline" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

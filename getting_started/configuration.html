@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Configuration Files &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>Configuration Files &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +18,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +31,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -54,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -85,7 +84,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="running_pipeline.html">Running the Pipeline</a></li>
@@ -105,7 +104,7 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -113,18 +112,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -167,8 +166,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -180,7 +177,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../_sources/getting_started/configuration.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -194,9 +191,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="configuration-files">
+  <section id="configuration-files">
 <h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="sample-sheet-file">
+<section id="sample-sheet-file">
 <span id="sample-sheet"></span><h2>Sample Sheet File<a class="headerlink" href="#sample-sheet-file" title="Permalink to this headline">¶</a></h2>
 <p>A sample sheet is a CSV formatted file where each row represents a sample and columns contain various metadata.
 This file must contain a column named <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> which has a unique ID for each row.
@@ -214,9 +211,9 @@ The only column name that is required is <code class="docutils literal notransla
 <span class="n">Samp0004</span><span class="p">,</span><span class="n">Sub0003</span><span class="p">,</span><span class="n">F</span><span class="p">,</span><span class="n">QC</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="cgr-lims-manifest-file">
+</aside>
+</section>
+<section id="cgr-lims-manifest-file">
 <span id="lims"></span><h2>CGR LIMs Manifest File<a class="headerlink" href="#cgr-lims-manifest-file" title="Permalink to this headline">¶</a></h2>
 <p>The CGR LIMs manifest file is our internal way to distribute sample information.
 If you use a <a class="reference internal" href="#sample-sheet-file">Sample Sheet File</a> then you can ignore this section.
@@ -224,8 +221,8 @@ The manifest file is an INI-like file with three section (header, manifests, dat
 During <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code> we will pull out the data section.
 This file should already have all of the required columns.
 See the <a class="reference internal" href="#workflow-parameters">Workflow Parameters</a> section below for details about what values are allowed for subject ID, expected sex, and case control.</p>
-</div>
-<div class="section" id="the-config-yml">
+</section>
+<section id="the-config-yml">
 <span id="config-yaml"></span><h2>The <code class="docutils literal notranslate"><span class="pre">config.yml</span></code><a class="headerlink" href="#the-config-yml" title="Permalink to this headline">¶</a></h2>
 <p>In <a class="reference internal" href="running_pipeline.html#running-the-pipeline"><span class="std std-ref">Running the Pipeline</span></a>, we created the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> using <a class="reference internal" href="running_pipeline.html#cgr-config"><span class="std std-ref">Creating Configuration</span></a>.
 This file is central to running the <em>CGR GwasQcPipeline</em>.
@@ -235,29 +232,24 @@ I will walk through each section below and end this page with a full example.</p
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Required options without defaults are in bold.</p>
-</div>
-<div class="section" id="top-level-config">
+</aside>
+<section id="top-level-config">
 <h3>Top Level Config<a class="headerlink" href="#top-level-config" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p><code class="docutils literal notranslate"><span class="pre">config.yml</span></code> data model.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.0.0</span><span class="w"></span>
-<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span><span class="w"></span>
-<span class="nt">sample_sheet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span><span class="w"></span>
-<span class="nt">genome_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hg37</span><span class="w"></span>
-<span class="nt">snp_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span><span class="w"></span>
-<span class="nt">num_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6336</span><span class="w"></span>
-<span class="nt">num_snps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">700078</span><span class="w"></span>
-<span class="nt">reference_files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Reference file namesapace</span><span class="w"></span>
-<span class="nt">user_files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># User file namespace</span><span class="w"></span>
-<span class="nt">software_params</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Software parameter namespace</span><span class="w"></span>
-<span class="nt">workflow_params</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Workflow parameter namespace</span><span class="w"></span>
-<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.0.0</span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span>
+<span class="nt">sample_sheet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span>
+<span class="nt">genome_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hg37</span>
+<span class="nt">snp_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span>
+<span class="nt">num_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6336</span>
+<span class="nt">num_snps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">700078</span>
+<span class="nt">reference_files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Reference file namesapace</span>
+<span class="nt">user_files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># User file namespace</span>
+<span class="nt">software_params</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Software parameter namespace</span>
+<span class="nt">workflow_params</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span><span class="w">  </span><span class="c1"># Workflow parameter namespace</span>
+<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
 </pre></div>
 </div>
 </td>
@@ -279,7 +271,7 @@ I will walk through each section below and end this page with a full example.</p
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td><p>v1.0.0</p></td>
+<td><p>v1.2.0</p></td>
 </tr>
 <tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>project_name</p></li>
@@ -408,25 +400,20 @@ I will walk through each section below and end this page with a full example.</p
 </tr>
 </tbody>
 </table>
-</div>
+</section>
 <p>The <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file contains all workflow configurations.
 The top level section is automatically populated by <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> and <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code>.
 You should not need to edit this section unless you want to
 (1) update the version of the workflow you are using, (2) change the project name, or (3) switch human references.</p>
-<div class="section" id="reference-files">
+<section id="reference-files">
 <h3>Reference Files<a class="headerlink" href="#reference-files" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p>A list of reference files used by the pipeline.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">reference_files</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span><span class="w"></span>
-<span class="w">    </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span><span class="w"></span>
-<span class="w">    </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">reference_files</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
+<span class="w">    </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
+<span class="w">    </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
 </pre></div>
 </div>
 </td>
@@ -494,7 +481,7 @@ You should not need to edit this section unless you want to
 </tr>
 </tbody>
 </table>
-</div>
+</section>
 <p>If you are on <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code> then the paths of the reference files are correctly populated by <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span> <span class="pre">--cgems</span></code> or <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span> <span class="pre">--cgems-dev</span></code>.
 If you are on another system then you most provide the correct paths and versions of these files.
 The <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code> is provided by Illumina.
@@ -514,45 +501,40 @@ The <code class="docutils literal notranslate"><span class="pre">illumina_cluste
 <p>The genome build needs to match <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code>, <code class="docutils literal notranslate"><span class="pre">thousand_genome_*</span></code>, and <code class="docutils literal notranslate"><span class="pre">genome_build</span></code> above.
 Currently we only support <code class="docutils literal notranslate"><span class="pre">hg37</span></code> and <code class="docutils literal notranslate"><span class="pre">hg38</span></code>.
 Though in reality as long as <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code> and <code class="docutils literal notranslate"><span class="pre">thousand_genome_*</span></code> are from the same build then everything should work.</p>
-</div>
-<div class="section" id="user-files">
+</aside>
+<section id="user-files">
 <h3>User Files<a class="headerlink" href="#user-files" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p>A list of user provided files or naming patterns.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">idat_pattern</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">red</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span><span class="w"></span>
-<span class="w">        </span><span class="nt">green</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span><span class="w"></span>
-<span class="w">    </span><span class="nt">gtc_pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+<span class="w">    </span><span class="nt">idat_pattern</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">red</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span>
+<span class="w">        </span><span class="nt">green</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span>
+<span class="w">    </span><span class="nt">gtc_pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span>
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ped</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.ped</span><span class="w"></span>
-<span class="w">    </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.map</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+<span class="w">    </span><span class="nt">ped</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.ped</span>
+<span class="w">    </span><span class="nt">map</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.map</span>
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">bed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bed</span><span class="w"></span>
-<span class="w">    </span><span class="nt">bim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bim</span><span class="w"></span>
-<span class="w">    </span><span class="nt">fam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.fam</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+<span class="w">    </span><span class="nt">bed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bed</span>
+<span class="w">    </span><span class="nt">bim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bim</span>
+<span class="w">    </span><span class="nt">fam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.fam</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The IDAT/GTC patterns, PED/MAP paths, and BED/BIM/FAM paths are mutually exclusive.
 You should only provide one set of patterns/paths.</p>
-</div>
+</aside>
 </td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
@@ -668,7 +650,7 @@ You should only provide one set of patterns/paths.</p>
 </tr>
 </tbody>
 </table>
-</div>
+</section>
 <p>The <code class="docutils literal notranslate"><span class="pre">user_files</span></code> section has a number of different mutually exclusive configurations depending on the starting file types.
 By default we assume you will be starting with IDAT and GTC files.
 Though we also accept aggregated PED/MAP and aggregated BED/BIM/FAM files.
@@ -679,38 +661,33 @@ We will convert each sample’s GTC to a PED/MAP and then aggregate all samples 
 Which will convert these files to a single BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
 <p>If the BED/BIM/FAM files are given, then this will trigger the BED/BIM/FAM entry point.
 Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
-<div class="section" id="software-parameters">
+<section id="software-parameters">
 <h3>Software Parameters<a class="headerlink" href="#software-parameters" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p>Software parameters used by various tools in the workflow.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">software_params</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">strand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">top</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">software_params</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">strand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">top</span>
 
-<span class="w">    </span><span class="nt">sample_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w"></span>
-<span class="w">    </span><span class="nt">snp_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w"></span>
-<span class="w">    </span><span class="nt">sample_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
-<span class="w">    </span><span class="nt">snp_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
+<span class="w">    </span><span class="nt">sample_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span>
+<span class="w">    </span><span class="nt">snp_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span>
+<span class="w">    </span><span class="nt">sample_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span>
+<span class="w">    </span><span class="nt">snp_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span>
 
-<span class="w">    </span><span class="nt">intensity_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000</span><span class="w"></span>
-<span class="w">    </span><span class="nt">contam_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
-<span class="w">    </span><span class="nt">contam_population</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AF</span><span class="w"></span>
+<span class="w">    </span><span class="nt">intensity_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000</span>
+<span class="w">    </span><span class="nt">contam_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">contam_population</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AF</span>
 
-<span class="w">    </span><span class="nt">ld_prune_r2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
-<span class="w">    </span><span class="nt">maf_for_ibd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
-<span class="w">    </span><span class="nt">maf_for_hwe</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ld_prune_r2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">maf_for_ibd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<span class="w">    </span><span class="nt">maf_for_hwe</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
 
-<span class="w">    </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ibd_pi_hat_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
-<span class="w">    </span><span class="nt">dup_concordance_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
-<span class="w">    </span><span class="nt">pi_hat_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">    </span><span class="nt">ibd_pi_hat_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">    </span><span class="nt">dup_concordance_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span>
+<span class="w">    </span><span class="nt">pi_hat_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
 
-<span class="w">    </span><span class="nt">autosomal_het_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
+<span class="w">    </span><span class="nt">autosomal_het_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
 </pre></div>
 </div>
 </td>
@@ -1027,26 +1004,23 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="workflow-parameters">
+</section>
+<section id="workflow-parameters">
 <h3>Workflow Parameters<a class="headerlink" href="#workflow-parameters" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td colspan="3"><p>This set of parameters control what parts and how the workflow is run.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">workflow_params</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">subject_id_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group_By</span><span class="w"></span>
-<span class="w">    </span><span class="nt">expected_sex_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span><span class="w"></span>
-<span class="w">    </span><span class="nt">case_control_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span><span class="w"></span>
-<span class="w">    </span><span class="nt">remove_contam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">    </span><span class="nt">remove_rep_discordant</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">    </span><span class="nt">minimum_pop_subjects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
-<span class="w">    </span><span class="nt">control_hwp_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
-<span class="w">    </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">workflow_params</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">subject_id_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group_By</span>
+<span class="w">    </span><span class="nt">expected_sex_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span>
+<span class="w">    </span><span class="nt">sex_chr_included</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">case_control_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span>
+<span class="w">    </span><span class="nt">remove_contam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">remove_rep_discordant</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">minimum_pop_subjects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">    </span><span class="nt">control_hwp_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">    </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">case_control_gwas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </pre></div>
 </div>
 </td>
@@ -1083,6 +1057,20 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
 <td><p>Expected_Sex</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>sex_chr_included</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Sex Chr Included</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>True if the sex chromosome is included in the microarray and a sex concordance check can be performed.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>True</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
 <li><p>case_control_column</p></li>
@@ -1174,99 +1162,121 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <tr class="row-odd"><td><p>default</p></td>
 <td><p>False</p></td>
 </tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>case_control_gwas</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Case Control Gwas</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>A plink logistic regression gwas will be performed with case_control phenotype.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>False</p></td>
+</tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="sample-ids-to-remove">
+</section>
+<section id="sample-ids-to-remove">
 <h3>Sample IDs to Remove<a class="headerlink" href="#sample-ids-to-remove" title="Permalink to this headline">¶</a></h3>
 <p>This is an optional section where you can list <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> that you do not want to include in the QC run.
 These samples will be indicated as <code class="docutils literal notranslate"><span class="pre">is_user_exclusion</span> <span class="pre">=</span> <span class="pre">True</span></code> in the sample level QC table.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">Sample_IDs_to_remove</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sample0001</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sample0001</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="full-example">
+</section>
+<section id="full-example">
 <h3>Full Example<a class="headerlink" href="#full-example" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.0.0</span><span class="w"></span>
-<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span><span class="w"></span>
-<span class="nt">sample_sheet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span><span class="w"></span>
-<span class="nt">genome_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hg37</span><span class="w"></span>
-<span class="nt">snp_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span><span class="w"></span>
-<span class="nt">num_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6336</span><span class="w"></span>
-<span class="nt">num_snps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">700078</span><span class="w"></span>
-<span class="nt">reference_files</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span><span class="w"></span>
-<span class="w">   </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span><span class="w"></span>
-<span class="w">   </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span><span class="w"></span>
-<span class="nt">user_files</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span><span class="w"></span>
-<span class="w">   </span><span class="nt">idat_pattern</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">red</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span><span class="w"></span>
-<span class="w">      </span><span class="nt">green</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span><span class="w"></span>
-<span class="w">   </span><span class="nt">gtc_pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span><span class="w"></span>
-<span class="nt">software_params</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="nt">sample_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w"></span>
-<span class="w">   </span><span class="nt">snp_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span><span class="w"></span>
-<span class="w">   </span><span class="nt">sample_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
-<span class="w">   </span><span class="nt">snp_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
-<span class="w">   </span><span class="nt">ld_prune_r2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
-<span class="w">   </span><span class="nt">maf_for_ibd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
-<span class="w">   </span><span class="nt">maf_for_hwe</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
-<span class="w">   </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w"></span>
-<span class="w">   </span><span class="nt">ibd_pi_hat_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
-<span class="w">   </span><span class="nt">dup_concordance_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span><span class="w"></span>
-<span class="w">   </span><span class="nt">intensity_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000</span><span class="w"></span>
-<span class="w">   </span><span class="nt">contam_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
-<span class="w">   </span><span class="nt">contam_population</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AF</span><span class="w"></span>
-<span class="w">   </span><span class="nt">pi_hat_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w"></span>
-<span class="w">   </span><span class="nt">autosomal_het_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w"></span>
-<span class="w">   </span><span class="nt">strand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">top</span><span class="w"></span>
-<span class="nt">workflow_params</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="nt">subject_id_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group_By</span><span class="w"></span>
-<span class="w">   </span><span class="nt">expected_sex_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span><span class="w"></span>
-<span class="w">   </span><span class="nt">case_control_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span><span class="w"></span>
-<span class="w">   </span><span class="nt">remove_contam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">   </span><span class="nt">remove_rep_discordant</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">   </span><span class="nt">minimum_pop_subjects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
-<span class="w">   </span><span class="nt">control_hwp_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
-<span class="w">   </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span><span class="w"></span>
-<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sample0001</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.0.0</span>
+<span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span>
+<span class="nt">sample_sheet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span>
+<span class="nt">genome_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hg37</span>
+<span class="nt">snp_array</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GSAMD-24v1-0</span>
+<span class="nt">num_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6336</span>
+<span class="nt">num_snps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">700078</span>
+<span class="nt">reference_files</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
+<span class="w">   </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
+<span class="w">   </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
+<span class="nt">user_files</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+<span class="w">   </span><span class="nt">idat_pattern</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">red</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat</span>
+<span class="w">      </span><span class="nt">green</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat</span>
+<span class="w">   </span><span class="nt">gtc_pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc</span>
+<span class="nt">software_params</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">sample_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span>
+<span class="w">   </span><span class="nt">snp_call_rate_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.8</span>
+<span class="w">   </span><span class="nt">sample_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span>
+<span class="w">   </span><span class="nt">snp_call_rate_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span>
+<span class="w">   </span><span class="nt">ld_prune_r2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">   </span><span class="nt">maf_for_ibd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<span class="w">   </span><span class="nt">maf_for_hwe</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">   </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">   </span><span class="nt">ibd_pi_hat_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">   </span><span class="nt">dup_concordance_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span>
+<span class="w">   </span><span class="nt">intensity_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000</span>
+<span class="w">   </span><span class="nt">contam_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">   </span><span class="nt">contam_population</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AF</span>
+<span class="w">   </span><span class="nt">pi_hat_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<span class="w">   </span><span class="nt">autosomal_het_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">   </span><span class="nt">strand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">top</span>
+<span class="nt">workflow_params</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">subject_id_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group_By</span>
+<span class="w">   </span><span class="nt">expected_sex_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span>
+<span class="w">   </span><span class="nt">case_control_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Case/Control_Status</span>
+<span class="w">   </span><span class="nt">remove_contam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">   </span><span class="nt">remove_rep_discordant</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">   </span><span class="nt">minimum_pop_subjects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">   </span><span class="nt">control_hwp_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">   </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sample0001</span>
 </pre></div>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../sub_workflows/entry_points.html" class="btn btn-neutral float-right" title="Entry Points Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="running_pipeline.html" class="btn btn-neutral float-left" title="Running the Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="../sub_workflows/entry_points.html" class="btn btn-neutral float-right" title="Entry Points Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="running_pipeline.html" class="btn btn-neutral float-left" title="Running the Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

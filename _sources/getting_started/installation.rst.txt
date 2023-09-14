@@ -42,6 +42,30 @@ To update the latest version of ``GwasQcPipeline``:
     $ pip install --force-reinstall |pkgurl|
     # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 
+Installing on ccad2
+-------------------------
+
+- Install miniconda and then create a GwasQcPipeline production environment
+.. code-block::
+
+   $ mkdir /scratch/myfolder/GwasQcPipeline_v1.2
+   $ cd /scratch/myfolder/GwasQcPipeline_v1.2
+   $ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
+   $ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -p /scratch/myfolder/GwasQcPipeline_v1.2/conda -b
+   $ source conda/bin/activate base
+   (base) $ conda update -n base -c defaults conda
+   (base) $ conda install -n base -c conda-forge mamba
+   (base) $ conda create -n GwasQcPipeline -y python=3.8 pip
+   (base) $ conda deactivate
+
+Next install the latest version of the GwasQcPipeline environment:
+.. code-block::
+   $ source /scratch/myfolder/GwasQcPipeline_v1.2/conda/bin/activate GwasQcPipeline 
+   (GwasQcPipeline) $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
+   (GwasQcPipeline) $ cgr --help
+   (GwasQcPipeline) $ cgr version
+   v1.2.0
+
 Installing on NIH Biowulf
 -------------------------
 
@@ -69,9 +93,9 @@ Next install the latest version of the GwasQcPipeline environment:
 .. code-block::
 
    $ source /<location of miniconda installation>/conda/bin/activate GwasQcPipeline
-   $ pip install --force-reinstall  https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0/cgr_gwas_qc-1.0.0-py3-none-any.whl
-   $ pip3 install markupsafe==2.0.1
+   $ pip install --force-reinstall  https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
    $ cgr --help
+   $ cgr version
 
 Installing on other systems
 ---------------------------

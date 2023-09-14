@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Installing GwasQcPipeline &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>Installing GwasQcPipeline &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +18,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +31,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -54,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -85,10 +84,11 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installing GwasQcPipeline</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installing-on-cgems-ccad">Installing on CGEMS/CCAD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-on-ccad2">Installing on ccad2</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-on-nih-biowulf">Installing on NIH Biowulf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-on-other-systems">Installing on other systems</a></li>
 </ul>
@@ -96,7 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -104,18 +104,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -158,8 +158,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -171,7 +169,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../_sources/getting_started/installation.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -185,9 +183,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installing-gwasqcpipeline">
+  <section id="installing-gwasqcpipeline">
 <h1>Installing GwasQcPipeline<a class="headerlink" href="#installing-gwasqcpipeline" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="installing-on-cgems-ccad">
+<section id="installing-on-cgems-ccad">
 <span id="installation"></span><h2>Installing on CGEMS/CCAD<a class="headerlink" href="#installing-on-cgems-ccad" title="Permalink to this headline">¶</a></h2>
 <p>These are the recommended installation instructions for <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code>.</p>
 <p>Create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment (python=3.8):</p>
@@ -197,7 +195,7 @@ $ conda activate GwasQcPipeline
 </pre></div>
 </div>
 <p>Install the current release of the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0/cgr_gwas_qc-1.0.0-py3-none-any.whl
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
 $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 </pre></div>
 </div>
@@ -210,12 +208,38 @@ $ cgr --help
 <p>To update the latest version of <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
 $ conda activate GwasQcPipeline
-$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0/cgr_gwas_qc-1.0.0-py3-none-any.whl
+$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
 # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 </pre></div>
 </div>
+</section>
+<section id="installing-on-ccad2">
+<h2>Installing on ccad2<a class="headerlink" href="#installing-on-ccad2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Install miniconda and then create a GwasQcPipeline production environment</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir /scratch/myfolder/GwasQcPipeline_v1.2
+$ cd /scratch/myfolder/GwasQcPipeline_v1.2
+$ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
+$ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -p /scratch/myfolder/GwasQcPipeline_v1.2/conda -b
+$ source conda/bin/activate base
+(base) $ conda update -n base -c defaults conda
+(base) $ conda install -n base -c conda-forge mamba
+(base) $ conda create -n GwasQcPipeline -y python=3.8 pip
+(base) $ conda deactivate
+</pre></div>
 </div>
-<div class="section" id="installing-on-nih-biowulf">
+<p>Next install the latest version of the GwasQcPipeline environment:
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ source /scratch/myfolder/GwasQcPipeline_v1.2/conda/bin/activate GwasQcPipeline
+(GwasQcPipeline) $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
+(GwasQcPipeline) $ cgr --help
+(GwasQcPipeline) $ cgr version
+v1.2.0
+</pre></div>
+</div>
+</section>
+<section id="installing-on-nih-biowulf">
 <h2>Installing on NIH Biowulf<a class="headerlink" href="#installing-on-nih-biowulf" title="Permalink to this headline">¶</a></h2>
 <p>Running the workflow on Biowulf requires installing miniconda and mamba. A detailed
 description is provided on the <a class="reference external" href="https://hpc.nih.gov/apps/python.html#envs">Biowulf python env website</a>.</p>
@@ -233,20 +257,20 @@ $ conda deactivate
 </div>
 <p>Next install the latest version of the GwasQcPipeline environment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ source /&lt;location of miniconda installation&gt;/conda/bin/activate GwasQcPipeline
-$ pip install --force-reinstall  https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0/cgr_gwas_qc-1.0.0-py3-none-any.whl
-$ pip3 install markupsafe==2.0.1
+$ pip install --force-reinstall  https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
 $ cgr --help
+$ cgr version
 </pre></div>
 </div>
-</div>
-<div class="section" id="installing-on-other-systems">
+</section>
+<section id="installing-on-other-systems">
 <h2>Installing on other systems<a class="headerlink" href="#installing-on-other-systems" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code> requires <code class="docutils literal notranslate"><span class="pre">conda</span></code> to run.
 We suggest you first install <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a>.
 Once you have <code class="docutils literal notranslate"><span class="pre">conda</span></code> installed, you need to create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment and install the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n GwasQcPipeline -y python=3.8 pip
 $ conda activate GwasQcPipeline
-$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0/cgr_gwas_qc-1.0.0-py3-none-any.whl
+$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
 $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 </pre></div>
 </div>
@@ -257,41 +281,49 @@ $ cgr --help
 </div>
 <p>And to update:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline
-$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.0.0/cgr_gwas_qc-1.0.0-py3-none-any.whl
+$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
 # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="running_pipeline.html" class="btn btn-neutral float-right" title="Running the Pipeline" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../index.html" class="btn btn-neutral float-left" title="GwasQcPipeline Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="running_pipeline.html" class="btn btn-neutral float-right" title="Running the Pipeline" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="GwasQcPipeline Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

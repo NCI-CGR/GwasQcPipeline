@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.testing.data &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>cgr_gwas_qc.testing.data &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +17,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +30,7 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -52,7 +50,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -83,13 +81,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -97,18 +95,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -136,8 +134,6 @@
         <div class="rst-content">
         
           
-
-
 
 
 
@@ -225,7 +221,7 @@
 
 
 <span class="k">class</span> <span class="nc">DataRepo</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Abstract Base Class for Test Data.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract Base Class for Test Data.</span>
 
 <span class="sd">    My goal is to create a set of classes to easily copy test datasets to the</span>
 <span class="sd">    test&#39;s working directory. The general functionality is very similar for</span>
@@ -288,7 +284,7 @@
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">_add_gtcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Each subclass must define this method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Each subclass must define this method.</span>
 
 <span class="sd">        Handling of copying GTCs is very specific to the source of the test</span>
 <span class="sd">        data. So I require that each subclass defines this method.</span>
@@ -297,7 +293,7 @@
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">_add_idats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Each subclass must define this method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Each subclass must define this method.</span>
 
 <span class="sd">        Handling of copying IDATs is very specific to the source of the test</span>
 <span class="sd">        data. So I require that each subclass defines this method.</span>
@@ -305,7 +301,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
     <span class="k">def</span> <span class="nf">make_cgr_sample_sheet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">U</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Parse the manifest file and create the cgr sample sheet.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the manifest file and create the cgr sample sheet.</span>
 
 <span class="sd">        Parses the sample manifest and creates a sample sheet saved to</span>
 <span class="sd">        ``working_dir/cgr_sample_sheet.csv``. Similar steps are performed</span>
@@ -317,7 +313,7 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: You must have provided a working directory when</span>
-<span class="sd">              instantiating the object.</span>
+<span class="sd">                        instantiating the object.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Creates a file ``working_dir/cgr_sample_sheet.csv`` and returns</span>
@@ -339,7 +335,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You need to have set ``self.working_dir``.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_user_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_point</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bed&quot;</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">U</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Add user provided files.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add user provided files.</span>
 
 <span class="sd">        The user files can either be copied into the working directory or</span>
 <span class="sd">        have their full path referenced in the config. If a working directory is</span>
@@ -348,7 +344,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            entry_point: Which entry point to use (&quot;gtc&quot;, &quot;ped&quot;, or &quot;bed&quot;).</span>
-<span class="sd">              Defaults to &quot;bed&quot;.</span>
+<span class="sd">                            Defaults to &quot;bed&quot;.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="ow">and</span> <span class="n">copy</span><span class="p">:</span>
@@ -410,7 +406,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;user_files&quot;</span><span class="p">][</span><span class="s2">&quot;fam&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">make_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">U</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Create a config.yml in ``self.working_dir``.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a config.yml in ``self.working_dir``.</span>
 
 <span class="sd">        The config.yml will be based on which objects were added using the</span>
 <span class="sd">        ``self.add_*`` methods.</span>
@@ -433,7 +429,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">make_snakefile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contents</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">U</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Convenience wrapper of ``cgr_gwas_qc.testing.make_snakefile``.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convenience wrapper of ``cgr_gwas_qc.testing.make_snakefile``.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">:</span>
             <span class="n">make_snakefile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -441,7 +437,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">destination</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">U</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Copy folder or file to a new directory</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Copy folder or file to a new directory</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            source: The name of a folder or file in the repository</span>
@@ -469,7 +465,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Override division operator to build paths.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override division operator to build paths.&quot;&quot;&quot;</span>
         <span class="n">pth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_path</span> <span class="o">/</span> <span class="n">value</span>
         <span class="k">if</span> <span class="n">pth</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">pth</span>
@@ -477,7 +473,7 @@
 
 
 <div class="viewcode-block" id="FakeData"><a class="viewcode-back" href="../../../dev_docs/testing.html#cgr_gwas_qc.testing.data.FakeData">[docs]</a><span class="k">class</span> <span class="nc">FakeData</span><span class="p">(</span><span class="n">DataRepo</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A repository of synthetic data stored in ``tests/data``.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A repository of synthetic data stored in ``tests/data``.</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; cache = FakeData(working_dir)</span>
@@ -543,7 +539,7 @@
 
 
 <span class="k">def</span> <span class="nf">_make_cgr_cache</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Create cache folder.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create cache folder.&quot;&quot;&quot;</span>
     <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;cgr_gwas_qc/&quot;</span> <span class="o">+</span> <span class="n">name</span>
 
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;XDG_CACHE_HOME&quot;</span><span class="p">):</span>
@@ -556,7 +552,7 @@
 
 
 <div class="viewcode-block" id="RealData"><a class="viewcode-back" href="../../../dev_docs/testing.html#cgr_gwas_qc.testing.data.RealData">[docs]</a><span class="k">class</span> <span class="nc">RealData</span><span class="p">(</span><span class="n">DataRepo</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A repository of real data stored on cgems.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A repository of real data stored on cgems.</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">        &gt;&gt;&gt; cache = ReadData(working_dir, sync=True)  # automatically symlink (on cgems) or rsync data locally</span>
@@ -610,7 +606,7 @@
         <span class="n">sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">GRCh_version</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">37</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;A real test data repository of ~200 samples.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A real test data repository of ~200 samples.</span>
 
 <span class="sd">        These data are stored on cgems. If you are running this on a computer</span>
 <span class="sd">        with access to cgems then providing ``sync=True`` will rsync the data</span>
@@ -655,7 +651,7 @@
             <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">target_folder</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_sync_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Symlink or Rsync data to cache folder.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Symlink or Rsync data to cache folder.&quot;&quot;&quot;</span>
         <span class="n">user</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TEST_DATA_USER&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;USER&quot;</span><span class="p">)</span>
         <span class="n">server</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TEST_DATA_SERVER&quot;</span><span class="p">,</span> <span class="n">DEFAULT_TEST_DATA_SERVER</span><span class="p">)</span>
         <span class="n">remote_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TEST_DATA_PATH&quot;</span><span class="p">,</span> <span class="n">DEFAULT_TEST_DATA_PATH</span><span class="p">))</span>
@@ -677,7 +673,9 @@
             <span class="p">]</span>
         <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">executable</span><span class="o">=</span><span class="s2">&quot;/bin/bash&quot;</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">SubprocessError</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Could not connect to </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">server</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">remote_path</span><span class="si">}</span><span class="s2">. To &quot;</span>
@@ -690,25 +688,28 @@
            
           </div>
           <footer>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

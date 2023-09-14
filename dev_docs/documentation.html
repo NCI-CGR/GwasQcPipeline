@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Working with Documentation &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>Working with Documentation &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +18,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +31,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -54,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -85,13 +84,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -99,18 +98,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -153,8 +152,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -166,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../_sources/dev_docs/documentation.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -180,23 +177,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="working-with-documentation">
+  <section id="working-with-documentation">
 <span id="documentation"></span><h1>Working with Documentation<a class="headerlink" href="#working-with-documentation" title="Permalink to this headline">¶</a></h1>
 <p><em>CGR GwasQcPipeline</em> uses the <a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a> python documentation generator.
 Documentation is written in <a class="reference external" href="https://www.sphinx-doc.org/en/master/">reStructuredText</a>, a markup language similar to Markdown but with more advanced features.
 The sphinx documentation is stored in the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.
-├── docs/
-│  ├── api/              <span class="c1"># Implementation details for parsers and other helpers</span>
-│  ├── common_urls.rst   <span class="c1"># URLs used throughout documentation</span>
-│  ├── conf.py           <span class="c1"># Sphinx configuration file</span>
-│  ├── dev_docs/         <span class="c1"># Development documentation</span>
-│  ├── getting_started/  <span class="c1"># Getting started documentation</span>
-│  ├── index.rst         <span class="c1"># Main page, if you add a new page link to it here</span>
-│  ├── Makefile          <span class="c1"># Sphinx make file for building docs ``make html``</span>
-│  ├── reference/        <span class="c1"># User reference material, i.e., file-type reference</span>
-│  ├── static/           <span class="c1"># Images and styling</span>
-│  └── sub_workflows/    <span class="c1"># Workflow documentation</span>
+├──<span class="w"> </span>docs/
+│<span class="w">  </span>├──<span class="w"> </span>api/<span class="w">              </span><span class="c1"># Implementation details for parsers and other helpers</span>
+│<span class="w">  </span>├──<span class="w"> </span>common_urls.rst<span class="w">   </span><span class="c1"># URLs used throughout documentation</span>
+│<span class="w">  </span>├──<span class="w"> </span>conf.py<span class="w">           </span><span class="c1"># Sphinx configuration file</span>
+│<span class="w">  </span>├──<span class="w"> </span>dev_docs/<span class="w">         </span><span class="c1"># Development documentation</span>
+│<span class="w">  </span>├──<span class="w"> </span>getting_started/<span class="w">  </span><span class="c1"># Getting started documentation</span>
+│<span class="w">  </span>├──<span class="w"> </span>index.rst<span class="w">         </span><span class="c1"># Main page, if you add a new page link to it here</span>
+│<span class="w">  </span>├──<span class="w"> </span>Makefile<span class="w">          </span><span class="c1"># Sphinx make file for building docs ``make html``</span>
+│<span class="w">  </span>├──<span class="w"> </span>reference/<span class="w">        </span><span class="c1"># User reference material, i.e., file-type reference</span>
+│<span class="w">  </span>├──<span class="w"> </span>static/<span class="w">           </span><span class="c1"># Images and styling</span>
+│<span class="w">  </span>└──<span class="w"> </span>sub_workflows/<span class="w">    </span><span class="c1"># Workflow documentation</span>
 </pre></div>
 </div>
 <p>However, I also embed documentation directly from the source code using keywords like <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">automodule</span></code>, <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">pydantic</span></code>, and <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">click</span></code>.
@@ -205,10 +202,10 @@ This allows me to have details in a single location as close to the code as poss
 <p class="admonition-title">Note</p>
 <p>If you add a new <code class="docutils literal notranslate"><span class="pre">rst</span></code> page, you must reference this page from <code class="docutils literal notranslate"><span class="pre">docs/index.rst</span></code> or from another page that is already linked.
 Otherwise, your new page will never be built.</p>
-</div>
-<div class="section" id="building-documentation">
+</aside>
+<section id="building-documentation">
 <h2>Building Documentation<a class="headerlink" href="#building-documentation" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="locally">
+<section id="locally">
 <h3>Locally<a class="headerlink" href="#locally" title="Permalink to this headline">¶</a></h3>
 <p>To builds documentation locally you need to have your <a class="reference internal" href="setup.html"><span class="doc">development environment setup</span></a> correctly.
 Then from the root folder run</p>
@@ -229,10 +226,10 @@ Add the following to your VS Code <cite>settings.json</cite>:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You must adjust the above paths <code class="docutils literal notranslate"><span class="pre">...</span></code> to match your installation.</p>
-</div>
+</aside>
 <p>Then if you preview the <code class="docutils literal notranslate"><span class="pre">rst</span></code> file in VS Code it will auto build the docs for you.</p>
-</div>
-<div class="section" id="publishing-documentation">
+</section>
+<section id="publishing-documentation">
 <h3>Publishing Documentation<a class="headerlink" href="#publishing-documentation" title="Permalink to this headline">¶</a></h3>
 <p>Publishing documentation is as easy as pushing a commit to GitHub prefixed by <code class="docutils literal notranslate"><span class="pre">docs:</span></code>.
 For example,</p>
@@ -243,38 +240,46 @@ For example,</p>
 </div>
 <p>This will automatically triggered a GitHub action to build and publish the documentation.
 This action is also triggered when creating a package release.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="source_code.html" class="btn btn-neutral float-right" title="Working with Source Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="setup.html" class="btn btn-neutral float-left" title="Development Environment Set-up" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="source_code.html" class="btn btn-neutral float-right" title="Working with Source Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="setup.html" class="btn btn-neutral float-left" title="Development Environment Set-up" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

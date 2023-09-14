@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Subject QC Sub-workflow &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>Subject QC Sub-workflow &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +18,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +31,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -54,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -85,13 +84,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination Sub-workflow</a></li>
@@ -113,18 +112,18 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -167,8 +166,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -180,7 +177,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../_sources/sub_workflows/subject_qc.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -194,7 +191,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="subject-qc-sub-workflow">
+  <section id="subject-qc-sub-workflow">
 <span id="subject-qc"></span><h1>Subject QC Sub-workflow<a class="headerlink" href="#subject-qc-sub-workflow" title="Permalink to this headline">¶</a></h1>
 <dl class="simple">
 <dt><strong>Workflow File</strong>:</dt><dd><p><a class="reference external" href="https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/subject_qc.smk">https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/subject_qc.smk</a></p>
@@ -229,11 +226,13 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">subject_level/population_qc.csv</span></code></p></li>
 </ul>
 </div></blockquote>
-<div class="figure align-default" id="fig-subject-qc-workflow">
-<img alt="../_images/subject_qc.svg" src="../_images/subject_qc.svg" /><p class="caption"><span class="caption-number">Fig. 5 </span><span class="caption-text">The subject-qc sub-workflow.
+<figure class="align-default" id="fig-subject-qc-workflow">
+<img alt="../_images/subject_qc.svg" src="../_images/subject_qc.svg" /><figcaption>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">The subject-qc sub-workflow.
 This runs additional QC checks at the subject and population level.</span><a class="headerlink" href="#fig-subject-qc-workflow" title="Permalink to this image">¶</a></p>
-</div>
-<div class="section" id="selecting-subject-representative">
+</figcaption>
+</figure>
+<section id="selecting-subject-representative">
 <h2>Selecting Subject Representative<a class="headerlink" href="#selecting-subject-representative" title="Permalink to this headline">¶</a></h2>
 <p><strong>Major Outputs</strong>:</p>
 <blockquote>
@@ -251,8 +250,8 @@ This runs additional QC checks at the subject and population level.</span><a cla
 In this table we have a flag <code class="docutils literal notranslate"><span class="pre">is_subject_representative</span></code> to indicate if a sample was selected to represent the subject.
 The <code class="docutils literal notranslate"><span class="pre">subject_level?subject_qc.csv</span></code> is simply the <code class="docutils literal notranslate"><span class="pre">sample_level/sample_qc.csv</span></code> but only with subject representatives.
 We then pull out these samples from <code class="docutils literal notranslate"><span class="pre">sample_level/call_rate_2/samples.{bed,bim,fam}</span></code> and rename them to subject IDs.</p>
-</div>
-<div class="section" id="population-level-analysis">
+</section>
+<section id="population-level-analysis">
 <h2>Population Level Analysis<a class="headerlink" href="#population-level-analysis" title="Permalink to this headline">¶</a></h2>
 <p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
 <blockquote>
@@ -269,7 +268,7 @@ We then pull out these samples from <code class="docutils literal notranslate"><
 </ul>
 </div></blockquote>
 <p>Here we split subjects into ancestral populations based on <a class="reference external" href="https://github.com/ncbi/graf">GRAF</a> calls made during the <a class="reference internal" href="sample_qc.html#sample-qc"><span class="std std-ref">Sample QC Sub-workflow</span></a>.</p>
-<div class="section" id="autosomal-heterozygosity">
+<section id="autosomal-heterozygosity">
 <h3>Autosomal Heterozygosity<a class="headerlink" href="#autosomal-heterozygosity" title="Permalink to this headline">¶</a></h3>
 <p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
 <blockquote>
@@ -285,8 +284,8 @@ We then pull out these samples from <code class="docutils literal notranslate"><
 </ul>
 </div></blockquote>
 <p>Here we calculate Autosomal Heterozygosity separately for each population and generate the plots used in the QC report.</p>
-</div>
-<div class="section" id="subject-relatedness">
+</section>
+<section id="subject-relatedness">
 <h3>Subject Relatedness<a class="headerlink" href="#subject-relatedness" title="Permalink to this headline">¶</a></h3>
 <p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
 <blockquote>
@@ -308,8 +307,8 @@ We then pull out these samples from <code class="docutils literal notranslate"><
 </div></blockquote>
 <p>Here we estimated related (IBD) again, but separately for each population.
 We then prune subjects so that no two subjects have a PI_HAT &gt;= pi_hat_threshold.</p>
-</div>
-<div class="section" id="population-structure-pca">
+</section>
+<section id="population-structure-pca">
 <h3>Population Structure (PCA)<a class="headerlink" href="#population-structure-pca" title="Permalink to this headline">¶</a></h3>
 <p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
 <blockquote>
@@ -327,8 +326,8 @@ We then prune subjects so that no two subjects have a PI_HAT &gt;= pi_hat_thresh
 </div></blockquote>
 <p>Here we use <a class="reference external" href="https://github.com/DReichLab/EIG">EIGENSOFT</a> fast pca to identify population structure.
 We then plot a panel of pair-plots for the first size principal components.</p>
-</div>
-<div class="section" id="hardy-weinberg">
+</section>
+<section id="hardy-weinberg">
 <h3>Hardy Weinberg<a class="headerlink" href="#hardy-weinberg" title="Permalink to this headline">¶</a></h3>
 <p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
 <blockquote>
@@ -346,9 +345,9 @@ We then plot a panel of pair-plots for the first size principal components.</p>
 <p>Here we pull out only control subjects.
 We then calculate Hardy Weinberg Equilibrium.
 We use only controls, but cases may have SNPs that are out of HWE.</p>
-</div>
-</div>
-<div class="section" id="subject-qc-summary-tables">
+</section>
+</section>
+<section id="subject-qc-summary-tables">
 <h2>Subject QC Summary Tables<a class="headerlink" href="#subject-qc-summary-tables" title="Permalink to this headline">¶</a></h2>
 <p><strong>Major Outputs</strong>:</p>
 <blockquote>
@@ -357,7 +356,7 @@ We use only controls, but cases may have SNPs that are out of HWE.</p>
 </ul>
 </div></blockquote>
 <p>Finally, all results are aggregated into the poulation level QC table.</p>
-<span class="target" id="module-cgr_gwas_qc.workflow.scripts.agg_population_qc_tables"></span><div class="section" id="internal-population-qc-report">
+<span class="target" id="module-cgr_gwas_qc.workflow.scripts.agg_population_qc_tables"></span><section id="internal-population-qc-report">
 <h3>Internal Population QC Report<a class="headerlink" href="#internal-population-qc-report" title="Permalink to this headline">¶</a></h3>
 <p><strong>Script</strong>: <code class="docutils literal notranslate"><span class="pre">agg_population_qc_tables.py</span></code></p>
 <p>Aggregate per population summary tables into a single table. Then add extra
@@ -365,11 +364,6 @@ metadata from the sample qc table.</p>
 <p><strong>Output</strong>: <code class="docutils literal notranslate"><span class="pre">population_level/population_qc.csv</span></code></p>
 <blockquote>
 <div><table class="docutils align-default">
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>name</p></th>
 <th class="head"><p>dtype</p></th>
@@ -467,38 +461,46 @@ metadata from the sample qc table.</p>
 <li><p><a class="reference internal" href="../api/parsers.html#cgr_gwas_qc.parsers.plink.read_het" title="cgr_gwas_qc.parsers.plink.read_het"><code class="xref py py-func docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.plink.read_het()</span></code></a></p></li>
 <li><p><a class="reference internal" href="../api/parsers.html#cgr_gwas_qc.parsers.eigensoft.Eigenvec" title="cgr_gwas_qc.parsers.eigensoft.Eigenvec"><code class="xref py py-class docutils literal notranslate"><span class="pre">cgr_gwas_qc.parsers.eigensoft.Eigenvec</span></code></a></p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="delivery.html" class="btn btn-neutral float-right" title="Delivery Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="sample_qc.html" class="btn btn-neutral float-left" title="Sample QC Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="delivery.html" class="btn btn-neutral float-right" title="Delivery Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="sample_qc.html" class="btn btn-neutral float-left" title="Sample QC Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +17,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +30,7 @@
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
@@ -52,7 +50,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -83,13 +81,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -97,18 +95,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -136,8 +134,6 @@
         <div class="rst-content">
         
           
-
-
 
 
 
@@ -278,7 +274,7 @@
 
 
 <div class="viewcode-block" id="GenotypeCalls"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls">[docs]</a><span class="k">class</span> <span class="nc">GenotypeCalls</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Class to parse gtc files as produced by Illumina AutoConvert</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to parse gtc files as produced by Illumina AutoConvert</span>
 <span class="sd">    and AutoCall software.</span>
 
 <span class="sd">    Attributes:</span>
@@ -319,7 +315,7 @@
     <span class="n">supported_version</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">ignore_version</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_write_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            filename (string): GTC filename</span>
@@ -350,7 +346,7 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;GTC file is incomplete&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_generic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toc_entry</span><span class="p">,</span> <span class="n">parse_function</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Internal helper function to access a data element in a</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal helper function to access a data element in a</span>
 <span class="sd">        generic fashion.</span>
 
 <span class="sd">        Args:</span>
@@ -366,7 +362,7 @@
             <span class="k">return</span> <span class="n">parse_function</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_generic_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toc_entry</span><span class="p">,</span> <span class="n">parse_function</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Internal helper function to access a data array in a generic</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal helper function to access a data array in a generic</span>
 <span class="sd">        fashion.</span>
 
 <span class="sd">        Args:</span>
@@ -385,7 +381,7 @@
             <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">__get_generic_array_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toc_entry</span><span class="p">,</span> <span class="n">numpy_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Internal helper function to access a data array in a generic</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal helper function to access a data array in a generic</span>
 <span class="sd">        fashion.</span>
 
 <span class="sd">        Args:</span>
@@ -402,61 +398,61 @@
             <span class="k">return</span> <span class="n">frombuffer</span><span class="p">(</span><span class="n">gtc_handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">num_entries</span> <span class="o">*</span> <span class="n">numpy_type</span><span class="o">.</span><span class="n">itemsize</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy_type</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GenotypeCalls.get_num_snps"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_snps">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_snps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The number of SNPs in the file as an integer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_NUM_SNPS</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_ploidy"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ploidy">[docs]</a>    <span class="k">def</span> <span class="nf">get_ploidy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The ploidy of the sample</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_PLOIDY</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_ploidy_type"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ploidy_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_ploidy_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The ploidy type of the sample</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toc_table</span><span class="p">[</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_PLOIDY_TYPE</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_sample_name"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The name of the sample as a string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SAMPLE_NAME</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_slide_identifier"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_slide_identifier">[docs]</a>    <span class="k">def</span> <span class="nf">get_slide_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The name of the sample as a string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SLIDE_IDENTIFIER</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_sample_plate"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_plate">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_plate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The name of the sample plate as a string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SAMPLE_PLATE</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_sample_well"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_sample_well">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_well</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The name of the sample well as a string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SAMPLE_WELL</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_cluster_file"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_cluster_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_cluster_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The name of the cluster file used for genotyping as a string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_CLUSTER_FILE</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_snp_manifest"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_snp_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">get_snp_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The name of the manifest used for genotyping as a string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SNP_MANIFEST</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_imaging_date"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_imaging_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_imaging_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The imaging date of scanning as a string</span>
 <span class="sd">        For example</span>
 <span class="sd">            Monday, December 01, 2014 4:51:47 PM</span>
@@ -464,7 +460,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_IMAGING_DATE</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_autocall_date"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_autocall_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The imaging date of scanning as a string</span>
 <span class="sd">        For example</span>
 <span class="sd">            2/17/2015 1:47 PM</span>
@@ -472,7 +468,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_AUTOCALL_DATE</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_autocall_version"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_autocall_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_autocall_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The version of AutoCall used for genotyping as a string</span>
 <span class="sd">        For example</span>
 <span class="sd">            1.6.2.2</span>
@@ -480,7 +476,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_AUTOCALL_VERSION</span><span class="p">,</span> <span class="n">read_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_genotypes"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_genotypes">[docs]</a>    <span class="k">def</span> <span class="nf">get_genotypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        A byte list (string) of genotypes. See code2genotype for mapping</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GENOTYPES</span><span class="p">,</span> <span class="n">read_byte</span><span class="p">)</span></div>
@@ -488,7 +484,7 @@
 <div class="viewcode-block" id="GenotypeCalls.get_base_calls_generic"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_generic">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_calls_generic</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">strand_annotations</span><span class="p">,</span> <span class="n">report_strand</span><span class="p">,</span> <span class="n">unknown_annotation</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get base calls on arbitrary strand</span>
 <span class="sd">        Args:</span>
 <span class="sd">            snps (list&lt;string&gt;) : A list of string representing the snp on the design strand for the loci (e.g. [A/C])</span>
@@ -508,7 +504,7 @@
                 <span class="s2">&quot;The number of reference strand annotations must match the number of loci in the GTC file&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">for</span> <span class="p">(</span><span class="n">genotype</span><span class="p">,</span> <span class="n">snp</span><span class="p">,</span> <span class="n">strand_annotation</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">genotypes</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">strand_annotations</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">genotype</span><span class="p">,</span> <span class="n">snp</span><span class="p">,</span> <span class="n">strand_annotation</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">genotypes</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">strand_annotations</span><span class="p">):</span>
             <span class="n">ab_genotype</span> <span class="o">=</span> <span class="n">code2genotype</span><span class="p">[</span><span class="n">genotype</span><span class="p">]</span>
             <span class="n">a_nucleotide</span> <span class="o">=</span> <span class="n">snp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">b_nucleotide</span> <span class="o">=</span> <span class="n">snp</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
@@ -533,7 +529,7 @@
 <div class="viewcode-block" id="GenotypeCalls.get_base_calls_plus_strand"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_plus_strand">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_calls_plus_strand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">ref_strand_annotations</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get base calls on plus strand of genomic reference. If you only see no-calls returned from this method,</span>
 <span class="sd">        please verify that the reference strand annotations passed as argument are not unknown (RefStrand.Unknown)</span>
 
@@ -551,7 +547,7 @@
 <div class="viewcode-block" id="GenotypeCalls.get_base_calls_forward_strand"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls_forward_strand">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_calls_forward_strand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">snps</span><span class="p">,</span> <span class="n">forward_strand_annotations</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get base calls on the forward strand.</span>
 
 <span class="sd">        Args:</span>
@@ -566,7 +562,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_base_calls"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_base_calls">[docs]</a>    <span class="k">def</span> <span class="nf">get_base_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Yields:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Yields:</span>
 <span class="sd">        The genotype basecalls as a string.</span>
 <span class="sd">        The characters are A, C, G, T, or - for a no-call/null.</span>
 <span class="sd">        The calls are relative to the top strand.</span>
@@ -598,74 +594,74 @@
                         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_genotype_scores"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_genotype_scores">[docs]</a>    <span class="k">def</span> <span class="nf">get_genotype_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The genotype scores as a list of floats</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GENOTYPE_SCORES</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_scanner_data"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_scanner_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_scanner_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        Information about scanner as ScannerData object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_SCANNER_DATA</span><span class="p">,</span> <span class="n">read_scanner_data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_control_x_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_control_x_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_control_x_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The x intensities of control bead types as a list of integers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_CONTROLS_X</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_control_y_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_control_y_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_control_y_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The y intensities of control bead types as a list of integers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_CONTROLS_Y</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_raw_x_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_raw_x_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_x_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The raw x intensities of assay bead types as a list of integers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_RAW_X</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_raw_y_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_raw_y_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_y_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The raw y intensities of assay bead types as a list of integers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_RAW_Y</span><span class="p">,</span> <span class="n">uint16</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_call_rate"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_call_rate">[docs]</a>    <span class="k">def</span> <span class="nf">get_call_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The call rate as a float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_CALL_RATE</span><span class="p">,</span> <span class="n">read_float</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_gender"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gender">[docs]</a>    <span class="k">def</span> <span class="nf">get_gender</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The gender as a char</span>
 <span class="sd">        M - Male, F - Female, U-Unknown</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GENDER</span><span class="p">,</span> <span class="n">read_char</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_logr_dev"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_logr_dev">[docs]</a>    <span class="k">def</span> <span class="nf">get_logr_dev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The logR deviation as a float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_LOGR_DEV</span><span class="p">,</span> <span class="n">read_float</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_gc10"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gc10">[docs]</a>    <span class="k">def</span> <span class="nf">get_gc10</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The GC10 (GenCall score - 10th percentile) as a float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GC10</span><span class="p">,</span> <span class="n">read_float</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_gc50"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_gc50">[docs]</a>    <span class="k">def</span> <span class="nf">get_gc50</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The GC50 (GenCall score - 50th percentile) as a float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_GC50</span><span class="p">,</span> <span class="n">read_float</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_num_calls"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_calls">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The number of calls as an integer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
@@ -673,7 +669,7 @@
             <span class="k">return</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_num_no_calls"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_no_calls">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_no_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The number of no calls as an integer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
@@ -681,7 +677,7 @@
             <span class="k">return</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_num_intensity_only"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_num_intensity_only">[docs]</a>    <span class="k">def</span> <span class="nf">get_num_intensity_only</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The number of intensity only SNPs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">gtc_handle</span><span class="p">:</span>
@@ -689,7 +685,7 @@
             <span class="k">return</span> <span class="n">read_int</span><span class="p">(</span><span class="n">gtc_handle</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_ballele_freqs"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_ballele_freqs">[docs]</a>    <span class="k">def</span> <span class="nf">get_ballele_freqs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The B allele frequencies as a list of floats</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
@@ -699,7 +695,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_B_ALLELE_FREQS</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_logr_ratios"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_logr_ratios">[docs]</a>    <span class="k">def</span> <span class="nf">get_logr_ratios</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The logR ratios as a list of floats</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
@@ -709,7 +705,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array_numpy</span><span class="p">(</span><span class="n">GenotypeCalls</span><span class="o">.</span><span class="n">__ID_LOGR_RATIOS</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_percentiles_x"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_percentiles_x">[docs]</a>    <span class="k">def</span> <span class="nf">get_percentiles_x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        An array of length three representing 5th, 50th and 95th percentiles for</span>
 <span class="sd">        x intensity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -726,7 +722,7 @@
             <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_percentiles_y"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_percentiles_y">[docs]</a>    <span class="k">def</span> <span class="nf">get_percentiles_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        An array of length three representing 5th, 50th and 95th percentiles for</span>
 <span class="sd">        y intensity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -743,7 +739,7 @@
             <span class="k">return</span> <span class="n">result</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_normalized_intensities"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalized_intensities">[docs]</a>    <span class="k">def</span> <span class="nf">get_normalized_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normalization_lookups</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Calculate and return the normalized intensities</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate and return the normalized intensities</span>
 <span class="sd">        Args:</span>
 <span class="sd">            normalization_lookups (list of ints): Map from each SNP to a normalization transform.</span>
 <span class="sd">                                   This list can be obtained from the BeadPoolManifest object.</span>
@@ -751,6 +747,7 @@
 <span class="sd">        Return:</span>
 <span class="sd">            The normalized intensities for the sample as a list of (x,y) float tuples</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">normalization_transforms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_normalization_transforms</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="n">normalization_transforms</span><span class="p">[</span><span class="n">lookup</span><span class="p">]</span><span class="o">.</span><span class="n">normalize_intensities</span><span class="p">(</span><span class="n">x_raw</span><span class="p">,</span> <span class="n">y_raw</span><span class="p">)</span>
@@ -760,7 +757,7 @@
         <span class="p">]</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.get_normalization_transforms"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.get_normalization_transforms">[docs]</a>    <span class="k">def</span> <span class="nf">get_normalization_transforms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns:</span>
 <span class="sd">        The normalization transforms used during genotyping (as a lit of NormalizationTransforms)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_generic_array</span><span class="p">(</span>
@@ -769,7 +766,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="GenotypeCalls.is_write_complete"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.GenotypeCalls.is_write_complete">[docs]</a>    <span class="k">def</span> <span class="nf">is_write_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check for last item written to GTC file to verify that write</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check for last item written to GTC file to verify that write</span>
 <span class="sd">        has successfully completed</span>
 
 <span class="sd">        Args:</span>
@@ -804,7 +801,7 @@
 
 <span class="k">class</span> <span class="nc">NormalizationTransform</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
 <span class="sd">        Args:</span>
 <span class="sd">            buffer (string): byte string containing binary data for transform</span>
 <span class="sd">        Returns:</span>
@@ -822,7 +819,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">read_normalization_transform</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Static helper function to read normalization transform from file handle</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Static helper function to read normalization transform from file handle</span>
 <span class="sd">        Args:</span>
 <span class="sd">            handle (file handle): File handle with position at start of normalization transform entry</span>
 <span class="sd">        Returns:</span>
@@ -832,7 +829,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">rect_to_polar</span><span class="p">(</span><span class="n">x_y</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Converts normalized x,y intensities to (pseudo) polar coordinates (R, theta)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts normalized x,y intensities to (pseudo) polar coordinates (R, theta)</span>
 <span class="sd">        Args:</span>
 <span class="sd">            x_y (float, float): Normalized x,y intensities for probe</span>
 <span class="sd">        Returns:</span>
@@ -844,7 +841,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">pi</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">normalize_intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Apply this normalization transform to raw intensities</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply this normalization transform to raw intensities</span>
 <span class="sd">        Args:</span>
 <span class="sd">            x (int): Raw x intensities</span>
 <span class="sd">            y (int): Raw y intensities</span>
@@ -875,7 +872,7 @@
 
 <span class="k">class</span> <span class="nc">ScannerData</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">pmt_green</span><span class="p">,</span> <span class="n">pmt_red</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
 <span class="sd">        Args:</span>
 <span class="sd">            name (string): scanner identifier</span>
 <span class="sd">            pmt_green (int): gain setting (green channel)</span>
@@ -893,7 +890,7 @@
 
 
 <div class="viewcode-block" id="BeadPoolManifest"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.BeadPoolManifest">[docs]</a><span class="k">class</span> <span class="nc">BeadPoolManifest</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Class for parsing binary (BPM) manifest file.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for parsing binary (BPM) manifest file.</span>
 <span class="sd">    Attributes:</span>
 <span class="sd">        names (list of strings): Names of loci from manifest</span>
 <span class="sd">        snps (list of strings) : SNP values of loci from manifest</span>
@@ -910,7 +907,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
 <span class="sd">        Args:</span>
 <span class="sd">            filename (string): Locations of BPM (bead pool manifest) file</span>
 <span class="sd">        Returns:</span>
@@ -932,7 +929,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__parse_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__parse_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifest_file</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function to initialize this object from a file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to initialize this object from a file.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            manifest_file (string): Location of BPM (bead pool manifest) file</span>
 <span class="sd">        Returns:</span>
@@ -1012,7 +1009,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="n">source_strand</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get an integer representation of source strand annotation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an integer representation of source strand annotation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            source_strand (str) : string representation of source strand annotation (e.g., &quot;F&quot;)</span>
@@ -1031,7 +1028,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="n">source_strand</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a string representation of source strand annotation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a string representation of source strand annotation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            source_strand (int) : int representation of source strand (e.g., SourceStrand.Forward)</span>
@@ -1056,7 +1053,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="n">ref_strand</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get a string reprensetation of ref strand annotation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a string reprensetation of ref strand annotation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ref_strand (int) : int representation of ref strand (e.g., RefStrand.Plus)</span>
@@ -1075,7 +1072,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="n">ref_strand</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get an integer representation of ref strand annotation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an integer representation of ref strand annotation</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ref_strand (str) : string representation of reference strand annotation (e.g., &quot;+&quot;)</span>
@@ -1094,7 +1091,7 @@
 
 
 <div class="viewcode-block" id="LocusEntry"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.LocusEntry">[docs]</a><span class="k">class</span> <span class="nc">LocusEntry</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Helper class representing a locus entry within a bead pool manifest. Current only support version</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class representing a locus entry within a bead pool manifest. Current only support version</span>
 <span class="sd">    6,7, and 8.</span>
 <span class="sd">    Attributes:</span>
 <span class="sd">        ilmn_id (string) : IlmnID (probe identifier) of locus</span>
@@ -1111,7 +1108,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
 <span class="sd">        Args:</span>
 <span class="sd">            handle (file handle):  File handle at start of locus entry record</span>
 <span class="sd">        Returns:</span>
@@ -1130,7 +1127,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__parse_file</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__parse_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function to initialize this object from a file handle</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to initialize this object from a file handle</span>
 <span class="sd">        Args:</span>
 <span class="sd">            handle (file handle): File handle at start of locus entry record</span>
 <span class="sd">        Returns:</span>
@@ -1149,7 +1146,7 @@
             <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__parse_locus_version_6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function to parse version 6 locus entry</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to parse version 6 locus entry</span>
 <span class="sd">        Args:</span>
 <span class="sd">            handle (file handle): File handle at start of locus entry record</span>
 <span class="sd">        Returns:</span>
@@ -1186,7 +1183,7 @@
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Manifest format error: Assay type is inconsistent with address B&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__parse_locus_version_7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function to parse version 7 locus entry</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to parse version 7 locus entry</span>
 <span class="sd">        Args:</span>
 <span class="sd">            handle (file handle): File handle at start of locus entry record</span>
 <span class="sd">        Returns:</span>
@@ -1196,7 +1193,7 @@
         <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__parse_locus_version_8</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function to parse version 8 locus entry</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to parse version 8 locus entry</span>
 <span class="sd">        Args:</span>
 <span class="sd">            handle (file handle): File handle at start of locus entry record</span>
 <span class="sd">        Returns:</span>
@@ -1210,7 +1207,7 @@
 
 
 <div class="viewcode-block" id="complement"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.complement">[docs]</a><span class="k">def</span> <span class="nf">complement</span><span class="p">(</span><span class="n">nucleotide</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Complement a single nucleotide. Complements of D(eletion) and I(nsertion) are D and I, respectively.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complement a single nucleotide. Complements of D(eletion) and I(nsertion) are D and I, respectively.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        nucleotide (string) : Nucleotide, must be A, C, T, G, D, or I</span>
 <span class="sd">    Returns:</span>
@@ -1222,7 +1219,7 @@
 
 
 <div class="viewcode-block" id="read_char"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_char">[docs]</a><span class="k">def</span> <span class="nf">read_char</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to parse character from file handle</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to parse character from file handle</span>
 <span class="sd">    Args:</span>
 <span class="sd">        handle (file handle): File handle</span>
 <span class="sd">    Returns:</span>
@@ -1232,7 +1229,7 @@
 
 
 <div class="viewcode-block" id="read_ushort"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_ushort">[docs]</a><span class="k">def</span> <span class="nf">read_ushort</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to parse ushort from file handle</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to parse ushort from file handle</span>
 <span class="sd">    Args:</span>
 <span class="sd">        handle (file handle): File handle</span>
 <span class="sd">    Returns:</span>
@@ -1242,7 +1239,7 @@
 
 
 <div class="viewcode-block" id="read_int"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_int">[docs]</a><span class="k">def</span> <span class="nf">read_int</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to parse int from file handle</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to parse int from file handle</span>
 <span class="sd">    Args:</span>
 <span class="sd">        handle (file handle): File handle</span>
 <span class="sd">    Returns:</span>
@@ -1252,7 +1249,7 @@
 
 
 <div class="viewcode-block" id="read_float"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_float">[docs]</a><span class="k">def</span> <span class="nf">read_float</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to parse float from file handle</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to parse float from file handle</span>
 <span class="sd">    Args:</span>
 <span class="sd">        handle (file handle): File handle</span>
 <span class="sd">    Returns:</span>
@@ -1262,7 +1259,7 @@
 
 
 <div class="viewcode-block" id="read_byte"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_byte">[docs]</a><span class="k">def</span> <span class="nf">read_byte</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to parse byte from file handle</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to parse byte from file handle</span>
 <span class="sd">    Args:</span>
 <span class="sd">        handle (file handle): File handle</span>
 <span class="sd">    Returns:</span>
@@ -1272,7 +1269,7 @@
 
 
 <div class="viewcode-block" id="read_string"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_string">[docs]</a><span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to parse string from file handle. See https://msdn.microsoft.com/en-us/library/yzxa6408(v=vs.100).aspx</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to parse string from file handle. See https://msdn.microsoft.com/en-us/library/yzxa6408(v=vs.100).aspx</span>
 <span class="sd">    for additional details on string format.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        handle (file handle): File handle</span>
@@ -1295,7 +1292,7 @@
 
 
 <div class="viewcode-block" id="read_scanner_data"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles.read_scanner_data">[docs]</a><span class="k">def</span> <span class="nf">read_scanner_data</span><span class="p">(</span><span class="n">handle</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Helper function to parse ScannerData object from file handle.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to parse ScannerData object from file handle.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        handle (file handle): File handle</span>
 <span class="sd">    Returns:</span>
@@ -1313,25 +1310,28 @@
            
           </div>
           <footer>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

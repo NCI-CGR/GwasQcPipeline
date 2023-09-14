@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.parsers.illumina.adpc &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>cgr_gwas_qc.parsers.illumina.adpc &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +17,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +30,7 @@
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
@@ -52,7 +50,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -83,13 +81,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -97,18 +95,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -136,8 +134,6 @@
         <div class="rst-content">
         
           
-
-
 
 
 
@@ -194,7 +190,7 @@
         <span class="n">genotype_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">genotype</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;A record from Illumina&#39;s adpc.bin file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A record from Illumina&#39;s adpc.bin file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x_raw: A allele intensity</span>
@@ -215,7 +211,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Simple validation, not sure if needed.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Simple validation, not sure if needed.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_raw</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Raw X intensity must be positive integer: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x_raw</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -235,16 +231,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Genotype must be [0, 1, 2, 3]: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">genotype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;This allows tuple unpacking&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This allows tuple unpacking&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">x_raw</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">y_raw</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">x_norm</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">y_norm</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">genotype_score</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">genotype</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_raw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_raw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_norm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_norm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">genotype_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">genotype</span><span class="p">,)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -261,7 +250,7 @@
 
 
 <div class="viewcode-block" id="AdpcBase"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.adpc.AdpcBase">[docs]</a><span class="k">class</span> <span class="nc">AdpcBase</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Base class for Illumina&#39;s adpc.bin files.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for Illumina&#39;s adpc.bin files.</span>
 
 <span class="sd">    Based on information found on Picard&#39;s website:</span>
 
@@ -274,7 +263,7 @@
 
 <div class="viewcode-block" id="AdpcReader"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.adpc.AdpcReader">[docs]</a><span class="k">class</span> <span class="nc">AdpcReader</span><span class="p">(</span><span class="n">AdpcBase</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
-        <span class="sd">&quot;&quot;&quot;A context manager for reading adpc.bin formatted files.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A context manager for reading adpc.bin formatted files.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file_name: Path to an adpc.bin file.</span>
@@ -316,7 +305,7 @@
 
 <div class="viewcode-block" id="AdpcWriter"><a class="viewcode-back" href="../../../../api/parsers.html#cgr_gwas_qc.parsers.illumina.adpc.AdpcWriter">[docs]</a><span class="k">class</span> <span class="nc">AdpcWriter</span><span class="p">(</span><span class="n">AdpcBase</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
-        <span class="sd">&quot;&quot;&quot;A context manager for writing adpc.bin formatted files.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A context manager for writing adpc.bin formatted files.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file_name: Path to save an adpc file.</span>
@@ -337,7 +326,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">file_handler</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">record_struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="o">*</span><span class="n">record</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_add_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The adpc.bin format has 16 bytes of padding at the beginning of the file.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The adpc.bin format has 16 bytes of padding at the beginning of the file.</span>
 
 <span class="sd">        The Picard group did not know what this is for, but they said it is</span>
 <span class="sd">        not needed so I will just add 8 0s at 2 bytes each.</span>
@@ -357,25 +346,28 @@
            
           </div>
           <footer>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

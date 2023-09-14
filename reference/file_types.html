@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>File Type Reference &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>File Type Reference &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +18,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +31,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -54,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -85,13 +84,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -99,7 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">File Type Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#adpc-bin">adpc.bin</a></li>
@@ -130,14 +129,14 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev_docs/testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -180,8 +179,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -193,7 +190,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../_sources/reference/file_types.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -207,43 +204,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="file-type-reference">
+  <section id="file-type-reference">
 <h1>File Type Reference<a class="headerlink" href="#file-type-reference" title="Permalink to this headline">¶</a></h1>
 <p>Here I briefly describe the large number of filetypes used throughout the GWAS QC Pipeline.</p>
-<div class="section" id="adpc-bin">
+<section id="adpc-bin">
 <h2>adpc.bin<a class="headerlink" href="#adpc-bin" title="Permalink to this headline">¶</a></h2>
 <p>An Illumina file format that can be output by GenomeStudio.
 I cannot find a spec file or any details about this format beyond a small reader function used by <a class="reference external" href="https://javadoc.io/static/org.broadinstitute/gatk/4.1.4.1/picard/arrays/illumina/IlluminaAdpcFileWriter.html">Picard</a>.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">A allele intensity</dt>
+<dt class="field-odd">A allele intensity<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">B allele intensity</dt>
+<dt class="field-even">B allele intensity<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">A normalized allele intensity</dt>
+<dt class="field-odd">A normalized allele intensity<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">B normalized allele intensity</dt>
+<dt class="field-even">B normalized allele intensity<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">cluster confidence score</dt>
+<dt class="field-odd">cluster confidence score<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">called genotype</dt>
+<dt class="field-even">called genotype<span class="colon">:</span></dt>
 <dd class="field-even"><p>0 (AA), 1 (AB), 2 (BB), and 3 (NN)</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="abf-txt">
+</section>
+<section id="abf-txt">
 <h2>abf.txt<a class="headerlink" href="#abf-txt" title="Permalink to this headline">¶</a></h2>
 <p>This is a simple text file with the <code class="docutils literal notranslate"><span class="pre">B</span></code> allele frequencies for each snp.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">SNP_ID</dt>
+<dt class="field-odd">SNP_ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">BAF</dt>
+<dt class="field-even">BAF<span class="colon">:</span></dt>
 <dd class="field-even"><p>(a.k.a ABF)</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="bed-plink-make-bed">
+</section>
+<section id="bed-plink-make-bed">
 <h2>bed (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--make-bed</span></code>)<a class="headerlink" href="#bed-plink-make-bed" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">bed</span></code> file is a binary genotype table with genotype calls at biallelic variants.
 It is always accompanied by a <code class="docutils literal notranslate"><span class="pre">fam</span></code> and <code class="docutils literal notranslate"><span class="pre">bim</span></code> file.</p>
@@ -281,8 +278,8 @@ You can test your understanding of the file format by interpreting this by hand 
 </ol>
 <p class="attribution">—<a class="reference external" href="https://www.cog-genomics.org/plink2/formats#bed">https://www.cog-genomics.org/plink2/formats#bed</a></p>
 </div></blockquote>
-</div>
-<div class="section" id="bim-plink-make-bed">
+</section>
+<section id="bim-plink-make-bed">
 <h2>bim (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--make-bed</span></code>)<a class="headerlink" href="#bim-plink-make-bed" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">bim</span></code> file describes each marker SNP. It is usually accompanied by a <code class="docutils literal notranslate"><span class="pre">fam</span></code> and <code class="docutils literal notranslate"><span class="pre">bed</span></code> file.</p>
 <blockquote class="epigraph">
@@ -291,26 +288,26 @@ Allele codes can contain more than one character. Variants with negative bp coor
 </div></blockquote>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Chromosome code</dt>
+<dt class="field-odd">Chromosome code<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(either an integer, or ‘X’/’Y’/’XY’/’MT’; ‘0’ indicates unknown) or name</p>
 </dd>
-<dt class="field-even">Variant identifier</dt>
+<dt class="field-even">Variant identifier<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">Position</dt>
+<dt class="field-odd">Position<span class="colon">:</span></dt>
 <dd class="field-odd"><p>in morgans or centimorgans (safe to use dummy value of ‘0’)</p>
 </dd>
-<dt class="field-even">Base-pair coordinate</dt>
+<dt class="field-even">Base-pair coordinate<span class="colon">:</span></dt>
 <dd class="field-even"><p>(1-based; limited to 2^{31}-2)</p>
 </dd>
-<dt class="field-odd">Allele 1</dt>
+<dt class="field-odd">Allele 1<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(corresponding to clear bits in .bed; usually minor)</p>
 </dd>
-<dt class="field-even">Allele 2</dt>
+<dt class="field-even">Allele 2<span class="colon">:</span></dt>
 <dd class="field-even"><p>(corresponding to set bits in .bed; usually major)</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="bpm-illumina-manifest-file">
+</section>
+<section id="bpm-illumina-manifest-file">
 <h2>bpm (Illumina Manifest File)<a class="headerlink" href="#bpm-illumina-manifest-file" title="Permalink to this headline">¶</a></h2>
 <p>The Illumina manifest file is a binary file that describes the specific array.
 It has information about each probe set and their corresponding SNPs.
@@ -318,198 +315,198 @@ This version <code class="docutils literal notranslate"><span class="pre">GSAMD-
 There is also a <code class="docutils literal notranslate"><span class="pre">csv</span></code> version that can be downloaded from Illumina.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">IlmnID</dt>
+<dt class="field-odd">IlmnID<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Name</dt>
+<dt class="field-even">Name<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">IlmnStrand</dt>
+<dt class="field-odd">IlmnStrand<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">BOT|TOP|PLUS|MINUs</span></code></p>
 </dd>
-<dt class="field-even">SNP</dt>
+<dt class="field-even">SNP<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">[A/B]</span></code> where <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code> can be <code class="docutils literal notranslate"><span class="pre">[ACTGID]</span></code></p>
 </dd>
-<dt class="field-odd">AddressA_ID</dt>
+<dt class="field-odd">AddressA_ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The location on the array for <code class="docutils literal notranslate"><span class="pre">A</span></code></p>
 </dd>
-<dt class="field-even">AlleleA_ProbeSeq</dt>
+<dt class="field-even">AlleleA_ProbeSeq<span class="colon">:</span></dt>
 <dd class="field-even"><p>The probe sequence for <code class="docutils literal notranslate"><span class="pre">A</span></code></p>
 </dd>
-<dt class="field-odd">AddressB_ID</dt>
+<dt class="field-odd">AddressB_ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The location on the array for <code class="docutils literal notranslate"><span class="pre">B</span></code></p>
 </dd>
-<dt class="field-even">AlleleB_ProbeSeq</dt>
+<dt class="field-even">AlleleB_ProbeSeq<span class="colon">:</span></dt>
 <dd class="field-even"><p>The probe sequence for <code class="docutils literal notranslate"><span class="pre">B</span></code></p>
 </dd>
-<dt class="field-odd">GenomeBuild</dt>
+<dt class="field-odd">GenomeBuild<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Reference genome build number (i.e. 37)</p>
 </dd>
-<dt class="field-even">Chr</dt>
+<dt class="field-even">Chr<span class="colon">:</span></dt>
 <dd class="field-even"><p>Chromosome</p>
 </dd>
-<dt class="field-odd">MapInfo</dt>
+<dt class="field-odd">MapInfo<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Ploidy</dt>
+<dt class="field-even">Ploidy<span class="colon">:</span></dt>
 <dd class="field-even"><p>Ploidy of the species (i.e. diploid)</p>
 </dd>
-<dt class="field-odd">Species</dt>
+<dt class="field-odd">Species<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The species (i.e. Homo sapiens)</p>
 </dd>
-<dt class="field-even">Source</dt>
+<dt class="field-even">Source<span class="colon">:</span></dt>
 <dd class="field-even"><p>The source for the SNP (e.g. 1000genomes, PAGE, ClinVar_ACMG).</p>
 </dd>
-<dt class="field-odd">SourceVersion</dt>
+<dt class="field-odd">SourceVersion<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Version of the source.</p>
 </dd>
-<dt class="field-even">SourceStrand</dt>
+<dt class="field-even">SourceStrand<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">BOT|TOP|PLUS|MINUs</span></code></p>
 </dd>
-<dt class="field-odd">SourceSeq</dt>
+<dt class="field-odd">SourceSeq<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">TopGenomicSeq</dt>
+<dt class="field-even">TopGenomicSeq<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">BeadSetID</dt>
+<dt class="field-odd">BeadSetID<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Exp_Clusters</dt>
+<dt class="field-even">Exp_Clusters<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">Intensity_Only</dt>
+<dt class="field-odd">Intensity_Only<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">RefStrand</dt>
+<dt class="field-even">RefStrand<span class="colon">:</span></dt>
 <dd class="field-even"><p>Reference strand <code class="docutils literal notranslate"><span class="pre">(\+|\-)</span></code></p>
 </dd>
 </dl>
 <p><a class="reference external" href="https://support.illumina.com/bulletins/2017/06/how-to-interpret-dna-strand-and-allele-information-for-infinium-.html">https://support.illumina.com/bulletins/2017/06/how-to-interpret-dna-strand-and-allele-information-for-infinium-.html</a></p>
-</div>
-<div class="section" id="contam-out-verifyidintensity">
+</section>
+<section id="contam-out-verifyidintensity">
 <h2>contam.out (verifyIDintensity)<a class="headerlink" href="#contam-out-verifyidintensity" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This output has no official documentation.</p>
-</div>
+</aside>
 <p>Sample level contamination score.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">ID</dt>
+<dt class="field-odd">ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>sample_ID</p>
 </dd>
-<dt class="field-even">%MIX</dt>
+<dt class="field-even">%MIX<span class="colon">:</span></dt>
 <dd class="field-even"><p>Percent mixture with another sample (i.e. Alpha from Jun et al. 2012)</p>
 </dd>
-<dt class="field-odd">LLN</dt>
+<dt class="field-odd">LLN<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The minimized log-likelihood. <em>not really sure what this is</em></p>
 </dd>
-<dt class="field-even">LLN0</dt>
+<dt class="field-even">LLN0<span class="colon">:</span></dt>
 <dd class="field-even"><p>The log-likelihood at alpha = 0 (i.e. no contamination).</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="csv-illumina-sample-sheet">
+</section>
+<section id="csv-illumina-sample-sheet">
 <h2>csv (Illumina Sample Sheet)<a class="headerlink" href="#csv-illumina-sample-sheet" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This output has no official documentation.</p>
-</div>
+</aside>
 <p>I am assuming this is the sample sheet used to run <code class="docutils literal notranslate"><span class="pre">GenomeStudio</span></code>.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Sample_ID</dt>
+<dt class="field-odd">Sample_ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">SC\d+_PB\d+_[A-H][0-1][1-9]</span></code></p>
 </dd>
-<dt class="field-even">SentrixBarcode_A</dt>
+<dt class="field-even">SentrixBarcode_A<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">\d+</span></code></p>
 </dd>
-<dt class="field-odd">SentrixPosition_A</dt>
+<dt class="field-odd">SentrixPosition_A<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">R\d{2}C\d{2}</span></code></p>
 </dd>
-<dt class="field-even">Sample_Plate</dt>
+<dt class="field-even">Sample_Plate<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">WG\d+-DNA</span></code></p>
 </dd>
-<dt class="field-odd">Sample_Well</dt>
+<dt class="field-odd">Sample_Well<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">[A-H][0-1][1-9]</span></code></p>
 </dd>
-<dt class="field-even">Sample_Group</dt>
+<dt class="field-even">Sample_Group<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">.*</span></code></p>
 </dd>
-<dt class="field-odd">Identifier_Sex</dt>
+<dt class="field-odd">Identifier_Sex<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(M|F|U)</span></code></p>
 </dd>
-<dt class="field-even">Sample_Name</dt>
+<dt class="field-even">Sample_Name<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">\w{2}</span> <span class="pre">\d{4}</span> <span class="pre">\d{4}</span></code></p>
 </dd>
-<dt class="field-odd">Replicate</dt>
+<dt class="field-odd">Replicate<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">.*</span></code></p>
 </dd>
-<dt class="field-even">Parent1</dt>
+<dt class="field-even">Parent1<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">SC\d+_PB\d+_[A-H][0-1][1-9]</span></code></p>
 </dd>
-<dt class="field-odd">Parent2</dt>
+<dt class="field-odd">Parent2<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">SC\d+_PB\d+_[A-H][0-1][1-9]</span></code></p>
 </dd>
-<dt class="field-even">SR_Subject_ID</dt>
+<dt class="field-even">SR_Subject_ID<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">SI\d+</span></code></p>
 </dd>
-<dt class="field-odd">LIMSSample_ID</dt>
+<dt class="field-odd">LIMSSample_ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">SC\d+</span></code></p>
 </dd>
-<dt class="field-even">Sample_Type</dt>
+<dt class="field-even">Sample_Type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">[\w\s]+</span></code></p>
 </dd>
-<dt class="field-odd">LIMS_Specimen_ID</dt>
+<dt class="field-odd">LIMS_Specimen_ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Project</dt>
+<dt class="field-even">Project<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">GP\d+-IN\d{2}</span></code></p>
 </dd>
-<dt class="field-odd">Project-Sample ID</dt>
+<dt class="field-odd">Project-Sample ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">PS-(?P&lt;year&gt;\d{4})(?P&lt;month&gt;\d{2})(?P&lt;day&gt;\d{2})-\d{6}</span></code></p>
 </dd>
-<dt class="field-even">Array</dt>
+<dt class="field-even">Array<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">GSAMD-24v1-0</span></code></p>
 </dd>
-<dt class="field-odd">LIMS_Individual_ID</dt>
+<dt class="field-odd">LIMS_Individual_ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">I-\d+</span></code></p>
 </dd>
-<dt class="field-even">PI_Subject_ID</dt>
+<dt class="field-even">PI_Subject_ID<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">\w-\d+-\d</span></code></p>
 </dd>
-<dt class="field-odd">PI_Study_ID</dt>
+<dt class="field-odd">PI_Study_ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Age</dt>
+<dt class="field-even">Age<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">Expected_Sex</dt>
+<dt class="field-odd">Expected_Sex<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(M|F)</span></code></p>
 </dd>
-<dt class="field-even">Ancestry_S1</dt>
+<dt class="field-even">Ancestry_S1<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">Ancestry_S2</dt>
+<dt class="field-odd">Ancestry_S2<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Ancestry_S3</dt>
+<dt class="field-even">Ancestry_S3<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">POPGROUP</dt>
+<dt class="field-odd">POPGROUP<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Case/Control_Status</dt>
+<dt class="field-even">Case/Control_Status<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(Control|Case)</span></code></p>
 </dd>
 </dl>
-</div>
-<div class="section" id="eigenstratgeno-eigensoft">
+</section>
+<section id="eigenstratgeno-eigensoft">
 <h2>eigenstratgeno (<code class="docutils literal notranslate"><span class="pre">eigensoft</span></code>)<a class="headerlink" href="#eigenstratgeno-eigensoft" title="Permalink to this headline">¶</a></h2>
 <p>The genotype data for each individual at each SNP. Each column represent an individual sample (same order as ind file). Each row represents a SNP (same order as snp file). Where values are 0-2 or 9.</p>
 <p class="rubric">Encoding</p>
 <dl class="field-list simple">
-<dt class="field-odd">0</dt>
+<dt class="field-odd">0<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Zero copies of the reference allele</p>
 </dd>
-<dt class="field-even">1</dt>
+<dt class="field-even">1<span class="colon">:</span></dt>
 <dd class="field-even"><p>One copies of the reference allele</p>
 </dd>
-<dt class="field-odd">2</dt>
+<dt class="field-odd">2<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Two copies of the reference allele</p>
 </dd>
-<dt class="field-even">9</dt>
+<dt class="field-even">9<span class="colon">:</span></dt>
 <dd class="field-even"><p>Missing data</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="fam-plink-make-bed">
+</section>
+<section id="fam-plink-make-bed">
 <h2>fam (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--make-bed</span></code>)<a class="headerlink" href="#fam-plink-make-bed" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">fam</span></code> sample information and accompanies a <code class="docutils literal notranslate"><span class="pre">bed</span></code> file.</p>
 <blockquote class="epigraph">
@@ -521,242 +518,242 @@ In this case, -9 normally still designates a missing phenotype; use –missing-p
 </div></blockquote>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Family ID</dt>
+<dt class="field-odd">Family ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(‘FID’)</p>
 </dd>
-<dt class="field-even">Within-family ID</dt>
+<dt class="field-even">Within-family ID<span class="colon">:</span></dt>
 <dd class="field-even"><p>(‘IID’; cannot be ‘0’)</p>
 </dd>
-<dt class="field-odd">Within-family ID of father</dt>
+<dt class="field-odd">Within-family ID of father<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(‘0’ if father isn’t in dataset)</p>
 </dd>
-<dt class="field-even">Within-family ID of mother</dt>
+<dt class="field-even">Within-family ID of mother<span class="colon">:</span></dt>
 <dd class="field-even"><p>(‘0’ if mother isn’t in dataset)</p>
 </dd>
-<dt class="field-odd">Sex code</dt>
+<dt class="field-odd">Sex code<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(‘1’ = male, ‘2’ = female, ‘0’ = unknown)</p>
 </dd>
-<dt class="field-even">Phenotype value</dt>
+<dt class="field-even">Phenotype value<span class="colon">:</span></dt>
 <dd class="field-even"><p>(‘1’ = control, ‘2’ = case, ‘-9’/’0’/non-numeric = missing data if case/control)</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="frq-plink-freq">
+</section>
+<section id="frq-plink-freq">
 <h2>frq (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--freq</span></code>)<a class="headerlink" href="#frq-plink-freq" title="Permalink to this headline">¶</a></h2>
 <p>The allele frequency report.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">CHR</dt>
+<dt class="field-odd">CHR<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Chromosome</p>
 </dd>
-<dt class="field-even">SNP</dt>
+<dt class="field-even">SNP<span class="colon">:</span></dt>
 <dd class="field-even"><p>Variant identifier</p>
 </dd>
-<dt class="field-odd">A1</dt>
+<dt class="field-odd">A1<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Allele 1 (usually minor)</p>
 </dd>
-<dt class="field-even">A2</dt>
+<dt class="field-even">A2<span class="colon">:</span></dt>
 <dd class="field-even"><p>Allele 2 (usually major)</p>
 </dd>
-<dt class="field-odd">MAF</dt>
+<dt class="field-odd">MAF<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Allele 1 frequency</p>
 </dd>
-<dt class="field-even">NCHROBS</dt>
+<dt class="field-even">NCHROBS<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of allele observations</p>
 </dd>
 </dl>
 <p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#frq">https://www.cog-genomics.org/plink/1.9/formats#frq</a></p>
-</div>
-<div class="section" id="genome-plink-genome">
+</section>
+<section id="genome-plink-genome">
 <h2>genome (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--genome</span></code>)<a class="headerlink" href="#genome-plink-genome" title="Permalink to this headline">¶</a></h2>
 <p>The IBS/IBD report.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">FID1</dt>
+<dt class="field-odd">FID1<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Family ID for first sample</p>
 </dd>
-<dt class="field-even">IID1</dt>
+<dt class="field-even">IID1<span class="colon">:</span></dt>
 <dd class="field-even"><p>Individual ID for first sample</p>
 </dd>
-<dt class="field-odd">FID2</dt>
+<dt class="field-odd">FID2<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Family ID for second sample</p>
 </dd>
-<dt class="field-even">IID2</dt>
+<dt class="field-even">IID2<span class="colon">:</span></dt>
 <dd class="field-even"><p>Individual ID for second sample</p>
 </dd>
-<dt class="field-odd">RT</dt>
+<dt class="field-odd">RT<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Relationship type inferred from .fam/.ped file</p>
 </dd>
-<dt class="field-even">EZ</dt>
+<dt class="field-even">EZ<span class="colon">:</span></dt>
 <dd class="field-even"><p>IBD sharing expected value, based on just .fam/.ped relationship</p>
 </dd>
-<dt class="field-odd">Z0</dt>
+<dt class="field-odd">Z0<span class="colon">:</span></dt>
 <dd class="field-odd"><p>P(IBD=0)</p>
 </dd>
-<dt class="field-even">Z1</dt>
+<dt class="field-even">Z1<span class="colon">:</span></dt>
 <dd class="field-even"><p>P(IBD=1)</p>
 </dd>
-<dt class="field-odd">Z2</dt>
+<dt class="field-odd">Z2<span class="colon">:</span></dt>
 <dd class="field-odd"><p>P(IBD=2)</p>
 </dd>
-<dt class="field-even">PI_HAT</dt>
+<dt class="field-even">PI_HAT<span class="colon">:</span></dt>
 <dd class="field-even"><p>Proportion IBD, i.e. P(IBD=2) + 0.5*P(IBD=1)</p>
 </dd>
-<dt class="field-odd">PHE</dt>
+<dt class="field-odd">PHE<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Pairwise phenotypic code (1, 0, -1 = AA, AU, and UU pairs, respectively)</p>
 </dd>
-<dt class="field-even">DST</dt>
+<dt class="field-even">DST<span class="colon">:</span></dt>
 <dd class="field-even"><p>IBS distance, i.e. (IBS2 + 0.5*IBS1) / (IBS0 + IBS1 + IBS2)</p>
 </dd>
-<dt class="field-odd">PPC</dt>
+<dt class="field-odd">PPC<span class="colon">:</span></dt>
 <dd class="field-odd"><p>IBS binomial test</p>
 </dd>
-<dt class="field-even">RATIO</dt>
+<dt class="field-even">RATIO<span class="colon">:</span></dt>
 <dd class="field-even"><p>HETHET : IBS0 SNP ratio (expected value 2)</p>
 </dd>
 </dl>
 <p class="rubric">Optional Fields (given <code class="docutils literal notranslate"><span class="pre">--genome</span> <span class="pre">full</span></code>)</p>
 <dl class="field-list simple">
-<dt class="field-odd">IBS0</dt>
+<dt class="field-odd">IBS0<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Number of nonmissing variants where both allele are different</p>
 </dd>
-<dt class="field-even">IBS1</dt>
+<dt class="field-even">IBS1<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of nonmissing variants where 1 allele is the same</p>
 </dd>
-<dt class="field-odd">IBS2</dt>
+<dt class="field-odd">IBS2<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Number of nonmissing variants where both alleles are the same</p>
 </dd>
-<dt class="field-even">HOMHOM</dt>
+<dt class="field-even">HOMHOM<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of IBS 0 SNP pairs used in PPC test</p>
 </dd>
-<dt class="field-odd">HETHET</dt>
+<dt class="field-odd">HETHET<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Number of IBS 2 het/het SNP pairs used in PPC test</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="gtc-illumina-genotype-calls">
+</section>
+<section id="gtc-illumina-genotype-calls">
 <h2>gtc (Illumina Genotype Calls)<a class="headerlink" href="#gtc-illumina-genotype-calls" title="Permalink to this headline">¶</a></h2>
 <p>The Illumina Infinium genotype (GTC) file format. This format is output from Illumina’s genotype calling software (either Autocall or Autoconvert). This is a complicated data format containing large amounts of metadata describing the run, data describing each probe on the array, as well as sample level genotype calls for probe.</p>
 <p>Each sample has a GTC file associated with it.</p>
 <p><a class="reference download external" download="" href="https://github.com/Illumina/BeadArrayFiles/blob/develop/docs/GTC_File_Format_v5.pdf"><code class="xref download docutils literal notranslate"><span class="pre">Format</span> <span class="pre">Spec</span></code></a></p>
-</div>
-<div class="section" id="hwe-plink-hardy">
+</section>
+<section id="hwe-plink-hardy">
 <h2>hwe (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--hardy</span></code>)<a class="headerlink" href="#hwe-plink-hardy" title="Permalink to this headline">¶</a></h2>
 <p>Exact test results for Hardy-Weinberg equilibrium.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">CHR</dt>
+<dt class="field-odd">CHR<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Chromosome</p>
 </dd>
-<dt class="field-even">SNP</dt>
+<dt class="field-even">SNP<span class="colon">:</span></dt>
 <dd class="field-even"><p>Variant identifier</p>
 </dd>
-<dt class="field-odd">TEST</dt>
+<dt class="field-odd">TEST<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Type of test: one of {‘ALL’, ‘AFF’, ‘UNAFF’, ‘ALL(QT)’, ‘ALL(NP)’}</p>
 </dd>
-<dt class="field-even">A1</dt>
+<dt class="field-even">A1<span class="colon">:</span></dt>
 <dd class="field-even"><p>Allele 1 (usually minor)</p>
 </dd>
-<dt class="field-odd">A2</dt>
+<dt class="field-odd">A2<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Allele 2 (usually major)</p>
 </dd>
-<dt class="field-even">GENO</dt>
+<dt class="field-even">GENO<span class="colon">:</span></dt>
 <dd class="field-even"><p>‘/’-separated genotype counts (A1 hom, het, A2 hom)</p>
 </dd>
-<dt class="field-odd">O(HET)</dt>
+<dt class="field-odd">O(HET)<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Observed heterozygote frequency</p>
 </dd>
-<dt class="field-even">E(HET)</dt>
+<dt class="field-even">E(HET)<span class="colon">:</span></dt>
 <dd class="field-even"><p>Expected heterozygote frequency</p>
 </dd>
-<dt class="field-odd">P</dt>
+<dt class="field-odd">P<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Hardy-Weinberg equilibrium exact test p-value</p>
 </dd>
 </dl>
 <p>When the samples are case/control, three separate sets of Hardy-Weinberg equilibrium statistics are computed: one considering both cases and controls, one considering only cases, and one considering only controls. These are distinguished by ‘ALL’, ‘AFF’, and ‘UNAFF’ in the TEST column, respectively. If the phenotype is quantitative or nonexistent instead, there is just one line per variant, labeled ‘ALL(QT)’ or ‘ALL(NP)’ respectively.</p>
 <p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#hwe">https://www.cog-genomics.org/plink/1.9/formats#hwe</a></p>
-</div>
-<div class="section" id="idat-illumina">
+</section>
+<section id="idat-illumina">
 <h2>idat (Illumina)<a class="headerlink" href="#idat-illumina" title="Permalink to this headline">¶</a></h2>
 <p>A binary format of intensities. This file includes various types of metadata (i.e., array information, software versions, the type of BeadChip). Data fields are made up of 4 values: ID of each probe on the array, mean intensity, intensity standard deviation, and the number of beads with each probe.</p>
-</div>
-<div class="section" id="imiss-plink-missing">
+</section>
+<section id="imiss-plink-missing">
 <h2>imiss (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--missing</span></code>)<a class="headerlink" href="#imiss-plink-missing" title="Permalink to this headline">¶</a></h2>
 <p>Sample-based missing data report.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">FID</dt>
+<dt class="field-odd">FID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Family ID</p>
 </dd>
-<dt class="field-even">IID</dt>
+<dt class="field-even">IID<span class="colon">:</span></dt>
 <dd class="field-even"><p>Within-family ID</p>
 </dd>
-<dt class="field-odd">MISS_PHENO</dt>
+<dt class="field-odd">MISS_PHENO<span class="colon">:</span></dt>
 <dd class="field-odd"><p>[Y/N] Phenotype is missing</p>
 </dd>
-<dt class="field-even">N_MISS</dt>
+<dt class="field-even">N_MISS<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of missing genotype calls not including obligatory missing or heterozygous haploids.</p>
 </dd>
-<dt class="field-odd">N_GENO</dt>
+<dt class="field-odd">N_GENO<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Number of potentially valid calls</p>
 </dd>
-<dt class="field-even">F_MISS</dt>
+<dt class="field-even">F_MISS<span class="colon">:</span></dt>
 <dd class="field-even"><p>Missing call rate</p>
 </dd>
 </dl>
 <p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#imiss">https://www.cog-genomics.org/plink/1.9/formats#imiss</a></p>
-</div>
-<div class="section" id="ind-eigensoft">
+</section>
+<section id="ind-eigensoft">
 <h2>ind (<code class="docutils literal notranslate"><span class="pre">eigensoft</span></code>)<a class="headerlink" href="#ind-eigensoft" title="Permalink to this headline">¶</a></h2>
 <p>The individual sample description file. Each row represents a sample.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Sample ID</dt>
+<dt class="field-odd">Sample ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The sample identifier</p>
 </dd>
-<dt class="field-even">gender</dt>
+<dt class="field-even">gender<span class="colon">:</span></dt>
 <dd class="field-even"><p>The gender of the sample {M, F, U}</p>
 </dd>
-<dt class="field-odd">phenotype</dt>
+<dt class="field-odd">phenotype<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The sample phenotype or population information.</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="lmiss-plink-missing">
+</section>
+<section id="lmiss-plink-missing">
 <h2>lmiss (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--missing</span></code>)<a class="headerlink" href="#lmiss-plink-missing" title="Permalink to this headline">¶</a></h2>
 <p>Variant-based missing data report.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">CHR</dt>
+<dt class="field-odd">CHR<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Chromosome</p>
 </dd>
-<dt class="field-even">SNP</dt>
+<dt class="field-even">SNP<span class="colon">:</span></dt>
 <dd class="field-even"><p>Variant ID</p>
 </dd>
-<dt class="field-odd">N_MISS</dt>
+<dt class="field-odd">N_MISS<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The number of missing genotype calls no including obligatory missing or heterozygous haploids.</p>
 </dd>
-<dt class="field-even">N_GENO</dt>
+<dt class="field-even">N_GENO<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of potentially valid calls</p>
 </dd>
-<dt class="field-odd">F_MISS</dt>
+<dt class="field-odd">F_MISS<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Missing call rate</p>
 </dd>
-<dt class="field-even">Optional fields</dt>
+<dt class="field-even">Optional fields<span class="colon">:</span></dt>
 <dd class="field-even"><p>if run with <code class="docutils literal notranslate"><span class="pre">--within/--family</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">CLST</dt>
+<dt class="field-odd">CLST<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Cluster identifier</p>
 </dd>
-<dt class="field-even">N_CLST</dt>
+<dt class="field-even">N_CLST<span class="colon">:</span></dt>
 <dd class="field-even"><p>Cluster size (does not include non-males on chrY)</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#.miss">https://www.cog-genomics.org/plink/1.9/formats#.miss</a></p>
-</div>
-<div class="section" id="map-plink">
+</section>
+<section id="map-plink">
 <h2>map (<code class="docutils literal notranslate"><span class="pre">plink</span></code>)<a class="headerlink" href="#map-plink" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">map</span></code> file describes the location of variants.</p>
 <blockquote class="epigraph">
@@ -767,19 +764,19 @@ In this case, -9 normally still designates a missing phenotype; use –missing-p
 </div></blockquote>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Chromosome code</dt>
+<dt class="field-odd">Chromosome code<span class="colon">:</span></dt>
 <dd class="field-odd"><p>PLINK 1.9 also permits contig names here, but most older programs do not.</p>
 </dd>
-<dt class="field-even">Variant identifier</dt>
+<dt class="field-even">Variant identifier<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">Position in morgans or centimorgans</dt>
+<dt class="field-odd">Position in morgans or centimorgans<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(optional; also safe to use dummy value of ‘0’)</p>
 </dd>
-<dt class="field-even">Base-pair coordinate</dt>
+<dt class="field-even">Base-pair coordinate<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
 </dl>
-</div>
-<div class="section" id="ped-plink">
+</section>
+<section id="ped-plink">
 <h2>ped (<code class="docutils literal notranslate"><span class="pre">plink</span></code>)<a class="headerlink" href="#ped-plink" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">ped</span></code> format is a text pedigree and genotype table used by PLINK/MERLIN/Haploview.</p>
 <blockquote class="epigraph">
@@ -791,186 +788,194 @@ The seventh and eighth fields are allele calls for the first variant in the .map
 </div></blockquote>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Family ID</dt>
+<dt class="field-odd">Family ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(‘FID’)</p>
 </dd>
-<dt class="field-even">Within-family ID</dt>
+<dt class="field-even">Within-family ID<span class="colon">:</span></dt>
 <dd class="field-even"><p>(‘IID’; cannot be ‘0’)</p>
 </dd>
-<dt class="field-odd">Within-family ID of father</dt>
+<dt class="field-odd">Within-family ID of father<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(‘0’ if father isn’t in dataset)</p>
 </dd>
-<dt class="field-even">Within-family ID of mother</dt>
+<dt class="field-even">Within-family ID of mother<span class="colon">:</span></dt>
 <dd class="field-even"><p>(‘0’ if mother isn’t in dataset)</p>
 </dd>
-<dt class="field-odd">Sex code</dt>
+<dt class="field-odd">Sex code<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(‘1’ = male, ‘2’ = female, ‘0’ = unknown)</p>
 </dd>
-<dt class="field-even">Phenotype value</dt>
+<dt class="field-even">Phenotype value<span class="colon">:</span></dt>
 <dd class="field-even"><p>(‘1’ = control, ‘2’ = case, ‘-9’/’0’/non-numeric = missing data if case/control)</p>
 </dd>
-<dt class="field-odd">Allele A marker_{1..n}</dt>
+<dt class="field-odd">Allele A marker_{1..n}<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Allele B marker_{1..n}</dt>
+<dt class="field-even">Allele B marker_{1..n}<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
 </dl>
-</div>
-<div class="section" id="prune-in-plink-indep-pairwise">
+</section>
+<section id="prune-in-plink-indep-pairwise">
 <h2>prune.in (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--indep-pairwise</span></code>)<a class="headerlink" href="#prune-in-plink-indep-pairwise" title="Permalink to this headline">¶</a></h2>
 <p>A list of marker IDs to include after running LD pruning.</p>
-</div>
-<div class="section" id="prune-out-plink-indep-pairwise">
+</section>
+<section id="prune-out-plink-indep-pairwise">
 <h2>prune.out (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--indep-pairwise</span></code>)<a class="headerlink" href="#prune-out-plink-indep-pairwise" title="Permalink to this headline">¶</a></h2>
 <p>A list of marker IDs to exclude after running LD pruning.</p>
-</div>
-<div class="section" id="sexcheck-plink-check-sex">
+</section>
+<section id="sexcheck-plink-check-sex">
 <h2>sexcheck (<code class="docutils literal notranslate"><span class="pre">plink</span> <span class="pre">--check-sex</span></code>)<a class="headerlink" href="#sexcheck-plink-check-sex" title="Permalink to this headline">¶</a></h2>
 <p>X chromosome based sex sanity checks.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">FID</dt>
+<dt class="field-odd">FID<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Family ID</p>
 </dd>
-<dt class="field-even">IID</dt>
+<dt class="field-even">IID<span class="colon">:</span></dt>
 <dd class="field-even"><p>Within-family ID</p>
 </dd>
-<dt class="field-odd">PEDSEX</dt>
+<dt class="field-odd">PEDSEX<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Sex code in input file</p>
 </dd>
-<dt class="field-even">SNPSEX</dt>
+<dt class="field-even">SNPSEX<span class="colon">:</span></dt>
 <dd class="field-even"><p>Imputed sex code (1 = male, 2 = female, 0 = unknown)</p>
 </dd>
-<dt class="field-odd">STATUS</dt>
+<dt class="field-odd">STATUS<span class="colon">:</span></dt>
 <dd class="field-odd"><p>[OK/PROBLEM] if PEDSEX and SNPSEX match then OK</p>
 </dd>
 </dl>
 <p class="rubric">Optional Fields (given <code class="docutils literal notranslate"><span class="pre">--ycount</span></code> or <code class="docutils literal notranslate"><span class="pre">-y-only</span></code>)</p>
 <dl class="field-list simple">
-<dt class="field-odd">F</dt>
+<dt class="field-odd">F<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Inbreeding coefficient based on X chromosome</p>
 </dd>
-<dt class="field-even">YCOUNT</dt>
+<dt class="field-even">YCOUNT<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of non-missing genotypes calls on Y chromosome</p>
 </dd>
 </dl>
 <p><a class="reference external" href="https://www.cog-genomics.org/plink/1.9/formats#sexcheck">https://www.cog-genomics.org/plink/1.9/formats#sexcheck</a></p>
-</div>
-<div class="section" id="snp-eigensoft">
+</section>
+<section id="snp-eigensoft">
 <h2>snp (<code class="docutils literal notranslate"><span class="pre">eigensoft</span></code>)<a class="headerlink" href="#snp-eigensoft" title="Permalink to this headline">¶</a></h2>
 <p>A file describing each SNP (one SNP per row).</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">SNP ID</dt>
+<dt class="field-odd">SNP ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Chromosome</dt>
+<dt class="field-even">Chromosome<span class="colon">:</span></dt>
 <dd class="field-even"><p>The chromosome number (X: 23, Y: 24, mtDNA: 90, XY: 91)</p>
 </dd>
-<dt class="field-odd">Genetic Position</dt>
+<dt class="field-odd">Genetic Position<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Given in morgans or 0.0 if unknown.</p>
 </dd>
-<dt class="field-even">Physical Position</dt>
+<dt class="field-even">Physical Position<span class="colon">:</span></dt>
 <dd class="field-even"><p>Given in bases.</p>
 </dd>
 </dl>
 <p class="rubric">Optional Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Reference Allele</dt>
+<dt class="field-odd">Reference Allele<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Variant Allele</dt>
+<dt class="field-even">Variant Allele<span class="colon">:</span></dt>
 <dd class="field-even"><p>For monomorphic SNPs can be encoded as X (unknown).</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="snpwt-snpweights">
+</section>
+<section id="snpwt-snpweights">
 <h2>snpwt.* (<code class="docutils literal notranslate"><span class="pre">SNPweights</span></code>)<a class="headerlink" href="#snpwt-snpweights" title="Permalink to this headline">¶</a></h2>
 <p class="rubric">Header Rows</p>
 <dl class="field-list simple">
-<dt class="field-odd">first</dt>
+<dt class="field-odd">first<span class="colon">:</span></dt>
 <dd class="field-odd"><p>shrinkage for the predicted PCs (1 and 2)</p>
 </dd>
-<dt class="field-even">second</dt>
+<dt class="field-even">second<span class="colon">:</span></dt>
 <dd class="field-even"><p>ancestral populations</p>
 </dd>
-<dt class="field-odd">third</dt>
+<dt class="field-odd">third<span class="colon">:</span></dt>
 <dd class="field-odd"><p>number of ancestral samples for each population</p>
 </dd>
-<dt class="field-even">fourth</dt>
+<dt class="field-even">fourth<span class="colon">:</span></dt>
 <dd class="field-even"><p>average PCs for each ancestral population</p>
 </dd>
-<dt class="field-odd">fifth</dt>
+<dt class="field-odd">fifth<span class="colon">:</span></dt>
 <dd class="field-odd"><p>parameter for linear transformation of PCs to % ancestry</p>
 </dd>
 </dl>
 <p class="rubric">Data Fields (remaining rows)</p>
 <dl class="field-list simple">
-<dt class="field-odd">SNP rs number</dt>
+<dt class="field-odd">SNP rs number<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">reference allele</dt>
+<dt class="field-even">reference allele<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">variant allele</dt>
+<dt class="field-odd">variant allele<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">reference allele frequency</dt>
+<dt class="field-even">reference allele frequency<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">SNP weight for PC1</dt>
+<dt class="field-odd">SNP weight for PC1<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">SNP weight for PC2</dt>
+<dt class="field-even">SNP weight for PC2<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
 </dl>
-</div>
-<div class="section" id="snpweights-snpweights">
+</section>
+<section id="snpweights-snpweights">
 <h2>snpweights (<code class="docutils literal notranslate"><span class="pre">SNPweights</span></code>)<a class="headerlink" href="#snpweights-snpweights" title="Permalink to this headline">¶</a></h2>
 <p>Per sample SNP weights based on an external reference panel.</p>
 <p class="rubric">Fields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Sample ID</dt>
+<dt class="field-odd">Sample ID<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Population Label</dt>
+<dt class="field-even">Population Label<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">Number of SNPs</dt>
+<dt class="field-odd">Number of SNPs<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The number of SNPs used for inference of SNP weight.</p>
 </dd>
-<dt class="field-even">Predicted PC1</dt>
+<dt class="field-even">Predicted PC1<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">Predicted PC2</dt>
+<dt class="field-odd">Predicted PC2<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Percent YRI Ancestry</dt>
+<dt class="field-even">Percent YRI Ancestry<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
-<dt class="field-odd">Percent CEU Ancestry</dt>
+<dt class="field-odd">Percent CEU Ancestry<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
-<dt class="field-even">Percent ASI (CHB + CHD) Ancestry</dt>
+<dt class="field-even">Percent ASI (CHB + CHD) Ancestry<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../dev_docs/setup.html" class="btn btn-neutral float-right" title="Development Environment Set-up" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../sub_workflows/delivery.html" class="btn btn-neutral float-left" title="Delivery Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="../dev_docs/setup.html" class="btn btn-neutral float-right" title="Development Environment Set-up" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../sub_workflows/delivery.html" class="btn btn-neutral float-left" title="Delivery Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

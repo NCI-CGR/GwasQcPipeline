@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Working with Test Suite &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>Working with Test Suite &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +18,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +31,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -54,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -85,13 +84,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -99,18 +98,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="setup.html">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -153,8 +152,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -166,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../_sources/dev_docs/testing.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -180,7 +177,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="working-with-test-suite">
+  <section id="working-with-test-suite">
 <h1>Working with Test Suite<a class="headerlink" href="#working-with-test-suite" title="Permalink to this headline">¶</a></h1>
 <p>Software testing is a technique where you isolate different parts of a system and test specific functionality.
 Testing in bioinformatics is challenging because we often need large amounts of data.
@@ -190,20 +187,20 @@ However, much of the workflow could only be tested using real data.
 We do not currently distribute our real test data but we have made the test suite module so that all developers can at least run the fake data tests.
 We are using the powerful <a class="reference external" href="https://docs.pytest.org/en/6.2.x/">pytest</a> to orchestrate running of our tests.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>.
-└── tests
-   ├── __init__.py
-   ├── cli/
-   ├── cluster_profiles/
-   ├── conftest.py
-   ├── data/                                <span class="c1"># This is a git submodule pointing to our fake test data at https://github.com/NCI-CGR/GwasQcPipeline-test-data</span>
-   ├── models/
-   ├── parsers/
-   ├── reporting/
-   ├── test_config.py
-   ├── test_snakemake_job_grouping.py
-   ├── testing/
-   ├── validators/
-   └── workflow/
+└──<span class="w"> </span>tests
+<span class="w">   </span>├──<span class="w"> </span>__init__.py
+<span class="w">   </span>├──<span class="w"> </span>cli/
+<span class="w">   </span>├──<span class="w"> </span>cluster_profiles/
+<span class="w">   </span>├──<span class="w"> </span>conftest.py
+<span class="w">   </span>├──<span class="w"> </span>data/<span class="w">                                </span><span class="c1"># This is a git submodule pointing to our fake test data at https://github.com/NCI-CGR/GwasQcPipeline-test-data</span>
+<span class="w">   </span>├──<span class="w"> </span>models/
+<span class="w">   </span>├──<span class="w"> </span>parsers/
+<span class="w">   </span>├──<span class="w"> </span>reporting/
+<span class="w">   </span>├──<span class="w"> </span>test_config.py
+<span class="w">   </span>├──<span class="w"> </span>test_snakemake_job_grouping.py
+<span class="w">   </span>├──<span class="w"> </span>testing/
+<span class="w">   </span>├──<span class="w"> </span>validators/
+<span class="w">   </span>└──<span class="w"> </span>workflow/
 </pre></div>
 </div>
 <p>Notice that the <code class="docutils literal notranslate"><span class="pre">test/</span></code> structure closely mimics the <code class="docutils literal notranslate"><span class="pre">src/cgr_gwas_qc/</span></code> structure.
@@ -231,7 +228,7 @@ For example,</p>
 Our test function <code class="docutils literal notranslate"><span class="pre">test_addition</span></code> has the fixture name as one of its parameters.
 <a class="reference external" href="https://docs.pytest.org/en/6.2.x/">pytest</a> will replace the fixture name with the return value so you can use it directly as a variable in your test.
 I use <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code> as a way to store and share fixtures among tests.</p>
-<div class="section" id="fake-data">
+<section id="fake-data">
 <h2>Fake Data<a class="headerlink" href="#fake-data" title="Permalink to this headline">¶</a></h2>
 <p>Our “fake” test data is stored at <a class="reference external" href="https://github.com/NCI-CGR/GwasQcPipeline-test-data">https://github.com/NCI-CGR/GwasQcPipeline-test-data</a>.
 We have this repository as a git submodule in the test directory.
@@ -245,7 +242,7 @@ This is a helper class for providing the correct paths to our test data.
 See the <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc.testing.data</span></code> module for more information.</p>
 <dl class="py class">
 <dt id="cgr_gwas_qc.testing.data.FakeData">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cgr_gwas_qc.testing.data.</span></code><code class="sig-name descname"><span class="pre">FakeData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/testing/data.html#FakeData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cgr_gwas_qc.testing.data.FakeData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.testing.data.</code><code class="sig-name descname">FakeData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>pathlib.Path<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/testing/data.html#FakeData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.testing.data.FakeData" title="Permalink to this definition">¶</a></dt>
 <dd><p>A repository of synthetic data stored in <code class="docutils literal notranslate"><span class="pre">tests/data</span></code>.</p>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span> <span class="o">=</span> <span class="n">FakeData</span><span class="p">(</span><span class="n">working_dir</span><span class="p">)</span>
@@ -266,8 +263,8 @@ See the <code class="docutils literal notranslate"><span class="pre">cgr_gwas_qc
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="real-data">
+</section>
+<section id="real-data">
 <h2>Real Data<a class="headerlink" href="#real-data" title="Permalink to this headline">¶</a></h2>
 <p>We also have small set real data stored on CGEMs/CCAD at <code class="docutils literal notranslate"><span class="pre">/DCEG/CGF/Bioinformatics/Production/data/cgr_gwas_qc</span></code>.
 We do not distribute this data publicly but CGR users can sync this data to other NIH computers/servers using:</p>
@@ -295,10 +292,10 @@ For example,</p>
 </pre></div>
 </div>
 <p>This tells <a class="reference external" href="https://docs.pytest.org/en/6.2.x/">pytest</a> that this test uses real data and should be skipped unless the <code class="docutils literal notranslate"><span class="pre">--real-data</span></code> flag is given.</p>
-</div>
+</aside>
 <dl class="py class">
 <dt id="cgr_gwas_qc.testing.data.RealData">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">cgr_gwas_qc.testing.data.</span></code><code class="sig-name descname"><span class="pre">RealData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_sample_sheet</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sync</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GRCh_version</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">37</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/testing/data.html#RealData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cgr_gwas_qc.testing.data.RealData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">cgr_gwas_qc.testing.data.</code><code class="sig-name descname">RealData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>pathlib.Path<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">full_sample_sheet</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sync</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">GRCh_version</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">37</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cgr_gwas_qc/testing/data.html#RealData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.testing.data.RealData" title="Permalink to this definition">¶</a></dt>
 <dd><p>A repository of real data stored on cgems.</p>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cache</span> <span class="o">=</span> <span class="n">ReadData</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">sync</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># automatically symlink (on cgems) or rsync data locally</span>
@@ -319,37 +316,45 @@ For example,</p>
 </div>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../api/cgr_gwas_qc.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="source_code.html" class="btn btn-neutral float-left" title="Working with Source Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="../api/cgr_gwas_qc.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="source_code.html" class="btn btn-neutral float-left" title="Working with Source Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

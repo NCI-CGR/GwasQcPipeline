@@ -82,7 +82,7 @@ Running the Workflow on a Cluster
 
 We provide the ``cgr submit`` command to easily submit to a cluster.
 We take advantage of snakemake_'s cluster profile system to run on different cluster environments.
-For CGR users, we include cluster profiles for ``CGEMS/CCAD`` and ``Biowulf``.
+For CGR users, we include cluster profiles for ``CGEMS/CCAD``, ``ccad2``, and ``Biowulf``.
 For external users will need to create your own `snakemake cluster profile`_.
 
 .. _`snakemake cluster profile`: https://github.com/snakemake-profiles/doc

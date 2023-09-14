@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Development Environment Set-up &mdash; GwasQcPipeline 1.0.0 documentation</title>
+  <title>Development Environment Set-up &mdash; GwasQcPipeline 1.2.0 documentation</title>
   
 
   
@@ -17,10 +18,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -33,6 +31,7 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -54,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> GwasQcPipeline
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> GwasQcPipeline
           
 
           
@@ -85,13 +84,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <p><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installing GwasQcPipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/running_pipeline.html">Running the Pipeline</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
-<p class="caption"><span class="caption-text">QC Sub Workflows</span></p>
+<p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
@@ -99,18 +98,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Reference</span></p>
+<p><span class="caption-text">User Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../reference/file_types.html">File Type Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developer Reference</span></p>
+<p><span class="caption-text">Developer Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Development Environment Set-up</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Working with Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source_code.html">Working with Source Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">Working with Test Suite</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Reference</span></p>
+<p><span class="caption-text">API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/cgr_gwas_qc.html">API Reference</a></li>
 </ul>
@@ -153,8 +152,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -166,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../_sources/dev_docs/setup.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -180,33 +177,44 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="development-environment-set-up">
+  <section id="development-environment-set-up">
 <span id="dev-setup"></span><h1>Development Environment Set-up<a class="headerlink" href="#development-environment-set-up" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="download-gwasqcpipeline">
-<h2>Download GwasQcPipeline<a class="headerlink" href="#download-gwasqcpipeline" title="Permalink to this headline">¶</a></h2>
-<p>First we need to download the development version of GwasQcPipeline.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone --recursive https://github.com/NCI-CGR/GwasQcPipeline.git
-$ cd GwasQcPipeline
+<section id="install-poetry">
+<h2>Install <code class="docutils literal notranslate"><span class="pre">poetry</span></code><a class="headerlink" href="#install-poetry" title="Permalink to this headline">¶</a></h2>
+<p>First we need to download poetry by using the official <a class="reference external" href="https://python-poetry.org/docs/#installation">Poetry installer</a>.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ curl -sSL https://install.python-poetry.org | python -
+$ poetry --version
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Our test data (<code class="docutils literal notranslate"><span class="pre">tests/data</span></code>) is stored in a separate git repository.
-This repository is embedded as a git submodule. The <code class="docutils literal notranslate"><span class="pre">--recursive</span></code> tells git to go ahead and download <code class="docutils literal notranslate"><span class="pre">tests/data</span></code>.</p>
-</div>
-</div>
-<div class="section" id="create-a-virtual-environment-conda">
+<p>If poetry version not accesible, check your PATH and ensure poetry’s install location is findable.
+If default python version is not 3.8, then follow these <a class="reference external" href="https://www.baeldung.com/linux/default-python3">instructions</a>.</p>
+</aside>
+</section>
+<section id="create-a-virtual-environment-conda">
 <h2>Create a virtual environment (<code class="docutils literal notranslate"><span class="pre">conda</span></code>)<a class="headerlink" href="#create-a-virtual-environment-conda" title="Permalink to this headline">¶</a></h2>
 <p>We are going to create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> virtual environment to store the development environment.
-If you need to install <code class="docutils literal notranslate"><span class="pre">conda</span></code> see the <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda website</a>.</p>
+If you need to install <code class="docutils literal notranslate"><span class="pre">conda</span></code> see the <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda website</a>. We reccomend installing conda locally:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
+$ bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -p miniconda3 -b
+$ echo &quot;export PATH=$(pwd)/miniconda3/bin:$PATH&quot; &gt;&gt; ~/.bashrc
+$ source ~/.bashrc
+$ conda init
+</pre></div>
+</div>
+<p>Restart you terminal.</p>
 <p>Next you need to setup three channels in your conda config by running the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda config --add channels defaults
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
+$ conda update -n base -c defaults conda
+$ conda install -n base -c conda-forge mamba
+$ conda config --add channels defaults
 $ conda config --add channels bioconda
 $ conda config --add channels conda-forge
 </pre></div>
 </div>
 <p>Next, To create our <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n cgr-dev python=3.8 poetry make -y
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n cgr-dev python=3.8 -y
 $ conda activate cgr-dev  # This activates the virtual environment
 </pre></div>
 </div>
@@ -215,29 +223,51 @@ $ conda activate cgr-dev  # This activates the virtual environment
 <p><code class="docutils literal notranslate"><span class="pre">psutil</span></code> and <code class="docutils literal notranslate"><span class="pre">pysam</span></code> are also runtime requirements.
 If you have <code class="docutils literal notranslate"><span class="pre">gcc</span></code> installed, they should be automatically built during the installation step below.
 However, if you have problems you may want to install them with <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">cgr-dev</span> <span class="pre">&amp;&amp;</span> <span class="pre">conda</span> <span class="pre">install</span> <span class="pre">psutil</span> <span class="pre">pysam</span></code>.</p>
+</aside>
+</section>
+<section id="download-gwasqcpipeline">
+<h2>Download GwasQcPipeline<a class="headerlink" href="#download-gwasqcpipeline" title="Permalink to this headline">¶</a></h2>
+<p>Download the development version of GwasQcPipeline.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone --recursive https://github.com/NCI-CGR/GwasQcPipeline.git
+$ cd GwasQcPipeline
+</pre></div>
 </div>
-</div>
-<div class="section" id="install-dependencies-and-gwasqcpipeline-poetry">
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Our test data (<code class="docutils literal notranslate"><span class="pre">tests/data</span></code>) is stored in a separate git repository.
+This repository is embedded as a git submodule. The <code class="docutils literal notranslate"><span class="pre">--recursive</span></code> tells git to go ahead and download <code class="docutils literal notranslate"><span class="pre">tests/data</span></code>.</p>
+</aside>
+</section>
+<section id="install-dependencies-and-gwasqcpipeline-poetry">
 <h2>Install dependencies and GwasQcPipeline (<code class="docutils literal notranslate"><span class="pre">poetry</span></code>)<a class="headerlink" href="#install-dependencies-and-gwasqcpipeline-poetry" title="Permalink to this headline">¶</a></h2>
 <p>This project uses <a class="reference external" href="https://python-poetry.org/">poetry</a> as a package manager and build tool.
 Poetry is a modern python build tool that uses the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> format to track dependencies and build settings.</p>
 <p>To install all runtime/development dependencies and GwasQcPipeline itself run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate cgr-dev      # Make sure we are in our conda environment
+$ poetry env use /PATH/TO/miniconda3/envs/cgr-dev/bin/python # Enable poetry to manage your conda environment
+$ poetry config virtualenvs.path /PATH/TO/miniconda3/envs/cgr-dev #This needs to be full path
+$ poetry env info # This should show that both system and virtual env python is 3.8 and that the venv is conda
 $ poetry install              # Install development and runtime dependencies
+$ cgr version
 </pre></div>
 </div>
 <p>Now lets make sure everything is working:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgr --help                  # This is our main entry point to running the workflow
 $ make -C docs html           # This will build documentation into docs/_build/html
-$ pytest -v                   # This will run the test suite
+$ poetry run pytest -vvv      # This will run the test suite
 </pre></div>
 </div>
-<p>The main reason we are using poetry is because it makes building python packages easy:</p>
+<p>The main reason we are using poetry is because it makes building python packages easy.
+In order to match the new config.yaml version line with the new QwasQcPipeline version
+edit and update the <code class="docutils literal notranslate"><span class="pre">version</span> <span class="pre">=</span> <span class="pre">&quot;1.2.0&quot;</span></code> line in the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ poetry build                # Build artifacts are in ./dist
 </pre></div>
 </div>
-</div>
-<div class="section" id="install-pre-commit-hooks-for-consistent-development">
+<p>Once the changes are pushed to Github, tag the new version for release. While Github is building
+the new release, a drop and drag box will appear for additional assets. Add the new
+cgr_gwas_qc-X.X.X.tar.gz and cgr_gwas_qc-X.X.X-py3-none-any.whl files to the box.</p>
+</section>
+<section id="install-pre-commit-hooks-for-consistent-development">
 <h2>Install pre-commit hooks for consistent development<a class="headerlink" href="#install-pre-commit-hooks-for-consistent-development" title="Permalink to this headline">¶</a></h2>
 <p>There are a number of tools out there to make coding cleaner and more consistent.
 For example, there are code formatters (i.e., <code class="docutils literal notranslate"><span class="pre">black</span></code>, <code class="docutils literal notranslate"><span class="pre">isort</span></code>, <code class="docutils literal notranslate"><span class="pre">snakefmt</span></code>), code linters (i.e., <code class="docutils literal notranslate"><span class="pre">flake8</span></code>, <code class="docutils literal notranslate"><span class="pre">rstcheck</span></code>), type checkers (i.e., <code class="docutils literal notranslate"><span class="pre">mypy</span></code>).
@@ -253,55 +283,63 @@ $ pre-commit run                 # Make sure everything is working
 <p class="admonition-title">Note</p>
 <p>The first time you run pre-commit it needs to download and setup virtual environments for each tool.
 This may take a few minutes.</p>
-</div>
+</aside>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Tools are only run on files with changes, if this is a fresh clone of the repository then all tools will be skipped.</p>
-</div>
+</aside>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Now every time you commit files it will run the required set of tools for the staged files.
 If an auto formatter detects a problem it will make the changes, but you will have to re-stage that file.
 This will slow down making commits, but I find the benefits out weight the inconvenience.</p>
-</div>
+</aside>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Sometimes pre-commit will keep calling something a problem that you want to ignore.
 For example, <code class="docutils literal notranslate"><span class="pre">codespell</span></code> tends to interpret this <code class="docutils literal notranslate"><span class="pre">&quot;\nNumber</span> <span class="pre">&quot;</span></code> as a spelling error even thought it is really a formatting thing.
 You can skip running al  pre-commit hooks using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">--no-verify</span></code>.
 However, make sure it is absolutely necessary!</p>
-</div>
-</div>
-</div>
+</aside>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="documentation.html" class="btn btn-neutral float-right" title="Working with Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../reference/file_types.html" class="btn btn-neutral float-left" title="File Type Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="documentation.html" class="btn btn-neutral float-right" title="Working with Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../reference/file_types.html" class="btn btn-neutral float-left" title="File Type Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2020, Leidos Biomedical Research, Inc..
+        
+        &copy; Copyright 2020, Leidos Biomedical Research, Inc.
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 
