@@ -48,6 +48,20 @@ CLUSTER_JOB_ID=${SLURM_JOB_ID}
 CLUSTER_JOB_ID=${SLURM_JOB_ID}
 {% endif %}
 
+{% if cambridge %}
+#SBATCH --job-name="GwasQcPipeline"
+#SBATCH --partition="{{ queue }}"
+#SBATCH --output=gwas_qc_log.%j
+#SBATCH --time={{ time_hr }}:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks={{ local_tasks }}
+#SBATCH --cpus-per-task=1
+#SBATCH --mem={{ local_mem_mb }}
+#SBATCH --parsable
+
+CLUSTER_JOB_ID=${SLURM_JOB_ID}
+{% endif %}
+
 shopt -s -o errexit pipefail nounset
 
 MAX_ATTEMPTS=5
