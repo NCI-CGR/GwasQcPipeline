@@ -63,15 +63,17 @@ module thousand_genomes:
     config:
         {}
 
-
 module plink:
     snakefile:
         cfg.modules("plink")
 
-
 module graf:
     snakefile:
-        cfg.modules("graf")
+        cfg.modules("graf_v2.4")
+
+module grafpop:
+    snakefile:
+        cfg.modules("grafpop")
 
 
 ################################################################################
@@ -399,13 +401,18 @@ rule split_sample_concordance:
 # -------------------------------------------------------------------------------
 # Ancestry
 # -------------------------------------------------------------------------------
-use rule populations from graf as graf_populations with:
+use rule grafpop_populations from grafpop as graf_populations with:
     input:
-        rules.graf_extract_fingerprint_snps.output[0],
+        bed=rules.snp_call_rate_filter_2.output.bed,
+        bim=rules.snp_call_rate_filter_2.output.bim,
+        fam=rules.snp_call_rate_filter_2.output.fam,
+	#bed="sample_level/call_rate_2/samples.bed",
+        #bim="sample_level/call_rate_2/samples.bim",
+        #fam="sample_level/call_rate_2/samples.fam", 
     output:
-        "sample_level/ancestry/graf_populations.txt",
+        "sample_level/ancestry/grafpop_populations.txt",
     log:
-        "sample_level/ancestry/graf_populations.log",
+        "sample_level/ancestry/grafpop_populations.log",
 
 
 use rule ancestry from graf as graf_ancestry with:
