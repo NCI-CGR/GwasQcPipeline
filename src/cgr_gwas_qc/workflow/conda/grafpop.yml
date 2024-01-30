@@ -1,0 +1,11 @@
+name: grafpop
+channels:
+  - https://raw.githubusercontent.com/NCI-CGR/conda-cgr/default/conda-cgr
+dependencies:
+  - grafpop
+  - graf
+  - perl-cgi
+  - perl-carp
+  - perl-gd
+  - perl-gdgraph
+  - perl-gdtextutil
