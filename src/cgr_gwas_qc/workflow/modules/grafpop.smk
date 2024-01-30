@@ -27,7 +27,7 @@ rule extract_fingerprint_snps:
 
 
 rule grafpop_populations:
-    """Estimate ancestry for each sample using grafpop1.0."""
+    """Estimate ancestry for each sample using grafpop"""
     input:
         bed="{prefix}.bed",
         bim="{prefix}.bim",
@@ -44,4 +44,17 @@ rule grafpop_populations:
         export GRAFPATH=$CONDA_PREFIX/share/grafpop
         grafpop {input.bim} {output[0]} > {log} 2>&1 || exit_code=$?; if [ $exit_code -ne 1 ]; then exit $exit_code; fi
         """
+
+rule grafpop_ancestry:
+    """Create summary table with ancestry calls."""
+    input:
+        "{prefix}_graf_populations.txt",
+    output:
+        #Needs to be a txt file for SaveSamples.pl
+        "{prefix}_graf_ancestry.txt",
+    conda:
+        cfg.conda("grafpop")
+    shell:
+        "SaveSamples.pl {input[0]} {output[0]}"
+
 

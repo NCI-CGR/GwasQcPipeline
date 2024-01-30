@@ -260,7 +260,7 @@ rule qc_report_xlsx:
         subject_qc_csv="subject_level/subject_qc.csv",
         population_concordance_csv="subject_level/concordance.csv",
         population_qc_csv="subject_level/population_qc.csv",
-        graf="sample_level/ancestry/graf_populations.txt",
+        graf="sample_level/ancestry/grafpop_populations.txt",
     output:
         "delivery/{deliver_prefix}QC_Report{deliver_suffix}.xlsx",
     script:

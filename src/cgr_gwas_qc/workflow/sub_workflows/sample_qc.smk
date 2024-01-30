@@ -415,9 +415,9 @@ use rule grafpop_populations from grafpop as graf_populations with:
         "sample_level/ancestry/grafpop_populations.log",
 
 
-use rule ancestry from graf as graf_ancestry with:
+use rule grafpop_ancestry from grafpop as graf_ancestry with:
     input:
-        rules.graf_populations.output[0],
+        rules.grafpop_populations.output[0],
     output:
         "sample_level/ancestry/graf_ancestry.txt",
 
@@ -492,7 +492,7 @@ rule sample_qc_table:
         imiss_cr1=rules.plink_call_rate_post1.output.imiss,
         imiss_cr2=rules.plink_call_rate_post2.output.imiss,
         sexcheck_cr1=rules.sample_level_sexcheck.output[0],
-        ancestry=rules.graf_ancestry.output[0],
+        ancestry=rules.grafpop_ancestry.output[0],
         sample_concordance_csv=rules.sample_concordance_summary.output[0],
         contam=_contam,
         intensity=_intensity,

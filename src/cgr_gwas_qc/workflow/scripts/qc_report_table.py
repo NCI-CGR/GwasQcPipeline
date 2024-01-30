@@ -208,19 +208,13 @@ _ANCESTRY_COLUMNS = [
     "Sample Used in Subject Analysis",
     "Case/Control_Status",
     "#SNPs",
-    "GD1",
-    "GD2",
-    "GD3",
+    "GD1 (x)",
+    "GD2 (y)",
+    "GD3 (z)",
     "GD4",
     "F(%)",
     "E(%)",
-    "A(%)",
-    "African",
-    "European",
-    "Asian",
-    "Mexican",
-    "Indian-Pakistani",
-    "Ancestry",
+    "A(%)"
 ]
 
 
@@ -237,9 +231,8 @@ def _ancestry(sample_qc_csv: PathLike, graf_txt: PathLike) -> pd.DataFrame:
     )
 
     graf = (
-        pd.read_csv(graf_txt, sep="\t")
+        pd.read_csv(graf_txt, sep="\t", skiprows=7)
         .rename({"Sample": "Sample_ID"}, axis=1)
-        .drop("DS No.", axis=1)
     )
 
     return (
