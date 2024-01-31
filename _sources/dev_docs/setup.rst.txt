@@ -17,14 +17,14 @@ First we need to download poetry by using the official `Poetry installer`_.::
 
 .. note::
 
-    If poetry version not accesible, check your PATH and ensure poetry's install location is findable.
+    If poetry version is not accessible, check your PATH and ensure poetry's install location is findable.
     If default python version is not 3.8, then follow these `instructions`_.
 
 Create a virtual environment (``conda``)
 ----------------------------------------
 
 We are going to create a ``conda`` virtual environment to store the development environment.
-If you need to install ``conda`` see the `Miniconda website`_. We reccomend installing conda locally::
+If you need to install ``conda`` see the `Miniconda website`_. We recomend installing conda locally::
 
     $ wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
     $ bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -p miniconda3 -b
@@ -111,7 +111,7 @@ There are a number of tools out there to make coding cleaner and more consistent
 For example, there are code formatters (i.e., ``black``, ``isort``, ``snakefmt``), code linters (i.e., ``flake8``, ``rstcheck``), type checkers (i.e., ``mypy``).
 These tools also help catch small mistakes.
 This repository has a set of git pre-commit hooks (``.pre-commit-config.yaml``) that will run a suite of tools at each commit.
-This helps keeps issues from making it into the code base.
+This helps keep issues from making it into the code base.
 
 There is a one-time install that you need to setup in your local version of GwasQcPipeline::
 
@@ -129,13 +129,13 @@ There is a one-time install that you need to setup in your local version of Gwas
 
 .. note::
 
-    Now every time you commit files it will run the required set of tools for the staged files.
-    If an auto formatter detects a problem it will make the changes, but you will have to re-stage that file.
+    Now, every time you commit files, it will run the required set of tools for the staged files.
+    If an auto formatter detects a problem, it will make the changes, but you will have to re-stage that file.
     This will slow down making commits, but I find the benefits out weight the inconvenience.
 
 .. warning::
 
     Sometimes pre-commit will keep calling something a problem that you want to ignore.
     For example, ``codespell`` tends to interpret this ``"\nNumber "`` as a spelling error even thought it is really a formatting thing.
-    You can skip running al  pre-commit hooks using ``git commit --no-verify``.
+    You can skip running all  pre-commit hooks using ``git commit --no-verify``.
     However, make sure it is absolutely necessary!

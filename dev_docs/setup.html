@@ -188,14 +188,14 @@ $ poetry --version
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If poetry version not accesible, check your PATH and ensure poetry’s install location is findable.
+<p>If poetry version is not accessible, check your PATH and ensure poetry’s install location is findable.
 If default python version is not 3.8, then follow these <a class="reference external" href="https://www.baeldung.com/linux/default-python3">instructions</a>.</p>
 </aside>
 </section>
 <section id="create-a-virtual-environment-conda">
 <h2>Create a virtual environment (<code class="docutils literal notranslate"><span class="pre">conda</span></code>)<a class="headerlink" href="#create-a-virtual-environment-conda" title="Permalink to this headline">¶</a></h2>
 <p>We are going to create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> virtual environment to store the development environment.
-If you need to install <code class="docutils literal notranslate"><span class="pre">conda</span></code> see the <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda website</a>. We reccomend installing conda locally:</p>
+If you need to install <code class="docutils literal notranslate"><span class="pre">conda</span></code> see the <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda website</a>. We recomend installing conda locally:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
 $ bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -p miniconda3 -b
 $ echo &quot;export PATH=$(pwd)/miniconda3/bin:$PATH&quot; &gt;&gt; ~/.bashrc
@@ -273,7 +273,7 @@ cgr_gwas_qc-X.X.X.tar.gz and cgr_gwas_qc-X.X.X-py3-none-any.whl files to the box
 For example, there are code formatters (i.e., <code class="docutils literal notranslate"><span class="pre">black</span></code>, <code class="docutils literal notranslate"><span class="pre">isort</span></code>, <code class="docutils literal notranslate"><span class="pre">snakefmt</span></code>), code linters (i.e., <code class="docutils literal notranslate"><span class="pre">flake8</span></code>, <code class="docutils literal notranslate"><span class="pre">rstcheck</span></code>), type checkers (i.e., <code class="docutils literal notranslate"><span class="pre">mypy</span></code>).
 These tools also help catch small mistakes.
 This repository has a set of git pre-commit hooks (<code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>) that will run a suite of tools at each commit.
-This helps keeps issues from making it into the code base.</p>
+This helps keep issues from making it into the code base.</p>
 <p>There is a one-time install that you need to setup in your local version of GwasQcPipeline:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pre-commit install             # Installs the hooks
 $ pre-commit run                 # Make sure everything is working
@@ -290,15 +290,15 @@ This may take a few minutes.</p>
 </aside>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Now every time you commit files it will run the required set of tools for the staged files.
-If an auto formatter detects a problem it will make the changes, but you will have to re-stage that file.
+<p>Now, every time you commit files, it will run the required set of tools for the staged files.
+If an auto formatter detects a problem, it will make the changes, but you will have to re-stage that file.
 This will slow down making commits, but I find the benefits out weight the inconvenience.</p>
 </aside>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Sometimes pre-commit will keep calling something a problem that you want to ignore.
 For example, <code class="docutils literal notranslate"><span class="pre">codespell</span></code> tends to interpret this <code class="docutils literal notranslate"><span class="pre">&quot;\nNumber</span> <span class="pre">&quot;</span></code> as a spelling error even thought it is really a formatting thing.
-You can skip running al  pre-commit hooks using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">--no-verify</span></code>.
+You can skip running all  pre-commit hooks using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">--no-verify</span></code>.
 However, make sure it is absolutely necessary!</p>
 </aside>
 </section>
