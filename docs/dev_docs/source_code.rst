@@ -14,7 +14,7 @@ This includes the GwasQcPipeline workflow, the ``cgr`` command line utility, and
    │     ├── __init__.py
    │     ├── __main__.py          # Points to the ``cgr`` entry point
    │     ├── cli/                 # All code for the ``cgr`` command line interface
-   │     ├── cluster_profiles/    # Cluster profiles for CGEMs and Biowuld
+   │     ├── cluster_profiles/    # Cluster profiles for CGEMs and Biowulf
    │     ├── conda.py             # Helpers to activate conda environments in a script
    │     ├── config.py            # Configuration manager helper code ``cfg``
    │     ├── exceptions.py        # Custom exceptions for nicer error handling
