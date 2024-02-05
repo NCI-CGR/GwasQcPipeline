@@ -1,4 +1,3 @@
-#Deprecated as of graf2.4 implementation
 from cgr_gwas_qc import load_config
 
 cfg = load_config()
@@ -17,7 +16,7 @@ rule extract_fingerprint_snps:
     log:
         "{prefix}.fpg.log",
     conda:
-        cfg.conda("graf")
+        cfg.conda("graf_v2.4")
     shell:
         # GRAF returns an exit code of 1, this captures it so snakemake will actually run.
         "graf "
@@ -40,7 +39,7 @@ rule relatedness:
     output:
         "{prefix}_graf_relatedness.tsv",
     conda:
-        cfg.conda("graf")
+        cfg.conda("graf_v2.4")
     log:
         "{prefix}_graf_relatedness.log",
     shell:
@@ -59,7 +58,7 @@ rule relatedness_png:
     output:
         "sample_level/plots/graf_relatedness.png",
     conda:
-        cfg.conda("graf")
+        cfg.conda("graf_v2.4")
     shell:
         "PlotGraf.pl {input[0]} {output[0]} 3"
 
@@ -73,7 +72,7 @@ rule populations:
     log:
         "{prefix}_graf_populations.log",
     conda:
-        cfg.conda("graf")
+        cfg.conda("graf_v2.4")
     shell:
         # GRAF returns an exit code of 1, this captures it so snakemake will actually run.
         "graf "
@@ -90,7 +89,7 @@ rule ancestry:
     output:
         "{prefix}_graf_ancestry.txt",
     conda:
-        cfg.conda("graf")
+        cfg.conda("graf_v2.4")
     shell:
         "PlotPopulations.pl {input[0]} {output[0]} "
 
@@ -102,6 +101,6 @@ rule populations_png:
     output:
         "{prefix}_graf_populations.png",
     conda:
-        cfg.conda("graf")
+        cfg.conda("graf_v2.4")
     shell:
         "PlotPopulations.pl {input[0]} {output[0]} "

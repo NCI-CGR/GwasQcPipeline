@@ -1,9 +1,8 @@
-#Deprecated as of graf2.4 implementation
+name: grafpop
 channels:
   - https://raw.githubusercontent.com/NCI-CGR/conda-cgr/default/conda-cgr
-  - conda-forge
-  - bioconda
 dependencies:
+  - grafpop
   - graf
   - perl-cgi
   - perl-carp
