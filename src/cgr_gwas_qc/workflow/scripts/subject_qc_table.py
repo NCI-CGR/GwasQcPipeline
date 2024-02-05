@@ -90,12 +90,10 @@ def main(
     )
 
 
-#Needed with graf-pop implementarion that returns Asian-Pacific_Islander which the hyphen isn't supported by snakemake wildcares
+# Needed with graf-pop implementarion that returns Asian-Pacific_Islander which the hyphen isn't supported by snakemake wildcares
 def _fix_hyphen_in_ancestry_name(df: pd.DataFrame) -> pd.DataFrame:
-    df['Ancestry'] = df['Ancestry'].str.replace('-', '_')
-    return (
-        df
-    )
+    df["Ancestry"] = df["Ancestry"].str.replace("-", "_")
+    return df
 
 
 def _sample_qc_to_subject_qc(df: pd.DataFrame) -> pd.DataFrame:

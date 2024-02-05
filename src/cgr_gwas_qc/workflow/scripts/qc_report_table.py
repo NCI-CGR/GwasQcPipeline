@@ -214,7 +214,7 @@ _ANCESTRY_COLUMNS = [
     "GD4",
     "F(%)",
     "E(%)",
-    "A(%)"
+    "A(%)",
 ]
 
 
@@ -230,10 +230,7 @@ def _ancestry(sample_qc_csv: PathLike, graf_txt: PathLike) -> pd.DataFrame:
         axis=1,
     )
 
-    graf = (
-        pd.read_csv(graf_txt, sep="\t", skiprows=7)
-        .rename({"Sample": "Sample_ID"}, axis=1)
-    )
+    graf = pd.read_csv(graf_txt, sep="\t", skiprows=7).rename({"Sample": "Sample_ID"}, axis=1)
 
     return (
         graf.merge(sample_qc, on="Sample_ID")
