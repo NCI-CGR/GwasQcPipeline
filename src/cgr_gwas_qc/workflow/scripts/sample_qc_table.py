@@ -96,6 +96,7 @@ DTYPES = {  # Header for main QC table
     "is_contaminated": "boolean",
     "replicate_ids": "string",
     "is_discordant_replicate": "boolean",
+    "is_unexpected_replicate": "boolean",
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
     "X_inbreeding_coefficient": "float",
@@ -365,11 +366,12 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
             - Sample_ID (pd.Index)
             - is_discordant_replicate (bool): True if replicates show
               a concordance below the supplied threshold. Otherwise False.
+            - is_unexpected_replicate
     """
     df = sample_concordance.read(filename)
     return (
         df.melt(
-            id_vars=["is_discordant_replicate"],
+            id_vars=["is_discordant_replicate","is_unexpected_replicate"],
             value_vars=["Sample_ID1", "Sample_ID2"],
             var_name="To_Drop",
             value_name="Sample_ID",

@@ -67,7 +67,7 @@ class WorkflowParams(BaseModel):
     )
 
     lims_upload: bool = Field(
-        False,
+        True,
         description="For ``CGEMS/CCAD`` use only, will place a copy of the LimsUpload file in the root directory.",
     )
 

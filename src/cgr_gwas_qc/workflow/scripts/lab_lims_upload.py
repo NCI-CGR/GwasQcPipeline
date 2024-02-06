@@ -31,9 +31,15 @@ def main(sample_sheet_csv: Path, sample_qc_csv: Path, outfile: Path):
     df = qc.merge(ss, on="Sample_ID", how="outer", suffixes=["", "_DROP"]).filter(
         regex="^(?!.*_DROP)", axis=1
     )
+    df.head()
+    df = df.reindex(COLUMNS, axis=1)
+    # rename columns to work with LIMS system
+    df = df.rename(columns = {'Sample_ID':'Sample ID','Call_Rate_Initial':'Call Rate'})
+    # For the samples missing GTC files, their status in the low call rate column should be TRUE instead of blank
+    df.loc[df['Call Rate'] =="",'Low Call Rate'] = True
 
     # Adjust names and column order to match legacy
-    df.reindex(COLUMNS, axis=1).to_csv(outfile, index=False)
+    df.to_csv(outfile, index=False)
 
 
 if __name__ == "__main__":
