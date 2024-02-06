@@ -31,7 +31,6 @@ def main(sample_sheet_csv: Path, sample_qc_csv: Path, outfile: Path):
     df = qc.merge(ss, on="Sample_ID", how="outer", suffixes=["", "_DROP"]).filter(
         regex="^(?!.*_DROP)", axis=1
     )
-    df.head()
     df = df.reindex(COLUMNS, axis=1)
     # rename columns to work with LIMS system
     df = df.rename(columns = {'Sample_ID':'Sample ID','Call_Rate_Initial':'Call Rate'})
