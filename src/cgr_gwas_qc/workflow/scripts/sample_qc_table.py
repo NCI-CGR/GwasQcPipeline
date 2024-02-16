@@ -371,7 +371,7 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     df = sample_concordance.read(filename)
     return (
         df.melt(
-            id_vars=["is_discordant_replicate","is_unexpected_replicate"],
+            id_vars=["is_discordant_replicate", "is_unexpected_replicate"],
             value_vars=["Sample_ID1", "Sample_ID2"],
             var_name="To_Drop",
             value_name="Sample_ID",

@@ -33,13 +33,15 @@ def main(sample_sheet_csv: Path, sample_qc_csv: Path, outfile: Path):
     )
     df = df.reindex(COLUMNS, axis=1)
     # rename columns to work with LIMS system
-    df = df.rename(columns = {'Sample_ID':'Sample ID','Call_Rate_Initial':'Call Rate'})
+    df = df.rename(columns={"Sample_ID": "Sample ID", "Call_Rate_Initial": "Call Rate"})
     # For the samples missing GTC files, their status in the low call rate column should be TRUE instead of blank
-    df.loc[df['Call Rate'] =="",'Low Call Rate'] = True
+    df.loc[df["Call Rate"] == "", "Low Call Rate"] = True
     # Fill in blanks for replicate and discordant columns
-    df['Unexpected Replicate'] = df['Unexpected Replicate'].replace("",False).fillna(False) 
-    df['Expected Replicate Discordance'] = df['Expected Replicate Discordance'].replace("",False).fillna(False)
-    df['Sex Discordant'] = df['Sex Discordant'].replace("",False).fillna(False)
+    df["Unexpected Replicate"] = df["Unexpected Replicate"].replace("", False).fillna(False)
+    df["Expected Replicate Discordance"] = (
+        df["Expected Replicate Discordance"].replace("", False).fillna(False)
+    )
+    df["Sex Discordant"] = df["Sex Discordant"].replace("", False).fillna(False)
     # Adjust names and column order to match legacy
     df.to_csv(outfile, index=False)
 
