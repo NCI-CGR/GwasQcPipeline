@@ -437,6 +437,7 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
         .IdatIntensity
     )
 
+
 # TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
 
 
