@@ -190,6 +190,7 @@ def main(
         contam,
         intensity,
     )
+
     add_qc_columns(
         sample_qc, remove_contam, remove_rep_discordant,
     )
@@ -435,7 +436,6 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
         .reindex(Sample_IDs)
         .IdatIntensity
     )
-
 
 # TO-ADD: Add a parsing/summary function that returns a Series or DataFrame indexed by Sample_ID
 
