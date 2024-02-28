@@ -10,6 +10,7 @@ Delivery Sub-workflow
 
    - ``user_files.output_pattern``
    - ``workflow_params.lims_upload``
+   - ``workflow_params.lims_output_dir``
 
 **Major Outputs**:
    - ``delivery/samples.bed``
