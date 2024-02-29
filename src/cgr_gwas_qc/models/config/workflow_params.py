@@ -18,7 +18,7 @@ class WorkflowParams(BaseModel):
             remove_rep_discordant: true
             minimum_pop_subjects: 50
             control_hwp_threshold: 50
-            lims_upload: false
+            lims_upload: true
             lims_output_dir: /DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/
             case_control_gwas: false
             time_start:
