@@ -15,7 +15,7 @@ class WorkflowParams(BaseModel):
             remove_rep_discordant: true
             minimum_pop_subjects: 50
             control_hwp_threshold: 50
-            lims_upload: false
+            lims_upload: true
             case_control_gwas: false
     """
 
