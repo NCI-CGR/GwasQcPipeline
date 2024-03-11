@@ -111,7 +111,7 @@ def test_add_discordant_replicate_missing_pair(fake_cfg, concordance):
         (False, True, pd.NA, pd.NA, "ID"),  # KING concordant
         (True, True, pd.NA, "UN", pd.NA),  # GRAF discordant
         (True, True, pd.NA, pd.NA, "UN"),  # KING discordant
-        (False, True, pd.NA, pd.NA, pd.NA),  # All missing so don't call
+        (True, True, pd.NA, pd.NA, pd.NA),  # All missing: flag as discordant replicate
     ],
 )
 def test_add_discordant_logic(expected_result, is_rep, plink, graf, king):

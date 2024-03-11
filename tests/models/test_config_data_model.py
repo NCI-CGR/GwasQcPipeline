@@ -154,7 +154,7 @@ def test_workflow_params_defaults():
     assert workflow_params.remove_rep_discordant is True
     assert workflow_params.minimum_pop_subjects == 50
     assert workflow_params.control_hwp_threshold == 50
-    assert workflow_params.lims_upload is False
+    assert workflow_params.lims_upload is True
 
 
 @pytest.mark.parametrize("value", [-0.01, 0, 1.01])
