@@ -1,13 +1,20 @@
 from cgr_gwas_qc import load_config
+import re
+import os
 cfg = load_config()
 output_pattern = cfg.config.user_files.output_pattern
 manifest_file = cfg.config.sample_sheet
 
 lims_dir = cfg.config.workflow_params.lims_output_dir
-timestr = cfg.config.workflow_params.time_start
-file_type_lims="LimsUpload_"+ timestr
-lims_file_name = "{deliver_prefix}LimsUpload_"+timestr+"{deliver_suffix}.csv"
 
+if (len(os.path.basename(manifest_file)[:-4].split('_AnalysisManifest_'))==2):
+    (outName,sampSheetDate)=os.path.basename(manifest_file)[:-4].split('_AnalysisManifest_')
+    lims_file_name = "{deliver_prefix}"+outName+"_LimsUpload_"+sampSheetDate+"{deliver_suffix}.csv"
+    file_type_lims= outName + "_LimsUpload_"+ sampSheetDate
+else:
+    timestr = cfg.config.workflow_params.time_start
+    file_type_lims="LimsUpload_"+ timestr
+    lims_file_name = "{deliver_prefix}LimsUpload_"+timestr+"{deliver_suffix}.csv"
 
 localrules:
     all_delivery,
