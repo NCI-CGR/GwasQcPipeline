@@ -95,8 +95,8 @@ DTYPES = {  # Header for main QC table
     "Contamination_Rate": "float",
     "is_contaminated": "boolean",
     "replicate_ids": "string",
-    "is_discordant_replicate": "boolean",
-    "is_unexpected_replicate": "boolean",
+    "Expected Replicate Discordance": "boolean",
+    "Unexpected Replicate": "boolean",
     "expected_sex": SEX_DTYPE,
     "predicted_sex": SEX_DTYPE,
     "X_inbreeding_coefficient": "float",
@@ -193,8 +193,12 @@ def main(
     add_qc_columns(
         sample_qc, remove_contam, remove_rep_discordant,
     )
+    sample_qc["is_unexpected_replicate"] = sample_qc["is_unexpected_replicate"].replace("", False).fillna(False)
+    sample_qc["is_discordant_replicate"] = (
+    sample_qc["is_discordant_replicate"].replace("", False).fillna(False))
+    sample_qc = sample_qc.rename(columns={"is_unexpected_replicate":"Unexpected Replicate","is_discordant_replicate":"Expected Replicate Discordance"})
     save(sample_qc, outfile)
-
+    
 
 def build(
     ss: pd.DataFrame,
