@@ -17,7 +17,7 @@ from cgr_gwas_qc.cluster_profiles import (
 
 @dataclass
 class Ccad2Options(ClusterOptions):
-    queue: Set[str] = field(default_factory=lambda: {"defq", "defq"})
+    queue: Set[str] = field(default_factory=lambda: {"defq", "bigmemq"})
     log: str = "logs/{rulename}_{job_id}.%j"
 
     def __str__(self):
@@ -32,12 +32,16 @@ class Ccad2Options(ClusterOptions):
             " --output={log}"
             " --parsable"
         )
-        # if self.time > timedelta(hours=4):
-        #    self.queue.discard("defq")
+
+        if self.time > timedelta(hours=4):
+            self.queue.discard("defq")
+
+        formatted_time = f"{self.time.days}-{self.time.seconds // 3600}"  # days-hours for slurm
+
         return cmd.format(
             queue=",".join(self.queue),
             mem_gb=self.mem_gb,
-            time=str(self.time),
+            time=formatted_time,
             threads=self.threads,
             rulename=self.rulename,
             job_id=self.job_id,
