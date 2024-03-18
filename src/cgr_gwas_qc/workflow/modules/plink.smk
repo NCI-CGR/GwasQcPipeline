@@ -3,6 +3,7 @@ from cgr_gwas_qc import load_config
 cfg = load_config()
 
 PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
+BIG_TIME = {1: 8, 2: 24, 3: 48}
 
 
 ################################################################################
@@ -28,7 +29,7 @@ rule sample_call_rate_filter:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-        tim_hr=lambda wildcards, attempt: attempt ** 2,
+        time_hr=lambda wildcards, attempt: attempt ** 2,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -61,7 +62,7 @@ rule snp_call_rate_filter:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-        tim_hr=lambda wildcards, attempt: attempt ** 2,
+        time_hr=lambda wildcards, attempt: attempt ** 2,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -232,6 +233,7 @@ rule keep_ids:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
+        time_hr=lambda wildcards, attempt: attempt**2,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -559,6 +561,7 @@ rule genome:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        time_hr=lambda wildcards, attempt: attempt**2,
     conda:
         cfg.conda("plink2")
     shell:
@@ -599,6 +602,7 @@ rule het:
         "--memory {resources.mem_mb} "
         "--out {params.out_prefix}"
 
+
 rule gwas:
     """logistic regression gwas"""
     input:
@@ -618,10 +622,10 @@ rule gwas:
     shell:
         """
         sleep 10 && plink \
-	--bed {input.bed} \
+	    --bed {input.bed} \
         --bim {input.bim} \
         --fam {input.fam} \
-	--pheno {input.gwasfile} \
+	    --pheno {input.gwasfile} \
         --pheno-name case \
         --ci 0.95 \
         --assoc \
@@ -630,4 +634,3 @@ rule gwas:
         --threads {threads} \
         --allow-no-sex
         """
-
