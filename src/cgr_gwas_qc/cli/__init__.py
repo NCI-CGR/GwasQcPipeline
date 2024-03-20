@@ -1,6 +1,6 @@
 """CGR Gwas QC Pipeline Command Line Interface.
 
-Welcome to the CGR Gwas Qc Pipeline CLI. Through this intervace you can try a
+Welcome to the CGR Gwas Qc Pipeline CLI. Through this interface you can try a
 demo, create a config file, run pre-flight checks, and interact with
 snakemake.
 """
