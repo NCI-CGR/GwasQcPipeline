@@ -251,11 +251,9 @@ def _families(population_qc_csv: PathLike, writer):
 
     if df.shape[0] > 0:
         for population, dd in df.groupby("population"):
-            dd=dd.reindex(_FAMILY_COLUMNS, axis=1)
-            dd = dd.sort_values(by=['Fam_ID'])
-            dd.to_excel(
-                writer, sheet_name=f"{population[:24]}_FAMILY", index=False
-            )
+            dd = dd.reindex(_FAMILY_COLUMNS, axis=1)
+            dd = dd.sort_values(by=["Fam_ID"])
+            dd.to_excel(writer, sheet_name=f"{population[:24]}_FAMILY", index=False)
 
 
 _POPULATION_CONCORDANCE_COLUMNS = [
@@ -278,10 +276,12 @@ def _population_concordance(population_concordance_csv: PathLike, writer: pd.Exc
     )
 
     for population, dd in df.groupby("population"):
-        dd=dd.reindex(_POPULATION_CONCORDANCE_COLUMNS, axis=1).pipe(_excel_limit_filter).sort_values(
-            ["Subject_ID1", "Subject_ID2"]
+        dd = (
+            dd.reindex(_POPULATION_CONCORDANCE_COLUMNS, axis=1)
+            .pipe(_excel_limit_filter)
+            .sort_values(["Subject_ID1", "Subject_ID2"])
         )
-        dd = dd.sort_values(by=['PLINK_PI_HAT'],ascending=False)
+        dd = dd.sort_values(by=["PLINK_PI_HAT"], ascending=False)
         dd.to_excel(writer, sheet_name=f"{population[:24]}_IBD", index=False)
 
 
