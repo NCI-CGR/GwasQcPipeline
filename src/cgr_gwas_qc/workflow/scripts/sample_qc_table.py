@@ -323,7 +323,9 @@ def _read_GRAF(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
 
     return (
         pd.read_csv(file_name, sep="\t")
-        .assign(Sample_ID=lambda x: x["Subject"].astype(str)) #Issue 216: When subject IDs are numeric reindex fails. This makes sure index Sample_ID will always be as a character
+        .assign(
+            Sample_ID=lambda x: x["Subject"].astype(str)
+        )  # Issue 216: When subject IDs are numeric reindex fails. This makes sure index Sample_ID will always be as a character
         .assign(Ancestry=lambda x: x["Computed population"].str.replace(" ", "_"))
         .assign(AFR=lambda x: x["P_f (%)"] / 100)
         .assign(EUR=lambda x: x["P_e (%)"] / 100)
