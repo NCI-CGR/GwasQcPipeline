@@ -8,6 +8,9 @@ import shutil
 
 cfg = load_config()
 
+PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
+BIG_TIME = {1: 8, 2: 24, 3: 48}
+
 
 localrules:
     all_subject_qc,
@@ -25,7 +28,8 @@ localrules:
     population_controls_checkpoint,
     population_controls_Subject_IDs,
     plot_hwe,
-    agg_control_plots,    
+    agg_control_plots,
+
 
 wildcard_constraints:
     population="[\w_]+",
@@ -273,6 +277,9 @@ use rule genome from plink as population_level_ibd with:
         out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd",
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd.genome",
+    resources:
+        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
 
 
 rule population_level_concordance_plink:
@@ -532,20 +539,24 @@ rule agg_population_qc_tables:
     script:
         "../scripts/agg_population_qc_tables.py"
 
-print("gwas =",cfg.config.workflow_params.case_control_gwas)
+
+print("gwas =", cfg.config.workflow_params.case_control_gwas)
 
 if cfg.config.workflow_params.case_control_gwas:
+
     use rule gwas from plink as gwas with:
         input:
             bed="sample_level/samples.bed",
             bim="sample_level/samples.bim",
             fam="sample_level/samples.fam",
-            gwasfile ="subject_level/gwas.txt",
+            gwasfile="subject_level/gwas.txt",
         params:
             out_prefix="delivery/gwas",
         output:
             "delivery/gwas.assoc",
+
 else:
+
     rule gwas:
         input:
             bed="sample_level/samples.bed",
@@ -558,6 +569,7 @@ else:
             touch delivery/gwas.assoc
             echo "gwas not selected" > delivery/gwas.assoc
             """
+
 
 def _population_plots(wildcards):
     populations = _get_populations(wildcards)
@@ -591,7 +603,7 @@ checkpoint population_controls_checkpoint:
     output:
         directory("subject_level/controls"),
     run:
-        # issue 221  
+        # issue 221
         populations1 = (
             subject_qc_table.read(input[0])
             .query("case_control == 'Control'")
@@ -630,6 +642,7 @@ checkpoint population_controls_checkpoint:
             (path / population).touch()
 
 
+
 def _get_controls(wildcards):
     checkpoint_output = checkpoints.population_controls_checkpoint.get(**wildcards).output[0]
     return [
@@ -650,7 +663,6 @@ rule population_controls_Subject_IDs:
         "subject_level/{population}/test_controlscase.txt",
         "subject_level/{population}/unknown.txt",
         cfg.config.workflow_params.control_hwp_threshold,
-        
     run:
         # issue 221,235 fix
         (
@@ -666,21 +678,23 @@ rule population_controls_Subject_IDs:
             .to_csv(params[1], sep=" ", index=False, header=False)
         )
         (
-           subject_qc_table.read(input[0])
-           .query("Ancestry == @wildcards.population & (case_control == 'Case'| case_control == 'Control')")
-           .reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1)
-           .to_csv(params[2], sep=" ", index=False, header=False)
+            subject_qc_table.read(input[0])
+            .query(
+                "Ancestry == @wildcards.population & (case_control == 'Case'| case_control == 'Control')"
+            )
+            .reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1)
+            .to_csv(params[2], sep=" ", index=False, header=False)
         )
         (
-           subject_qc_table.read(input[0])
-           .query("Ancestry == @wildcards.population & case_control == 'Unknown'")
-           .reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1)
-           .to_csv(params[3], sep=" ", index=False, header=False)
+            subject_qc_table.read(input[0])
+            .query("Ancestry == @wildcards.population & case_control == 'Unknown'")
+            .reindex(["Group_By_Subject_ID", "Group_By_Subject_ID"], axis=1)
+            .to_csv(params[3], sep=" ", index=False, header=False)
         )
 
         min_num_subjects = int(params[4])
         print("minimum min_num_subjects:", min_num_subjects)
-        # Controls 
+        # Controls
         print(params[0])
         num_lines0 = sum(1 for line in open(params[0]))
         print(num_lines0)
@@ -697,13 +711,24 @@ rule population_controls_Subject_IDs:
         num_lines3 = sum(1 for line in open(params[3]))
         print(num_lines3)
 
-      
-        if num_lines0 <  min_num_subjects:
-            print(num_lines0, "controls samples less than", min_num_subjects, "threshold, using control and case samples for HWE")
+
+        if num_lines0 < min_num_subjects:
+            print(
+                num_lines0,
+                "controls samples less than",
+                min_num_subjects,
+                "threshold, using control and case samples for HWE",
+            )
             shutil.copyfile(params[2], output[0])
         else:
-            print(num_lines0, "control samples present and above the ", min_num_subjects, "threshold for HWE")
+            print(
+                num_lines0,
+                "control samples present and above the ",
+                min_num_subjects,
+                "threshold for HWE",
+            )
             shutil.copyfile(params[0], output[0])
+
 
 use rule keep_ids from plink as pull_population_unrelated_controls with:
     input:

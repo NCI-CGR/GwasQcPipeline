@@ -22,7 +22,7 @@ class SoftwareParams(BaseModel):
             maf_for_ibd: 0.2
             maf_for_hwe: 0.05
 
-            ibd_pi_hat_min: 0.05
+            ibd_pi_hat_min: 0.12
             ibd_pi_hat_max: 1.0
             dup_concordance_cutoff: 0.95
             pi_hat_threshold: 0.2
@@ -109,7 +109,7 @@ class SoftwareParams(BaseModel):
     )
 
     ibd_pi_hat_min: float = Field(
-        0.05,
+        0.12,
         ge=0,
         lt=1,
         description="The minimum IBD pi hat value to save in the results table. "

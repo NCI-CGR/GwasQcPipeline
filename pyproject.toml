@@ -13,7 +13,7 @@ authors = [
     "Kevin Liao <kliao@rti.org>"
 ]
 readme = "README.md"
-repository = "http://10.133.130.114/jfear/GwasQcPipeline"
+repository = "https://github.com/NCI-CGR/GwasQcPipeline.git"
 keywords = ["GWAS", "cancer", "QC", "snakemake"]
 packages = [
     { include = "cgr_gwas_qc", from = "src"}
