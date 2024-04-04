@@ -163,7 +163,7 @@ class ExpectedReplicates:
     @classmethod
     def construct(cls, sample_qc: pd.DataFrame, replicates: pd.DataFrame) -> "ExpectedReplicates":
         return cls(
-            sample_qc.is_discordant_replicate.sum(),
+            sample_qc["Expected Replicate Discordance"].sum(),
             sample_qc.query(
                 "not is_internal_control & not analytic_exclusion & not is_subject_representative"
             ).shape[0],

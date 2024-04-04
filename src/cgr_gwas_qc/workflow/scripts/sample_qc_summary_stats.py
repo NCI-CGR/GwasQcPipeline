@@ -29,7 +29,7 @@ def main(filename: Path, outfile: Path):
         "intensity": _table_summary_str(df.IdatIntensity),
         "contaminated": _value_counts_w_na(df.is_contaminated),
         "call_rate_filtered": _value_counts_w_na(df["is_call_rate_filtered"]),
-        "rep_discord": _value_counts_w_na(df["is_discordant_replicate"]),
+        "rep_discord": _value_counts_w_na(df["Expected Replicate Discordance"]),
         "identifiler": _value_counts_w_na(df["identifiler_needed"]),
         "issues": _value_counts_w_na(df["num_analytic_exclusion"]),
     }

@@ -21,7 +21,7 @@ def main(
     _save_sample_flag_as_file(df, "is_call_rate_filtered", cr)
     _save_sample_flag_as_file(df, "is_contaminated", contam)
     _save_sample_flag_as_file(df, "is_sex_discordant", sex)
-    _save_sample_flag_as_file(df, "is_discordant_replicate", rep)
+    _save_sample_flag_as_file(df, "Expected Replicate Discordance", rep)
     _save_sample_flag_as_file(df, "is_internal_control", ctrl)
 
 
