@@ -23,12 +23,14 @@ def main(
     biowulf: bool = typer.Option(
         False, help="Run the workflow using the cli Biowulf cluster profile."
     ),
-    cluster_profile: Optional[Path] = typer.Option(
-        None,
-        help="Path to a custom cluster profile. See https://github.com/snakemake-profiles/doc.",
+    ccad2: bool = typer.Option(
+        False, help="Run the workflow using the cli ccad2 cluster profile."
     ),
-    ccad2: bool = typer.Option(False, help="Run the workflow using the cli ccad2 cluster profile."),
-    cluster_profile2: Optional[Path] = typer.Option(
+    slurm_generic: bool = typer.Option(
+        False, help="Run the workflow using the a generic slurm cluster profile. "
+        "This option requires you to specify the name of the queue (partition) to submit to.",
+    ),
+    cluster_profile: Optional[Path] = typer.Option(
         None,
         help="Path to a custom cluster profile. See https://github.com/snakemake-profiles/doc.",
     ),
@@ -104,10 +106,9 @@ def main(
         Sometimes it may be useful to edit the submission script before submitting it to the cluster.
         In that case you can add the ``--dry-run`` option and edit the generated file in ``.snakemake/GwasQcPipeline_submission.sh``.
         You would then submit this script directly to your cluster (i.e., ``qsub .snakemake/GwasQcPipeline_submission.sh``).
-
     """
 
-    check_exclusive_options(cgems, biowulf, ccad2, cluster_profile)
+    check_exclusive_options(cgems, biowulf, ccad2, slurm_generic, cluster_profile)
 
     payload = {
         "python_executable": sys.executable,
@@ -117,6 +118,7 @@ def main(
         "cgems": cgems,
         "biowulf": biowulf,
         "ccad2": ccad2,
+        "slurm_generic": slurm_generic,
         "time_hr": time_hr,
         "local_mem_mb": local_mem_mb,
         "local_tasks": local_tasks,
@@ -153,22 +155,28 @@ def main(
         payload["profile"] = get_profile("ccad2")
         payload["queue"] = queue or ("defq,defq" if time_hr <= 4 else "defq")
         submission_cmd = "sbatch"
+    elif slurm_generic:
+        payload["profile"] = get_profile("slurm_generic", queue=queue)
+        payload["queue"] = queue
+        submission_cmd = "sbatch"
     else:
         payload["profile"] = check_custom_cluster_profile(cluster_profile, queue, submission_cmd)
         payload["queue"] = queue
+        # payload["slurm_generic"] = True
 
     run_script = create_submission_script(payload)
+
     if not dry_run:
         job_id = sp.check_output([submission_cmd, run_script]).decode().strip()  # type: ignore
         print(f"Submitted {job_id}")
 
 
-def check_exclusive_options(cgems, biowulf, ccad2, cluster_profile):
-    if sum([cgems, biowulf, ccad2, (cluster_profile is not None)]) > 1:
+def check_exclusive_options(cgems, biowulf, ccad2, slurm_generic, cluster_profile):
+    if sum([cgems, biowulf, ccad2, slurm_generic, (cluster_profile is not None)]) > 1:
         typer.echo(
             "\n".join(
                 wrap(
-                    "Please only provide one of `--cgems`, `--biowulf`, `--ccad2, or `--cluster_profile`. "
+                    "Please only provide one of `--cgems`, `--biowulf`, `--ccad2, `--slurm_generic`, or `--cluster_profile`. "
                     "Run `cgr submit --help` for more information.",
                     width=100,
                 )
@@ -198,7 +206,7 @@ def check_custom_cluster_profile(cluster_profile, queue, submission_cmd):
     return cluster_profile.resolve().as_posix()
 
 
-def get_profile(cluster: str):
+def get_profile(cluster: str, queue: None):
     cgr_profiles = (Path(__file__).parents[1] / "cluster_profiles").resolve()
 
     if cluster == "cgems":
@@ -209,6 +217,11 @@ def get_profile(cluster: str):
 
     if cluster == "ccad2":
         return (cgr_profiles / "ccad2").as_posix()
+
+    if cluster == "slurm_generic":
+        if queue is None:
+            raise ValueError("You must provide a queue to use with `--slurm-generic`.")
+        return (cgr_profiles / "slurm_generic").as_posix()
 
 
 def create_submission_script(payload) -> str:
