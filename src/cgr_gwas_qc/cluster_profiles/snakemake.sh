@@ -191,7 +191,8 @@ run_workflow() {
   {{ python_executable }} -m cgr_gwas_qc snakemake \
     --local-cores {{ local_tasks }} \
     --profile {{ profile }} \
-    {{ added_options }} || exit_status=$?  # Don't exit on failure, see why we exited
+    {{ added_options }}
+  exit_status=$?
 
   if (( exit_status != 0 )) && log_says_locked; then
     exit 42
