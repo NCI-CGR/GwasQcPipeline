@@ -17,14 +17,14 @@ from cgr_gwas_qc.cluster_profiles import (
 
 @dataclass
 class SlurmOptions(ClusterOptions):
-    #queue: Set[str] = field(default_factory=lambda: {"defq", "bigmemq"})
+    #queue: Set[str] = field(default_factory=lambda: {""})
     log: str = "logs/{rulename}_{job_id}.%j"
 
     def __str__(self):
         # See cgems_jobscript.sh for default sge options
+            #" --partition={queue}"
         cmd = (
             "sbatch"
-            " --partition={queue}"
             " --job-name={rulename}.{job_id}"
             " --cpus-per-task={threads}"
             " --mem={mem_gb:0.0f}gb"
@@ -33,13 +33,10 @@ class SlurmOptions(ClusterOptions):
             " --parsable"
         )
 
-       # if self.time > timedelta(hours=4):
-       #     self.queue.discard("defq")
-
         formatted_time = f"{self.time.days}-{self.time.seconds // 3600}"  # days-hours for slurm
 
+            #queue=",".join(self.queue),
         return cmd.format(
-            queue=",".join(self.queue),
             mem_gb=self.mem_gb,
             time=formatted_time,
             threads=self.threads,
