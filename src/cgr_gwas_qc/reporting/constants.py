@@ -1,7 +1,15 @@
 import pandas as pd
 
 CASE_CONTROL_DTYPE = pd.CategoricalDtype(categories=["Case", "Control", "QC", "Unknown"])
-CASE_CONTROL_COLORS = ["#f7022a", "#3e82fc", "gray", "#1bfc06"]  # red  # blue  # gray  # green
+CASE_CONTROL_COLORS = ["#f7022a", "#3e82fc", "gray", "gold"]  # red  # blue  # gray  #gold
+
+# Assign labels to colors for plotting consistency
+CASE_CONTROL_LABEL_COLORS = {
+    "Case": CASE_CONTROL_COLORS[0],
+    "Control": CASE_CONTROL_COLORS[1],
+    "QC": CASE_CONTROL_COLORS[2],
+    "Unknown": CASE_CONTROL_COLORS[3],
+}
 
 SEX_DTYPE = pd.CategoricalDtype(categories=["F", "M", "U"])
 
