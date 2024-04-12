@@ -2,10 +2,6 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
-PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
-BIG_TIME = {1: 8, 2: 24, 3: 48}
-
-
 use_contamination = (
     cfg.config.user_files.idat_pattern
     and cfg.config.user_files.gtc_pattern
@@ -15,6 +11,8 @@ use_contamination = (
 
 localrules:
     all_sample_qc,
+    sample_concordance_plink,
+    sample_concordance_summary,
     split_sample_concordance,
     snp_qc_table,
     sample_level_sexcheck,
@@ -65,13 +63,16 @@ module thousand_genomes:
     config:
         {}
 
+
 module plink:
     snakefile:
         cfg.modules("plink")
 
+
 module graf:
     snakefile:
         cfg.modules("graf_v2.4")
+
 
 module grafpop:
     snakefile:
@@ -316,10 +317,6 @@ rule sample_concordance_plink:
         pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
     output:
         "sample_level/concordance/plink.csv",
-    resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
-        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
-
     script:
         "../scripts/concordance_table.py"
 
@@ -386,9 +383,8 @@ rule sample_concordance_summary:
     output:
         "sample_level/concordance/summary.csv",
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
-        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
-
+        mem_mb=lambda wildcards, attempt: 1024 * 2 * attempt,
+        time_hr=lambda wildcards, attempt: 2 * attempt,
     script:
         "../scripts/sample_concordance.py"
 
@@ -413,9 +409,9 @@ use rule grafpop_populations from grafpop as graf_populations with:
         bed=rules.snp_call_rate_filter_2.output.bed,
         bim=rules.snp_call_rate_filter_2.output.bim,
         fam=rules.snp_call_rate_filter_2.output.fam,
-	#bed="sample_level/call_rate_2/samples.bed",
-        #bim="sample_level/call_rate_2/samples.bim",
-        #fam="sample_level/call_rate_2/samples.fam", 
+    # bed="sample_level/call_rate_2/samples.bed",
+    # bim="sample_level/call_rate_2/samples.bim",
+    # fam="sample_level/call_rate_2/samples.fam",
     output:
         "sample_level/ancestry/grafpop_populations.txt",
     log:
@@ -454,6 +450,7 @@ rule snp_qc_table:
 sex_chr_included = cfg.config.workflow_params.sex_chr_included
 if sex_chr_included:
     print("sex_chr_included ", sex_chr_included)
+
     use rule sexcheck from plink as sample_level_sexcheck with:
         input:
             bed=rules.snp_call_rate_filter_1.output.bed,
@@ -463,8 +460,10 @@ if sex_chr_included:
             out_prefix="sample_level/call_rate_1/samples",
         output:
             "sample_level/call_rate_1/samples.sexcheck",
+
 else:
     print("sex_chr_included ", sex_chr_included)
+
     rule sample_level_sexcheck:
         input:
             bed=rules.snp_call_rate_filter_1.output.bed,
@@ -477,6 +476,7 @@ else:
             touch sample_level/call_rate_1/samples.sexcheck
             echo "FID IID PEDSEX SNPSEX STATUS F" >> sample_level/call_rate_1/samples.sexcheck
             """
+
 
 def _contam(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
