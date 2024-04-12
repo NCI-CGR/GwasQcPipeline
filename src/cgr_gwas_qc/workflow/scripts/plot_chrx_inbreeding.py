@@ -18,10 +18,11 @@ import pandas as pd
 import seaborn as sns
 import typer
 
-# import snakemake
-
 from cgr_gwas_qc.reporting import CASE_CONTROL_COLORS
 from cgr_gwas_qc.workflow.scripts import sample_qc_table
+
+# import snakemake
+
 
 app = typer.Typer(add_completion=False)
 
@@ -30,7 +31,7 @@ app = typer.Typer(add_completion=False)
 def main(sample_qc: Path, outfile: Path, xchr: str):
     sample = load_sample_data(sample_qc)
     xchr = str(snakemake.params)  # type: ignore # noqa
-    plot(sample, outfile, xchr)
+    plot(sample, xchr, outfile)
 
 
 """
@@ -67,8 +68,15 @@ def _update_categories(sr: pd.DataFrame):
     return sr
 
 
-def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None, xchr: bool = True):
+def plot(sample: pd.DataFrame, xchr: str, outfile: Optional[os.PathLike] = None):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
+
+    CASE_CONTROL_LABEL_COLORS = {
+        "Case": CASE_CONTROL_COLORS[0],
+        "Control": CASE_CONTROL_COLORS[1],
+        "QC": CASE_CONTROL_COLORS[2],
+        "Unknown": CASE_CONTROL_COLORS[3],
+    }
 
     # Create plots
     style_defaults = dict(linewidth=0, alpha=0.8, s=2)
@@ -76,7 +84,7 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None, xchr: bool
     fig, ax = plt.subplots(figsize=(6, 6))
     sns.boxplot(ax=ax, showfliers=False, **defaults)
     sns.stripplot(
-        ax=ax, hue="case_control", palette=CASE_CONTROL_COLORS, **defaults, **style_defaults
+        ax=ax, hue="case_control", palette=CASE_CONTROL_LABEL_COLORS, **defaults, **style_defaults
     )
 
     # Make boxplot black and white
@@ -87,13 +95,13 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None, xchr: bool
     # ax.set_xlabel("Reported Sex")
     ax.set_ylabel("ChrX Inbreeding Coeff")
 
-    xchr = xchr.strip().lower() == "true"
-    print(type(xchr), " ", xchr)
-    if xchr:
-        print("sex chr included", xchr)
+    xchr_bool = xchr.strip().lower() == "true"
+    print(type(xchr_bool), " ", xchr_bool)
+    if xchr_bool:
+        print("sex chr included", xchr_bool)
         ax.set_xlabel("Reported Sex")
     else:
-        print("No sex chromosome ", xchr)
+        print("No sex chromosome ", xchr_bool)
         ax.set_xlabel("No sex chromosome \nSkipping sex condordace")
 
     # Add line at 0.5
