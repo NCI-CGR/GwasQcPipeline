@@ -186,7 +186,7 @@ def _discordant_logic(sr: pd.Series) -> bool:
         ]
     ):
         # No metrics so ignore
-        # Issue 210: If someone is an expected replicates but has no PLINK, GRAF, or KING then these should be flagged as an discordant replicate (True). Before was returning False
+        # Issue 210: If someone is an expected replicates but has no PLINK, GRAF, or KING then these should be flagged as an discordant replicate (True). Before was returning False 
         return True
 
     if pd.notna(sr.PLINK_is_ge_concordance):
