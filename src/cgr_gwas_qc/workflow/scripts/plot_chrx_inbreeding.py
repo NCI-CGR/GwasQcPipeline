@@ -70,15 +70,13 @@ def _update_categories(sr: pd.DataFrame):
 def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None, xchr: bool = True):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
 
-    CASE_CONTROL_LABEL_COLORS = {'Case': CASE_CONTROL_COLORS[0], 'Control': CASE_CONTROL_COLORS[1], 'QC': CASE_CONTROL_COLORS[2], 'Unknown': CASE_CONTROL_COLORS[3]}
-
     # Create plots
     style_defaults = dict(linewidth=0, alpha=0.8, s=2)
     defaults = dict(x="expected_sex", y="X_inbreeding_coefficient", data=sample)
     fig, ax = plt.subplots(figsize=(6, 6))
     sns.boxplot(ax=ax, showfliers=False, **defaults)
     sns.stripplot(
-        ax=ax, hue="case_control", palette=CASE_CONTROL_LABEL_COLORS, **defaults, **style_defaults
+        ax=ax, hue="case_control", palette=CASE_CONTROL_COLORS, **defaults, **style_defaults
     )
 
     # Make boxplot black and white

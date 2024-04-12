@@ -50,9 +50,7 @@ def main(qc_table: Path, eigenvec: Path, population: str, outfile: Path):
 def plot(df: pd.DataFrame, population: str) -> sns.PairGrid:
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
 
-    CASE_CONTROL_LABEL_COLORS = {'Case': CASE_CONTROL_COLORS[0], 'Control': CASE_CONTROL_COLORS[1], 'QC': CASE_CONTROL_COLORS[2], 'Unknown': CASE_CONTROL_COLORS[3]}
-
-    g = sns.PairGrid(df, hue="case_control", palette=CASE_CONTROL_LABEL_COLORS, corner=True)
+    g = sns.PairGrid(df, hue="case_control", palette=COLORS, corner=True)
     g.map_lower(sns.scatterplot, s=10, alpha=0.8, linewidth=0)
     g.map_diag(sns.kdeplot)
     g.add_legend(

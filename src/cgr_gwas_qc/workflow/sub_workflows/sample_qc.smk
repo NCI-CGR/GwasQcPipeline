@@ -21,7 +21,7 @@ localrules:
     sample_lists_from_qc_flags,
     plot_call_rate,
     plot_chrx_inbreeding,
-    plot_ancestry
+    plot_ancestry,
 
 
 ################################################################################

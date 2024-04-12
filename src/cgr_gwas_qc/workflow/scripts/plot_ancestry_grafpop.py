@@ -31,7 +31,7 @@ def main(sample_qc: Path, outfile: Path):
 
 
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
-    return sample_qc_table.read(sample_qc).dropna(subset=["EUR", "AFR", "ASN"])
+    return sample_qc_table.read(sample_qc).dropna(subset=["E(%)", "F(%)", "A(%)"])
 
 
 def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
@@ -47,14 +47,14 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
     if case.shape[0] > 0:
         case_color = CASE_CONTROL_COLORS[0]
         tax.scatter(
-            case[["EUR", "AFR", "ASN"]].values, color=case_color, label="Case", **style_defaults
+            case[["E(%)", "F(%)", "A(%)"]].values, color=case_color, label="Case", **style_defaults
         )
 
     control = sample.query("case_control == 'Control'")
     if control.shape[0] > 0:
         control_color = CASE_CONTROL_COLORS[1]
         tax.scatter(
-            control[["EUR", "AFR", "ASN"]].values,
+            control[["E(%)", "F(%)", "A(%)"]].values,
             color=control_color,
             label="Control",
             **style_defaults

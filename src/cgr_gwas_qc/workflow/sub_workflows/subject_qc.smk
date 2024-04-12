@@ -46,7 +46,7 @@ targets = [
     "subject_level/population_qc.csv",
     "subject_level/.population_plots.done",
     "subject_level/.control_plots.done",
-    "delivery/gwas.assoc"
+    "delivery/gwas.assoc",
 ]
 
 
