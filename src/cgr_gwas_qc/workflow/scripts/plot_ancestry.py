@@ -31,8 +31,11 @@ def main(sample_qc: Path, outfile: Path):
 
 
 def load_sample_data(sample_qc: Path) -> pd.DataFrame:
-    return sample_qc_table.read(sample_qc).dropna(subset=["EUR", "AFR", "ASN"])
-
+    return (
+            sample_qc_table.read(sample_qc)
+            .query("is_subject_representative")
+            .dropna(subset=["EUR", "AFR", "ASN"])
+    )
 
 def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
@@ -42,21 +45,42 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
     fig, tax = ternary.figure(scale=1)  # Set scale 0 to 1
     fig.set_size_inches(6, 5)
 
-    # Plot cases and controls separately
+    # Plot cases, controls, QC, and unknowns separately. Make sure case is last so most visible
     case = sample.query("case_control == 'Case'")
     if case.shape[0] > 0:
         case_color = CASE_CONTROL_COLORS[0]
         tax.scatter(
-            case[["EUR", "AFR", "ASN"]].values, color=case_color, label="Case", **style_defaults
+            case[["EUR", "AFR", "ASN"]].values, color=case_color, label="Case", zorder=4, **style_defaults
         )
 
     control = sample.query("case_control == 'Control'")
     if control.shape[0] > 0:
-        control_color = CASE_CONTROL_COLORS[1]
+        control_color = CASE_CONTROL_COLORS[1] #blue
         tax.scatter(
             control[["EUR", "AFR", "ASN"]].values,
             color=control_color,
             label="Control",
+            **style_defaults
+        )
+
+    #Issue 237: Add samples if they are neither case or control. 
+    project_qc = sample.query("case_control == 'QC'")
+    if project_qc.shape[0] > 0:
+        project_qc_color = CASE_CONTROL_COLORS[2] #Yellow
+        tax.scatter(
+            project_qc[["EUR", "AFR", "ASN"]].values,
+            color=project_qc_color,
+            label="QC",
+            **style_defaults
+        )
+
+    unknown = sample.query("case_control != 'Control' and case_control != 'Case' and case_control != 'QC'")
+    if unknown.shape[0] > 0:
+        unknown_color = CASE_CONTROL_COLORS[3] #Gray
+        tax.scatter(
+            unknown[["EUR", "AFR", "ASN"]].values,
+            color=unknown_color,
+            label="Unknown",
             **style_defaults
         )
 
@@ -74,7 +98,7 @@ def plot(sample: pd.DataFrame, outfile: Optional[os.PathLike] = None):
 
     # Add legend
     tax.legend(title="case_control")
-
+    
     # Clean-up plot
     tax.set_background_color(color="white")
     tax.clear_matplotlib_ticks()
