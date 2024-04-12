@@ -192,9 +192,7 @@ def main(
     )
 
     add_qc_columns(
-        sample_qc,
-        remove_contam,
-        remove_rep_discordant,
+        sample_qc, remove_contam, remove_rep_discordant,
     )
     save(sample_qc, outfile)
 
@@ -322,9 +320,12 @@ def _read_GRAF(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     .. _manuscript: https://pubmed.ncbi.nlm.nih.gov/31151998/
 
     """
+
     return (
         pd.read_csv(file_name, sep="\t")
-        .rename({"Subject": "Sample_ID"}, axis=1)
+        .assign(
+            Sample_ID=lambda x: x["Subject"].astype(str)
+        )  # Issue 216: When subject IDs are numeric reindex fails. This makes sure index Sample_ID will always be as a character
         .assign(Ancestry=lambda x: x["Computed population"].str.replace(" ", "_"))
         .assign(AFR=lambda x: x["P_f (%)"] / 100)
         .assign(EUR=lambda x: x["P_e (%)"] / 100)
@@ -401,8 +402,7 @@ def _read_contam(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.DataFram
 
     if file_name is None:
         return pd.DataFrame(
-            index=Sample_IDs,
-            columns=["Contamination_Rate", "is_contaminated"],
+            index=Sample_IDs, columns=["Contamination_Rate", "is_contaminated"],
         ).astype({"Contamination_Rate": "float", "is_contaminated": "boolean"})
 
     return (
@@ -445,16 +445,12 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
 
 
 def add_qc_columns(
-    sample_qc: pd.DataFrame,
-    remove_contam: bool,
-    remove_rep_discordant: bool,
+    sample_qc: pd.DataFrame, remove_contam: bool, remove_rep_discordant: bool,
 ) -> pd.DataFrame:
     add_call_rate_flags(sample_qc)
     _add_identifiler(sample_qc)
     _add_analytic_exclusion(
-        sample_qc,
-        remove_contam,
-        remove_rep_discordant,
+        sample_qc, remove_contam, remove_rep_discordant,
     )
     _add_subject_representative(sample_qc)
     _add_subject_dropped_from_study(sample_qc)
@@ -500,9 +496,7 @@ def _get_reason(sample_qc: pd.DataFrame, flags: Mapping[str, str]):
 
 
 def _add_analytic_exclusion(
-    sample_qc: pd.DataFrame,
-    remove_contam: bool,
-    remove_rep_discordant: bool,
+    sample_qc: pd.DataFrame, remove_contam: bool, remove_rep_discordant: bool,
 ) -> pd.DataFrame:
     """Adds a flag to remove samples based on provided conditions.
 

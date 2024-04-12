@@ -31,6 +31,7 @@ COLORS = [
 
 @app.command()
 def main(qc_table: Path, het: Path, population: str, threshold: float, outfile: Path):
+
     df = (
         read_het(het)
         .join(subject_qc_table.read(qc_table).set_index("Group_By_Subject_ID"), how="left")
@@ -49,20 +50,13 @@ def main(qc_table: Path, het: Path, population: str, threshold: float, outfile: 
 def plot(df: pd.DataFrame, population: str, threshold: float):
     sns.set_context("paper")  # use seaborn's context to make sane plot defaults for a paper
 
-    CASE_CONTROL_LABEL_COLORS = {
-        "Case": CASE_CONTROL_COLORS[0],
-        "Control": CASE_CONTROL_COLORS[1],
-        "QC": CASE_CONTROL_COLORS[2],
-        "Unknown": CASE_CONTROL_COLORS[3],
-    }
-
     fig, ax = plt.subplots(figsize=(6, 6))
     sns.scatterplot(
         x="x_label",
         y="F",
         data=df,
         hue="case_control",
-        palette=CASE_CONTROL_LABEL_COLORS,
+        palette=COLORS,
         ax=ax,
         alpha=0.8,
         linewidth=0,
@@ -73,7 +67,7 @@ def plot(df: pd.DataFrame, population: str, threshold: float):
     ax.set_xlabel("Subjects sorted by F")
     ax.set_ylabel("F")
     ax.set_ylim(_get_ylim(df.F, threshold))
-    ax.set_title(f"{population} Heterozygosity F Coefficient")
+    ax.set_title(f"{population} Homozygosity F Coefficient")
 
     # Move legend
     plt.legend(loc="upper left")

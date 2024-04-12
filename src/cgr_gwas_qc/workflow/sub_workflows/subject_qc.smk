@@ -8,6 +8,9 @@ import shutil
 
 cfg = load_config()
 
+PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
+BIG_TIME = {1: 8, 2: 24, 3: 48}
+
 
 localrules:
     all_subject_qc,
@@ -274,6 +277,9 @@ use rule genome from plink as population_level_ibd with:
         out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd",
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd.genome",
+    resources:
+        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
 
 
 rule population_level_concordance_plink:

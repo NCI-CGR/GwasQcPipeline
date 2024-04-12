@@ -88,16 +88,9 @@ def plot_panel(
     )
 
     # Set basic defaults so I don't have to repeat myself
-    CASE_CONTROL_LABEL_COLORS = {
-        "Case": CASE_CONTROL_COLORS[0],
-        "Control": CASE_CONTROL_COLORS[1],
-        "QC": CASE_CONTROL_COLORS[2],
-        "Unknown": CASE_CONTROL_COLORS[3],
-    }
-
     style_defaults = dict(linewidth=0, alpha=0.8, s=5)
     sample_defaults = {
-        **dict(hue="case_control", palette=CASE_CONTROL_LABEL_COLORS, data=sample),
+        **dict(hue="case_control", palette=CASE_CONTROL_COLORS, data=sample),
         **style_defaults,
     }
     snp_defaults = {**dict(data=snp, palette="gray"), **style_defaults}
