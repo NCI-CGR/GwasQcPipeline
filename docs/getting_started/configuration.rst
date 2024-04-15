@@ -158,6 +158,8 @@ Full Example
       remove_rep_discordant: true
       minimum_pop_subjects: 50
       control_hwp_threshold: 50
-      lims_upload: false
+      lims_upload: true
+      lims_output_dir: /example/location/to/place/lims/upload/file
+      time_start: '20240227130627'
    Sample_IDs_to_remove:
       - Sample0001

@@ -254,7 +254,7 @@ def fake_sample_qc() -> pd.DataFrame:
         "is_cr1_filtered",
         "is_cr2_filtered",
         "is_contaminated",
-        "is_discordant_replicate",
+        "Expected Replicate Discordance",
     ]
     data = [
         ("SP00001", "SB00001", False, False, 0.99, False, False, False, False),

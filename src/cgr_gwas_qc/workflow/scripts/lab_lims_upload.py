@@ -43,6 +43,8 @@ def main(sample_sheet_csv: Path, sample_qc_csv: Path, outfile: Path):
     )
     df["Sex Discordant"] = df["Sex Discordant"].replace("", False).fillna(False)
     # Adjust names and column order to match legacy
+    df[["Sex Discordant","Low Call Rate","Contaminated","Expected Replicate Discordance","Unexpected Replicate"]] = df[["Sex Discordant","Low Call Rate","Contaminated","Expected Replicate Discordance","Unexpected Replicate"]].astype(str)
+    df[["Sex Discordant","Low Call Rate","Contaminated","Expected Replicate Discordance","Unexpected Replicate"]] = df[["Sex Discordant","Low Call Rate","Contaminated","Expected Replicate Discordance","Unexpected Replicate"]].apply(lambda x: x.astype(str).str.upper())
     df.to_csv(outfile, index=False)
 
 

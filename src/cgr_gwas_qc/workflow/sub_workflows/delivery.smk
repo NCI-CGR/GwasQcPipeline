@@ -1,7 +1,20 @@
 from cgr_gwas_qc import load_config
+import re
+import os
 cfg = load_config()
 output_pattern = cfg.config.user_files.output_pattern
 manifest_file = cfg.config.sample_sheet
+
+lims_dir = cfg.config.workflow_params.lims_output_dir
+
+if (len(os.path.basename(manifest_file)[:-4].split('_AnalysisManifest_'))==2):
+    (outName,sampSheetDate)=os.path.basename(manifest_file)[:-4].split('_AnalysisManifest_')
+    lims_file_name = "{deliver_prefix}"+outName+"_LimsUpload_"+sampSheetDate+"{deliver_suffix}.csv"
+    file_type_lims= outName + "_LimsUpload_"+ sampSheetDate
+else:
+    timestr = cfg.config.workflow_params.time_start
+    file_type_lims="LimsUpload_"+ timestr
+    lims_file_name = "{deliver_prefix}LimsUpload_"+timestr+"{deliver_suffix}.csv"
 
 localrules:
     all_delivery,
@@ -38,7 +51,7 @@ targets = [
     "delivery/subjects.fam",
     "delivery/HWP.zip",
     output_pattern.format(prefix="files_for_lab", file_type="all_sample_qc", ext="csv"),
-    output_pattern.format(prefix="files_for_lab", file_type="LimsUpload", ext="csv"),
+    output_pattern.format(prefix="files_for_lab", file_type=file_type_lims, ext="csv"),
     output_pattern.format(prefix="files_for_lab", file_type="Identifiler", ext="csv"),
     output_pattern.format(prefix="files_for_lab", file_type="KnownReplicates", ext="csv"),
     output_pattern.format(prefix="files_for_lab", file_type="UnknownReplicates", ext="csv"),
@@ -51,8 +64,7 @@ if cfg.config.workflow_params.lims_upload:
     # The CGEMs/CCAD cluster has a cron job running that looks for this file in
     # the root run directory. If it is there then it will automatically upload
     # to the LIMs system. This is only useful on CGEMs/CCAD.
-    targets.append(output_pattern.format(prefix=".", file_type="LimsUpload", ext="csv"))
-
+    targets.append(output_pattern.format(prefix=cfg.config.workflow_params.lims_output_dir, file_type=file_type_lims, ext="csv"))
 
 rule all_delivery:
     input:
@@ -73,13 +85,12 @@ rule lab_sample_level_qc_report:
     shell:
         "cp {input[0]} {output[0]}"
 
-
 rule lab_lims_upload:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
         sample_qc_csv="sample_level/sample_qc.csv",
     output:
-        "files_for_lab/{deliver_prefix}LimsUpload{deliver_suffix}.csv",
+        "files_for_lab/"+lims_file_name,
     script:
         "../scripts/lab_lims_upload.py"
 
@@ -92,7 +103,7 @@ if cfg.config.workflow_params.lims_upload:
         input:
             rules.lab_lims_upload.output[0],
         output:
-            "{deliver_prefix}LimsUpload{deliver_suffix}.csv",
+            lims_dir+"/"+lims_file_name,
         shell:
             "cp {input[0]} {output[0]}"
 
