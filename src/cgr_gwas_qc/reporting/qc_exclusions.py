@@ -22,7 +22,6 @@ class ExclusionTables:
         subject_qc: DataFrameOrFile,
         population_qc: DataFrameOrFile,
     ) -> "ExclusionTables":
-
         sample_exclusions = sample_exclusion_counts(sample_qc)
         subject_exclusions = subject_exclusion_counts(subject_qc, population_qc)
 
@@ -39,6 +38,16 @@ def sample_exclusion_counts(data: DataFrameOrFile) -> pd.DataFrame:
         df = sample_qc_table.read(data)
 
     return _create_sample_exclusion_counts_table(df)
+
+
+def _replace_unknown_labels(df):
+    known_cc_labels = ["Unknown", "Case", "Control", "QC"]  # must be one of these labels
+
+    # Use boolean indexing to select rows where "case_control" isn't in known_cc_labels
+    is_unknown = ~df["case_control"].isin(known_cc_labels)
+    # Update the "case_control" column with "Unknown" for these rows
+    df.loc[is_unknown, "case_control"] = "Unknown"
+    return df
 
 
 def _create_sample_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
@@ -61,6 +70,8 @@ def _create_sample_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
         "Unknown": "Other",
         "total": "All Samples",  # added below
     }
+
+    df = _replace_unknown_labels(df.copy())
 
     return (
         df.assign(is_array_processing_failure=lambda x: x.is_missing_idats | x.is_missing_gtc)
@@ -112,6 +123,8 @@ def _create_subject_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
         "Unknown": "Other",
         "total": "All Subjects",
     }
+
+    df = _replace_unknown_labels(df.copy())
 
     return (
         df.reindex(["case_control", *row_names.keys()], axis=1)

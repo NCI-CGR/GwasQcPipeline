@@ -103,7 +103,7 @@ if config.get("cluster_mode", False):
             "sample_level/contamination/median_idat_intensity.csv",
         resources:
             mem_gb=lambda wildcards, attempt: attempt * 4,
-            tim_hr=lambda wildcards, attempt: attempt ** 2,
+            time_hr=lambda wildcards, attempt: attempt ** 2,
         script:
             "../scripts/agg_median_idat_intensity.py"
 
@@ -157,7 +157,7 @@ if config.get("cluster_mode", False):
             "sample_level/contamination/verifyIDintensity.csv",
         resources:
             mem_gb=lambda wildcards, attempt: attempt * 4,
-            tim_hr=lambda wildcards, attempt: attempt ** 2,
+            time_hr=lambda wildcards, attempt: attempt ** 2,
         script:
             "../scripts/agg_verifyidintensity.py"
 
@@ -194,7 +194,7 @@ else:
             "sample_level/contamination/median_idat_intensity.csv",
         resources:
             mem_gb=lambda wildcards, attempt: attempt * 4,
-            tim_hr=lambda wildcards, attempt: attempt ** 2,
+            time_hr=lambda wildcards, attempt: attempt ** 2,
         script:
             "../scripts/agg_median_idat_intensity.py"
 
@@ -256,6 +256,6 @@ else:
             "sample_level/contamination/verifyIDintensity.csv",
         resources:
             mem_gb=lambda wildcards, attempt: attempt * 4,
-            tim_hr=lambda wildcards, attempt: attempt ** 2,
+            time_hr=lambda wildcards, attempt: attempt ** 2,
         script:
             "../scripts/agg_verifyidintensity.py"

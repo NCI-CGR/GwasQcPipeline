@@ -132,7 +132,7 @@ def test_software_params_defaults():
     assert software_params.ld_prune_r2 == 0.1
     assert software_params.maf_for_ibd == 0.2
     assert software_params.maf_for_hwe == 0.05
-    assert software_params.ibd_pi_hat_min == 0.05
+    assert software_params.ibd_pi_hat_min == 0.12
     assert software_params.ibd_pi_hat_max == 1.0
     assert software_params.dup_concordance_cutoff == 0.95
     assert software_params.contam_threshold == 0.1
@@ -154,7 +154,7 @@ def test_workflow_params_defaults():
     assert workflow_params.remove_rep_discordant is True
     assert workflow_params.minimum_pop_subjects == 50
     assert workflow_params.control_hwp_threshold == 50
-    assert workflow_params.lims_upload is False
+    assert workflow_params.lims_upload is True
 
 
 @pytest.mark.parametrize("value", [-0.01, 0, 1.01])
