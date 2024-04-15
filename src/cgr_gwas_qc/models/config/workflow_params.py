@@ -1,8 +1,10 @@
 from pydantic import BaseModel, Field
 
 import time
-#setting start time to define unique lim file name
+
+# setting start time to define unique lim file name
 timestr = time.strftime("%Y%m%d%H%M%S")
+
 
 class WorkflowParams(BaseModel):
     """This set of parameters control what parts and how the workflow is run.
@@ -79,16 +81,16 @@ class WorkflowParams(BaseModel):
     lims_output_dir: str = Field(
         "/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/",
         descrition="For ``CGEMS/CCAD`` use only, if lims_upload is set to true, the LimsUpload file will be copied to LIMS production directory or designated directory.",
-        )
+    )
 
     case_control_gwas: bool = Field(
         False,
         description="A plink logistic regression gwas will be performed with case_control phenotype.",
     )
-    time_start: str =Field(
+    time_start: str = Field(
         timestr,
         description="Date and time at which the workflow starts. This creates a unique id for the run.",
-        )
+    )
 
     @staticmethod
     def schema_rst():
