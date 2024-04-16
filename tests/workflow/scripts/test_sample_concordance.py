@@ -70,7 +70,7 @@ def test_add_discordant_replicate(fake_cfg, concordance):
     df = concordance.pipe(sample_concordance._add_expected_replicates, fake_cfg.ss).pipe(
         sample_concordance._add_discordant_replicates
     )
-    assert 0 == df["Expected Replicate Discordance"].sum()
+    assert 0 == df["is_discordant_replicate"].sum()
 
 
 def test_add_discordant_replicate_missing_pair(fake_cfg, concordance):
@@ -87,7 +87,7 @@ def test_add_discordant_replicate_missing_pair(fake_cfg, concordance):
     df = concordance.pipe(sample_concordance._add_expected_replicates, fake_cfg.ss).pipe(
         sample_concordance._add_discordant_replicates
     )
-    assert 1 == df["Expected Replicate Discordance"].sum()
+    assert 1 == df["is_discordant_replicate"].sum()
 
 
 @pytest.mark.parametrize(
