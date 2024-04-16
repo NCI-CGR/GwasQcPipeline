@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Delivery Sub-workflow &mdash; GwasQcPipeline 1.2.0 documentation</title>
+  <title>Delivery Sub-workflow &mdash; GwasQcPipeline 1.3.0 documentation</title>
   
 
   
@@ -188,6 +188,8 @@
 <div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">user_files.output_pattern</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.lims_upload</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.lims_output_dir</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.time_start</span></code></p></li>
 </ul>
 </div></blockquote>
 <dl class="simple">
@@ -213,7 +215,7 @@
 </dl>
 <p>The delivery workflow mostly just copies files to the correct location in either <code class="docutils literal notranslate"><span class="pre">delivery/</span></code> or <code class="docutils literal notranslate"><span class="pre">files_for_lab/</span></code>.
 It also generates the QC report (<code class="docutils literal notranslate"><span class="pre">*.docx</span></code>) and QC report table (<code class="docutils literal notranslate"><span class="pre">*.xlsx</span></code>).
-If this <code class="docutils literal notranslate"><span class="pre">lims_upload</span></code> options is set then it will copy <code class="docutils literal notranslate"><span class="pre">*LimsUpload*.csv</span></code> to the root of the project folder.</p>
+If this <code class="docutils literal notranslate"><span class="pre">lims_upload</span></code> options is set then it will copy <code class="docutils literal notranslate"><span class="pre">*LimsUpload*.csv</span></code> to the designated <code class="docutils literal notranslate"><span class="pre">lims_output_dir</span></code>.</p>
 </section>
 
 

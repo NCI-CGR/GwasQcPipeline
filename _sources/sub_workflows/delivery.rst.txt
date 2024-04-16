@@ -10,6 +10,8 @@ Delivery Sub-workflow
 
    - ``user_files.output_pattern``
    - ``workflow_params.lims_upload``
+   - ``workflow_params.lims_output_dir``
+   - ``workflow_params.time_start``
 
 **Major Outputs**:
    - ``delivery/samples.bed``
@@ -31,4 +33,4 @@ Delivery Sub-workflow
 
 The delivery workflow mostly just copies files to the correct location in either ``delivery/`` or ``files_for_lab/``.
 It also generates the QC report (``*.docx``) and QC report table (``*.xlsx``).
-If this ``lims_upload`` options is set then it will copy ``*LimsUpload*.csv`` to the root of the project folder.
+If this ``lims_upload`` options is set then it will copy ``*LimsUpload*.csv`` to the designated ``lims_output_dir``.

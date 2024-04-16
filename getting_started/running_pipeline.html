@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Running the Pipeline &mdash; GwasQcPipeline 1.2.0 documentation</title>
+  <title>Running the Pipeline &mdash; GwasQcPipeline 1.3.0 documentation</title>
   
 
   
@@ -652,7 +652,7 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 <dd><p>The amount of memory to use for main snakemake process and local rules [default 8GB]. There are a number of rules that are run along side of the main snakemake process instead of submitting a new job. If you have a very large project &gt;50k samples, you may want to increase the amount of memory used for this job. Ignored if using <code class="docutils literal notranslate"><span class="pre">--cgems</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p>1208925819614629174706176</p>
+<dd class="field-odd"><p>8000</p>
 </dd>
 </dl>
 </dd></dl>

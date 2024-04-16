@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; GwasQcPipeline 1.2.0 documentation</title>
+  <title>Configuration Files &mdash; GwasQcPipeline 1.3.0 documentation</title>
   
 
   
@@ -271,7 +271,7 @@ I will walk through each section below and end this page with a full example.</p
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td><p>v1.2.0</p></td>
+<td><p>v1.3.0</p></td>
 </tr>
 <tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>project_name</p></li>
@@ -682,7 +682,7 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <span class="w">    </span><span class="nt">maf_for_ibd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
 <span class="w">    </span><span class="nt">maf_for_hwe</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
 
-<span class="w">    </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">    </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.12</span>
 <span class="w">    </span><span class="nt">ibd_pi_hat_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
 <span class="w">    </span><span class="nt">dup_concordance_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span>
 <span class="w">    </span><span class="nt">pi_hat_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
@@ -920,7 +920,7 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <td><p>0</p></td>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
-<td><p>0.05</p></td>
+<td><p>0.12</p></td>
 </tr>
 <tr class="row-odd"><td rowspan="6"><ul class="simple">
 <li><p>ibd_pi_hat_max</p></li>
@@ -1019,8 +1019,10 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <span class="w">    </span><span class="nt">remove_rep_discordant</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">minimum_pop_subjects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 <span class="w">    </span><span class="nt">control_hwp_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
-<span class="w">    </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">lims_output_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/</span>
 <span class="w">    </span><span class="nt">case_control_gwas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">time_start</span><span class="p">:</span>
 </pre></div>
 </div>
 </td>
@@ -1160,21 +1162,47 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <td><p><em>boolean</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td><p>False</p></td>
+<td><p>True</p></td>
 </tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>lims_output_dir</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Lims Output Dir</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
 <li><p>case_control_gwas</p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Case Control Gwas</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>A plink logistic regression gwas will be performed with case_control phenotype.</p></td>
+<tr class="row-even"><td colspan="2"><p>A plink logistic regression gwas will be performed with case_control phenotype.</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>default</p></td>
+<tr class="row-even"><td><p>default</p></td>
 <td><p>False</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>time_start</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Time Start</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Date and time at which the workflow starts. This creates a unique id for the run.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>20240416160117</p></td>
 </tr>
 </tbody>
 </table>
@@ -1232,7 +1260,9 @@ These samples will be indicated as <code class="docutils literal notranslate"><s
 <span class="w">   </span><span class="nt">remove_rep_discordant</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">   </span><span class="nt">minimum_pop_subjects</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 <span class="w">   </span><span class="nt">control_hwp_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
-<span class="w">   </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">   </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">   </span><span class="nt">lims_output_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/example/location/to/place/lims/upload/file</span>
+<span class="w">   </span><span class="nt">time_start</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;20240227130627&#39;</span>
 <span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
 <span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sample0001</span>
 </pre></div>
