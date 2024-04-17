@@ -37,6 +37,7 @@ class Config(BaseModel):
     .. code-block:: yaml
 
         pipeline_version: v1.0.0
+        slurm_partition: defq
         project_name: SR0001-001_1_0000000
         sample_sheet: /path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv
         genome_build: hg37
@@ -55,7 +56,12 @@ class Config(BaseModel):
         __version__,
         description="The version of the GwasQcPipeline to use. "
         "If you want to use a different version you may just edit this value to match. "
-        "However, it is suggested that you re-run the entire pipeline incases there are differences between version.",
+        "However, it is suggested that you re-run the entire pipeline in case there are differences between version.",
+    )
+
+    slurm_partition: Optional[str] = Field(
+        None, description="Name of the Slurm partition to which jobs will be submitted "
+        "when using the --slurm-generic submit option."
     )
 
     project_name: Optional[str] = Field(
