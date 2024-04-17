@@ -31,12 +31,16 @@ class BiowulfOptions(ClusterOptions):
             " --time={time}"
             " --output={log}"
         )
+
         if self.time > timedelta(hours=4):
             self.queue.discard("quick")
+
+        formatted_time = f"{self.time.days}-{self.time.seconds // 3600}"  # days-hours for slurm
+
         return cmd.format(
             queue=",".join(self.queue),
             mem_gb=self.mem_gb,
-            time=str(self.time),
+            time=formatted_time,
             threads=self.threads,
             rulename=self.rulename,
             job_id=self.job_id,
