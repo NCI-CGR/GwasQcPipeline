@@ -48,7 +48,7 @@ CLUSTER_JOB_ID=${SLURM_JOB_ID}
 CLUSTER_JOB_ID=${SLURM_JOB_ID}
 {% endif %}
 
-{% if slurm_generic %}
+{% if slurm %}
 #SBATCH --job-name="GwasQcPipeline-{{ version }}"
 #SBATCH --partition="{{ queue }}"
 #SBATCH --output=gwas_qc_log.%j

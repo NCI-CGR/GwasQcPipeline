@@ -26,9 +26,10 @@ def main(
     ccad2: bool = typer.Option(
         False, help="Run the workflow using the cli ccad2 cluster profile."
     ),
-    slurm_generic: bool = typer.Option(
-        False, help="Run the workflow using the a generic slurm cluster profile. "
-        "This option requires you to specify the name of the queue (partition) to submit to.",
+    slurm: bool = typer.Option(
+        False, help="Run the workflow using the generic slurm cluster profile. "
+        "This option necessitates specifying the name of the Slurm partition "
+        "to submit to in the config.yml file."
     ),
     cluster_profile: Optional[Path] = typer.Option(
         None,
@@ -108,7 +109,7 @@ def main(
         You would then submit this script directly to your cluster (i.e., ``qsub .snakemake/GwasQcPipeline_submission.sh``).
     """
 
-    check_exclusive_options(cgems, biowulf, ccad2, slurm_generic, cluster_profile)
+    check_exclusive_options(cgems, biowulf, ccad2, slurm, cluster_profile)
 
     payload = {
         "python_executable": sys.executable,
@@ -118,7 +119,7 @@ def main(
         "cgems": cgems,
         "biowulf": biowulf,
         "ccad2": ccad2,
-        "slurm_generic": slurm_generic,
+        "slurm": slurm,
         "time_hr": time_hr,
         "local_mem_mb": local_mem_mb,
         "local_tasks": local_tasks,
@@ -155,14 +156,16 @@ def main(
         payload["profile"] = get_profile("ccad2")
         payload["queue"] = queue or ("defq,defq" if time_hr <= 4 else "defq")
         submission_cmd = "sbatch"
-    elif slurm_generic:
-        payload["profile"] = get_profile("slurm_generic", queue=queue)
+    elif slurm:
+        payload["profile"] = get_profile("slurm")
+        queue = cfg.config.slurm_partition # could remove this if want to give user freedom to choose queue for local jobs
+        if queue == None:
+            raise ValueError("\nError: Missing required configuration.\n\nTo use the `--slurm` option, you must provide the `slurm_partition` key in your config.yml file. Please configure it and try again.")
         payload["queue"] = queue
         submission_cmd = "sbatch"
     else:
         payload["profile"] = check_custom_cluster_profile(cluster_profile, queue, submission_cmd)
         payload["queue"] = queue
-        # payload["slurm_generic"] = True
 
     run_script = create_submission_script(payload)
 
@@ -171,12 +174,12 @@ def main(
         print(f"Submitted {job_id}")
 
 
-def check_exclusive_options(cgems, biowulf, ccad2, slurm_generic, cluster_profile):
-    if sum([cgems, biowulf, ccad2, slurm_generic, (cluster_profile is not None)]) > 1:
+def check_exclusive_options(cgems, biowulf, ccad2, slurm, cluster_profile):
+    if sum([cgems, biowulf, ccad2, slurm, (cluster_profile is not None)]) > 1:
         typer.echo(
             "\n".join(
                 wrap(
-                    "Please only provide one of `--cgems`, `--biowulf`, `--ccad2, `--slurm_generic`, or `--cluster_profile`. "
+                    "Please only provide one of `--cgems`, `--biowulf`, `--ccad2, `--slurm`, or `--cluster_profile`. "
                     "Run `cgr submit --help` for more information.",
                     width=100,
                 )
@@ -206,7 +209,7 @@ def check_custom_cluster_profile(cluster_profile, queue, submission_cmd):
     return cluster_profile.resolve().as_posix()
 
 
-def get_profile(cluster: str, queue: None):
+def get_profile(cluster: str):
     cgr_profiles = (Path(__file__).parents[1] / "cluster_profiles").resolve()
 
     if cluster == "cgems":
@@ -218,10 +221,10 @@ def get_profile(cluster: str, queue: None):
     if cluster == "ccad2":
         return (cgr_profiles / "ccad2").as_posix()
 
-    if cluster == "slurm_generic":
-        if queue is None:
-            raise ValueError("You must provide a queue to use with `--slurm-generic`.")
+    if cluster == "slurm":
         return (cgr_profiles / "slurm_generic").as_posix()
+        #if queue is None:
+        #    raise ValueError("You must provide provide slurm_parition in the config.yml to use with `--slurm`.")
 
 
 def create_submission_script(payload) -> str:
