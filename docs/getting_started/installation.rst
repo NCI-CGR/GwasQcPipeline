@@ -45,13 +45,15 @@ To update the latest version of ``GwasQcPipeline``:
 Installing on ccad2
 -------------------------
 
-- Install miniconda and then create a GwasQcPipeline production environment
-.. code-block::
+Install miniconda and then create a GwasQcPipeline production environment:
 
-   $ mkdir /scratch/myfolder/GwasQcPipeline_v1.2
-   $ cd /scratch/myfolder/GwasQcPipeline_v1.2
+.. code-block::
+   :substitutions:
+
+   $ mkdir /scratch/myfolder/GwasQcPipeline_|pkg_version|
+   $ cd /scratch/myfolder/GwasQcPipeline_|pkg_version|
    $ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
-   $ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -p /scratch/myfolder/GwasQcPipeline_v1.2/conda -b
+   $ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -p /scratch/myfolder/GwasQcPipeline_|pkg_version|/conda -b
    $ source conda/bin/activate base
    (base) $ conda update -n base -c defaults conda
    (base) $ conda install -n base -c conda-forge mamba
@@ -59,12 +61,15 @@ Installing on ccad2
    (base) $ conda deactivate
 
 Next install the latest version of the GwasQcPipeline environment:
+
 .. code-block::
-   $ source /scratch/myfolder/GwasQcPipeline_v1.2/conda/bin/activate GwasQcPipeline 
-   (GwasQcPipeline) $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
+   :substitutions:
+
+   $ source /scratch/myfolder/GwasQcPipeline_|pkg_version|/conda/bin/activate GwasQcPipeline
+   (GwasQcPipeline) $ pip install |pkgurl|
    (GwasQcPipeline) $ cgr --help
    (GwasQcPipeline) $ cgr version
-   v1.2.0
+   |pkg_version|
 
 Installing on NIH Biowulf
 -------------------------
@@ -76,6 +81,7 @@ description is provided on the `Biowulf python env website`_.
 
 
 .. code-block::
+   :substitutions:
 
    $ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-x86_64.sh
 
@@ -91,9 +97,10 @@ description is provided on the `Biowulf python env website`_.
 Next install the latest version of the GwasQcPipeline environment:
 
 .. code-block::
+   :substitutions:
 
    $ source /<location of miniconda installation>/conda/bin/activate GwasQcPipeline
-   $ pip install --force-reinstall  https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.2.0/cgr_gwas_qc-1.2.0-py3-none-any.whl
+   $ pip install --force-reinstall |pkgurl|
    $ cgr --help
    $ cgr version
 
