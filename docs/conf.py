@@ -45,6 +45,7 @@ rst_prolog = f"""
 .. |pkgurl| replace:: https://github.com/NCI-CGR/GwasQcPipeline/releases/download/{__version__}/{pkg}
 .. |cgr| replace:: *CGR GwasQcPipeline*
 .. |pkg_version| replace:: {__version__}
+.. |pkg_version_num| replace:: {release}
 """
 
 rst_epilog = ".. include:: /common_urls.rst"
