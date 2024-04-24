@@ -160,7 +160,18 @@ def main(
         payload["profile"] = get_profile("slurm")
         queue = cfg.config.slurm_partition # could remove this if want to give user freedom to choose queue for local jobs
         if queue == None:
-            raise ValueError("\nError: Missing required configuration.\n\nTo use the `--slurm` option, you must provide the `slurm_partition` key in your config.yml file. Please configure it and try again.")
+            raise ValueError(
+            """
+            \033[1;31mMissing required configuration key-value pair for slurm option\033[0m\n
+            The `--slurm` option requires the `slurm_partition`
+            key-value pair to be defined in your `config.yml` file.
+            This pair specifies the partition where your job will
+            run on the Slurm scheduler. The key is `slurm_partition`
+            and the value should be the name of the desired partition.
+            You can execute `sinfo` to see which partitions are available.
+            Add a line like this in your config.yml:\n
+                    \033[32mslurm_partition: <partition_name>\033[0m
+            """)
         payload["queue"] = queue
         submission_cmd = "sbatch"
     else:
