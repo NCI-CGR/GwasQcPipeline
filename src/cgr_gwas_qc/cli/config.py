@@ -43,6 +43,12 @@ def main(
     project_name: Optional[str] = typer.Option(
         None, help="The project name to use for this QC run."
     ),
+    slurm_partition: Optional[str] = typer.Option(
+        None, help="""
+Name of the Slurm partition to which jobs will be submitted
+when using the `--slurm` submit option.
+      """
+    ),
     include_unused_settings: bool = typer.Option(
         False,
         "--include-unused-settings",
@@ -101,11 +107,11 @@ def main(
         pre-flight``.
 
     .. warning::
-        The sample sheet must exist and be readable. We will raises an error if
-        it is not.
+        The sample sheet must exist and be readable.
+        We will raises an error if it is not.
 
     """
-    cfg = initialize_config(sample_sheet, project_name, bpm_file, genome_build)
+    cfg = initialize_config(sample_sheet, project_name, bpm_file, genome_build, slurm_partition)
 
     # Update config to use paths on CGEMs/CCAD or add place holders for other systems
     update_config_for_cgems(cfg) if cgems | cgems_dev else update_config_for_general(cfg)
@@ -137,6 +143,7 @@ def initialize_config(
     project_name: Optional[str],
     bpm_file: Optional[Path],
     genome_build: GenomeBuild,
+    slurm_partition: Optional[str],
 ) -> Config:
     """Initialize config object.
 
@@ -148,6 +155,7 @@ def initialize_config(
         project_name=project_name,
         sample_sheet=sample_sheet.resolve(),
         genome_build=genome_build,
+        slurm_partition=slurm_partition,
         num_snps=0,
         reference_files=ReferenceFiles.construct(
             illumina_manifest_file=bpm_file,
@@ -157,10 +165,10 @@ def initialize_config(
         user_files=UserFiles(
             output_pattern="{prefix}/{file_type}.{ext}",
             idat_pattern=Idat(
-                red="/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat",
-                green="/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat",
+                red="/example/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Red.idat",
+                green="/example/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}_Grn.idat",
             ),
-            gtc_pattern="/expample/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc",
+            gtc_pattern="/example/pattern/wildcards/are/columns/in/sample_sheet_file/{Project}/{Sample_ID}.gtc",
         ),
         software_params=SoftwareParams(),
         workflow_params=WorkflowParams(),
