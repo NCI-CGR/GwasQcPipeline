@@ -53,7 +53,7 @@ $ source conda/bin/activate base
 ```
 - Install GwasQcPipeline source code
 ```
-$ source /scratch/myfolder/GwasQcPipeline_v1.2/conda/bin/activate GwasQcPipeline 
+$ source /scratch/myfolder/GwasQcPipeline_v1.4.0/conda/bin/activate GwasQcPipeline 
 (GwasQcPipeline) $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.4.0/cgr_gwas_qc-1.4.0-py3-none-any.whl
 (GwasQcPipeline) $ cgr --help
 (GwasQcPipeline) $ cgr version
