@@ -44,10 +44,9 @@ def main(
         None, help="The project name to use for this QC run."
     ),
     slurm_partition: Optional[str] = typer.Option(
-        None, help="""
-Name of the Slurm partition to which jobs will be submitted
-when using the `--slurm` submit option.
-      """
+        None,
+        help="Name of the Slurm partition to which jobs will be submitted. "
+             "This is required when running ``cgr submit --slurm``."
     ),
     include_unused_settings: bool = typer.Option(
         False,
@@ -96,19 +95,23 @@ when using the `--slurm` submit option.
 
     Non-CGR users and CGR users on other systems will probably want to run::
 
-        $ cgr config -s <path to lims manifest file or sample sheet> --project-name <my project name>
+        $ cgr config \\
+              --sample-sheet <path to lims manifest file or sample sheet> \\
+              --project-name <my project name> \\
+              [--slurm-partition <partition_name>]
 
-    This will create the ``config.yml`` file in the current working directory
-    with place holders for reference files and user files.
+    This will generate the ``config.yml`` file in the current working directory,
+    with placeholders for reference files and user files.
+    Slurm users can include the ``--slurm-partition`` option to specify
+    the name of the queue to which your jobs will be submitted.
 
     .. attention::
-        All uses should always open the ``config.yml`` file and make any
-        necessary changes. When you are happy then continue to ``cgr
-        pre-flight``.
+        Always review and update ``config.yml`` before each pipeline run.
+        Then run ``cgr pre-flight`` to ensure proper configuration.
 
     .. warning::
         The sample sheet must exist and be readable.
-        We will raises an error if it is not.
+        An error will be raised if it is not.
 
     """
     cfg = initialize_config(sample_sheet, project_name, bpm_file, genome_build, slurm_partition)

@@ -28,8 +28,8 @@ def main(
     ),
     slurm: bool = typer.Option(
         False, help="Run the workflow using the generic slurm cluster profile. "
-        "This option necessitates specifying the name of the Slurm partition "
-        "to submit to in the config.yml file."
+        "This option requires that you specify the ``slurm_partition`` "
+        "in the ``config.yml`` file."
     ),
     cluster_profile: Optional[Path] = typer.Option(
         None,
@@ -86,6 +86,7 @@ def main(
     The ``cgr submit`` command will create a submission script and submit it to the cluster.
     We will create an optimized submission script for users of CGEMs/CCAD, CCAD2 and Biowulf.
     For other systems you will need to provide a snakemake cluster profile to tell snakemake how use your system.
+    If you are submitting to a Slurm cluster, you can use the generic Slurm cluster profile we provide by including the ``--slurm`` option in your submit command.
 
     Users running on CGEMs/CCAD will typically run::
 
@@ -99,9 +100,18 @@ def main(
 
         cgr submit --ccad2
 
-    Users running on other systems will typically run::
+    Users running on other Slurm systems will typically run::
 
-        cgr submit --profile <path to custom cluster profile> --queue <name of the queue to submit main job> --submission-cmd <tool used for submit such as sbatch or qsub>
+        cgr submit --slurm
+
+    Users running with a custom cluster profile will typically run:
+
+    .. code-block:: none
+
+        cgr submit \\
+            --profile <path to custom cluster profile> \\
+            --queue <name of the queue to submit main job> \\
+            --submission-cmd <tool used for submit such as sbatch or qsub>
 
     .. note::
         Sometimes it may be useful to edit the submission script before submitting it to the cluster.

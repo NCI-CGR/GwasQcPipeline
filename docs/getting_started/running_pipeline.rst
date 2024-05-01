@@ -98,7 +98,7 @@ For external users will need to create your own `snakemake cluster profile`_.
 
    **Biowulf users**.
    You may need to adjust ``--time-hr``, ``--local_mem_mb``, and ``--local_tasks``
-   if you main job is getting killed by the cluster because of resource limits.
+   if your main job is getting killed by the cluster because of resource limits.
 
 The submission script will create a log file ``./gwas_qc_log.$JOB_ID`` that will have the status of your cluster submission.
 Logs for each submitted job can be found in ``./logs/``.
