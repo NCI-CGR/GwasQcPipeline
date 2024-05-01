@@ -23,13 +23,12 @@ def main(
     biowulf: bool = typer.Option(
         False, help="Run the workflow using the cli Biowulf cluster profile."
     ),
-    ccad2: bool = typer.Option(
-        False, help="Run the workflow using the cli ccad2 cluster profile."
-    ),
+    ccad2: bool = typer.Option(False, help="Run the workflow using the cli ccad2 cluster profile."),
     slurm: bool = typer.Option(
-        False, help="Run the workflow using the generic slurm cluster profile. "
+        False,
+        help="Run the workflow using the generic slurm cluster profile. "
         "This option requires that you specify the ``slurm_partition`` "
-        "in the ``config.yml`` file."
+        "in the ``config.yml`` file.",
     ),
     cluster_profile: Optional[Path] = typer.Option(
         None,
@@ -168,10 +167,10 @@ def main(
         submission_cmd = "sbatch"
     elif slurm:
         payload["profile"] = get_profile("slurm")
-        queue = cfg.config.slurm_partition # could remove this if want to give user freedom to choose queue for local jobs
-        if queue == None:
+        queue = cfg.config.slurm_partition
+        if queue is None:
             raise ValueError(
-            """
+                """
             \033[1;31mMissing required configuration key-value pair for slurm option\033[0m\n
             The `--slurm` option requires the `slurm_partition`
             key-value pair to be defined in your `config.yml` file.
@@ -181,7 +180,8 @@ def main(
             You can execute `sinfo` to see which partitions are available.
             Add a line like this in your config.yml:\n
                     \033[32mslurm_partition: <partition_name>\033[0m
-            """)
+            """
+            )
         payload["queue"] = queue
         submission_cmd = "sbatch"
     else:
@@ -244,7 +244,7 @@ def get_profile(cluster: str):
 
     if cluster == "slurm":
         return (cgr_profiles / "slurm_generic").as_posix()
-        #if queue is None:
+        # if queue is None:
         #    raise ValueError("You must provide provide slurm_parition in the config.yml to use with `--slurm`.")
 
 

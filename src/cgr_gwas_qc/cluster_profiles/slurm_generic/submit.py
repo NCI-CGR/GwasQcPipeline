@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-from dataclasses import dataclass, field
-from datetime import timedelta
-from typing import Set
+
+from dataclasses import dataclass  # , field
 
 from snakemake.utils import read_job_properties
-from cgr_gwas_qc import load_config
 
+from cgr_gwas_qc import load_config
 from cgr_gwas_qc.cluster_profiles import (
     ClusterOptions,
     load_cluster_config,
@@ -15,8 +14,13 @@ from cgr_gwas_qc.cluster_profiles import (
     update_properties,
 )
 
+# from datetime import timedelta
+# from typing import Set
+
+
 cfg = load_config()
 queue = cfg.config.slurm_partition
+
 
 @dataclass
 class SlurmOptions(ClusterOptions):

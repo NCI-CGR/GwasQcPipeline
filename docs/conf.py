@@ -19,7 +19,17 @@ from cgr_gwas_qc.version import __version__
 
 project = "GwasQcPipeline"
 copyright = "2020, Leidos Biomedical Research, Inc."
-authors = ["Justin Fear", "Eric Karlins", "Jiahui Wang", "Cameron Palmer", "Bari Ballew", "Bin Zhu", "Caryn Willis", "Kevin Liao", "Jesse Marks"]
+authors = [
+    "Justin Fear",
+    "Eric Karlins",
+    "Jiahui Wang",
+    "Cameron Palmer",
+    "Bari Ballew",
+    "Bin Zhu",
+    "Caryn Willis",
+    "Kevin Liao",
+    "Jesse Marks",
+]
 
 # The full version, including alpha/beta/rc tags
 release = (

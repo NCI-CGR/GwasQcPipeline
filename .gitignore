@@ -74,4 +74,3 @@ pytest.out
 src/cgr_gwas_qc/workflow/scripts/orig/
 src/cgr_gwas_qc/workflow/sub_workflows/orig/
 src/cgr_gwas_qc/reporting/templates/orig/
-

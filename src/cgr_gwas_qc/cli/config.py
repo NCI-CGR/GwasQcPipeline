@@ -46,7 +46,7 @@ def main(
     slurm_partition: Optional[str] = typer.Option(
         None,
         help="Name of the Slurm partition to which jobs will be submitted. "
-             "This is required when running ``cgr submit --slurm``."
+        "This is required when running ``cgr submit --slurm``.",
     ),
     include_unused_settings: bool = typer.Option(
         False,
@@ -217,7 +217,7 @@ def _add_project_name(cfg: Config):
 
 def _sample_sheet_name_to_project_name(stem: str):
     """Convert a CGEMs sample sheet name to the project name."""
-    if (m := re.match(r"(?P<prefix>.*)_AnalysisManifest_(?P<suffix>.*)", stem)) :
+    if m := re.match(r"(?P<prefix>.*)_AnalysisManifest_(?P<suffix>.*)", stem):
         return "_".join(m.groups())
     return f"GwasQcPipeline_{TODAY}"
 

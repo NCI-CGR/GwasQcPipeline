@@ -60,8 +60,9 @@ class Config(BaseModel):
     )
 
     slurm_partition: Optional[str] = Field(
-        None, description="Name of the Slurm partition to which jobs will be submitted "
-        "when using the --slurm-generic submit option."
+        None,
+        description="Name of the Slurm partition to which jobs will be submitted "
+        "when using the --slurm-generic submit option.",
     )
 
     project_name: Optional[str] = Field(
