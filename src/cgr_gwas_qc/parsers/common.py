@@ -17,7 +17,6 @@ class CgrFile(ABC):
     endchar: Optional[str] = None
 
     def __init__(self, filename, mode="r"):
-
         if hasattr(filename, "readlines"):
             # Need for handling StringIO or file objects instead of just file paths.
             self.fileobj = filename

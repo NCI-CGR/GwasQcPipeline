@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-from dataclasses import dataclass, field
-from datetime import timedelta
-from typing import Set
+
+from dataclasses import dataclass  # , field
 
 from snakemake.utils import read_job_properties
 
+from cgr_gwas_qc import load_config
 from cgr_gwas_qc.cluster_profiles import (
     ClusterOptions,
     load_cluster_config,
@@ -14,14 +14,19 @@ from cgr_gwas_qc.cluster_profiles import (
     update_properties,
 )
 
+# from datetime import timedelta
+# from typing import Set
+
+
+cfg = load_config()
+queue = cfg.config.slurm_partition
+
 
 @dataclass
-class BiowulfOptions(ClusterOptions):
-    queue: Set[str] = field(default_factory=lambda: {"quick", "norm"})
+class SlurmOptions(ClusterOptions):
     log: str = "logs/{rulename}_{job_id}.%j"
 
     def __str__(self):
-        # See cgems_jobscript.sh for default sge options
         cmd = (
             "sbatch"
             " --partition={queue}"
@@ -30,15 +35,13 @@ class BiowulfOptions(ClusterOptions):
             " --mem={mem_gb:0.0f}gb"
             " --time={time}"
             " --output={log}"
+            " --parsable"
         )
-
-        if self.time > timedelta(hours=4):
-            self.queue.discard("quick")
 
         formatted_time = f"{self.time.days}-{self.time.seconds // 3600}"  # days-hours for slurm
 
         return cmd.format(
-            queue=",".join(self.queue),
+            queue=queue,
             mem_gb=self.mem_gb,
             time=formatted_time,
             threads=self.threads,
@@ -57,16 +60,16 @@ def main(jobscript=None):
     jobscript = jobscript or parse_jobscript()
     job_properties = read_job_properties(jobscript)
 
-    # Build cgems options
+    # Build slurm options
     update_properties(options, cluster_config, job_properties)
 
     if job_properties["type"] == "group":
         update_group_properties(options, cluster_config, job_properties, jobscript)
 
-    biowulf_options = BiowulfOptions.from_dict(options)
+    slurm_options = SlurmOptions.from_dict(options)
 
     # Submit job script
-    cmd = biowulf_options.command + [jobscript]
+    cmd = slurm_options.command + [jobscript]
     print(submit_job(cmd))
 
 

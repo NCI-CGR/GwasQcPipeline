@@ -23,12 +23,14 @@ def main(
     biowulf: bool = typer.Option(
         False, help="Run the workflow using the cli Biowulf cluster profile."
     ),
-    cluster_profile: Optional[Path] = typer.Option(
-        None,
-        help="Path to a custom cluster profile. See https://github.com/snakemake-profiles/doc.",
-    ),
     ccad2: bool = typer.Option(False, help="Run the workflow using the cli ccad2 cluster profile."),
-    cluster_profile2: Optional[Path] = typer.Option(
+    slurm: bool = typer.Option(
+        False,
+        help="Run the workflow using the generic slurm cluster profile. "
+        "This option requires that you specify the ``slurm_partition`` "
+        "in the ``config.yml`` file.",
+    ),
+    cluster_profile: Optional[Path] = typer.Option(
         None,
         help="Path to a custom cluster profile. See https://github.com/snakemake-profiles/doc.",
     ),
@@ -83,6 +85,7 @@ def main(
     The ``cgr submit`` command will create a submission script and submit it to the cluster.
     We will create an optimized submission script for users of CGEMs/CCAD, CCAD2 and Biowulf.
     For other systems you will need to provide a snakemake cluster profile to tell snakemake how use your system.
+    If you are submitting to a Slurm cluster, you can use the generic Slurm cluster profile we provide by including the ``--slurm`` option in your submit command.
 
     Users running on CGEMs/CCAD will typically run::
 
@@ -96,18 +99,26 @@ def main(
 
         cgr submit --ccad2
 
-    Users running on other systems will typically run::
+    Users running on other Slurm systems will typically run::
 
-        cgr submit --profile <path to custom cluster profile> --queue <name of the queue to submit main job> --submission-cmd <tool used for submit such as sbatch or qsub>
+        cgr submit --slurm
+
+    Users running with a custom cluster profile will typically run:
+
+    .. code-block:: none
+
+        cgr submit \\
+            --profile <path to custom cluster profile> \\
+            --queue <name of the queue to submit main job> \\
+            --submission-cmd <tool used for submit such as sbatch or qsub>
 
     .. note::
         Sometimes it may be useful to edit the submission script before submitting it to the cluster.
         In that case you can add the ``--dry-run`` option and edit the generated file in ``.snakemake/GwasQcPipeline_submission.sh``.
         You would then submit this script directly to your cluster (i.e., ``qsub .snakemake/GwasQcPipeline_submission.sh``).
-
     """
 
-    check_exclusive_options(cgems, biowulf, ccad2, cluster_profile)
+    check_exclusive_options(cgems, biowulf, ccad2, slurm, cluster_profile)
 
     payload = {
         "python_executable": sys.executable,
@@ -117,6 +128,7 @@ def main(
         "cgems": cgems,
         "biowulf": biowulf,
         "ccad2": ccad2,
+        "slurm": slurm,
         "time_hr": time_hr,
         "local_mem_mb": local_mem_mb,
         "local_tasks": local_tasks,
@@ -153,22 +165,42 @@ def main(
         payload["profile"] = get_profile("ccad2")
         payload["queue"] = queue or ("defq,defq" if time_hr <= 4 else "defq")
         submission_cmd = "sbatch"
+    elif slurm:
+        payload["profile"] = get_profile("slurm")
+        queue = cfg.config.slurm_partition
+        if queue is None:
+            raise ValueError(
+                """
+            \033[1;31mMissing required configuration key-value pair for slurm option\033[0m\n
+            The `--slurm` option requires the `slurm_partition`
+            key-value pair to be defined in your `config.yml` file.
+            This pair specifies the partition where your job will
+            run on the Slurm scheduler. The key is `slurm_partition`
+            and the value should be the name of the desired partition.
+            You can execute `sinfo` to see which partitions are available.
+            Add a line like this in your config.yml:\n
+                    \033[32mslurm_partition: <partition_name>\033[0m
+            """
+            )
+        payload["queue"] = queue
+        submission_cmd = "sbatch"
     else:
         payload["profile"] = check_custom_cluster_profile(cluster_profile, queue, submission_cmd)
         payload["queue"] = queue
 
     run_script = create_submission_script(payload)
+
     if not dry_run:
         job_id = sp.check_output([submission_cmd, run_script]).decode().strip()  # type: ignore
         print(f"Submitted {job_id}")
 
 
-def check_exclusive_options(cgems, biowulf, ccad2, cluster_profile):
-    if sum([cgems, biowulf, ccad2, (cluster_profile is not None)]) > 1:
+def check_exclusive_options(cgems, biowulf, ccad2, slurm, cluster_profile):
+    if sum([cgems, biowulf, ccad2, slurm, (cluster_profile is not None)]) > 1:
         typer.echo(
             "\n".join(
                 wrap(
-                    "Please only provide one of `--cgems`, `--biowulf`, `--ccad2, or `--cluster_profile`. "
+                    "Please only provide one of `--cgems`, `--biowulf`, `--ccad2, `--slurm`, or `--cluster_profile`. "
                     "Run `cgr submit --help` for more information.",
                     width=100,
                 )
@@ -209,6 +241,11 @@ def get_profile(cluster: str):
 
     if cluster == "ccad2":
         return (cgr_profiles / "ccad2").as_posix()
+
+    if cluster == "slurm":
+        return (cgr_profiles / "slurm_generic").as_posix()
+        # if queue is None:
+        #    raise ValueError("You must provide provide slurm_parition in the config.yml to use with `--slurm`.")
 
 
 def create_submission_script(payload) -> str:

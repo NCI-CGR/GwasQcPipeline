@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field
-
 import time
+
+from pydantic import BaseModel, Field
 
 # setting start time to define unique lim file name
 timestr = time.strftime("%Y%m%d%H%M%S")
