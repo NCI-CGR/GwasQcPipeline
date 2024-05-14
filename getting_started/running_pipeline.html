@@ -220,21 +220,25 @@ not want to create the production folder structure then you can use the
 <code class="docutils literal notranslate"><span class="pre">--cgems-dev</span></code> option instead of <code class="docutils literal notranslate"><span class="pre">--cgems</span></code>.</p>
 <p><strong>Other Users</strong></p>
 <p>Non-CGR users and CGR users on other systems will probably want to run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgr config -s &lt;path to lims manifest file or sample sheet&gt; --project-name &lt;my project name&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgr config \
+      --sample-sheet &lt;path to lims manifest file or sample sheet&gt; \
+      --project-name &lt;my_project_name&gt; \
+      [--slurm-partition &lt;partition_name&gt;]
 </pre></div>
 </div>
-<p>This will create the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file in the current working directory
-with place holders for reference files and user files.</p>
+<p>This will generate the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file in the current working directory,
+with placeholders for reference files and user files.
+Slurm users can include the <code class="docutils literal notranslate"><span class="pre">--slurm-partition</span></code> option to specify
+the name of the queue to which your jobs will be submitted.</p>
 <div class="admonition attention">
 <p class="admonition-title">Attention</p>
-<p>All uses should always open the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file and make any
-necessary changes. When you are happy then continue to <code class="docutils literal notranslate"><span class="pre">cgr</span>
-<span class="pre">pre-flight</span></code>.</p>
+<p>Always review and update <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> before each pipeline run.
+Then run <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code> to ensure proper configuration.</p>
 </aside>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The sample sheet must exist and be readable. We will raises an error if
-it is not.</p>
+<p>The sample sheet must exist and be readable.
+An error will be raised if it is not.</p>
 </aside>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cgr<span class="w"> </span>config<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </pre></div>
@@ -270,6 +274,12 @@ it is not.</p>
 <dt id="cmdoption-cgr-config-project-name">
 <code class="sig-name descname">--project-name</code><code class="sig-prename descclassname"> &lt;project_name&gt;</code><a class="headerlink" href="#cmdoption-cgr-config-project-name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The project name to use for this QC run.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-cgr-config-slurm-partition">
+<code class="sig-name descname">--slurm-partition</code><code class="sig-prename descclassname"> &lt;slurm_partition&gt;</code><a class="headerlink" href="#cmdoption-cgr-config-slurm-partition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the Slurm partition to which jobs will be submitted. This is required when running <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">submit</span> <span class="pre">--slurm</span></code>.</p>
 </dd></dl>
 
 <dl class="std option">
@@ -474,7 +484,7 @@ this by adding the <cite>-s</cite> option to your snakemake command:</p>
 </pre></div>
 </div>
 <p>In addition, we also add some snakemake options if you did not specify them.
-This is mostly for convenience.  Specifically, the we require the use of
+This is mostly for convenience.  Specifically, we require the use of
 <code class="docutils literal notranslate"><span class="pre">conda</span></code>, so we always will add <code class="docutils literal notranslate"><span class="pre">--use-conda</span></code>.  Second, in recent
 versions of snakemake they no longer default to <code class="docutils literal notranslate"><span class="pre">--cores</span> <span class="pre">1</span></code> and will throw
 an error if you did not specify a value.  We find this annoying, so we will
@@ -523,7 +533,8 @@ For external users will need to create your own <a class="reference external" hr
 <p>Submit the CGR GwasQcPipeline to a cluster for execution.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">submit</span></code> command will create a submission script and submit it to the cluster.
 We will create an optimized submission script for users of CGEMs/CCAD, CCAD2 and Biowulf.
-For other systems you will need to provide a snakemake cluster profile to tell snakemake how use your system.</p>
+For other systems you will need to provide a snakemake cluster profile to tell snakemake how use your system.
+If you are submitting to a Slurm cluster, you can use the generic Slurm cluster profile we provide by including the <code class="docutils literal notranslate"><span class="pre">--slurm</span></code> option in your submit command.</p>
 <p>Users running on CGEMs/CCAD will typically run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cgr</span> <span class="n">submit</span> <span class="o">--</span><span class="n">cgems</span>
 </pre></div>
@@ -536,8 +547,15 @@ For other systems you will need to provide a snakemake cluster profile to tell s
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cgr</span> <span class="n">submit</span> <span class="o">--</span><span class="n">ccad2</span>
 </pre></div>
 </div>
-<p>Users running on other systems will typically run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cgr</span> <span class="n">submit</span> <span class="o">--</span><span class="n">profile</span> <span class="o">&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">custom</span> <span class="n">cluster</span> <span class="n">profile</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">queue</span> <span class="o">&lt;</span><span class="n">name</span> <span class="n">of</span> <span class="n">the</span> <span class="n">queue</span> <span class="n">to</span> <span class="n">submit</span> <span class="n">main</span> <span class="n">job</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">submission</span><span class="o">-</span><span class="n">cmd</span> <span class="o">&lt;</span><span class="n">tool</span> <span class="n">used</span> <span class="k">for</span> <span class="n">submit</span> <span class="n">such</span> <span class="k">as</span> <span class="n">sbatch</span> <span class="ow">or</span> <span class="n">qsub</span><span class="o">&gt;</span>
+<p>Users running on other Slurm systems will typically run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cgr</span> <span class="n">submit</span> <span class="o">--</span><span class="n">slurm</span>
+</pre></div>
+</div>
+<p>Users running with a custom cluster profile will typically run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cgr submit \
+    --profile &lt;path to custom cluster profile&gt; \
+    --queue &lt;name of the queue to submit main job&gt; \
+    --submission-cmd &lt;tool used for submit such as sbatch or qsub&gt;
 </pre></div>
 </div>
 <div class="admonition note">
@@ -573,12 +591,6 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 </dd></dl>
 
 <dl class="std option">
-<dt id="cmdoption-cgr-submit-cluster-profile">
-<code class="sig-name descname">--cluster-profile</code><code class="sig-prename descclassname"> &lt;cluster_profile&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-cluster-profile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Path to a custom cluster profile. See <a class="reference external" href="https://github.com/snakemake-profiles/doc">https://github.com/snakemake-profiles/doc</a>.</p>
-</dd></dl>
-
-<dl class="std option">
 <dt id="cmdoption-cgr-submit-ccad2">
 <span id="cmdoption-cgr-submit-no-ccad2"></span><code class="sig-name descname">--ccad2</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--no-ccad2</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-ccad2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the workflow using the cli ccad2 cluster profile.</p>
@@ -590,8 +602,19 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 </dd></dl>
 
 <dl class="std option">
-<dt id="cmdoption-cgr-submit-cluster-profile2">
-<code class="sig-name descname">--cluster-profile2</code><code class="sig-prename descclassname"> &lt;cluster_profile2&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-cluster-profile2" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-cgr-submit-slurm">
+<span id="cmdoption-cgr-submit-no-slurm"></span><code class="sig-name descname">--slurm</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--no-slurm</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-cgr-submit-slurm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the workflow using the generic slurm cluster profile. This option requires that you specify the <code class="docutils literal notranslate"><span class="pre">slurm_partition</span></code> in the <code class="docutils literal notranslate"><span class="pre">config.yml</span></code> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-cgr-submit-cluster-profile">
+<code class="sig-name descname">--cluster-profile</code><code class="sig-prename descclassname"> &lt;cluster_profile&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-cluster-profile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Path to a custom cluster profile. See <a class="reference external" href="https://github.com/snakemake-profiles/doc">https://github.com/snakemake-profiles/doc</a>.</p>
 </dd></dl>
 
@@ -677,7 +700,7 @@ You would then submit this script directly to your cluster (i.e., <code class="d
 <p class="admonition-title">Attention</p>
 <p><strong>Biowulf users</strong>.
 You may need to adjust <code class="docutils literal notranslate"><span class="pre">--time-hr</span></code>, <code class="docutils literal notranslate"><span class="pre">--local_mem_mb</span></code>, and <code class="docutils literal notranslate"><span class="pre">--local_tasks</span></code>
-if you main job is getting killed by the cluster because of resource limits.</p>
+if your main job is getting killed by the cluster because of resource limits.</p>
 </aside>
 <p>The submission script will create a log file <code class="docutils literal notranslate"><span class="pre">./gwas_qc_log.$JOB_ID</span></code> that will have the status of your cluster submission.
 Logs for each submitted job can be found in <code class="docutils literal notranslate"><span class="pre">./logs/</span></code>.</p>

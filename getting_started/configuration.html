@@ -239,6 +239,7 @@ I will walk through each section below and end this page with a full example.</p
 <tbody>
 <tr class="row-odd"><td colspan="3"><p><code class="docutils literal notranslate"><span class="pre">config.yml</span></code> data model.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pipeline_version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.0.0</span>
+<span class="nt">slurm_partition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">defq</span>
 <span class="nt">project_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SR0001-001_1_0000000</span>
 <span class="nt">sample_sheet</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/manifest/file/SR0001-001_1_AnalysisManifest_0000000.csv</span>
 <span class="nt">genome_build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hg37</span>
@@ -265,7 +266,7 @@ I will walk through each section below and end this page with a full example.</p
 </td>
 <td colspan="2"><p><em>Pipeline Version</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>The version of the GwasQcPipeline to use. If you want to use a different version you may just edit this value to match. However, it is suggested that you re-run the entire pipeline incases there are differences between version.</p></td>
+<tr class="row-odd"><td colspan="2"><p>The version of the GwasQcPipeline to use. If you want to use a different version you may just edit this value to match. However, it is suggested that you re-run the entire pipeline in case there are differences between version.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -274,128 +275,139 @@ I will walk through each section below and end this page with a full example.</p
 <td><p>v1.4.0</p></td>
 </tr>
 <tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>slurm_partition</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Slurm Partition</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Name of the Slurm partition to which jobs will be submitted when using the –slurm-generic submit option.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
 <li><p>project_name</p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Project Name</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>The title of the project to use during report generation.</p></td>
+<tr class="row-even"><td colspan="2"><p>The title of the project to use during report generation.</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<tr class="row-even"><td rowspan="4"><ul class="simple">
 <li><p><strong>sample_sheet</strong></p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Sample Sheet</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>The path to the sample sheet (or LIMs manifest). This is the file referenced during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> and used to generate <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.</p></td>
+<tr class="row-odd"><td colspan="2"><p>The path to the sample sheet (or LIMs manifest). This is the file referenced during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> and used to generate <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>type</p></td>
+<tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-even"><td><p>format</p></td>
+<tr class="row-odd"><td><p>format</p></td>
 <td><p>path</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>genome_build</p></li>
 </ul>
 </td>
 <td colspan="2"><p>The human genome build. This field is not actually used by the workflow. It is only used during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> to select the VCF file when running on CGEMs/CCAD.</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string; [hg37|hg38]</em></p></td>
 </tr>
-<tr class="row-odd"><td><p>default</p></td>
+<tr class="row-even"><td><p>default</p></td>
 <td><p>hg37</p></td>
 </tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
 <li><p>snp_array</p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Snp Array</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Which SNP array was used. Only used for reporting.</p></td>
+<tr class="row-even"><td colspan="2"><p>Which SNP array was used. Only used for reporting.</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p><strong>num_samples</strong></p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Num Samples</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>Number of samples, automatically calculated from the sample sheet during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code>.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Number of samples, automatically calculated from the sample sheet during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p>type</p></td>
+<tr class="row-even"><td><p>type</p></td>
 <td><p><em>integer</em></p></td>
 </tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
 <li><p><strong>num_snps</strong></p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Num Snps</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Number of markers, automatically calculated from the <code class="docutils literal notranslate"><span class="pre">reference_files.illumina_manifest_file</span></code>. We will attempt to calculate this during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> and <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code>.</p></td>
+<tr class="row-even"><td colspan="2"><p>Number of markers, automatically calculated from the <code class="docutils literal notranslate"><span class="pre">reference_files.illumina_manifest_file</span></code>. We will attempt to calculate this during <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">config</span></code> and <code class="docutils literal notranslate"><span class="pre">cgr</span> <span class="pre">pre-flight</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><p>type</p></td>
+<tr class="row-odd"><td><p>type</p></td>
 <td><p><em>integer</em></p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p><strong>reference_files</strong></p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Reference Files</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>Reference file namespace. Reference files include the Illumina provided BPM and the 1000 Genomes VCF.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Reference file namespace. Reference files include the Illumina provided BPM and the 1000 Genomes VCF.</p></td>
 </tr>
-<tr class="row-odd"><td><p>type</p></td>
+<tr class="row-even"><td><p>type</p></td>
 <td><p><em>namespace</em></p></td>
 </tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
 <li><p><strong>user_files</strong></p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>User Files</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>User file namespace. User files include the user provided genotype data in IDAT/GTC, PED/MAP, or BED/BIM/FAM formats.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>namespace</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
-<li><p><strong>software_params</strong></p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Software Params</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Software parameter namespace. This includes all parameters passed to 3rd party and internal software and scripts.</p></td>
+<tr class="row-even"><td colspan="2"><p>User file namespace. User files include the user provided genotype data in IDAT/GTC, PED/MAP, or BED/BIM/FAM formats.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>namespace</em></p></td>
 </tr>
 <tr class="row-even"><td rowspan="3"><ul class="simple">
-<li><p><strong>workflow_params</strong></p></li>
+<li><p><strong>software_params</strong></p></li>
 </ul>
 </td>
-<td colspan="2"><p><em>Workflow Params</em></p></td>
+<td colspan="2"><p><em>Software Params</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Workflow parameter namespace. This includes all parameters used to control workflow behavior.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Software parameter namespace. This includes all parameters passed to 3rd party and internal software and scripts.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>namespace</em></p></td>
 </tr>
 <tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p><strong>workflow_params</strong></p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Workflow Params</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Workflow parameter namespace. This includes all parameters used to control workflow behavior.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>namespace</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>Sample_IDs_to_remove</p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Sample Ids To Remove</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>A list of Sample_IDs to exclude from QC. This is the easiest way for a user to exclude specific samples from the GwasQcPipeline. These samples will be flagged as <code class="docutils literal notranslate"><span class="pre">is_user_exclusion</span></code> and will be present in the report, but they will have not have any results from this analysis.</p></td>
+<tr class="row-odd"><td colspan="2"><p>A list of Sample_IDs to exclude from QC. This is the easiest way for a user to exclude specific samples from the GwasQcPipeline. These samples will be flagged as <code class="docutils literal notranslate"><span class="pre">is_user_exclusion</span></code> and will be present in the report, but they will have not have any results from this analysis.</p></td>
 </tr>
-<tr class="row-odd"><td><p>type</p></td>
+<tr class="row-even"><td><p>type</p></td>
 <td><p><em>list of strings</em></p></td>
 </tr>
 </tbody>
@@ -1202,7 +1214,7 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
-<td><p>20240423141035</p></td>
+<td><p>20240514154816</p></td>
 </tr>
 </tbody>
 </table>
@@ -1243,7 +1255,7 @@ These samples will be indicated as <code class="docutils literal notranslate"><s
 <span class="w">   </span><span class="nt">ld_prune_r2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
 <span class="w">   </span><span class="nt">maf_for_ibd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
 <span class="w">   </span><span class="nt">maf_for_hwe</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
-<span class="w">   </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+<span class="w">   </span><span class="nt">ibd_pi_hat_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.12</span>
 <span class="w">   </span><span class="nt">ibd_pi_hat_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
 <span class="w">   </span><span class="nt">dup_concordance_cutoff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.95</span>
 <span class="w">   </span><span class="nt">intensity_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6000</span>
