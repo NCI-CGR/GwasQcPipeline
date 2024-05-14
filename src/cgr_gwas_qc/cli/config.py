@@ -97,7 +97,7 @@ def main(
 
         $ cgr config \\
               --sample-sheet <path to lims manifest file or sample sheet> \\
-              --project-name <my project name> \\
+              --project-name <my_project_name> \\
               [--slurm-partition <partition_name>]
 
     This will generate the ``config.yml`` file in the current working directory,
