@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cgr_gwas_qc"
-version = "1.4.1"
+version = "1.5.0"
 description = "The CGR GWAS QC Pipeline"
 authors = [
     "Justin Fear <justin.fear@nih.gov>",
