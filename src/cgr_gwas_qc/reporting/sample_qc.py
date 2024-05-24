@@ -27,7 +27,6 @@ class SampleQC:
         call_rate_png: Path,
         ancestry_png: Path,
     ) -> "SampleQC":
-
         return cls(
             ArrayProcessing.construct(sample_sheet),
             CompletionRate.construct(snp_qc, sample_qc, call_rate_png),
@@ -206,7 +205,6 @@ class SampleSummary:
 
 @dataclass
 class Ancestry:
-
     table: str
     png: str
 
@@ -216,6 +214,12 @@ class Ancestry:
 
     @staticmethod
     def _build_table(sample_qc: pd.DataFrame) -> str:
+        # Issue 281: Ensure unknown ancestry captured in table 3
+
+        # Add 'Unknown' to the categories and full blanks with "Unknown"
+        sample_qc["Ancestry"] = sample_qc["Ancestry"].cat.add_categories(["Other"])
+        sample_qc["Ancestry"] = sample_qc["Ancestry"].fillna("Other")
+
         return (
             sample_qc.query("is_subject_representative")
             .groupby("Ancestry")
