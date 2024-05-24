@@ -214,9 +214,9 @@ class Ancestry:
 
     @staticmethod
     def _build_table(sample_qc: pd.DataFrame) -> str:
-        # Issue 281: Ensure unknown ancestry captured in table 3
+        # Issue 281: Ensure 'Other' ancestry output from graf-pop captured in table 3
 
-        # Add 'Unknown' to the categories and full blanks with "Unknown"
+        # Add 'Other' to the categories and full blanks with "Other"
         sample_qc["Ancestry"] = sample_qc["Ancestry"].cat.add_categories(["Other"])
         sample_qc["Ancestry"] = sample_qc["Ancestry"].fillna("Other")
 
