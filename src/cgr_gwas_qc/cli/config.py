@@ -153,6 +153,7 @@ def initialize_config(
             illumina_manifest_file=bpm_file,
             thousand_genome_vcf="/path/to/thousand/genome/vcf.gz",
             thousand_genome_tbi="/path/to/thousand/genome/vcf.gz.tbi",
+            reference_fasta="",
         ),
         user_files=UserFiles(
             output_pattern="{prefix}/{file_type}.{ext}",
@@ -206,7 +207,7 @@ def _add_project_name(cfg: Config):
 
 def _sample_sheet_name_to_project_name(stem: str):
     """Convert a CGEMs sample sheet name to the project name."""
-    if (m := re.match(r"(?P<prefix>.*)_AnalysisManifest_(?P<suffix>.*)", stem)) :
+    if m := re.match(r"(?P<prefix>.*)_AnalysisManifest_(?P<suffix>.*)", stem):
         return "_".join(m.groups())
     return f"GwasQcPipeline_{TODAY}"
 

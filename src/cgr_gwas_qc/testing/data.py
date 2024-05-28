@@ -78,6 +78,7 @@ class DataRepo(ABC):
     _subject_id_column: str  # The column containing subject information
     _expected_sex_column: str  # The column containing sex information
     _case_control_column: str  # The column containing Case/Control information
+    _reference_fasta: str  # fasta reference file for GCT to VCF
 
     def __init__(self, working_dir: Optional[Path] = None):
         self.working_dir = working_dir
@@ -95,6 +96,7 @@ class DataRepo(ABC):
             illumina_manifest_file=(self / self._illumina_manifest_file).resolve(),
             thousand_genome_vcf=(self / self._thousand_genome_vcf).resolve(),
             thousand_genome_tbi=(self / self._thousand_genome_tbi).resolve(),
+            reference_fasta=(self / self._reference_fasta).resolve(),
         ).dict()
 
         self._config["user_files"] = UserFiles().dict()
@@ -322,6 +324,7 @@ class FakeData(DataRepo):
     _illumina_manifest_file = "illumina/bpm/small_manifest.bpm"
     _thousand_genome_vcf = "1KG/small_1KG.vcf.gz"
     _thousand_genome_tbi = "1KG/small_1KG.vcf.gz.tbi"
+    _reference_fasta = ""
 
     _gtc_pattern = "{Sample_ID}.gtc"
     _idat_red_pattern = "{SentrixBarcode_A}_{SentrixPosition_A}_Red.idat"

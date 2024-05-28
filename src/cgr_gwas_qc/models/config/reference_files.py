@@ -28,6 +28,10 @@ class ReferenceFiles(BaseModel):
         ..., description="Path to the corresponding index for the 1000 Genomes VCF file."
     )
 
+    reference_fasta: Path = Field(
+        ..., description="Path to Reference fasta file to be used to convert gtc to vcf"
+    )
+
     @staticmethod
     def schema_rst():
         """Tweak schema for rendering in Sphinx."""
