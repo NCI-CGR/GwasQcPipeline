@@ -1,0 +1,5 @@
+name: bcftools-gtc2vcf-plugin
+channels:
+  - https://raw.githubusercontent.com/NCI-CGR/conda-cgr/default/conda-cgr
+dependencies:
+  - bcftools-gtc2vcf-plugin
