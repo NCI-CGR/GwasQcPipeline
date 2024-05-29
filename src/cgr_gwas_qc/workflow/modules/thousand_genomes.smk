@@ -21,7 +21,7 @@ rule pull_b_allele_freq_from_1kg:
         population=cfg.config.software_params.contam_population,
     output:
         abf_file="sample_level/{}.{}.abf.txt".format(
-            cfg.config.reference_files.illumina_manifest_file.stem,
+            cfg.config.snp_array,
             cfg.config.software_params.contam_population,
         ),
     script:
