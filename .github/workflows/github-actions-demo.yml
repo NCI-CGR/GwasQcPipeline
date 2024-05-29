@@ -15,4 +15,5 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
+      - run: echo ${GITHUB_REF} vs ${GITHUB_REF##*/} vs ${GITHUB_REF_NAME}
       - run: echo "🍏 This job's status is ${{ job.status }}."
