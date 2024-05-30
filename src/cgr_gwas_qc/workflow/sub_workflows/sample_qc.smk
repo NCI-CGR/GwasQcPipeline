@@ -65,13 +65,16 @@ module thousand_genomes:
     config:
         {}
 
+
 module plink:
     snakefile:
         cfg.modules("plink")
 
+
 module graf:
     snakefile:
         cfg.modules("graf_v2.4")
+
 
 module grafpop:
     snakefile:
@@ -319,7 +322,6 @@ rule sample_concordance_plink:
     resources:
         mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
-
     script:
         "../scripts/concordance_table.py"
 
@@ -388,7 +390,6 @@ rule sample_concordance_summary:
     resources:
         mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
-
     script:
         "../scripts/sample_concordance.py"
 
@@ -413,11 +414,10 @@ use rule grafpop_populations from grafpop as graf_populations with:
         bed=rules.snp_call_rate_filter_2.output.bed,
         bim=rules.snp_call_rate_filter_2.output.bim,
         fam=rules.snp_call_rate_filter_2.output.fam,
-	#bed="sample_level/call_rate_2/samples.bed",
-        #bim="sample_level/call_rate_2/samples.bim",
-        #fam="sample_level/call_rate_2/samples.fam", 
     output:
         "sample_level/ancestry/grafpop_populations.txt",
+    resources:
+        mem_mb=lambda wc, attempt, input: max( (attempt+1)* input.size_mb, 1000)
     log:
         "sample_level/ancestry/grafpop_populations.log",
 
@@ -454,6 +454,7 @@ rule snp_qc_table:
 sex_chr_included = cfg.config.workflow_params.sex_chr_included
 if sex_chr_included:
     print("sex_chr_included ", sex_chr_included)
+
     use rule sexcheck from plink as sample_level_sexcheck with:
         input:
             bed=rules.snp_call_rate_filter_1.output.bed,
@@ -463,8 +464,10 @@ if sex_chr_included:
             out_prefix="sample_level/call_rate_1/samples",
         output:
             "sample_level/call_rate_1/samples.sexcheck",
+
 else:
     print("sex_chr_included ", sex_chr_included)
+
     rule sample_level_sexcheck:
         input:
             bed=rules.snp_call_rate_filter_1.output.bed,
@@ -477,6 +480,7 @@ else:
             touch sample_level/call_rate_1/samples.sexcheck
             echo "FID IID PEDSEX SNPSEX STATUS F" >> sample_level/call_rate_1/samples.sexcheck
             """
+
 
 def _contam(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
