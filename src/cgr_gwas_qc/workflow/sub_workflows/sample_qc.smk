@@ -344,6 +344,8 @@ use rule relatedness from graf as sample_concordance_graf with:
         rules.graf_extract_fingerprint_snps.output[0],
     output:
         "sample_level/concordance/graf.tsv",
+    resources:
+        mem_mb=lambda wc, attempt, input: max( (attempt+1)* input.size_mb, 1000),
     log:
         "sample_level/concordance/graf.log",
 
