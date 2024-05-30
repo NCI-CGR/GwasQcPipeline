@@ -48,6 +48,7 @@ targets = [
     "subject_level/subjects.fam",
     "subject_level/concordance.csv",
     "subject_level/population_qc.csv",
+    "subject_level/gwas.txt",
     "subject_level/.population_plots.done",
     "subject_level/.control_plots.done",
     "delivery/gwas.assoc",
@@ -536,6 +537,7 @@ rule agg_population_qc_tables:
         population_qc_tables=_population_qc_tables,
     output:
         "subject_level/population_qc.csv",
+        "subject_level/gwas.txt",
     script:
         "../scripts/agg_population_qc_tables.py"
 
