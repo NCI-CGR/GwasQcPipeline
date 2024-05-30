@@ -47,7 +47,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag_name="${GITHUB_REF##*/}"
-          hub release edit $(find ./dist/ -type f -printf "-a %p ") -m "" "$tag_name"
+          gh release upload $tag_name $(find ./dist/ -type f -printf "%p ")
 
       - name: Build Docs  # Need to update install directions to use new release
         run: |
