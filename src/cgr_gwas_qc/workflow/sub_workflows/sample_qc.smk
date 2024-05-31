@@ -2,7 +2,6 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
-PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
 BIG_TIME = {1: 10, 2: 48, 3: 96}
 
 
@@ -320,7 +319,7 @@ rule sample_concordance_plink:
     output:
         "sample_level/concordance/plink.csv",
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     script:
         "../scripts/concordance_table.py"
@@ -369,7 +368,7 @@ rule sample_concordance_king:
         "sample_level/concordance/king.log",
     threads: 8
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     shell:
         # king does not always output all files so touch for snakemake
@@ -390,7 +389,7 @@ rule sample_concordance_summary:
     output:
         "sample_level/concordance/summary.csv",
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     script:
         "../scripts/sample_concordance.py"
