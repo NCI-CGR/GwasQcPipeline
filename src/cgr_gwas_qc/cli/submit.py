@@ -27,8 +27,8 @@ def main(
     slurm: bool = typer.Option(
         False,
         help="Run the workflow using the generic slurm cluster profile. "
-        "This option requires that you specify the ``slurm_partition`` "
-        "in the ``config.yml`` file.",
+        "This option requires that you specify the `slurm_partition` "
+        "in the `config.yml` file.",
     ),
     cluster_profile: Optional[Path] = typer.Option(
         None,
@@ -40,52 +40,52 @@ def main(
     time_hr: int = typer.Option(
         120,
         help="The walltime limit (in hours) for the main snakemake process. "
-        "Ignored if using ``--cgems``.",
+        "Ignored if using `--cgems`.",
     ),
     queue: Optional[str] = typer.Option(
         None,
         help="Name of the queue for the main process to use. "
-        "This option is required if you are using ``--cluster-profile``. "
+        "This option is required if you are using `--cluster-profile`. "
         "CGEMs/CCAD, CCAD2, and Biowulf users may want to use this to override which queue to use for the main process.",
     ),
     submission_cmd: Optional[str] = typer.Option(
         None,
         help="Name of the command to use for submission (i.e., qsub, sbatch). "
-        "This is required if you are using ``--cluster-profile``. "
-        "Ignored if using ``--cgems`` or ``--biowulf`` or ``--ccad2``.",
+        "This is required if you are using `--cluster-profile`. "
+        "Ignored if using `--cgems` or `--biowulf` or `--ccad2`.",
     ),
     dry_run: bool = typer.Option(
         False,
         help="Create the submission script but do not send to the schedular. "
-        "The generate submission script is in ``.snakemake/GwasQcPipeline_submission.sh``. "
+        "The generate submission script is in `.snakemake/GwasQcPipeline_submission.sh`. "
         "This file can be edited and submitted directly to the cluster.",
     ),
     notemp: bool = typer.Option(
         False,
         help="Do not delete temporary files. "
-        "This option runs the workflow using ``snakemake --notemp``.",
+        "This option runs the workflow using `snakemake --notemp`.",
     ),
     local_mem_mb: int = typer.Option(
         8000,
         help="The amount of memory to use for main snakemake process and local rules [default 8GB]. "
         "There are a number of rules that are run along side of the main snakemake process instead of submitting a new job. "
         "If you have a very large project >50k samples, you may want to increase the amount of memory used for this job. "
-        "Ignored if using ``--cgems``.",
+        "Ignored if using `--cgems`.",
     ),
     local_tasks: int = typer.Option(
         4,
         help="The number of threads for the main snakemake process and local rules."
         "There are a number of rules that are run along side of the main snakemake process instead of submitting a new job. "
         "If you have a very large project >50k samples, you may want to increase the number of CPUs used for this job. "
-        "Ignored if using ``--cgems``.",
+        "Ignored if using `--cgems`.",
     ),
 ):
     """Submit the CGR GwasQcPipeline to a cluster for execution.
 
-    The ``cgr submit`` command will create a submission script and submit it to the cluster.
+    The `cgr submit` command will create a submission script and submit it to the cluster.
     We will create an optimized submission script for users of CGEMs/CCAD, CCAD2 and Biowulf.
     For other systems you will need to provide a snakemake cluster profile to tell snakemake how use your system.
-    If you are submitting to a Slurm cluster, you can use the generic Slurm cluster profile we provide by including the ``--slurm`` option in your submit command.
+    If you are submitting to a Slurm cluster, you can use the generic Slurm cluster profile we provide by including the `--slurm` option in your submit command.
 
     Users running on CGEMs/CCAD will typically run::
 
@@ -114,8 +114,8 @@ def main(
 
     .. note::
         Sometimes it may be useful to edit the submission script before submitting it to the cluster.
-        In that case you can add the ``--dry-run`` option and edit the generated file in ``.snakemake/GwasQcPipeline_submission.sh``.
-        You would then submit this script directly to your cluster (i.e., ``qsub .snakemake/GwasQcPipeline_submission.sh``).
+        In that case you can add the `--dry-run` option and edit the generated file in `.snakemake/GwasQcPipeline_submission.sh`.
+        You would then submit this script directly to your cluster (i.e., `qsub .snakemake/GwasQcPipeline_submission.sh`).
     """
 
     check_exclusive_options(cgems, biowulf, ccad2, slurm, cluster_profile)
