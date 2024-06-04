@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.8
 
@@ -27,27 +27,18 @@ jobs:
       - name: Build project
         id: poetry
         run: |
-          poetry version ${GITHUB_REF##*/}
+          poetry version ${GITHUB_REF_NAME}
           poetry build
-          echo "::set-output name=whl_loc::$(find dist -type f -name *.whl)"
+          echo "whl_loc=$(find dist -type f -name *.whl)" >> $GITHUB_OUTPUT
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create and Upload Release Asset to GitHub
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset to GitHub
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag_name="${GITHUB_REF##*/}"
-          hub release edit $(find ./dist/ -type f -printf "-a %p ") -m "" "$tag_name"
+            allowUpdates: true
+            artifacts: "./dist/*"
+            draft: true
+            generateReleaseNotes: true
+            prerelease: true
 
       - name: Build Docs  # Need to update install directions to use new release
         run: |
