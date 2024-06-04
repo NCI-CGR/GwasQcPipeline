@@ -2,8 +2,7 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
-PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
-BIG_TIME = {1: 8, 2: 24, 3: 48}
+BIG_TIME = {1: 10, 2: 48, 3: 96}
 
 
 use_contamination = (
@@ -320,7 +319,7 @@ rule sample_concordance_plink:
     output:
         "sample_level/concordance/plink.csv",
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     script:
         "../scripts/concordance_table.py"
@@ -369,8 +368,8 @@ rule sample_concordance_king:
         "sample_level/concordance/king.log",
     threads: 8
     resources:
-        mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
-        time_hr=lambda wildcards, attempt: 2 * attempt,
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     shell:
         # king does not always output all files so touch for snakemake
         "king -b {input.bed} --related --degree 3 --prefix {params.out_prefix} --cpu {threads} > {log} 2>&1 "
@@ -390,7 +389,7 @@ rule sample_concordance_summary:
     output:
         "sample_level/concordance/summary.csv",
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     script:
         "../scripts/sample_concordance.py"
