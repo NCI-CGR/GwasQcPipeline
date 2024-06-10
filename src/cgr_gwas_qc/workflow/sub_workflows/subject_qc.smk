@@ -866,7 +866,7 @@ def _control_plots(wildcards):
     if not populations:
         return []
 
-    return expand(rules.plot_hwe.output, population=populations)
+    return expand(rules.plot_hwe.output[0], population=populations)
 
 
 rule agg_control_plots:
