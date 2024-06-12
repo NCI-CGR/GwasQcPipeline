@@ -606,7 +606,7 @@ checkpoint population_controls_checkpoint:
     output:
         directory("subject_level/controls"),
     run:
-        # issue 221
+        # issue 221 and 295 fix
         populations1 = (
             subject_qc_table.read(input[0])
             .query("case_control == 'Control'")
@@ -618,22 +618,14 @@ checkpoint population_controls_checkpoint:
         print(populations1)
         populations2 = (
             subject_qc_table.read(input[0])
-            .query("case_control == 'Case'")
+            .query("case_control == 'Case' or case_control == 'Control'")
             .groupby("Ancestry")
             .size()
             .pipe(lambda x: x[x >= params.min_num_subjects])
             .index.tolist()
         )
         print(populations2)
-        populations3 = (
-            subject_qc_table.read(input[0])
-            .query("case_control == 'Unknown'")
-            .groupby("Ancestry")
-            .size()
-            .pipe(lambda x: x[x >= params.min_num_subjects])
-            .index.tolist()
-        )
-        print(populations3)
+
         populations = populations1 + populations2
         populations = list(set(populations))
         print(populations)
