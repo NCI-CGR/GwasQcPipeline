@@ -5,6 +5,7 @@ from more_itertools import flatten
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.workflow.scripts import subject_qc_table
 import shutil
+import math
 
 cfg = load_config()
 
@@ -654,11 +655,12 @@ def _get_controls(wildcards):
     ]
 
 
-rule population_controls_Subject_IDs:
+checkpoint population_controls_Subject_IDs:
     input:
         rules.subject_qc_table.output[0],
     output:
         "subject_level/{population}/controls.txt",
+        "subject_level/{population}/hwe_maf_thres.txt",
     params:
         "subject_level/{population}/test_controls.txt",
         "subject_level/{population}/test_case.txt",
@@ -722,6 +724,15 @@ rule population_controls_Subject_IDs:
                 "threshold, using control and case samples for HWE",
             )
             shutil.copyfile(params[2], output[0])
+            with open(output[1], "w") as f:
+                f.write(
+                    str(
+                        round(
+                            min(cfg.config.software_params.maf_for_hwe, math.sqrt(5 / num_lines2)),
+                            2,
+                        )
+                    )
+                )
         else:
             print(
                 num_lines0,
@@ -730,6 +741,15 @@ rule population_controls_Subject_IDs:
                 "threshold for HWE",
             )
             shutil.copyfile(params[0], output[0])
+            with open(output[1], "w") as f:
+                f.write(
+                    str(
+                        round(
+                            min(cfg.config.software_params.maf_for_hwe, math.sqrt(5 / num_lines0)),
+                            2,
+                        )
+                    )
+                )
 
 
 use rule keep_ids from plink as pull_population_unrelated_controls with:
@@ -817,13 +837,21 @@ use rule hwe from plink as population_level_unrelated_controls_hwe with:
         "{population}_controls_filter"
 
 
+def compute_maf(wildcards):
+    with open(
+        checkpoints.population_controls_Subject_IDs.get(population=wildcards.population).output[1]
+    ) as f:
+        value = f.read().strip()
+    return expand(
+        rules.population_level_unrelated_controls_hwe.output[0],
+        maf=value,
+        allow_missing=True,
+    )
+
+
 rule plot_hwe:
     input:
-        expand(
-            rules.population_level_unrelated_controls_hwe.output[0],
-            maf=cfg.config.software_params.maf_for_hwe,
-            allow_missing=True,
-        ),
+        compute_maf,
     params:
         population="{population}",
     output:
