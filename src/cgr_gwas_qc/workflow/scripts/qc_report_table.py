@@ -72,7 +72,7 @@ _SAMPLE_QC_COLUMNS = [
     "IdatIntensity",
     "Expected Replicate",
     "Expected Replicate Discordance",
-    "is_unexpected_replicate",
+    "Unexpected Replicate",
     "Sex Discordant",
     "Expected_Sex",
     "Predicted_Sex",
@@ -112,7 +112,7 @@ _SAMPLE_CONCORDANCE_COLUMNS = [
     "Ancestry2",
     "Expected Replicate",
     "Expected Replicate Discordance",
-    "is_unexpected_replicate",
+    "Unexpected Replicate",
     "PLINK_PI_HAT",
     "PLINK_concordance",
     "PLINK_is_ge_pi_hat",
@@ -177,7 +177,7 @@ _SUBJECT_QC_COLUMNS = [
     "Group_By_Subject_ID",
     "Sample_ID",
     "Case/Control_Status",
-    "is_unexpected_replicate",
+    "Unexpected Replicate",
     "unexpected_replicate_ids",
     "Expected_Sex",
     "Predicted_Sex",
@@ -193,6 +193,7 @@ _SUBJECT_QC_COLUMNS = [
 def _subject_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame:
     ss = sample_sheet.read(sample_sheet_csv).rename(REPORT_NAME_MAPPER, axis=1)
     _additional_columns = [x for x in ss.columns if x not in _SUBJECT_QC_COLUMNS]
+
     return (
         subject_qc_table.read(sample_qc_csv)
         .rename(REPORT_NAME_MAPPER, axis=1)
