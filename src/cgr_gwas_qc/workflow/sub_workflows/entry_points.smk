@@ -89,10 +89,16 @@ if cfg.config.user_files.gtc_pattern:
             cfg.conda("bcftools-gtc2vcf-plugin")
         shell:
             "bcftools +gtc2vcf --gtcs {input.gtcs} --bpm {input.bpm} --fasta-ref {input.reference_fasta} --output {output.vcf} --use-gtc-sample-names"
-
-    rule vcf_to_bed:
+    rule filter_missing_allele_snps:
         input:
             vcf=rules.gtc_to_vcf.output.vcf,
+        output:
+            vcf="sample_level/samples_filtered.vcf",
+        shell:
+            "grep -vP '\t\.\t\.\t\.' {input.vcf} > {output.vcf}" 
+    rule vcf_to_bed:
+        input:
+            vcf=rules.filter_missing_allele_snps.output.vcf,
         params:
             out_prefix="sample_level/samples",
         output:
