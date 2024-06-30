@@ -86,13 +86,13 @@ module grafpop:
 # -------------------------------------------------------------------------------
 # Call Rate Filters
 # -------------------------------------------------------------------------------
-use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
+use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
     input:
         bed="sample_level/samples.bed",
         bim="sample_level/samples.bim",
         fam="sample_level/samples.fam",
     params:
-        mind=1 - cfg.config.software_params.sample_call_rate_1,
+        geno=1 - cfg.config.software_params.snp_call_rate_1,
         out_prefix="sample_level/call_rate_1/samples_p1",
     output:
         bed=temp("sample_level/call_rate_1/samples_p1.bed"),
@@ -103,13 +103,13 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
         "sample_level/call_rate_1/samples_p1.log",
 
 
-use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
+use rule sample_call_rate_filter from plink as sample_call_rate_filter_1 with:
     input:
-        bed=rules.sample_call_rate_filter_1.output.bed,
-        bim=rules.sample_call_rate_filter_1.output.bim,
-        fam=rules.sample_call_rate_filter_1.output.fam,
+        bed=rules.snp_call_rate_filter.output.bed,
+        bim=rules.snp_call_rate_filter.output.bim,
+        fam=rules.snp_call_rate_filter.output.fam,
     params:
-        geno=1 - cfg.config.software_params.snp_call_rate_1,
+        mind=1 - cfg.config.software_params.sample_call_rate_1,
         out_prefix="sample_level/call_rate_1/samples",
     output:
         bed="sample_level/call_rate_1/samples.bed",
@@ -120,13 +120,13 @@ use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
         "sample_level/call_rate_1/samples.log",
 
 
-use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
+use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
     input:
-        bed=rules.snp_call_rate_filter_1.output.bed,
-        bim=rules.snp_call_rate_filter_1.output.bim,
-        fam=rules.snp_call_rate_filter_1.output.fam,
+        bed=rules.sample_call_rate_filter_1.output.bed,
+        bim=rules.sample_call_rate_filter_1.output.bim,
+        fam=rules.sample_call_rate_filter_1.output.fam,
     params:
-        mind=1 - cfg.config.software_params.sample_call_rate_2,
+        geno=1 - cfg.config.software_params.snp_call_rate_2,
         out_prefix="sample_level/call_rate_2/samples_p1",
     output:
         bed=temp("sample_level/call_rate_2/samples_p1.bed"),
@@ -137,13 +137,13 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
         "sample_level/call_rate_2/samples_p1.log",
 
 
-use rule snp_call_rate_filter from plink as snp_call_rate_filter_2 with:
+use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
     input:
-        bed=rules.sample_call_rate_filter_2.output.bed,
-        bim=rules.sample_call_rate_filter_2.output.bim,
-        fam=rules.sample_call_rate_filter_2.output.fam,
+        bed=rules.snp_call_rate_filter_2.output.bed,
+        bim=rules.snp_call_rate_filter_2.output.bim,
+        fam=rules.snp_call_rate_filter_2.output.fam,
     params:
-        geno=1 - cfg.config.software_params.snp_call_rate_2,
+        mind=1 - cfg.config.software_params.sample_call_rate_2,
         out_prefix="sample_level/call_rate_2/samples",
     output:
         bed="sample_level/call_rate_2/samples.bed",
@@ -171,9 +171,9 @@ use rule miss from plink as plink_call_rate_initial with:
 
 use rule miss from plink as plink_call_rate_post1 with:
     input:
-        bed=rules.snp_call_rate_filter_1.output.bed,
-        bim=rules.snp_call_rate_filter_1.output.bim,
-        fam=rules.snp_call_rate_filter_1.output.fam,
+        bed=rules.sample_call_rate_filter_1.output.bed,
+        bim=rules.sample_call_rate_filter_1.output.bim,
+        fam=rules.sample_call_rate_filter_1.output.fam,
     params:
         out_prefix="sample_level/call_rate_1/samples",
     output:
@@ -183,9 +183,9 @@ use rule miss from plink as plink_call_rate_post1 with:
 
 use rule miss from plink as plink_call_rate_post2 with:
     input:
-        bed=rules.snp_call_rate_filter_2.output.bed,
-        bim=rules.snp_call_rate_filter_2.output.bim,
-        fam=rules.snp_call_rate_filter_2.output.fam,
+        bed=rules.sample_call_rate_filter_2.output.bed,
+        bim=rules.sample_call_rate_filter_2.output.bim,
+        fam=rules.sample_call_rate_filter_2.output.fam,
     params:
         out_prefix="sample_level/call_rate_2/samples",
     output:
@@ -226,9 +226,9 @@ if use_contamination:
 # -------------------------------------------------------------------------------
 use rule update_snps_to_1kg_rsID from thousand_genomes as update_samples_to_1kg_rsIDs with:
     input:
-        bed=rules.snp_call_rate_filter_2.output.bed,
-        bim=rules.snp_call_rate_filter_2.output.bim,
-        fam=rules.snp_call_rate_filter_2.output.fam,
+        bed=rules.sample_call_rate_filter_2.output.bed,
+        bim=rules.sample_call_rate_filter_2.output.bim,
+        fam=rules.sample_call_rate_filter_2.output.fam,
         vcf=cfg.config.reference_files.thousand_genome_vcf,
     output:
         bed="sample_level/call_rate_2/samples_1kg_rsID.bed",
@@ -242,9 +242,9 @@ use rule update_snps_to_1kg_rsID from thousand_genomes as update_samples_to_1kg_
 # -------------------------------------------------------------------------------
 use rule maf_filter from plink as sample_level_maf_filter with:
     input:
-        bed=rules.snp_call_rate_filter_2.output.bed,
-        bim=rules.snp_call_rate_filter_2.output.bim,
-        fam=rules.snp_call_rate_filter_2.output.fam,
+        bed=rules.sample_call_rate_filter_2.output.bed,
+        bim=rules.sample_call_rate_filter_2.output.bim,
+        fam=rules.sample_call_rate_filter_2.output.fam,
     params:
         maf="{maf}",
         out_prefix="sample_level/call_rate_2/samples_maf{maf}",
@@ -344,16 +344,16 @@ use rule relatedness from graf as sample_concordance_graf with:
     output:
         "sample_level/concordance/graf.tsv",
     resources:
-        mem_mb=lambda wc, attempt, input: max( (attempt+1)* input.size_mb, 1000),
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
     log:
         "sample_level/concordance/graf.log",
 
 
 rule sample_concordance_king:
     input:
-        bed=rules.snp_call_rate_filter_2.output.bed,
-        bim=rules.snp_call_rate_filter_2.output.bim,
-        fam=rules.snp_call_rate_filter_2.output.fam,
+        bed=rules.sample_call_rate_filter_2.output.bed,
+        bim=rules.sample_call_rate_filter_2.output.bim,
+        fam=rules.sample_call_rate_filter_2.output.fam,
     output:
         within_family="sample_level/concordance/king.kin",
         between_family="sample_level/concordance/king.kin0",
@@ -412,13 +412,13 @@ rule split_sample_concordance:
 # -------------------------------------------------------------------------------
 use rule grafpop_populations from grafpop as graf_populations with:
     input:
-        bed=rules.snp_call_rate_filter_2.output.bed,
-        bim=rules.snp_call_rate_filter_2.output.bim,
-        fam=rules.snp_call_rate_filter_2.output.fam,
+        bed=rules.sample_call_rate_filter_2.output.bed,
+        bim=rules.sample_call_rate_filter_2.output.bim,
+        fam=rules.sample_call_rate_filter_2.output.fam,
     output:
         "sample_level/ancestry/grafpop_populations.txt",
     resources:
-        mem_mb=lambda wc, attempt, input: max( (attempt+1)* input.size_mb, 1000)
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
     log:
         "sample_level/ancestry/grafpop_populations.log",
 
@@ -458,9 +458,9 @@ if sex_chr_included:
 
     use rule sexcheck from plink as sample_level_sexcheck with:
         input:
-            bed=rules.snp_call_rate_filter_1.output.bed,
-            bim=rules.snp_call_rate_filter_1.output.bim,
-            fam=rules.snp_call_rate_filter_1.output.fam,
+            bed=rules.sample_call_rate_filter_1.output.bed,
+            bim=rules.sample_call_rate_filter_1.output.bim,
+            fam=rules.sample_call_rate_filter_1.output.fam,
         params:
             out_prefix="sample_level/call_rate_1/samples",
         output:
