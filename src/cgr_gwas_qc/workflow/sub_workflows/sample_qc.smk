@@ -412,9 +412,9 @@ rule split_sample_concordance:
 # -------------------------------------------------------------------------------
 use rule grafpop_populations from grafpop as graf_populations with:
     input:
-        bed=rules.sample_call_rate_filter_2.output.bed,
-        bim=rules.sample_call_rate_filter_2.output.bim,
-        fam=rules.sample_call_rate_filter_2.output.fam,
+        bed=rules.update_samples_to_1kg_rsIDs.output.bed,
+        bim=rules.update_samples_to_1kg_rsIDs.output.bim,
+        fam=rules.update_samples_to_1kg_rsIDs.output.fam,
     output:
         "sample_level/ancestry/grafpop_populations.txt",
     resources:
