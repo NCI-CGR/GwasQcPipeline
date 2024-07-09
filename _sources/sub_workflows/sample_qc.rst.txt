@@ -41,7 +41,7 @@ Sample QC Sub-workflow
 .. figure:: ../static/sample_qc.*
    :name: fig-sample-qc-workflow
 
-   The sample-qc sub-workflow.
+   The sample QC sub-workflow.
    This runs all major QC checks at the sample level.
 
 

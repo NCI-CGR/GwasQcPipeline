@@ -342,9 +342,8 @@ We then plot a panel of pair-plots for the first size principal components.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">subject_level/&lt;population&gt;/controls_unrelated_maf{maf_for_hwe}_snps_autosomes.hwe</span></code></p></li>
 </ul>
 </div></blockquote>
-<p>Here we pull out only control subjects.
-We then calculate Hardy Weinberg Equilibrium.
-We use only controls, but cases may have SNPs that are out of HWE.</p>
+<p>Here we calculate Hardy Weinberg Equilibrium (HWE) and produce plots for all populations (from graf-pop) that have &gt;50 controls. Populations with &lt;50 controls but &gt; 50 cases + control are also run.</p>
+<p>MAF threshold for computing HWE is the minimum(software_params.maf_for_hwe, sqrt(5/n)) where n is the number of controls or cases + controls (if number of controls &lt; 50).</p>
 </section>
 </section>
 <section id="subject-qc-summary-tables">

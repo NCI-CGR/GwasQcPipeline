@@ -133,9 +133,9 @@ Hardy Weinberg
 
    - ``subject_level/<population>/controls_unrelated_maf{maf_for_hwe}_snps_autosomes.hwe``
 
-Here we pull out only control subjects.
-We then calculate Hardy Weinberg Equilibrium.
-We use only controls, but cases may have SNPs that are out of HWE.
+Here we calculate Hardy Weinberg Equilibrium (HWE) and produce plots for all populations (from graf-pop) that have >50 controls. Populations with <50 controls but > 50 cases + control are also run.
+
+MAF threshold for computing HWE is the minimum(software_params.maf_for_hwe, sqrt(5/n)) where n is the number of controls or cases + controls (if number of controls < 50).
 
 Subject QC Summary Tables
 -------------------------
