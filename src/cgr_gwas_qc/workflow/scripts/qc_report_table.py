@@ -56,7 +56,6 @@ _SAMPLE_QC_COLUMNS = [
     "Number Samples Per Subject",
     "Replicate IDs",
     "Sample Excluded from QC",
-    "IdatsInProjectDir",
     "Sample Used in Subject Analysis",
     "Subject Removed",
     # QC Results
