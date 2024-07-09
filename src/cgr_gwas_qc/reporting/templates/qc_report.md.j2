@@ -116,7 +116,7 @@ NOTE: Samples that fail the sex concordance check may be eligible for recovery e
 Next, we checked if two study subjects were taken from the same individual (i.e., biological replicates or tumor/normal sampling).
 We consider subjects with pairwise concordance (proportion IBS2) > {{ config.software_params.dup_concordance_cutoff | toPct | numFormat(0) }}%, for a set of LD-pruned SNPs, as replicates.
 In this project, we found {{ subject_qc.unexpected_replicates.num_unexpected_replicates | numFormat }} subjects that were unexpected replicates.
-See the "SUBJECT_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
+See the "SAMPLE_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
 
 NOTE: Subjects with unexpected replicates identified may be eligible for recovery efforts, including confirmation of concordance by STR profiling and confirmation of subject information with the investigator. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
 
@@ -130,7 +130,7 @@ A `PI_HAT` value > 0.2 is considered closely related (1st and 2nd degree).
 Using a combination of HGMR and AGMR, each pair is classified as duplicate or identical twin (ID), parent-offspring (PO), full siblings (FS), 2nd degree (D2), 3rd degree (D3), or unrelated (UN) individuals.
 [KING](https://people.virginia.edu/~wc9c/KING/) estimates pairwise kinship coefficients and assigns relationships ([described here](https://people.virginia.edu/~wc9c/KING/manual.html#WITHIN)) as duplicate or identical twin (ID), 1st degree (D1), 2nd degree (D2), 3rd degree (D3), and unrelated (UN) individuals.
 This global view of relatedness can help identify related subjects across populations.
-See the "SUBJECT_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
+See the "SAMPLE_CONCORDANCE" tab of "{{ excel_file_name }}" for more details.
 However, we also estimate relatedness and prune relatives on a per population basis (see below).
 
 ## Ancestry Assignment

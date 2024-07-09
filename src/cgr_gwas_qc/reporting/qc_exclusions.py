@@ -59,7 +59,7 @@ def _create_sample_exclusion_counts_table(df: pd.DataFrame) -> pd.DataFrame:
         "contam_pass_cr": "Contaminated",
         "internal_control_pass": "Internal QC Samples Removed",
         "samples_remaining": "Samples Remaining for Analysis",  # added below
-        "dropped_replicate": "Expected Duplicates Removed",  # added below
+        "dropped_replicate": "Expected Replicates Removed",  # added below
         "is_subject_representative": "Subjects Remaining",
     }
 
