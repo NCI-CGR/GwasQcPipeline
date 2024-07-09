@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 import pandas as pd
 import typer
@@ -28,7 +29,6 @@ def main(
     graf: Path,
     outfile: Path,
 ):
-
     with pd.ExcelWriter(outfile) as writer:
         _sample_qc(sample_sheet_csv, sample_qc_csv).to_excel(
             writer, sheet_name="SAMPLE_QC", index=False
@@ -83,14 +83,30 @@ _SAMPLE_QC_COLUMNS = [
 ]
 
 
+_PASS_FAIL_QC_COLUMNS: List[str] = [
+    "is_call_rate_filtered",
+    "is_contaminated",
+    "Expected Replicate Discordance",
+    "Unexpected Replicate",
+    "is_sex_discordant",
+]
+
+
+def _count_issues(sample_qc_csv: PathLike, qc_columns: List[str]) -> pd.DataFrame:
+    df = sample_qc_table.read(sample_qc_csv)
+    df["Count_of_QC_Issue"] = df[qc_columns].sum(axis=1)
+    return df
+
+
 def _sample_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame:
     ss = sample_sheet.read(sample_sheet_csv, remove_exclusions=False).rename(
         REPORT_NAME_MAPPER, axis=1
     )
     _additional_columns = [x for x in ss.columns if x not in _SAMPLE_QC_COLUMNS]
+
+    df = _count_issues(sample_qc_csv, _PASS_FAIL_QC_COLUMNS)
     return (
-        sample_qc_table.read(sample_qc_csv)
-        .rename(REPORT_NAME_MAPPER, axis=1)
+        df.rename(REPORT_NAME_MAPPER, axis=1)
         .merge(ss, on="Sample_ID", suffixes=["", "_DROP"], how="outer")
         .filter(regex="^(?!.*_DROP)")
         .reindex(_SAMPLE_QC_COLUMNS + _additional_columns, axis=1)
