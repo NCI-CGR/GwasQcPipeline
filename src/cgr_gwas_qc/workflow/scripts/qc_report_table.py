@@ -69,7 +69,6 @@ _SAMPLE_QC_COLUMNS = [
     "Contaminated",
     "Contamination_Rate",
     "IdatIntensity",
-    "Expected Replicate",
     "Expected Replicate Discordance",
     "Unexpected Replicate",
     "Sex Discordant",
