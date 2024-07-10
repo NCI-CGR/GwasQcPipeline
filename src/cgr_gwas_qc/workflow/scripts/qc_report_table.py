@@ -95,6 +95,7 @@ _PASS_FAIL_QC_COLUMNS: List[str] = [
 def _count_issues(sample_qc_csv: PathLike, qc_columns: List[str]) -> pd.DataFrame:
     df = sample_qc_table.read(sample_qc_csv)
     df["Count_of_QC_Issue"] = df[qc_columns].sum(axis=1)
+    df["Sample Pass QC"] = df["Count_of_QC_Issue"] == 0  # TRUE iif all pass_fail columns are true
     return df
 
 
