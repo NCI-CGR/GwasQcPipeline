@@ -56,6 +56,64 @@ rule plink_conda:
 ################################################################################
 # Workflow Rules
 ################################################################################
+"""Entry points into the QC workflow.
+
+This module contains all the different data entry points into the QC
+workflow. The most common case is a set of sample level GTC files provided by
+the user.
+
+All entry points should create:
+
+    - sample_level/samples.bed
+    - sample_level/samples.bim
+    - sample_level/samples.fam
+"""
+from cgr_gwas_qc import load_config
+from cgr_gwas_qc.parsers import sample_sheet
+
+cfg = load_config()
+
+
+################################################################################
+# Entry Points Targets
+################################################################################
+targets = [
+    "sample_level/samples.bed",
+    "sample_level/samples.bim",
+    "sample_level/samples.fam",
+]
+
+
+rule all_entry_points:
+    input:
+        targets,
+
+
+################################################################################
+# PHONY Rules
+################################################################################
+# NOTE: Because of job grouping it is cleaner to wrap the various CLI utilities in
+# their own python script. This makes using conda more complicated. Instead of
+# installing all of the python dependencies in each environment, I will just
+# pass the conda environment and activate it internal. However, we want to make
+# sure that snakemake creates the environments, so these PHONY rules will make
+# sure that the conda env exists.
+localrules:
+    plink_conda,
+
+
+rule plink_conda:
+    output:
+        temp(".plink_env_built"),
+    conda:
+        cfg.conda("plink2")
+    shell:
+        "touch {output[0]}"
+
+
+################################################################################
+# Workflow Rules
+################################################################################
 if cfg.config.user_files.gtc_pattern:
     ################################################################################
     # GTC To Plink
@@ -177,3 +235,40 @@ elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user
             "ln -s $(readlink -f {input.bed}) {output.bed} && "
             "ln -s $(readlink -f {input.bim}) {output.bim} && "
             "ln -s $(readlink -f {input.fam}) {output.fam}"
+
+elif cfg.config.user_files.bcf:
+
+    ################################################################################
+    # Aggregated BCF
+    ################################################################################
+    localrules:
+        convert_bcf_to_plink_bed,
+
+    rule convert_bcf_to_plink_bed:
+        """Converts BCF to plink BED file
+
+        Path to aggregated BCF file is expected in user_files in config. The expected
+        VCF should be created using BCFtools/gtc2vcf. The BCF will be converted to BED
+        file for processing.
+        """
+        input:
+            bcf=cfg.config.user_files.bcf,
+        params:
+            prefix="sample_level/samples",
+        output:
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+        log:
+            "sample_level/samples.log",
+        conda:
+            cfg.conda("plink2")
+        resources:
+            mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+        shell:
+            "plink "
+            "--allow-extra-chr 0 --keep-allele-order --double-id "
+            "--bcf {input.bcf} "
+            "--make-bed "
+            "--out {params.prefix} "
+            "--memory {resources.mem_mb}"

@@ -89,6 +89,12 @@ class UserFiles(BaseModel):
         description="The full path to an aggregated FAM file if the sample level GTC files are not available.",
     )
 
+    # BCF
+    bcf: Optional[Path] = Field(
+        None,
+        description="The full path to an aggregated BCF/VCF file perferably encoding the GenCall scores.",
+    )
+
     @validator("gtc_pattern")
     def validate_gtc_pattern(cls, v):
         if v is None:
