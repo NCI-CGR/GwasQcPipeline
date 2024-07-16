@@ -73,7 +73,8 @@ if cfg.config.user_files.bcf:
             agg_verifyidintensity,
 
         rule grouped_contamination:
-            """Converts a sample's GTC/BPM to an Illumina ADPC.BIN.
+            """Extracts normalized intensities and other metrics from an aggregated
+            VCF file and writes to Illumina ADPC.BIN per sample.
 
             This is the format required by ``verifyIDintensity``. The script also
             runs some sanity checks (intensities and normalized intensities > 0;
@@ -97,12 +98,11 @@ if cfg.config.user_files.bcf:
             """
             input:
                 sample_sheet_csv="cgr_sample_sheet.csv",
-                bpm_file=cfg.config.reference_files.illumina_manifest_file,
+                vcf_file=cfg.config.user_files.bcf,
                 abf_file=rules.pull_b_allele_freq_from_1kg.output.abf_file,
                 _=rules.verifyidintensity_conda.output[0],
             params:
                 grp="{grp}",
-                gtc_pattern=lambda _: cfg.config.user_files.gtc_pattern,
                 snps=cfg.config.num_snps,
                 conda_env=cfg.conda("verifyidintensity"),
                 notemp=config.get("notemp", False),
