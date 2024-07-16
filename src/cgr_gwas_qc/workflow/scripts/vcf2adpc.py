@@ -27,7 +27,7 @@ def main(
     vcf_file: Path = typer.Argument(
         ..., help="Path to a multisample VCF file with needed scores.", exists=True, readable=True
     ),
-    target_sample: str = typer.Argument(..., help="Sample name.", exists=True, readable=True),
+    target_sample: str = typer.Argument(..., help="Sample name."),
     outfile: Path = typer.Argument(
         ..., help="Path to output the adpc.bin file.", file_okay=True, writable=True
     ),
@@ -136,6 +136,7 @@ if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {}
         defaults.update({k: Path(v) for k, v in snakemake.input.items()})  # type: ignore # noqa
+        defaults.update({k: v for k, v in snakemake.params.items()})  # type: ignore # noqa
         defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
         main(**defaults)
     else:
