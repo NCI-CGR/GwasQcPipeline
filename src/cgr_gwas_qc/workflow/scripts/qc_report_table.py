@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 import pandas as pd
 import typer
@@ -28,7 +29,6 @@ def main(
     graf: Path,
     outfile: Path,
 ):
-
     with pd.ExcelWriter(outfile) as writer:
         _sample_qc(sample_sheet_csv, sample_qc_csv).to_excel(
             writer, sheet_name="SAMPLE_QC", index=False
@@ -56,7 +56,6 @@ _SAMPLE_QC_COLUMNS = [
     "Number Samples Per Subject",
     "Replicate IDs",
     "Sample Excluded from QC",
-    "IdatsInProjectDir",
     "Sample Used in Subject Analysis",
     "Subject Removed",
     # QC Results
@@ -70,9 +69,8 @@ _SAMPLE_QC_COLUMNS = [
     "Contaminated",
     "Contamination_Rate",
     "IdatIntensity",
-    "Expected Replicate",
     "Expected Replicate Discordance",
-    "is_unexpected_replicate",
+    "Unexpected Replicate",
     "Sex Discordant",
     "Expected_Sex",
     "Predicted_Sex",
@@ -85,14 +83,31 @@ _SAMPLE_QC_COLUMNS = [
 ]
 
 
+_PASS_FAIL_QC_COLUMNS: List[str] = [
+    "is_call_rate_filtered",
+    "is_contaminated",
+    "Expected Replicate Discordance",
+    "Unexpected Replicate",
+    "is_sex_discordant",
+]
+
+
+def _count_issues(sample_qc_csv: PathLike, qc_columns: List[str]) -> pd.DataFrame:
+    df = sample_qc_table.read(sample_qc_csv)
+    df["Count_of_QC_Issue"] = df[qc_columns].sum(axis=1)
+    df["Sample Pass QC"] = df["Count_of_QC_Issue"] == 0  # TRUE iif all pass_fail columns are true
+    return df
+
+
 def _sample_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame:
     ss = sample_sheet.read(sample_sheet_csv, remove_exclusions=False).rename(
         REPORT_NAME_MAPPER, axis=1
     )
     _additional_columns = [x for x in ss.columns if x not in _SAMPLE_QC_COLUMNS]
+
+    df = _count_issues(sample_qc_csv, _PASS_FAIL_QC_COLUMNS)
     return (
-        sample_qc_table.read(sample_qc_csv)
-        .rename(REPORT_NAME_MAPPER, axis=1)
+        df.rename(REPORT_NAME_MAPPER, axis=1)
         .merge(ss, on="Sample_ID", suffixes=["", "_DROP"], how="outer")
         .filter(regex="^(?!.*_DROP)")
         .reindex(_SAMPLE_QC_COLUMNS + _additional_columns, axis=1)
@@ -112,7 +127,7 @@ _SAMPLE_CONCORDANCE_COLUMNS = [
     "Ancestry2",
     "Expected Replicate",
     "Expected Replicate Discordance",
-    "is_unexpected_replicate",
+    "Unexpected Replicate",
     "PLINK_PI_HAT",
     "PLINK_concordance",
     "PLINK_is_ge_pi_hat",
@@ -177,7 +192,7 @@ _SUBJECT_QC_COLUMNS = [
     "Group_By_Subject_ID",
     "Sample_ID",
     "Case/Control_Status",
-    "is_unexpected_replicate",
+    "Unexpected Replicate",
     "unexpected_replicate_ids",
     "Expected_Sex",
     "Predicted_Sex",
@@ -190,11 +205,12 @@ _SUBJECT_QC_COLUMNS = [
 ]
 
 
-def _subject_qc(sample_sheet_csv: PathLike, sample_qc_csv: PathLike) -> pd.DataFrame:
+def _subject_qc(sample_sheet_csv: PathLike, subject_qc_csv: PathLike) -> pd.DataFrame:
     ss = sample_sheet.read(sample_sheet_csv).rename(REPORT_NAME_MAPPER, axis=1)
     _additional_columns = [x for x in ss.columns if x not in _SUBJECT_QC_COLUMNS]
+
     return (
-        subject_qc_table.read(sample_qc_csv)
+        subject_qc_table.read(subject_qc_csv)
         .rename(REPORT_NAME_MAPPER, axis=1)
         .merge(ss, on="Sample_ID", suffixes=["", "_DROP"])
         .filter(regex="^(?!.*_DROP)")

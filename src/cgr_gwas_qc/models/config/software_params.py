@@ -81,7 +81,7 @@ class SoftwareParams(BaseModel):
     )
     contam_population: str = Field(
         "AF",
-        description="While population from the 1000 Genomes project to use for B-allele frequencies during contamination testing ."
+        description="Which population from the 1000 Genomes project to use for B-allele frequencies during contamination testing. "
         "Can be one of {AF, EAS_AF, AMR_AF, AFR_AF, EUR_AF, SAS_AF}. "
         "``workflow/scripts/bpm2abf.py``",
     )

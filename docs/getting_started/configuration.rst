@@ -141,7 +141,7 @@ Full Example
       ld_prune_r2: 0.1
       maf_for_ibd: 0.2
       maf_for_hwe: 0.05
-      ibd_pi_hat_min: 0.05
+      ibd_pi_hat_min: 0.12
       ibd_pi_hat_max: 1.0
       dup_concordance_cutoff: 0.95
       intensity_threshold: 6000

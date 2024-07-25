@@ -34,6 +34,7 @@ References:
     - :mod:`cgr_gwas_qc.parsers.king`
     - :mod:`cgr_gwas_qc.parsers.graf`
 """
+import os
 from itertools import combinations
 from pathlib import Path
 from typing import List, Tuple
@@ -105,6 +106,11 @@ def main(
     sample_sheet_csv: Path, plink_file: Path, graf_file: Path, king_file: Path, outfile: Path,
 ):
     ss = sample_sheet.read(sample_sheet_csv)
+
+    # Check if graf or king are empty (no related). If so add expected final headers to file
+    check_empty_add_headers(graf_file, ["GRAF_HGMR", "GRAF_AGMR", "GRAF_relationship"])
+    check_empty_add_headers(king_file, ["KING_Kinship", "KING_relationship"])
+
     concordance = (
         build(plink_file, graf_file, king_file)
         .pipe(_add_expected_replicates, ss)
@@ -117,6 +123,13 @@ def main(
     concordance.reset_index().reindex(DTYPES.keys(), axis=1).astype(DTYPES).to_csv(
         outfile, index=False
     )
+
+
+def check_empty_add_headers(file_path: Path, headers: list):
+    """Check if the file is empty"""
+    if os.path.getsize(file_path) == 0:
+        with open(file_path, "w") as f:
+            f.write("\t".join(headers) + "\n")
 
 
 def build(plink_file: PathLike, graf_file: PathLike, king_file: PathLike):

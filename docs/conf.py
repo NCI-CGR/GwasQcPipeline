@@ -19,7 +19,17 @@ from cgr_gwas_qc.version import __version__
 
 project = "GwasQcPipeline"
 copyright = "2020, Leidos Biomedical Research, Inc."
-authors = ["Justin Fear", "Eric Karlins", "Jiahui Wang", "Cameron Palmer", "Bari Ballew", "Bin Zhu"]
+authors = [
+    "Justin Fear",
+    "Eric Karlins",
+    "Jiahui Wang",
+    "Cameron Palmer",
+    "Bari Ballew",
+    "Bin Zhu",
+    "Caryn Willis",
+    "Kevin Liao",
+    "Jesse Marks",
+]
 
 # The full version, including alpha/beta/rc tags
 release = (
@@ -44,6 +54,8 @@ exclude_patterns = [
 rst_prolog = f"""
 .. |pkgurl| replace:: https://github.com/NCI-CGR/GwasQcPipeline/releases/download/{__version__}/{pkg}
 .. |cgr| replace:: *CGR GwasQcPipeline*
+.. |pkg_version| replace:: {__version__}
+.. |pkg_version_num| replace:: {release}
 """
 
 rst_epilog = ".. include:: /common_urls.rst"

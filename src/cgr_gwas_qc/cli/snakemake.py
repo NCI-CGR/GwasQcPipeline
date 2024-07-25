@@ -25,7 +25,7 @@ def main(ctx: typer.Context):
         snakemake -s <path to workflow install location> OPTIONS TARGETS
 
     In addition, we also add some snakemake options if you did not specify them.
-    This is mostly for convenience.  Specifically, the we require the use of
+    This is mostly for convenience.  Specifically, we require the use of
     ``conda``, so we always will add ``--use-conda``.  Second, in recent
     versions of snakemake they no longer default to ``--cores 1`` and will throw
     an error if you did not specify a value.  We find this annoying, so we will

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cgr_gwas_qc"
-version = "1.4.0"
+version = "1.5.1"
 description = "The CGR GWAS QC Pipeline"
 authors = [
     "Justin Fear <justin.fear@nih.gov>",
@@ -37,6 +37,7 @@ python-ternary = "^1.0.8"
 tabulate = "^0.8.0"
 openpyxl = "^3.1.2"
 markupsafe = "~2.0"
+pulp = "2.7.0"
 
 [tool.poetry.dev-dependencies]
 black = { version = "^19.10b0", allow-prereleases = true }
