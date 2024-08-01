@@ -164,6 +164,7 @@ def initialize_config(
             illumina_manifest_file=bpm_file,
             thousand_genome_vcf="/path/to/thousand/genome/vcf.gz",
             thousand_genome_tbi="/path/to/thousand/genome/vcf.gz.tbi",
+            reference_fasta="",
         ),
         user_files=UserFiles(
             output_pattern="{prefix}/{file_type}.{ext}",
