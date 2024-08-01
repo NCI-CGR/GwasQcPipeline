@@ -20,7 +20,6 @@ cfg = load_config()
 # Entry Points Targets
 ################################################################################
 targets = [
-    "sample_level/samples.vcf",
     "sample_level/samples.bed",
     "sample_level/samples.bim",
     "sample_level/samples.fam",
@@ -80,7 +79,7 @@ if cfg.config.user_files.gtc_pattern:
             bpm=cfg.config.reference_files.illumina_manifest_file,
             reference_fasta=cfg.config.reference_files.reference_fasta,
         output:
-            vcf="sample_level/samples.vcf",
+            vcf=temp("sample_level/samples.vcf"),
         threads: 12
         resources:
             mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
@@ -93,7 +92,7 @@ if cfg.config.user_files.gtc_pattern:
         input:
             vcf=rules.gtc_to_vcf.output.vcf,
         output:
-            vcf="sample_level/samples_filtered.vcf",
+            vcf=temp("sample_level/samples_filtered.vcf"),
         shell:
             "grep -vP '\t\.\t\.\t\.' {input.vcf} > {output.vcf}" 
     rule vcf_to_bed:
