@@ -23,16 +23,9 @@ Sample Concordance Table
     PLINK_concordance, float, Proportion IBS2 ``IBS2 / (IBS0 + IBS1 + IBS2)``
     PLINK_is_ge_pi_hat, boolean, True if PI_HAT was greater than ``software_params.pi_hat_cutoff``
     PLINK_is_ge_concordance, boolean, True if concordance was greater than ``software_params.dup_concordance_cutoff``
-    GRAF_HGMR, float, Homozygous Genotype Mismatch Rate (%)
-    GRAF_AGMR, float, All Genotype Mismatch Rate (%)
-    GRAF_relationship, string, relationship determined by sample genotypes.
-    KING_Kinship, float, Estimated kinship coefficient from the SNP data
-    KING_relationship, string, The assigned relationship based on Kinship
 
 References:
     - :mod:`cgr_gwas_qc.workflow.scripts.concordance_table`
-    - :mod:`cgr_gwas_qc.parsers.king`
-    - :mod:`cgr_gwas_qc.parsers.graf`
 """
 from itertools import combinations
 from pathlib import Path
