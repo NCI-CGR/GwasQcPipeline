@@ -497,7 +497,6 @@ def _intensity(wildcards):
     return []
 
 
-# ISSUE 313: MODIFY
 rule sample_qc_table:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
