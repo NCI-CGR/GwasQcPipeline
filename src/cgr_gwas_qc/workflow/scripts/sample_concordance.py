@@ -90,7 +90,6 @@ def read(filename: PathLike):
     return pd.read_csv(filename, dtype=DTYPES)
 
 
-# DONT IMPORT GRAF AND KING FILES
 @app.command()
 def main(
     sample_sheet_csv: Path,
@@ -115,7 +114,6 @@ def main(
     )
 
 
-# DONT IMPORT GRAF AND KING FILES AND MERGE THEM
 def build(plink_file: PathLike):
     """Build the main concordance table."""
     return _plink(plink_file).rename_axis(["Sample_ID1", "Sample_ID2"])
