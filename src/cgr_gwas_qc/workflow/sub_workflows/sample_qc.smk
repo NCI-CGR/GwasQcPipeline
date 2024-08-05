@@ -344,7 +344,7 @@ use rule relatedness from graf as sample_concordance_graf with:
     output:
         "sample_level/concordance/graf.tsv",
     resources:
-        mem_mb=lambda wc, attempt, input: max( (attempt+1)* input.size_mb, 1000),
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
     log:
         "sample_level/concordance/graf.log",
 
@@ -418,7 +418,7 @@ use rule grafpop_populations from grafpop as graf_populations with:
     output:
         "sample_level/ancestry/grafpop_populations.txt",
     resources:
-        mem_mb=lambda wc, attempt, input: max( (attempt+1)* input.size_mb, 1000)
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
     log:
         "sample_level/ancestry/grafpop_populations.log",
 
@@ -497,6 +497,7 @@ def _intensity(wildcards):
     return []
 
 
+# ISSUE 313: MODIFY
 rule sample_qc_table:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",

@@ -28,7 +28,6 @@ def main(
     graf: Path,
     outfile: Path,
 ):
-
     with pd.ExcelWriter(outfile) as writer:
         _sample_qc(sample_sheet_csv, sample_qc_csv).to_excel(
             writer, sheet_name="SAMPLE_QC", index=False
@@ -117,11 +116,6 @@ _SAMPLE_CONCORDANCE_COLUMNS = [
     "PLINK_concordance",
     "PLINK_is_ge_pi_hat",
     "PLINK_is_ge_concordance",
-    "GRAF_HGMR",
-    "GRAF_AGMR",
-    "GRAF_relationship",
-    "KING_Kinship",
-    "KING_relationship",
 ]
 
 
@@ -143,9 +137,7 @@ def _sample_concordance(sample_qc_csv: PathLike, sample_concordance_csv: PathLik
     return (
         sample_concordance.read(sample_concordance_csv)
         .pipe(
-            lambda x: x[
-                x.PLINK_PI_HAT.notna() | (x.GRAF_relationship.notna() & x.KING_relationship.notna())
-            ]
+            lambda x: x[x.PLINK_PI_HAT.notna()]
         )  # Keep if we have results from plink or both GRAF and KING. This will limit the number of rows.
         .merge(ancestry.rename_axis("Sample_ID1").rename("Ancestry1"), on="Sample_ID1", how="left")
         .merge(ancestry.rename_axis("Sample_ID2").rename("Ancestry2"), on="Sample_ID2", how="left")

@@ -34,7 +34,6 @@ References:
     - :mod:`cgr_gwas_qc.parsers.king`
     - :mod:`cgr_gwas_qc.parsers.graf`
 """
-import os
 from itertools import combinations
 from pathlib import Path
 from typing import List, Tuple
@@ -42,7 +41,7 @@ from typing import List, Tuple
 import pandas as pd
 import typer
 
-from cgr_gwas_qc.parsers import graf, king, sample_sheet
+from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.typing import PathLike
 from cgr_gwas_qc.workflow.scripts import concordance_table
 
@@ -64,11 +63,6 @@ DTYPES = {
     "PLINK_concordance": "float",
     "PLINK_is_ge_pi_hat": "boolean",
     "PLINK_is_ge_concordance": "boolean",
-    "GRAF_HGMR": "float",
-    "GRAF_AGMR": "float",
-    "GRAF_relationship": "string",
-    "KING_Kinship": "float",
-    "KING_relationship": "string",
 }
 
 
@@ -92,27 +86,23 @@ def read(filename: PathLike):
         - PLINK_concordance
         - PLINK_is_ge_pi_hat
         - PLINK_is_ge_concordance
-        - GRAF_HGMR
-        - GRAF_AGMR
-        - GRAF_relationship
-        - KING_Kinship
-        - KING_relationship
     """
     return pd.read_csv(filename, dtype=DTYPES)
 
 
+# DONT IMPORT GRAF AND KING FILES
 @app.command()
 def main(
-    sample_sheet_csv: Path, plink_file: Path, graf_file: Path, king_file: Path, outfile: Path,
+    sample_sheet_csv: Path,
+    plink_file: Path,
+    graf_file: Path,
+    king_file: Path,
+    outfile: Path,
 ):
     ss = sample_sheet.read(sample_sheet_csv)
 
-    # Check if graf or king are empty (no related). If so add expected final headers to file
-    check_empty_add_headers(graf_file, ["GRAF_HGMR", "GRAF_AGMR", "GRAF_relationship"])
-    check_empty_add_headers(king_file, ["KING_Kinship", "KING_relationship"])
-
     concordance = (
-        build(plink_file, graf_file, king_file)
+        build(plink_file)
         .pipe(_add_expected_replicates, ss)
         .pipe(_add_discordant_replicates)
         .pipe(_add_unexpected_replicates)
@@ -125,21 +115,10 @@ def main(
     )
 
 
-def check_empty_add_headers(file_path: Path, headers: list):
-    """Check if the file is empty"""
-    if os.path.getsize(file_path) == 0:
-        with open(file_path, "w") as f:
-            f.write("\t".join(headers) + "\n")
-
-
-def build(plink_file: PathLike, graf_file: PathLike, king_file: PathLike):
+# DONT IMPORT GRAF AND KING FILES AND MERGE THEM
+def build(plink_file: PathLike):
     """Build the main concordance table."""
-    return (
-        _plink(plink_file)
-        .join(_graf(graf_file), how="outer")
-        .join(_king(king_file), how="outer")
-        .rename_axis(["Sample_ID1", "Sample_ID2"])
-    )
+    return _plink(plink_file).rename_axis(["Sample_ID1", "Sample_ID2"])
 
 
 def _add_subject(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame:
@@ -188,34 +167,18 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
 
 def _discordant_logic(sr: pd.Series) -> bool:
     if not sr.is_expected_replicate:
-        # not a replicate
+        # not an expected replicate
         return False
 
-    if all(
-        [
-            pd.isna(sr.PLINK_is_ge_concordance),
-            pd.isna(sr.GRAF_relationship),
-            pd.isna(sr.KING_relationship),
-        ]
-    ):
-        # No metrics so ignore
+    if pd.isna(sr.PLINK_is_ge_concordance):
         # Issue 210: If someone is an expected replicates but has no PLINK, GRAF, or KING then these should be flagged as an discordant replicate (True). Before was returning False
         return True
 
     if pd.notna(sr.PLINK_is_ge_concordance):
-        # plink call: True if < concordance threshold
+        # plink call: Mark as discordant (True) if expected replicate and < concordance threshold
         return not sr.PLINK_is_ge_concordance
 
-    if all([pd.notna(sr.GRAF_relationship), pd.notna(sr.KING_relationship)]):
-        # We have both graf and king calls: True if both are discordant
-        return (sr.GRAF_relationship != "ID") & (sr.KING_relationship != "ID")
-
-    if pd.notna(sr.GRAF_relationship):
-        # We only have graf call
-        return sr.GRAF_relationship != "ID"
-
-    # We only have king call
-    return sr.KING_relationship != "ID"
+    return False
 
 
 def _add_discordant_replicates(df: pd.DataFrame) -> pd.DataFrame:
@@ -231,8 +194,6 @@ def _add_unexpected_replicates(df: pd.DataFrame) -> pd.DataFrame:
     """
     df["is_unexpected_replicate"] = ~df.is_expected_replicate & (
         (df.PLINK_is_ge_concordance.notna() & df.PLINK_is_ge_concordance)
-        | (df.GRAF_relationship.notna() & (df.GRAF_relationship == "ID"))
-        | (df.KING_relationship.notna() & (df.KING_relationship == "ID"))
     )
     return df
 
@@ -250,26 +211,6 @@ def _plink(filename: PathLike):
             },
             axis=1,
         )
-    )
-
-
-def _graf(filename: PathLike):
-    return (
-        graf.read_relatedness(filename)
-        .set_index(["ID1", "ID2"])
-        .reindex(["HGMR", "AGMR", "relationship"], axis=1)
-        .rename(
-            {"HGMR": "GRAF_HGMR", "AGMR": "GRAF_AGMR", "relationship": "GRAF_relationship"}, axis=1,
-        )
-    )
-
-
-def _king(filename: PathLike):
-    return (
-        king.read_related(filename)
-        .set_index(["ID1", "ID2"])
-        .reindex(["Kinship", "relationship"], axis=1)
-        .rename({"Kinship": "KING_Kinship", "relationship": "KING_relationship"}, axis=1)
     )
 
 
