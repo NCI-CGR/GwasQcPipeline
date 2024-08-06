@@ -10,7 +10,9 @@ authors = [
     "Bari Ballew <bari.ballew@nih.gov>",
     "Cameron Palmer <cameron.palmer@nih.gov>",
     "Bin Zhu <bin.zhu2@nih.gov>",
-    "Kevin Liao <kliao@rti.org>"
+    "Kevin Liao <kliao@rti.org>",
+    "Caryn Willis <cdwillis@rti.org>",
+    "Jesse Marks <jmarks@rti.org>"
 ]
 readme = "README.md"
 repository = "https://github.com/NCI-CGR/GwasQcPipeline.git"
