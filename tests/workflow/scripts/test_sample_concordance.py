@@ -131,7 +131,7 @@ def test_add_unexpected_replicate_one(fake_cfg, concordance):
         (False, False, pd.NA),  # all missing
     ],
 )
-def test_add_unexpected_logic(expected_result, is_rep, plink, graf, king):
+def test_add_unexpected_logic(expected_result, is_rep, plink):
     df = pd.DataFrame({"is_expected_replicate": [is_rep], "PLINK_is_ge_concordance": [plink],})
 
     result = sample_concordance._add_unexpected_replicates(df).is_unexpected_replicate.squeeze()
