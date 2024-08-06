@@ -8,9 +8,7 @@ from cgr_gwas_qc.workflow.scripts import sample_concordance
 @pytest.fixture
 def concordance():
     data_cache = FakeData()
-    return sample_concordance.build(
-        data_cache / "cgr/concordance.csv",
-    )
+    return sample_concordance.build(data_cache / "cgr/concordance.csv",)
 
 
 def test_build(concordance):
@@ -97,12 +95,7 @@ def test_add_discordant_replicate_missing_pair(fake_cfg, concordance):
     ],
 )
 def test_add_discordant_logic(expected_result, is_rep, plink):
-    df = pd.DataFrame(
-        {
-            "is_expected_replicate": [is_rep],
-            "PLINK_is_ge_concordance": [plink],
-        }
-    )
+    df = pd.DataFrame({"is_expected_replicate": [is_rep], "PLINK_is_ge_concordance": [plink],})
 
     result = sample_concordance._add_discordant_replicates(df).is_discordant_replicate.squeeze()
     assert expected_result == result
@@ -139,12 +132,7 @@ def test_add_unexpected_replicate_one(fake_cfg, concordance):
     ],
 )
 def test_add_unexpected_logic(expected_result, is_rep, plink, graf, king):
-    df = pd.DataFrame(
-        {
-            "is_expected_replicate": [is_rep],
-            "PLINK_is_ge_concordance": [plink],
-        }
-    )
+    df = pd.DataFrame({"is_expected_replicate": [is_rep], "PLINK_is_ge_concordance": [plink],})
 
     result = sample_concordance._add_unexpected_replicates(df).is_unexpected_replicate.squeeze()
     assert expected_result == result
