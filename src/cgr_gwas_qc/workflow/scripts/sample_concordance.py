@@ -85,11 +85,7 @@ def read(filename: PathLike):
 
 @app.command()
 def main(
-    sample_sheet_csv: Path,
-    plink_file: Path,
-    graf_file: Path,
-    king_file: Path,
-    outfile: Path,
+    sample_sheet_csv: Path, plink_file: Path, graf_file: Path, king_file: Path, outfile: Path,
 ):
     ss = sample_sheet.read(sample_sheet_csv)
 
