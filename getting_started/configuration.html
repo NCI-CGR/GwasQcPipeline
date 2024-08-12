@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; GwasQcPipeline 1.5.1 documentation</title>
+  <title>Configuration Files &mdash; GwasQcPipeline 1.5.2 documentation</title>
   
 
   
@@ -272,7 +272,7 @@ I will walk through each section below and end this page with a full example.</p
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td><p>v1.5.1</p></td>
+<td><p>v1.5.2</p></td>
 </tr>
 <tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>slurm_partition</p></li>
@@ -484,6 +484,20 @@ You should not need to edit this section unless you want to
 <td colspan="2"><p><em>Thousand Genome Tbi</em></p></td>
 </tr>
 <tr class="row-odd"><td colspan="2"><p>Path to the corresponding index for the 1000 Genomes VCF file.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>reference_fasta</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Reference Fasta</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Path to Reference fasta file to be used to convert gtc to vcf</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -846,7 +860,7 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 </td>
 <td colspan="2"><p><em>Contam Population</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>While population from the 1000 Genomes project to use for B-allele frequencies during contamination testing .Can be one of {AF, EAS_AF, AMR_AF, AFR_AF, EUR_AF, SAS_AF}. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/bpm2abf.py</span></code></p></td>
+<tr class="row-even"><td colspan="2"><p>Which population from the 1000 Genomes project to use for B-allele frequencies during contamination testing. Can be one of {AF, EAS_AF, AMR_AF, AFR_AF, EUR_AF, SAS_AF}. <code class="docutils literal notranslate"><span class="pre">workflow/scripts/bpm2abf.py</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -1214,7 +1228,7 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
-<td><p>20240709145319</p></td>
+<td><p>20240812163209</p></td>
 </tr>
 </tbody>
 </table>

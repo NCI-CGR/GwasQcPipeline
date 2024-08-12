@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cgr_gwas_qc.testing.data &mdash; GwasQcPipeline 1.5.1 documentation</title>
+  <title>cgr_gwas_qc.testing.data &mdash; GwasQcPipeline 1.5.2 documentation</title>
   
 
   
@@ -253,6 +253,7 @@
     <span class="n">_subject_id_column</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># The column containing subject information</span>
     <span class="n">_expected_sex_column</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># The column containing sex information</span>
     <span class="n">_case_control_column</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># The column containing Case/Control information</span>
+    <span class="n">_reference_fasta</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># fasta reference file for GCT to VCF</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">working_dir</span>
@@ -270,6 +271,7 @@
             <span class="n">illumina_manifest_file</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_illumina_manifest_file</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
             <span class="n">thousand_genome_vcf</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thousand_genome_vcf</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
             <span class="n">thousand_genome_tbi</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thousand_genome_tbi</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+            <span class="n">reference_fasta</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reference_fasta</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
         <span class="p">)</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">[</span><span class="s2">&quot;user_files&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UserFiles</span><span class="p">()</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
@@ -497,6 +499,7 @@
     <span class="n">_illumina_manifest_file</span> <span class="o">=</span> <span class="s2">&quot;illumina/bpm/small_manifest.bpm&quot;</span>
     <span class="n">_thousand_genome_vcf</span> <span class="o">=</span> <span class="s2">&quot;1KG/small_1KG.vcf.gz&quot;</span>
     <span class="n">_thousand_genome_tbi</span> <span class="o">=</span> <span class="s2">&quot;1KG/small_1KG.vcf.gz.tbi&quot;</span>
+    <span class="n">_reference_fasta</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
     <span class="n">_gtc_pattern</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{Sample_ID}</span><span class="s2">.gtc&quot;</span>
     <span class="n">_idat_red_pattern</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{SentrixBarcode_A}</span><span class="s2">_</span><span class="si">{SentrixPosition_A}</span><span class="s2">_Red.idat&quot;</span>
