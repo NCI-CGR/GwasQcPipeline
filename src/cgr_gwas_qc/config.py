@@ -48,6 +48,9 @@ class ConfigMgr:
     #: The absolute path to the ``reporting/templates``.
     TEMPLATE_DIR: Path = SRC_DIR / "reporting/templates"
 
+    #: The absolute path to the ``reporting/QC_Report_Data_Dictionary.xlsx``.
+    DD_DIR: Path = SRC_DIR / "reporting/QC_Report_Data_Dictionary.xlsx"
+
     __instance = None
 
     ################################################################################
@@ -185,6 +188,11 @@ class ConfigMgr:
     def docx_template(self) -> str:
         """Return the path to the docx template."""
         return (self.TEMPLATE_DIR / "cgr_reference.docx").as_posix()
+
+    @property
+    def data_dictionary(self) -> str:
+        """Return the path to the qc report data dictioanry."""
+        return (self.DD_DIR).as_posix()
 
 
 ################################################################################

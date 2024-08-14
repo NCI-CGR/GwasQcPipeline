@@ -1,20 +1,24 @@
 from cgr_gwas_qc import load_config
 import re
 import os
+
 cfg = load_config()
 output_pattern = cfg.config.user_files.output_pattern
 manifest_file = cfg.config.sample_sheet
 
 lims_dir = cfg.config.workflow_params.lims_output_dir
 
-if (len(os.path.basename(manifest_file)[:-4].split('_AnalysisManifest_'))==2):
-    (outName,sampSheetDate)=os.path.basename(manifest_file)[:-4].split('_AnalysisManifest_')
-    lims_file_name = "{deliver_prefix}"+outName+"_LimsUpload_"+sampSheetDate+"{deliver_suffix}.csv"
-    file_type_lims= outName + "_LimsUpload_"+ sampSheetDate
+if len(os.path.basename(manifest_file)[:-4].split("_AnalysisManifest_")) == 2:
+    (outName, sampSheetDate) = os.path.basename(manifest_file)[:-4].split("_AnalysisManifest_")
+    lims_file_name = (
+        "{deliver_prefix}" + outName + "_LimsUpload_" + sampSheetDate + "{deliver_suffix}.csv"
+    )
+    file_type_lims = outName + "_LimsUpload_" + sampSheetDate
 else:
     timestr = cfg.config.workflow_params.time_start
-    file_type_lims="LimsUpload_"+ timestr
-    lims_file_name = "{deliver_prefix}LimsUpload_"+timestr+"{deliver_suffix}.csv"
+    file_type_lims = "LimsUpload_" + timestr
+    lims_file_name = "{deliver_prefix}LimsUpload_" + timestr + "{deliver_suffix}.csv"
+
 
 localrules:
     all_delivery,
@@ -31,6 +35,7 @@ localrules:
     qc_report,
     qc_report_docx,
     qc_report_xlsx,
+    deliver_data_dictionary,
 
 
 wildcard_constraints:
@@ -50,6 +55,7 @@ targets = [
     "delivery/subjects.bim",
     "delivery/subjects.fam",
     "delivery/HWP.zip",
+    "delivery/QC_Report_Data_Dictionary.xlsx",
     output_pattern.format(prefix="files_for_lab", file_type="all_sample_qc", ext="csv"),
     output_pattern.format(prefix="files_for_lab", file_type=file_type_lims, ext="csv"),
     output_pattern.format(prefix="files_for_lab", file_type="Identifiler", ext="csv"),
@@ -64,7 +70,12 @@ if cfg.config.workflow_params.lims_upload:
     # The CGEMs/CCAD cluster has a cron job running that looks for this file in
     # the root run directory. If it is there then it will automatically upload
     # to the LIMs system. This is only useful on CGEMs/CCAD.
-    targets.append(output_pattern.format(prefix=cfg.config.workflow_params.lims_output_dir, file_type=file_type_lims, ext="csv"))
+    targets.append(
+        output_pattern.format(
+            prefix=cfg.config.workflow_params.lims_output_dir, file_type=file_type_lims, ext="csv"
+        )
+    )
+
 
 rule all_delivery:
     input:
@@ -85,12 +96,13 @@ rule lab_sample_level_qc_report:
     shell:
         "cp {input[0]} {output[0]}"
 
+
 rule lab_lims_upload:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
         sample_qc_csv="sample_level/sample_qc.csv",
     output:
-        "files_for_lab/"+lims_file_name,
+        "files_for_lab/" + lims_file_name,
     script:
         "../scripts/lab_lims_upload.py"
 
@@ -103,7 +115,7 @@ if cfg.config.workflow_params.lims_upload:
         input:
             rules.lab_lims_upload.output[0],
         output:
-            lims_dir+"/"+lims_file_name,
+            lims_dir + "/" + lims_file_name,
         shell:
             "cp {input[0]} {output[0]}"
 
@@ -142,7 +154,7 @@ rule lab_unknown_replicates:
 rule deliver_manifest:
     input:
         cfg.sample_sheet_file.as_posix(),
-        manifest = manifest_file,
+        manifest=manifest_file,
     output:
         "delivery/{deliver_prefix}AnalysisManifest{deliver_suffix}.csv",
     shell:
@@ -151,7 +163,6 @@ rule deliver_manifest:
         file=$(echo {input[1]} | rev | cut -d"/" -f -1 | rev)
         cp {input[1]} delivery/$file
         """
-        
 
 
 rule deliver_hwp:
@@ -263,6 +274,7 @@ rule qc_report_docx:
     shell:
         "pandoc --reference-doc {params.template} --toc -s {input} -o {output[0]}"
 
+
 rule qc_report_xlsx:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
@@ -276,3 +288,12 @@ rule qc_report_xlsx:
         "delivery/{deliver_prefix}QC_Report{deliver_suffix}.xlsx",
     script:
         "../scripts/qc_report_table.py"
+
+
+rule deliver_data_dictionary:
+    input:
+        cfg.data_dictionary,
+    output:
+        "delivery/QC_Report_Data_Dictionary.xlsx",
+    shell:
+        "cp {input} {output}"
