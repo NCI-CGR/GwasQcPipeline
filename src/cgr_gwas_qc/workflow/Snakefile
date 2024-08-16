@@ -48,7 +48,7 @@ use rule * from sample_qc
 targets.extend(sample_qc.targets)
 
 
-if sample_qc.use_contamination:
+if sample_qc.use_contamination or cfg.config.user_files.bcf:
 
     module contamination:
         snakefile:
@@ -61,7 +61,7 @@ if sample_qc.use_contamination:
     targets.extend(contamination.targets)
 
 
-if sample_qc.use_contamination:
+if sample_qc.use_contamination or cfg.config.user_files.bcf:
 
     module intensity_check:
         snakefile:
