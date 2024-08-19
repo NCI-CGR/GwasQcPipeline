@@ -83,7 +83,7 @@ if cfg.config.user_files.gtc_pattern:
         threads: 12
         resources:
             mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
-            time_hr=lambda wildcards, attempt: 4 * attempt,
+            time_hr=lambda wildcards, attempt: 120,
         conda:
             cfg.conda("bcftools-gtc2vcf-plugin")
         shell:
