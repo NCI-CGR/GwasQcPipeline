@@ -61,6 +61,7 @@ if cfg.config.user_files.gtc_pattern:
     ################################################################################
     # GTC To Plink
     ################################################################################
+
     if config.get("cluster_mode", False):
 
         rule grouped_gtc_to_bed:
@@ -166,7 +167,6 @@ if cfg.config.user_files.gtc_pattern:
                 time_hr=lambda wildcards, attempt: 4 * attempt,
             script:
                 "../scripts/plink_merge.py"
-
 
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
 
