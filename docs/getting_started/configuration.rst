@@ -65,6 +65,7 @@ If you are on another system then you most provide the correct paths and version
 The ``illumina_manifest_file`` is provided by Illumina.
 The ``thousand_genome_vcf`` and ``thousand_genome_tbi`` files can be downloaded from the 1000 Genome's website.
 The ``illumina_cluster_file`` is the EGT file used to generate GTCs; this file is not required and is only referenced in the QC report if present.
+The ``reference_fasta`` is used convert GTCs to VCF and needed if GTCs are provided. 
 
 1000 Genomes reference files download links
    * **hg37**: `VCF <http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz>`__,
@@ -72,6 +73,15 @@ The ``illumina_cluster_file`` is the EGT file used to generate GTCs; this file i
 
    * **hg38**: `VCF <http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20181203_biallelic_SNV/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz>`__,
      `TBI <http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20181203_biallelic_SNV/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz.tbi>`__
+
+reference fasta download links
+   * **hg37**: `fasta <https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GRCh37_seqs_for_alignment_pipelines/GCA_000001405.14_GRCh37.p13_full_analysis_set.fna.gz>`__
+
+   * **hg38**: `fasta <https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fftp.ncbi.nlm.nih.gov%2Fgenomes%2Fall%2FGCF%2F000%2F001%2F405%2FGCF_000001405.26_GRCh38%2FGRCh38_major_release_seqs_for_alignment_pipelines%2FGCA_000001405.15_GRCh38_full_analysis_set.fna.gz&data=05%7C02%7Ccdwillis%40rti.org%7C16dafc3de4c243d08b8f08dc99ce6157%7C2ffc2ede4d4449948082487341fa43fb%7C0%7C0%7C638554358914493874%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=KF7KD9mFUHu2mILsEb8TAEi%2F4Q%2FDEaa5my50nNKzcdw%3D&reserved=0>`__
+
+After downloading the reference fasta, it needs to be converted from gz format to bgz format. This can be done with:
+
+``zcat GCA_000001405.15_GRCh38_full_analysis_set.fna.gz | bgzip -c > GCA_000001405.15_GRCh38_full_analysis_set.fna.bgz``
 
 .. warning::
 
@@ -127,6 +137,8 @@ Full Example
       illumina_manifest_file: /path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm
       thousand_genome_vcf: /path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz
       thousand_genome_tbi: /path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi
+      reference_fasta: /home/williscd/GwasQcPipeline-test-data/GCA_000001405.15_GRCh38_full_analysis_set.fna.bgz
+
    user_files:
       output_pattern: '{prefix}/{file_type}.{ext}'
       idat_pattern:
