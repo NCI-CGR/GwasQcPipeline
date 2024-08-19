@@ -512,7 +512,8 @@ You should not need to edit this section unless you want to
 If you are on another system then you most provide the correct paths and versions of these files.
 The <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code> is provided by Illumina.
 The <code class="docutils literal notranslate"><span class="pre">thousand_genome_vcf</span></code> and <code class="docutils literal notranslate"><span class="pre">thousand_genome_tbi</span></code> files can be downloaded from the 1000 Genome’s website.
-The <code class="docutils literal notranslate"><span class="pre">illumina_cluster_file</span></code> is the EGT file used to generate GTCs; this file is not required and is only referenced in the QC report if present.</p>
+The <code class="docutils literal notranslate"><span class="pre">illumina_cluster_file</span></code> is the EGT file used to generate GTCs; this file is not required and is only referenced in the QC report if present.
+The <code class="docutils literal notranslate"><span class="pre">reference_fasta</span></code> is used convert GTCs to VCF and needed if GTCs are provided.</p>
 <dl class="simple">
 <dt>1000 Genomes reference files download links</dt><dd><ul class="simple">
 <li><p><strong>hg37</strong>: <a class="reference external" href="http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz">VCF</a>,
@@ -521,7 +522,14 @@ The <code class="docutils literal notranslate"><span class="pre">illumina_cluste
 <a class="reference external" href="http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/data_collections/1000_genomes_project/release/20181203_biallelic_SNV/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz.tbi">TBI</a></p></li>
 </ul>
 </dd>
+<dt>reference fasta download links</dt><dd><ul class="simple">
+<li><p><strong>hg37</strong>: <a class="reference external" href="https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GRCh37_seqs_for_alignment_pipelines/GCA_000001405.14_GRCh37.p13_full_analysis_set.fna.gz">fasta</a></p></li>
+<li><p><strong>hg38</strong>: <a class="reference external" href="https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fftp.ncbi.nlm.nih.gov%2Fgenomes%2Fall%2FGCF%2F000%2F001%2F405%2FGCF_000001405.26_GRCh38%2FGRCh38_major_release_seqs_for_alignment_pipelines%2FGCA_000001405.15_GRCh38_full_analysis_set.fna.gz&amp;data=05%7C02%7Ccdwillis%40rti.org%7C16dafc3de4c243d08b8f08dc99ce6157%7C2ffc2ede4d4449948082487341fa43fb%7C0%7C0%7C638554358914493874%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&amp;sdata=KF7KD9mFUHu2mILsEb8TAEi%2F4Q%2FDEaa5my50nNKzcdw%3D&amp;reserved=0">fasta</a></p></li>
+</ul>
+</dd>
 </dl>
+<p>After downloading the reference fasta, it needs to be converted from gz format to bgz format. This can be done with:</p>
+<p><code class="docutils literal notranslate"><span class="pre">zcat</span> <span class="pre">GCA_000001405.15_GRCh38_full_analysis_set.fna.gz</span> <span class="pre">|</span> <span class="pre">bgzip</span> <span class="pre">-c</span> <span class="pre">&gt;</span> <span class="pre">GCA_000001405.15_GRCh38_full_analysis_set.fna.bgz</span></code></p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The genome build needs to match <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code>, <code class="docutils literal notranslate"><span class="pre">thousand_genome_*</span></code>, and <code class="docutils literal notranslate"><span class="pre">genome_build</span></code> above.
@@ -1228,7 +1236,7 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
-<td><p>20240813175642</p></td>
+<td><p>20240819201023</p></td>
 </tr>
 </tbody>
 </table>
@@ -1255,6 +1263,8 @@ These samples will be indicated as <code class="docutils literal notranslate"><s
 <span class="w">   </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
 <span class="w">   </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
 <span class="w">   </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
+<span class="w">   </span><span class="nt">reference_fasta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/williscd/GwasQcPipeline-test-data/GCA_000001405.15_GRCh38_full_analysis_set.fna.bgz</span>
+
 <span class="nt">user_files</span><span class="p">:</span>
 <span class="w">   </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
 <span class="w">   </span><span class="nt">idat_pattern</span><span class="p">:</span>
