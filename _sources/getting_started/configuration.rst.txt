@@ -137,7 +137,7 @@ Full Example
       illumina_manifest_file: /path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm
       thousand_genome_vcf: /path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz
       thousand_genome_tbi: /path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi
-      reference_fasta: /home/williscd/GwasQcPipeline-test-data/GCA_000001405.15_GRCh38_full_analysis_set.fna.bgz
+      reference_fasta: /path/to/reference/GwasQcPipeline-test-data/GCA_000001405.15_GRCh38_full_analysis_set.fna.bgz
 
    user_files:
       output_pattern: '{prefix}/{file_type}.{ext}'
