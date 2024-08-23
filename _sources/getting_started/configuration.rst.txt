@@ -77,7 +77,7 @@ The ``reference_fasta`` is used convert GTCs to VCF and needed if GTCs are provi
 reference fasta download links
    * **hg37**: `fasta <https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.25_GRCh37.p13/GRCh37_seqs_for_alignment_pipelines/GCA_000001405.14_GRCh37.p13_full_analysis_set.fna.gz>`__
 
-   * **hg38**: `fasta <https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fftp.ncbi.nlm.nih.gov%2Fgenomes%2Fall%2FGCF%2F000%2F001%2F405%2FGCF_000001405.26_GRCh38%2FGRCh38_major_release_seqs_for_alignment_pipelines%2FGCA_000001405.15_GRCh38_full_analysis_set.fna.gz&data=05%7C02%7Ccdwillis%40rti.org%7C16dafc3de4c243d08b8f08dc99ce6157%7C2ffc2ede4d4449948082487341fa43fb%7C0%7C0%7C638554358914493874%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=KF7KD9mFUHu2mILsEb8TAEi%2F4Q%2FDEaa5my50nNKzcdw%3D&reserved=0>`__
+   * **hg38**: `fasta <https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/405/GCF_000001405.26_GRCh38/GRCh38_major_release_seqs_for_alignment_pipelines/GCA_000001405.15_GRCh38_full_analysis_set.fna.gz>`__
 
 After downloading the reference fasta, it needs to be converted from gz format to bgz format. This can be done with:
 
