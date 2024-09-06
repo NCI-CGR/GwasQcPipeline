@@ -41,13 +41,14 @@ All {{ sample_qc.array_processing.num_samples_qc_processed | numFormat }} sample
 
 A total of {{ sample_qc.array_processing.num_samples_qc_processed | numFormat }} samples passing array processing were converted to [PLINK](https://www.cog-genomics.org/plink2) files and underwent CGR's QC process. The mean initial sample completion rate is {{ sample_qc.completion_rate.mean_initial_call_rate | numFormat(4) }}. The distributions of the completion rates by sample and locus, before and after two-stage filtering, are shown in **Figure 1**.
 
-A two-stage filter by completion rate threshold of {{ config.software_params.sample_call_rate_1 | numFormat }} for samples and {{ config.software_params.snp_call_rate_1 | numFormat }} for loci, followed by {{ config.software_params.sample_call_rate_2 | numFormat }} for samples and {{ config.software_params.snp_call_rate_2 | numFormat }} for loci was performed. The first stage excluded {{ sample_qc.completion_rate.num_sample_cr1_filtered | numFormat }} samples, and {{ sample_qc.completion_rate.num_snp_cr1_filtered | numFormat }} loci. The subsequent filter excluded {{ sample_qc.completion_rate.num_sample_cr2_filtered | numFormat }} samples and {{ sample_qc.completion_rate.num_snp_cr2_filtered | numFormat }} loci, resulting in {{ sample_qc.completion_rate.num_sample_pass_call_rate | numFormat }} samples at {{ sample_qc.completion_rate.num_snp_pass_call_rate | numFormat }} loci (**Table 2**).
+A two-stage filter was performed, applying loci filters followed by sample filters at each stage. The initial stage utilized a completion rate threshold of {{ config.software_params.snp_call_rate_1 | numFormat }} for loci and {{ config.software_params.sample_call_rate_1 | numFormat }} for samples. This resulted in the exclusion of {{ sample_qc.completion_rate.num_snp_cr1_filtered | numFormat }} loci and {{ sample_qc.completion_rate.num_sample_cr1_filtered | numFormat }} samples. The subsequent filter excluded  {{ sample_qc.completion_rate.num_snp_cr2_filtered | numFormat }} loci and {{ sample_qc.completion_rate.num_sample_cr2_filtered | numFormat }} samples resulting in {{ sample_qc.completion_rate.num_sample_pass_call_rate | numFormat }} samples at {{ sample_qc.completion_rate.num_snp_pass_call_rate | numFormat }} loci (**Table 2**).
+
 
 NOTE: Samples that fail due to completion rate may be eligible for recovery. Recovery efforts include repeating the array from the same library or possibly re-extracting DNA. Final QC reports will have already addressed possible recovery avenues, and thus failures at this step will be included in final analytical exclusions.
 
 ![]({{ sample_qc.completion_rate.png }})
 
-**Figure 1** Sample and Loci completion rates. (**a**) Initial completion rate by sample and by loci. (**b**) Completion rate by sample and by loci after filter 2 (y-axis is zoomed).
+**Figure 1** Sample and Loci completion rates. (**a**) Initial completion rate by loci and by sample. (**b**) Completion rate by loci and sample after filter 2 (y-axis is zoomed).
 
 **Table 2a** Sample completion rate exclusion summary.
 
