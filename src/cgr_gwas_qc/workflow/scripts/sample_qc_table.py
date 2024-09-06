@@ -194,18 +194,14 @@ def main(
     add_qc_columns(
         sample_qc, remove_contam, remove_rep_discordant,
     )
-    sample_qc["is_unexpected_replicate"] = (
-        sample_qc["is_unexpected_replicate"].replace("", False).fillna(False)
-    )
-    sample_qc["is_discordant_replicate"] = (
-        sample_qc["is_discordant_replicate"].replace("", False).fillna(False)
-    )
+
     sample_qc = sample_qc.rename(
         columns={
             "is_unexpected_replicate": "Unexpected Replicate",
             "is_discordant_replicate": "Expected Replicate Discordance",
         }
     )
+
     save(sample_qc, outfile)
 
 
@@ -396,6 +392,8 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
         .max()  # Flag a sample as True if it is True for any comparison.
         .astype("boolean")
         .reindex(Sample_IDs)
+        .replace("", False)
+        .fillna(False)
     )
 
 
@@ -527,7 +525,7 @@ def _add_analytic_exclusion(
         exclusion_criteria["is_contaminated"] = "Contamination"
 
     if remove_rep_discordant:
-        exclusion_criteria["Expected Replicate Discordance"] = "Replicate Discordance"
+        exclusion_criteria["is_discordant_replicate"] = "Replicate Discordance"
 
     sample_qc["analytic_exclusion"] = sample_qc.reindex(exclusion_criteria.keys(), axis=1).any(
         axis=1
