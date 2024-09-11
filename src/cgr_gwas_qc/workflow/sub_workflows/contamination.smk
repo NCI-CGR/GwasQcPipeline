@@ -32,7 +32,7 @@ if cfg.config.user_files.bcf:
 
     use rule pull_b_allele_freq_from_1kg_bcfinput from thousand_genomes as pull_b_allele_freq_from_1kg with:
         input:
-            vcf_file=cfg.config.user_files.bcf,
+            bcf_file=cfg.config.user_files.bcf,
             kgvcf_file=cfg.config.reference_files.thousand_genome_vcf,
 
 else:
@@ -98,7 +98,7 @@ if cfg.config.user_files.bcf:
             """
             input:
                 sample_sheet_csv="cgr_sample_sheet.csv",
-                vcf_file=cfg.config.user_files.bcf,
+                bcf_file=cfg.config.user_files.bcf,
                 abf_file=rules.pull_b_allele_freq_from_1kg.output.abf_file,
                 _=rules.verifyidintensity_conda.output[0],
             params:
@@ -139,7 +139,7 @@ if cfg.config.user_files.bcf:
                 This is a submission hot spot creating 1 job per sample.
             """
             input:
-                vcf_file=cfg.config.user_files.bcf,
+                bcf_file=cfg.config.user_files.bcf,
             params:
                 target_sample="{Sample_ID}",
             output:

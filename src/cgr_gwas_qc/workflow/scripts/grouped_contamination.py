@@ -27,7 +27,7 @@ def main(
         ..., help="Path to bpm_file[optional, to be used if GTC input]"
     ),
     abf_file: PathLike = typer.Argument(..., help="Allele B frequency file"),
-    vcf_file: Optional[PathLike] = typer.Argument(
+    bcf_file: Optional[PathLike] = typer.Argument(
         ..., help="vcf_file[optional, to be used if VCF/BCF input]"
     ),
     grp: str = typer.Argument(..., help="cluster_grp"),
@@ -55,7 +55,7 @@ def main(
 
     # If BCF file is input, Convert VCF to ADPC per sample
     if cfg.config.user_files.bcf:
-        convert_vcf_to_adpc(ss, vcf_file, adpc_pattern, threads)
+        convert_vcf_to_adpc(ss, bcf_file, adpc_pattern, threads)
     # Otherwise, Convert GTC to ADPC - default
     else:
         convert_gtc_to_adpc(ss, bpm_file, gtc_pattern, adpc_pattern, threads)
@@ -91,12 +91,12 @@ def convert_gtc_to_adpc(ss, bpm_file, gtc_pattern, outfile_pattern, threads):
     assert all(f.exists() for f in outfiles)
 
 
-def convert_vcf_to_adpc(ss, vcf_file, outfile_pattern, threads):
+def convert_vcf_to_adpc(ss, bcf_file, outfile_pattern, threads):
     with ProcessPoolExecutor(threads) as executor:
         futures = [
             executor.submit(
                 vcf2adpc.main,
-                vcf_file,
+                bcf_file,
                 record.Sample_ID,
                 outfile_pattern.format(**record.to_dict()),
             )

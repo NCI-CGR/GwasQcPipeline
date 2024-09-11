@@ -40,7 +40,7 @@ rule pull_b_allele_freq_from_1kg_bcfinput:
     ``AF`` which ignores super population.
     """
     input:
-        vcf_file=cfg.config.user_files.bcf,
+        bcf_file=cfg.config.user_files.bcf,
         kgvcf_file=cfg.config.reference_files.thousand_genome_vcf,
     params:
         population=cfg.config.software_params.contam_population,
