@@ -78,6 +78,8 @@ if cfg.config.user_files.gtc_pattern:
             gtcs="gtcs.tsv",
             bpm=cfg.config.reference_files.illumina_manifest_file,
             reference_fasta=cfg.config.reference_files.reference_fasta,
+        params:
+            notemp=config.get("notemp", False),
         output:
             vcf=temp("sample_level/samples.vcf"),
         threads: 12
@@ -91,6 +93,8 @@ if cfg.config.user_files.gtc_pattern:
     rule filter_missing_allele_snps:
         input:
             vcf=rules.gtc_to_vcf.output.vcf,
+        params:
+            notemp=config.get("notemp", False),
         output:
             vcf=temp("sample_level/samples_filtered.vcf"),
         shell:
