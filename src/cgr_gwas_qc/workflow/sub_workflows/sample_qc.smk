@@ -193,10 +193,10 @@ use rule miss from plink as plink_call_rate_initial with:
         bim="sample_level/impute_sex/samples.bim",
         fam="sample_level/impute_sex/samples.fam",
     params:
-        out_prefix="sample_level/samples",
+        out_prefix="sample_level/impute_sex/samples",
     output:
-        imiss="sample_level/samples.imiss",
-        lmiss="sample_level/samples.lmiss",
+        imiss="sample_level/impute_sex/samples.imiss",
+        lmiss="sample_level/impute_sex/samples.lmiss",
 
 
 use rule miss from plink as plink_call_rate_post1 with:
