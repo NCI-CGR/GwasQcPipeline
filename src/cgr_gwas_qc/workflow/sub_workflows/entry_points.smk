@@ -72,14 +72,14 @@ if cfg.config.user_files.gtc_pattern:
 
     _get_gtc()
 
-    rule gtc_to_vcf:
+    rule gtc_to_bcf:
         input:
             sample_sheet_csv="cgr_sample_sheet.csv",
             gtcs="gtcs.tsv",
             bpm=cfg.config.reference_files.illumina_manifest_file,
             reference_fasta=cfg.config.reference_files.reference_fasta,
         output:
-            vcf=temp("sample_level/samples.vcf"),
+            bcf="sample_level/samples.bcf",
         threads: 12
         resources:
             mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
@@ -87,19 +87,19 @@ if cfg.config.user_files.gtc_pattern:
         conda:
             cfg.conda("bcftools-gtc2vcf-plugin")
         shell:
-            "bcftools +gtc2vcf --gtcs {input.gtcs} --bpm {input.bpm} --fasta-ref {input.reference_fasta} --output {output.vcf} --use-gtc-sample-names"
+            "bcftools +gtc2vcf --gtcs {input.gtcs} --bpm {input.bpm} --fasta-ref {input.reference_fasta} --output {output.bcf} -Ou --use-gtc-sample-names"
 
     rule filter_missing_allele_snps:
         input:
-            vcf=rules.gtc_to_vcf.output.vcf,
+            bcf=rules.gtc_to_bcf.output.bcf,
         output:
-            vcf=temp("sample_level/samples_filtered.vcf"),
+            bcf="sample_level/samples_filtered.bcf",
         shell:
-            "grep -vP '\t\.\t\.\t\.' {input.vcf} > {output.vcf}"
+            "grep -vP '\t\.\t\.\t\.' {input.bcf} > {output.bcf}"
 
-    rule vcf_to_bed:
+    rule bcf_to_bed:
         input:
-            vcf=rules.filter_missing_allele_snps.output.vcf,
+            bcf=rules.filter_missing_allele_snps.output.bcf,
         params:
             out_prefix="sample_level/samples",
         output:
@@ -116,7 +116,7 @@ if cfg.config.user_files.gtc_pattern:
             mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
             time_hr=lambda wildcards, attempt: 4 * attempt,
         shell:
-            "plink --vcf {input.vcf} --make-bed --out {params.out_prefix} --double-id"
+            "plink --bcf {input.bcf} --make-bed --out {params.out_prefix} --double-id"
 
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
 
