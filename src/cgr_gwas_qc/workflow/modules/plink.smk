@@ -99,16 +99,10 @@ rule maf_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--maf {params.maf} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        ''' 
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --maf {params.maf} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        '''
 
 rule ld_filter:
     """Subsets the dataset only keeping variants in linkage equilibrium.
@@ -170,16 +164,10 @@ rule snps_only_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--snps-only "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        '''
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --snps-only --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        '''
 
 rule autosome_only_filter:
     """Exclude all unplaced and non-autosomal variants"""
@@ -202,16 +190,10 @@ rule autosome_only_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--autosome "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        '''
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --autosome --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        '''
 
 rule keep_ids:
     input:
@@ -235,16 +217,10 @@ rule keep_ids:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
         time_hr=lambda wildcards, attempt: attempt**2,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--keep {input.to_keep} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        '''
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --keep {input.to_keep} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        '''
 
 rule remove_ids:
     input:
