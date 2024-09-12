@@ -24,7 +24,7 @@ app = typer.Typer(add_completion=False)
 
 @app.command()
 def main(
-    vcf_file: Path = typer.Argument(
+    bcf_file: Path = typer.Argument(
         ..., help="Path to a multisample VCF file with needed scores.", exists=True, readable=True
     ),
     target_sample: str = typer.Argument(..., help="Sample name."),
@@ -44,7 +44,7 @@ def main(
         genotype: The called genotype (0: AA, 1: AB, 2: BB, 3: unknown or missing)
     """
 
-    vcf = VariantFile(vcf_file)
+    vcf = VariantFile(bcf_file)
     sample_fields_to_fetch = ["X", "Y", "NORMX", "NORMY", "GT"]
     info_fieilds_to_fetch = ["ALLELE_A", "ALLELE_B", "GC_SCORE"]
 
