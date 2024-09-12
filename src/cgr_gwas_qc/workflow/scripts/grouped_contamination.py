@@ -138,12 +138,13 @@ def estimate_contamination(
 
 if __name__ == "__main__" and "snakemake" in locals():
     main(
-        **{k: v for k, v in snakemake.input.items() if not k.startswith("_")},  # type: ignore # noqa
-        grp=snakemake.params.grp,  # type: ignore # noqa
-        gtc_pattern=snakemake.params.gtc_pattern,  # type: ignore # noqa
-        snps=int(snakemake.params.snps),  # type: ignore # noqa
-        conda_env=snakemake.params.conda_env,  # type: ignore # noqa
-        notemp=bool(snakemake.params.notemp),  # type: ignore # noqa
-        outfile=snakemake.output[0],  # type: ignore # noqa
-        threads=snakemake.threads or 2,  # type: ignore # noqa
+        defaults = {}
+        defaults.update({k: Path(v) for k, v in snakemake.input.items() if not k.startswith("_")})  # type: ignore # noqa
+        defaults.update({k: v for k, v in snakemake.params.items()})  # type: ignore # noqa
+        # gtc_pattern=snakemake.params.gtc_pattern,  # type: ignore # noqa
+        # snps=int(snakemake.params.snps),  # type: ignore # noqa
+        # conda_env=snakemake.params.conda_env,  # type: ignore # noqa
+        # notemp=bool(snakemake.params.notemp),  # type: ignore # noqa
+        defaults.update({"outfile": Path(snakemake.output[0])})  # type: ignore # noqa
+        defaults.update({"threads": snakemake.threads[0] or 2 })  # type: ignore # noqa
     )
