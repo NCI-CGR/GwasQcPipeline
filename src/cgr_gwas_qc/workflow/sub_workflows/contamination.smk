@@ -74,7 +74,7 @@ if cfg.config.user_files.bcf:
 
         rule grouped_contamination:
             """Extracts normalized intensities and other metrics from an aggregated
-            VCF file and writes to Illumina ADPC.BIN per sample.
+            BCF file and writes to Illumina ADPC.BIN per sample.
 
             This is the format required by ``verifyIDintensity``. The script also
             runs some sanity checks (intensities and normalized intensities > 0;
@@ -129,7 +129,8 @@ if cfg.config.user_files.bcf:
     else:
 
         rule per_sample_vcf_to_adpc:
-            """Converts a sample's GTC/BPM to an Illumina ADPC.BIN.
+            """From an aggregated BCF input file, extracts normalized intensities and
+            other metrics  for the target sample and writes to Illumina ADPC.BIN per sample.
 
             This is the format required by ``verifyIDintensity``. The script also
             runs some sanity checks (intensities and normalized intensities > 0;
