@@ -66,7 +66,7 @@ def main(
                 rec.ref[0],
                 rec.alts[0],
                 is_biallelic_snp(rec),
-                rec.info["GC_SCORE"],
+                rec.info["IGC"],
                 rec.info["ALLELE_A"],
             ]
         )
