@@ -45,15 +45,15 @@ def main(
     """
 
     vcf = VariantFile(bcf_file)
-    sample_fields_to_fetch = ["X", "Y", "NORMX", "NORMY", "GT"]
-    info_fieilds_to_fetch = ["ALLELE_A", "ALLELE_B", "GC_SCORE"]
+    sample_fields_to_fetch = ["X", "Y", "NORMX", "NORMY", "GT", "IGC"]
+    info_fieilds_to_fetch = ["ALLELE_A", "ALLELE_B"]
 
     renaming_scheme = {
         "X": "x_raw",
         "Y": "y_raw",
         "NORMX": "x_norm",
         "NORMY": "y_norm",
-        "GC_SCORE": "genotype_score",
+        "IGC": "genotype_score",
     }
 
     vcf_info = []
