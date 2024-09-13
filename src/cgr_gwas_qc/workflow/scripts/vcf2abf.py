@@ -54,10 +54,6 @@ def main(
     if abf_file is None:
         abf_file = bcf_file.with_suffix(".abf.txt")
 
-    # vcf_file='/scratch/rajwanir2/data_catalog/QC-test/results/GSAMD-24v1-0-contamseries/vcf/GSAMD-24v1-0-contamseries.bcf'
-    # abf_file='/scratch/rajwanir2/data_catalog/QC-test/GSAMD-24v1-0.new.abf'
-    # kg_vcf='/DCEG/CGF/Bioinformatics/Production/data/thousG/hg38/ALL.wgs.shapeit2_integrated_v1a.GRCh38.20181129.sites.vcf.gz'
-
     # retrieving needed info from the input vcf
     vcf = VariantFile(bcf_file, drop_samples=True)
     vcf_info = []
