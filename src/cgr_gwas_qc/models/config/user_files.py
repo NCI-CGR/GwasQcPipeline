@@ -95,6 +95,13 @@ class UserFiles(BaseModel):
         description="The full path to an aggregated BCF/VCF file perferably encoding the GenCall scores.",
     )
 
+    @validator("bcf")
+    def validate_bcf(cls, v):
+        if v.suffix == ".bcf":
+            return v
+        else:
+            raise ValueError("BCF suffix should be *.bcf")
+
     @validator("gtc_pattern")
     def validate_gtc_pattern(cls, v):
         if v is None:
