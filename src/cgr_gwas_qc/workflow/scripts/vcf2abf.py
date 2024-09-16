@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
 
 from pathlib import Path
 from typing import Optional
@@ -15,14 +13,8 @@ from pysam import VariantFile
 app = typer.Typer(add_completion=False)
 
 
-# In[2]:
-
-
 def is_biallelic_snp(rec):
     return len(rec.ref) == 1 and len(rec.alts[0]) == 1
-
-
-# In[27]:
 
 
 @app.command()
@@ -122,9 +114,6 @@ def main(
     vcf_info[["id", "af"]].to_csv(
         abf_file, sep="\t", index=False, header=["SNP_ID", "ABF"], na_rep="NA"
     )
-
-
-# In[ ]:
 
 
 if __name__ == "__main__":

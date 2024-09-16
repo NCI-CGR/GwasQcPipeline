@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
 
 """Extracts Illumina scores from a multisample VCF for target sample and writes into a single sample adpc.bin format."""
 from pathlib import Path
@@ -15,9 +13,6 @@ from pysam import VariantFile
 
 # from more_itertools import unzip
 from cgr_gwas_qc.parsers.illumina import AdpcRecord, AdpcWriter
-
-# In[ ]:
-
 
 app = typer.Typer(add_completion=False)
 
@@ -99,9 +94,6 @@ def main(
             fh.write(record)
 
 
-# In[2]:
-
-
 ## function to adpc records
 def vcf_to_adpc_record(vcf_info) -> Generator[AdpcRecord, None, None]:
     for x_raw, y_raw, x_norm, y_norm, genotype_score, genotype in zip(
@@ -127,9 +119,6 @@ def vcf_to_adpc_record(vcf_info) -> Generator[AdpcRecord, None, None]:
 #                            adpc_records.append(record)
 #                            i+=1
 #     return(pd.DataFrame(adpc_records,columns=['x_raw', 'y_raw', 'x_norm', 'y_norm', 'genotype_score', 'genotype']))
-
-
-# In[ ]:
 
 
 if __name__ == "__main__":
