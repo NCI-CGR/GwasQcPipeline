@@ -164,7 +164,7 @@ def _add_unexpected_replicate_status(df: pd.DataFrame) -> pd.DataFrame:
     # iterate over each row in the dataframe
     for index, row in df.iterrows():
         # Check if unexpected replicate and extract information
-        if row["is_unexpected_replicate"] == "True":
+        if row["is_unexpected_replicate"]:
             pair = row["unexpected_replicate_ids"].split("|")
             current_subject = df.loc[
                 index, "Group_By_Subject_ID"
@@ -173,7 +173,7 @@ def _add_unexpected_replicate_status(df: pd.DataFrame) -> pd.DataFrame:
             other_subject = "".join([str(subid) for subid in pair if subid != current_subject])
 
             # Check contamination status of current subject
-            if df.loc[index, "is_contaminated"] == "False":
+            if not df.loc[index, "is_contaminated"]:
                 other_subject_index = df[df["Group_By_Subject_ID"] == other_subject].index
                 other_subject_row = df.iloc[other_subject_index]
                 is_contaminated = other_subject_row["is_contaminated"]
@@ -181,12 +181,11 @@ def _add_unexpected_replicate_status(df: pd.DataFrame) -> pd.DataFrame:
                 # Update status of current subject if other subject is contaminated
                 if is_contaminated.all():
                     df.loc[index, "unexpected_replicate_status"] = 1
-                    df.loc[index, "is_unexpected_replicate"] = "False"
+                    df.loc[index, "is_unexpected_replicate"] = False
 
                 else:
-                    df.loc[
-                        index, "unexpected_replicate_status"
-                    ] = 3  # Neither contaminated, no change
+                    # Neither contaminated, no change
+                    df.loc[index, "unexpected_replicate_status"] = 3
 
             # Current subject is contaminated (no status change)
             else:
