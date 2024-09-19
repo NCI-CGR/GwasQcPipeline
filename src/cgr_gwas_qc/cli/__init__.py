@@ -4,6 +4,7 @@ Welcome to the CGR Gwas Qc Pipeline CLI. Through this interface you can try a
 demo, create a config file, run pre-flight checks, and interact with
 snakemake.
 """
+
 import typer
 
 from cgr_gwas_qc.cli import cgems_copy, config, pre_flight, snakemake, submit, version

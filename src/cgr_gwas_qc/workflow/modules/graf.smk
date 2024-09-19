@@ -1,4 +1,4 @@
-#Deprecated as of graf2.4 implementation
+# Deprecated as of graf2.4 implementation
 from cgr_gwas_qc import load_config
 
 cfg = load_config()

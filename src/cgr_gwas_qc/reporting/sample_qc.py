@@ -197,9 +197,9 @@ class SampleSummary:
     @staticmethod
     def _count_subjects(sample_qc: pd.DataFrame) -> int:
         Subject_IDs = sample_qc.Group_By_Subject_ID
-        Subject_IDs[
-            sample_qc.is_internal_control
-        ] = "QC"  # Treat internal controls as a single subject
+        Subject_IDs[sample_qc.is_internal_control] = (
+            "QC"  # Treat internal controls as a single subject
+        )
         return Subject_IDs.unique().shape[0]
 
 

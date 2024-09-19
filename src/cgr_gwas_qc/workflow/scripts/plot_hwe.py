@@ -7,6 +7,7 @@ This script plots the p-value QQ-plot for the Hardy-Weinberg equilibrium exact-t
 Output:
     ``population_level/hwe_plots/{population}.png``
 """
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt

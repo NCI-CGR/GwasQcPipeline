@@ -157,7 +157,7 @@ sub GetAncestrySnps
     	}
     }
     die "\nERROR: didn't find ancestry SNP file $baseAncFile!\n" unless (-e $ancFile);
-	
+
     my %rsSnpIds = ();
     my %gb37SnpIds = ();
     my %gb38SnpIds = ();

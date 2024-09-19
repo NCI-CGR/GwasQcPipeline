@@ -1,4 +1,5 @@
 """Compares a plink BIM file with the 1KG VCF and flags SNPs for removal."""
+
 import re
 
 import pandas as pd

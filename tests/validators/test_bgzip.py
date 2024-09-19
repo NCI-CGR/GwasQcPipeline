@@ -3,6 +3,7 @@
 Since this is a binary format, it would be really hard to test individual
 issues. For now I am just testing that a good file passes.
 """
+
 import pytest
 
 from cgr_gwas_qc.testing.data import FakeData

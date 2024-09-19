@@ -1,4 +1,5 @@
 """Validate that file is a LIMs Sample Sheet."""
+
 from pathlib import Path
 
 import pandas as pd

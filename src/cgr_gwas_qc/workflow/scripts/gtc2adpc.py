@@ -50,7 +50,7 @@ def get_adpc_records(bpm_file: Path, gtc_file: Path) -> Generator[AdpcRecord, No
     genotype_scores = gtc.get_genotype_scores()
     genotypes = fix_genotype_codes(gtc.get_genotypes())
 
-    for (x_raw, y_raw, x_norm, y_norm, genotype_score, genotype) in zip(
+    for x_raw, y_raw, x_norm, y_norm, genotype_score, genotype in zip(
         x_raw_values, y_raw_values, x_norm_values, y_norm_values, genotype_scores, genotypes
     ):
         yield AdpcRecord(x_raw, y_raw, x_norm, y_norm, genotype_score, genotype)

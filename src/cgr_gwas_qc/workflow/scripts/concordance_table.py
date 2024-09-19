@@ -16,6 +16,7 @@ Reads the plink ``.genome`` format file and calculates concordance as
     is_ge_concordance, boolean, True if concordance was greater than ``software_params.dup_concordance_cutoff``
 
 """
+
 from pathlib import Path
 
 import pandas as pd

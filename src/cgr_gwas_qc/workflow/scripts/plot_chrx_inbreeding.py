@@ -9,6 +9,7 @@ Output:
     ``sample_level/chrx_inbreeding.png``
 
 """
+
 import os
 from pathlib import Path
 from typing import Optional

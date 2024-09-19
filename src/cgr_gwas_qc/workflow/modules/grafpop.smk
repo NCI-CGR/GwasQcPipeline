@@ -2,6 +2,7 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
+
 rule extract_fingerprint_snps:
     """Extract fingerprint SNPs from a PLINK data and convert to a GRAF."""
     input:
@@ -45,6 +46,7 @@ rule grafpop_populations:
         grafpop {input.bim} {output[0]} > {log} 2>&1 || exit_code=$?; if [ $exit_code -ne 1 ]; then exit $exit_code; fi
         """
 
+
 rule grafpop_ancestry:
     """Create summary table with ancestry calls."""
     input:
@@ -56,5 +58,3 @@ rule grafpop_ancestry:
         cfg.conda("grafpop")
     shell:
         "SaveSamples.pl {input[0]} {output[0]}"
-
-

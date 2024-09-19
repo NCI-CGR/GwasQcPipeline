@@ -10,6 +10,7 @@ Output:
     ``population_level/pca_png/{population}.png``
 
 """
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt

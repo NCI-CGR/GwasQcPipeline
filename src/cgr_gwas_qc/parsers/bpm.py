@@ -1,4 +1,5 @@
 """Parser for the Illumina BPM format."""
+
 import re
 from contextlib import contextmanager
 from dataclasses import dataclass

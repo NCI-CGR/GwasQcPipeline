@@ -46,11 +46,11 @@ class ClusterOptions:
 
     @property
     def mem_mb(self):
-        return self.mem / 1024 ** 2
+        return self.mem / 1024**2
 
     @property
     def mem_gb(self):
-        return self.mem / 1024 ** 3
+        return self.mem / 1024**3
 
     @property
     def command(self):
@@ -62,15 +62,15 @@ class ClusterOptions:
             return 1024 * int(data["mem_kb"])  # convert KB to Bytes
 
         if "mem_mb" in data:
-            return 1024 ** 2 * int(data["mem_mb"])  # convert MB to Bytes
+            return 1024**2 * int(data["mem_mb"])  # convert MB to Bytes
 
         if "mem_gb" in data:
-            return 1024 ** 3 * int(data["mem_gb"])  # Convert GB to Bytes
+            return 1024**3 * int(data["mem_gb"])  # Convert GB to Bytes
 
         if "mem" in data:  # Assume mem is mem_gb
-            return 1024 ** 3 * int(data["mem"])  # Convert GB to Bytes
+            return 1024**3 * int(data["mem"])  # Convert GB to Bytes
 
-        return 1024 ** 3 * 2  # Default to 2GB
+        return 1024**3 * 2  # Default to 2GB
 
     @staticmethod
     def _get_time(data: Dict):
