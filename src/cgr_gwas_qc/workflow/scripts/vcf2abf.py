@@ -5,7 +5,7 @@
 from pathlib import Path
 from typing import Optional
 
-import numpy as np
+# import numpy as np
 import pandas as pd
 import typer
 from pysam import VariantFile
@@ -58,14 +58,23 @@ def main(
                 rec.ref[0],
                 rec.alts[0],
                 is_biallelic_snp(rec),
-                rec.info["IGC"],
+                # rec.info["IGC"],
                 rec.info["ALLELE_A"],
             ]
         )
 
     vcf_info = pd.DataFrame(
         vcf_info,
-        columns=["id", "chrom", "pos", "ref", "alt", "is_biallelic_snp", "gc_score", "allele_a"],
+        columns=[
+            "id",
+            "chrom",
+            "pos",
+            "ref",
+            "alt",
+            "is_biallelic_snp",
+            # "gc_score",
+            "allele_a",
+        ],
     )
     vcf_info["is_chrompos_uniq"] = (
         vcf_info.duplicated(subset=["chrom", "pos"], keep=False) == False
@@ -109,7 +118,7 @@ def main(
     # A pseudo way to switch from population AF to Illumina A/B frequency
     vcf_info["af"] = abs(vcf_info["allele_a"] - (vcf_info["ac"] / vcf_info["an"]))
     # Setting AF to na if gentrain score is not >0, if this is egt file was an older one
-    vcf_info["af"].where(vcf_info.gc_score > 0, np.nan, inplace=True)
+    # vcf_info["af"].where(vcf_info.gc_score > 0, np.nan, inplace=True)
     # writing abf file
     vcf_info[["id", "af"]].to_csv(
         abf_file, sep="\t", index=False, header=["SNP_ID", "ABF"], na_rep="NA"
