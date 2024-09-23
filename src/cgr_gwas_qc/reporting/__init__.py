@@ -3,7 +3,13 @@
 These tools include report templates and various constants used during
 reporting.
 """
-from .constants import CASE_CONTROL_COLORS, CASE_CONTROL_DTYPE, REPORT_NAME_MAPPER, SEX_DTYPE
+from .constants import (
+    CASE_CONTROL_COLORS,
+    CASE_CONTROL_DTYPE,
+    REPORT_NAME_MAPPER,
+    SEX_DTYPE,
+    UNEXPECTED_REPLICATE_STATUS_DTYPE,
+)
 from .qc_exclusions import ExclusionTables
 from .sample_qc import SampleQC
 from .subject_qc import SubjectQC
@@ -18,4 +24,5 @@ __all__ = [
     "SampleQC",
     "SEX_DTYPE",
     "SubjectQC",
+    "UNEXPECTED_REPLICATE_STATUS_DTYPE",
 ]

@@ -13,6 +13,8 @@ CASE_CONTROL_LABEL_COLORS = {
 
 SEX_DTYPE = pd.CategoricalDtype(categories=["F", "M", "U"])
 
+UNEXPECTED_REPLICATE_STATUS_DTYPE = pd.CategoricalDtype(categories=[0, 1, 2, 3])
+
 # Mapping current column names to names from the legacy workflow to maintain
 # consistency in deliverables.
 REPORT_NAME_MAPPER = {
