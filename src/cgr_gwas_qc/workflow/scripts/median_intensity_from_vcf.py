@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
 
 from pathlib import Path
 from statistics import median
@@ -35,7 +33,7 @@ def main(
     vcf = VariantFile(vcf_file)
 
     # loops over all records in the VCF, fetches the 'X' and 'Y' intensity values, sums them and stores them in the list
-    # of 'sample_values'.z
+    # of 'sample_values'
     sample_values = []
     for rec in vcf:
         sample_values.append(np.sum([rec.samples[sample_id].get(key) for key in fields_to_fetch]))
@@ -46,9 +44,12 @@ def main(
     df.to_csv(outfile, index=False)
 
 
-if __name__ == "__main__" and "snakemake" in locals():
-    main(
-        **{k: v for k, v in snakemake.input.items() if not k.startswith("_")},  # type: ignore # noqa
-        **{k: v for k, v in snakemake.params.items()},  # type: ignore # noqa
-        outfile=snakemake.output[0],  # type: ignore # noqa
-    )
+if __name__ == "__main__":
+    if "snakemake" in locals():
+        main(
+            **{k: v for k, v in snakemake.input.items() if not k.startswith("_")},  # type: ignore # noqa
+            **{k: v for k, v in snakemake.params.items()},  # type: ignore # noqa
+            outfile=snakemake.output[0],  # type: ignore # noqa
+        )
+    else:
+        app()
