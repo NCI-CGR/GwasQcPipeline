@@ -97,7 +97,9 @@ class UserFiles(BaseModel):
 
     @validator("bcf")
     def validate_bcf(cls, v):
-        if v.suffix == ".bcf":
+        if v is None:
+            return v
+        elif v.suffix == ".bcf":
             return v
         else:
             raise ValueError("BCF suffix should be *.bcf")
