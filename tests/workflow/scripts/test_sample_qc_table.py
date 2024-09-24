@@ -257,6 +257,7 @@ def fake_sample_qc() -> pd.DataFrame:
         "is_contaminated",
         "is_discordant_replicate",
     ]
+
     data = [
         ("SP00001", "SB00001", "", False, False, 0.99, False, False, False, False),
         ("SP00002", "SB00002", "", False, False, 0.82, False, True, False, False),
@@ -321,9 +322,10 @@ def test_add_analytic_exclusion(fake_sample_qc, contam, rep_discordant, num_remo
     assert num_removed == fake_sample_qc.analytic_exclusion.sum()
 
 
+# change these since I updated fake_sample_qc
 @pytest.mark.parametrize(
     "contam,rep_discordant,num_subjects",
-    [(False, False, 8), (True, False, 8), (False, True, 6), (True, True, 6)],
+    [(False, False, 9), (True, False, 9), (False, True, 8), (True, True, 8)],
 )
 def test_add_subject_representative(fake_sample_qc, contam, rep_discordant, num_subjects):
     sample_qc_table._add_analytic_exclusion(fake_sample_qc, contam, rep_discordant)
@@ -333,7 +335,7 @@ def test_add_subject_representative(fake_sample_qc, contam, rep_discordant, num_
 
 @pytest.mark.parametrize(
     "contam,rep_discordant,num_subjects",
-    [(False, False, 1), (True, False, 1), (False, True, 3), (True, True, 3)],
+    [(False, False, 1), (True, False, 1), (False, True, 2), (True, True, 2)],
 )
 def test_add_subject_dropped_from_study(fake_sample_qc, contam, rep_discordant, num_subjects):
     sample_qc_table._add_analytic_exclusion(fake_sample_qc, contam, rep_discordant)
