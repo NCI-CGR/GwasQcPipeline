@@ -35,9 +35,19 @@ class UserFiles(BaseModel):
             bim: /path/to/samples.bim
             fam: /path/to/samples.fam
 
+    or
+
+    .. code-block:: yaml
+
+        user_files:
+            output_pattern: '{prefix}/{file_type}.{ext}'
+            bcf: /path/to/samples.bcf
+
     .. note::
-        The IDAT/GTC patterns, PED/MAP paths, and BED/BIM/FAM paths are mutually exclusive.
+        The BCF file, IDAT/GTC patterns, PED/MAP paths, BED/BIM/FAM paths are all mutually exclusive.
         You should only provide one set of patterns/paths.
+
+
     """
 
     output_pattern: str = Field(
