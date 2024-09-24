@@ -15,6 +15,7 @@ Entry Points Sub-workflow
    - ``user_files.bed``
    - ``user_files.bim``
    - ``user_files.fam``
+   - ``user_files.bcf``
 
 **Major Outputs**:
 
@@ -22,7 +23,7 @@ Entry Points Sub-workflow
    - ``sample_level/samples.bim``
    - ``sample_level/samples.fam``
 
-There are three paths we can take to create these files:
+There are four paths we can take to create these files:
 
 1. If GTC files are provided using ``user_files.gtc_pattern`` then we will
 
@@ -34,3 +35,4 @@ There are three paths we can take to create these files:
 
 2. If an aggregated PED/MAP is provided using ``user_files.ped`` and ``user_files.map`` then we will convert the PED/MAP to BED/BIM/FAM.
 3. If an aggregated BED/BIM/FAM is provided using ``user_files.bed``, ``user_files.bim``, ``user_files.fam`` then we will create a symbolic link.
+4. If an aggregated BCF file is provided using ``user_files.bcf`` then we will convert the BCF to BED/BIM/FAM.
