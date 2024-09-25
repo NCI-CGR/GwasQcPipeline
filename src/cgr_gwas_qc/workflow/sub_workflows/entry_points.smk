@@ -177,3 +177,40 @@ elif cfg.config.user_files.bed and cfg.config.user_files.bim and cfg.config.user
             "ln -s $(readlink -f {input.bed}) {output.bed} && "
             "ln -s $(readlink -f {input.bim}) {output.bim} && "
             "ln -s $(readlink -f {input.fam}) {output.fam}"
+
+elif cfg.config.user_files.bcf:
+
+    ################################################################################
+    # Aggregated BCF
+    ################################################################################
+    localrules:
+        convert_bcf_to_plink_bed,
+
+    rule convert_bcf_to_plink_bed:
+        """Converts BCF to plink BED file
+
+        Path to aggregated BCF file is expected in user_files in config. The expected
+        VCF should be created using BCFtools/gtc2vcf. The BCF will be converted to BED
+        file for processing.
+        """
+        input:
+            bcf=cfg.config.user_files.bcf,
+        params:
+            prefix="sample_level/samples",
+        output:
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+        log:
+            "sample_level/samples.log",
+        conda:
+            cfg.conda("plink2")
+        resources:
+            mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+        shell:
+            "plink "
+            "--allow-extra-chr 0 --keep-allele-order --double-id "
+            "--bcf {input.bcf} "
+            "--make-bed "
+            "--out {params.prefix} "
+            "--memory {resources.mem_mb}"

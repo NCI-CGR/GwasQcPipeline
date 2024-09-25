@@ -35,9 +35,19 @@ class UserFiles(BaseModel):
             bim: /path/to/samples.bim
             fam: /path/to/samples.fam
 
+    or
+
+    .. code-block:: yaml
+
+        user_files:
+            output_pattern: '{prefix}/{file_type}.{ext}'
+            bcf: /path/to/samples.bcf
+
     .. note::
-        The IDAT/GTC patterns, PED/MAP paths, and BED/BIM/FAM paths are mutually exclusive.
+        The BCF file, IDAT/GTC patterns, PED/MAP paths, BED/BIM/FAM paths are all mutually exclusive.
         You should only provide one set of patterns/paths.
+
+
     """
 
     output_pattern: str = Field(
@@ -88,6 +98,21 @@ class UserFiles(BaseModel):
         None,
         description="The full path to an aggregated FAM file if the sample level GTC files are not available.",
     )
+
+    # BCF
+    bcf: Optional[Path] = Field(
+        None,
+        description="The full path to an aggregated BCF/VCF file perferably encoding the GenCall scores.",
+    )
+
+    @validator("bcf")
+    def validate_bcf(cls, v):
+        if v is None:
+            return v
+        elif v.suffix == ".bcf":
+            return v
+        else:
+            raise ValueError("BCF suffix should be *.bcf")
 
     @validator("gtc_pattern")
     def validate_gtc_pattern(cls, v):
