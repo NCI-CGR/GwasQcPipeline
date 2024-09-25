@@ -22,6 +22,6 @@ Intensity check Sub-workflow
 .. |bcf_input_intensity| image:: ../static/bcf_intensity.svg
    :width: 45%
 
-The Intenstiy check sub-workflow.
-This workflow will caclucate the median intensity for each sample individually.
+The Intensity check sub-workflow.
+This workflow will calculate the median intensity for each sample individually.
 It requires that you have an aggregated BCF or IDAT files.

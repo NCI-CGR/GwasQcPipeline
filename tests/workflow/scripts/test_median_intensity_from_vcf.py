@@ -3,7 +3,7 @@
 
 """Test calculation of median intensity from BCF
 
-We need to assess whether the intensity meets the miniumum threshold. For this purpose, we typically check median IDAT intensity. Here we attempt to test the same with BCF as input file.
+We need to assess whether the intensity meets the minimum threshold. For this purpose, we typically check median IDAT intensity. Here we attempt to test the same with BCF as input file.
 """
 
 import pandas as pd

@@ -30,4 +30,4 @@ The contamination sub-workflow.
 This workflow will estimate contamination using verifyIDintensity on each sample individually.
 It requires that you have aggregated BCF or GTC files.
 It first pulls B-allele frequencies from the 1000 Genomes VCF file.
-It then estimate contamination for each sample and aggregates these results.
+It then estimates contamination for each sample and aggregates these results.
