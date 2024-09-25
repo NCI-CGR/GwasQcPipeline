@@ -107,20 +107,6 @@ def vcf_to_adpc_record(vcf_info) -> Generator[AdpcRecord, None, None]:
         yield AdpcRecord(x_raw, y_raw, x_norm, y_norm, genotype_score, genotype)
 
 
-# In[ ]:
-
-
-# def adpc_as_df(adpc):
-#     i=0
-#     adpc_records = []
-#     with AdpcReader(adpc) as fh:
-#                    for record in fh:
-#                       # if i <10000:
-#                            adpc_records.append(record)
-#                            i+=1
-#     return(pd.DataFrame(adpc_records,columns=['x_raw', 'y_raw', 'x_norm', 'y_norm', 'genotype_score', 'genotype']))
-
-
 if __name__ == "__main__":
     if "snakemake" in locals():
         defaults = {}

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[5]:
-
 
 import shutil
 from concurrent.futures import ProcessPoolExecutor
@@ -14,8 +12,6 @@ from snakemake.rules import expand
 from cgr_gwas_qc.parsers import sample_sheet
 from cgr_gwas_qc.typing import PathLike
 from cgr_gwas_qc.workflow.scripts import agg_median_idat_intensity, median_intensity_from_vcf
-
-# In[ ]:
 
 
 def main(
@@ -38,9 +34,6 @@ def main(
         shutil.rmtree(tmp_dir)
 
 
-# In[10]:
-
-
 def calculate_median_intensity_from_vcf(ss, vcf_file, outdir, threads) -> List[Path]:
     outfile_pattern = (outdir / "{Sample_ID}.csv").as_posix()
     with ProcessPoolExecutor(threads) as executor:
@@ -61,9 +54,6 @@ def calculate_median_intensity_from_vcf(ss, vcf_file, outdir, threads) -> List[P
     outfiles = [Path(f) for f in expand(outfile_pattern, **ss.to_dict("list"))]
     assert all(f.exists() for f in outfiles)
     return outfiles
-
-
-# In[6]:
 
 
 if __name__ == "__main__" and "snakemake" in locals():
