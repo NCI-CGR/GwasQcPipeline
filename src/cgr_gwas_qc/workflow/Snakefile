@@ -48,7 +48,7 @@ use rule * from sample_qc
 targets.extend(sample_qc.targets)
 
 
-if sample_qc.use_contamination or cfg.config.user_files.bcf:
+if sample_qc.use_contamination:
 
     module contamination:
         snakefile:
@@ -58,20 +58,8 @@ if sample_qc.use_contamination or cfg.config.user_files.bcf:
 
     use rule * from contamination
 
+
     targets.extend(contamination.targets)
-
-
-if sample_qc.use_contamination or cfg.config.user_files.bcf:
-
-    module intensity_check:
-        snakefile:
-            cfg.subworkflow("intensity_check")
-        config:
-            config
-
-    use rule * from intensity_check
-
-    targets.extend(intensity_check.targets)
 
 
 module subject_qc:

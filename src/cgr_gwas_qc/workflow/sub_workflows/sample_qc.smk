@@ -11,10 +11,6 @@ use_contamination = (
     and cfg.config.workflow_params.remove_contam
 )
 
-idat_intensity_retrieved = Path("sample_level/contamination/median_idat_intensity.csv").is_file()
-
-contamination_checked = Path("sample_level/contamination/verifyIDintensity.csv").is_file()
-
 
 localrules:
     all_sample_qc,
@@ -200,7 +196,7 @@ use rule miss from plink as plink_call_rate_post2 with:
 # -------------------------------------------------------------------------------
 # Contamination
 # -------------------------------------------------------------------------------
-if use_contamination or (idat_intensity_retrieved and contamination_checked):
+if use_contamination:
 
     localrules:
         sample_contamination_verifyIDintensity,
@@ -489,7 +485,7 @@ else:
 
 def _contam(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
-    if use_contamination or (idat_intensity_retrieved and contamination_checked):
+    if use_contamination:
         return rules.sample_contamination_verifyIDintensity.output[0]
     return []
 
@@ -497,8 +493,6 @@ def _contam(wildcards):
 def _intensity(wildcards):
     uf, wf = cfg.config.user_files, cfg.config.workflow_params
     if use_contamination:
-        return "sample_level/contamination/median_idat_intensity.csv"
-    elif idat_intensity_retrieved:
         return "sample_level/contamination/median_idat_intensity.csv"
     return []
 

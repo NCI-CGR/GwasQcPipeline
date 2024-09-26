@@ -17,9 +17,7 @@ class ReferenceFiles(BaseModel):
 
     """
 
-    illumina_manifest_file: Optional[Path] = Field(
-        None, description="Path to the Illumina provided BPM file."
-    )
+    illumina_manifest_file: Path = Field(..., description="Path to the Illumina provided BPM file.")
 
     illumina_cluster_file: Optional[Path] = Field(
         None, description="Path to the array cluster EGT file."
