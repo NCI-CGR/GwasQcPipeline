@@ -21,11 +21,36 @@ rule pull_b_allele_freq_from_1kg:
         population=cfg.config.software_params.contam_population,
     output:
         abf_file="sample_level/{}.{}.abf.txt".format(
-            cfg.config.reference_files.illumina_manifest_file.stem,
+            cfg.config.snp_array,
             cfg.config.software_params.contam_population,
         ),
     script:
         "../scripts/bpm2abf.py"
+
+
+rule pull_b_allele_freq_from_1kg_bcfinput:
+    """Pulls the population level allele frequencies from the 1KG project.
+
+    ``verifyIDintensity`` requires population level allele frequencies
+    for its model. Here we use a custom script to pull out the allele B
+    frequencies (ABF) from the 1000 genomes project (1KG). To do this we
+    take each marker from the manifest file (BPM) and pull out ABF in the
+    1KG ``.vcf`` from the ``INFO`` column. The script allows pulling out
+    allele frequencies for different super populations but defaults to
+    ``AF`` which ignores super population.
+    """
+    input:
+        bcf_file=cfg.config.user_files.bcf,
+        kgvcf_file=cfg.config.reference_files.thousand_genome_vcf,
+    params:
+        population=cfg.config.software_params.contam_population,
+    output:
+        abf_file="sample_level/{}.{}.abf.txt".format(
+            cfg.config.snp_array,
+            cfg.config.software_params.contam_population,
+        ),
+    script:
+        "../scripts/vcf2abf.py"
 
 
 rule update_snps_to_1kg_rsID:

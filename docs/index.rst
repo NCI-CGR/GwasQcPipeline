@@ -29,6 +29,7 @@ This lets us take advantage of snakemake_'s amazing workflow management system, 
    :maxdepth: 1
 
    sub_workflows/entry_points
+   sub_workflows/intensity_check
    sub_workflows/contamination
    sub_workflows/sample_qc
    sub_workflows/subject_qc

@@ -106,7 +106,7 @@ class Config(BaseModel):
     user_files: UserFiles = Field(
         ...,
         description="User file namespace. "
-        "User files include the user provided genotype data in IDAT/GTC, PED/MAP, or BED/BIM/FAM formats.",
+        "User files include the user provided genotype data in BCF, IDAT/GTC, PED/MAP or BED/BIM/FAM formats.",
     )
 
     software_params: SoftwareParams = Field(
