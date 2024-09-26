@@ -168,63 +168,6 @@ if cfg.config.user_files.gtc_pattern:
             script:
                 "../scripts/plink_merge.py"
 
-    else:
-
-        def _get_gtc(wildcards):
-            return cfg.expand(
-                cfg.config.user_files.gtc_pattern,
-                query=f"Sample_ID == '{wildcards.Sample_ID}'",
-            )[0]
-
-        rule per_sample_gtc_to_ped:
-            """Converts a sample's GTC/BPM to PED/MAP.
-
-            .. warning::
-                This is a submission hot spot creating 1 job per sample.
-            """
-            input:
-                gtc=_get_gtc,
-                bpm=cfg.config.reference_files.illumina_manifest_file,
-            params:
-                strand=cfg.config.software_params.strand,
-            output:
-                ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
-                map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
-            resources:
-                mem_mb=lambda wildcards, attempt: attempt * 1024,
-            script:
-                "../scripts/gtc2plink.py"
-
-        rule merge_gtc_sample_peds:
-            """Merges multiple samples using ``plink --merge-list``.
-
-            Merge and convert sample(s) into an aggregated binary ``plink``
-            format.
-            """
-            input:
-                ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
-                map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
-                _=rules.plink_conda.output[0],
-            params:
-                out_prefix="sample_level/samples",
-                conda_env=cfg.conda("plink2"),
-                notemp=config.get("notemp", False),
-            output:
-                bed="sample_level/samples.bed",
-                bim="sample_level/samples.bim",
-                fam="sample_level/samples.fam",
-                nosex="sample_level/samples.nosex",
-            log:
-                "sample_level/samples.log",
-            threads: 8
-            resources:
-                mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
-                time_hr=lambda wildcards, attempt: 4 * attempt,
-            script:
-                "../scripts/plink_merge.py"
-
->>>>>>> 20c80c5d2532108667ea94da15420a6cdb1b0ac9
-
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
 
     ################################################################################
