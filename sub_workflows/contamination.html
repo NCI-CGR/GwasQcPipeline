@@ -39,7 +39,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Sample QC Sub-workflow" href="sample_qc.html" />
-    <link rel="prev" title="Entry Points Sub-workflow" href="entry_points.html" /> 
+    <link rel="prev" title="Intensity check Sub-workflow" href="intensity_check.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,6 +93,7 @@
 <p><span class="caption-text">QC Sub Workflows</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intensity_check.html">Intensity check Sub-workflow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC Sub-workflow</a></li>
@@ -183,35 +184,28 @@
 <dt><strong>Workflow File</strong>:</dt><dd><p><a class="reference external" href="https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/contamination.smk">https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/contamination.smk</a></p>
 </dd>
 </dl>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/&lt;BPM</span> <span class="pre">Prefix&gt;.&lt;software_params.contam_population&gt;.abf.txt</span></code> B allele frequencies from the 1000 genomes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/contamination/verifyIDintensity.csv</span></code> aggregated table of contamination scores.</p></li>
+</ul>
+</div></blockquote>
 <p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">reference_files.thousand_genome_vcf</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">reference_files.thousand_genome_tbi</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">user_files.idat_pattern</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.bcf</span></code> or ( <code class="docutils literal notranslate"><span class="pre">reference_files.illumina_manifest_file</span></code> and <code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code> )</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">software_params.contam_population</span></code></p></li>
 </ul>
 </div></blockquote>
-<p><strong>Major Outputs</strong>:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/&lt;BPM</span> <span class="pre">Prefix&gt;.&lt;software_params.contam_population&gt;.abf.txt</span></code> B allele frequencies from the 1000 genomes.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/contamination/median_idat_intensity.csv</span></code> aggregated table of median IDAT intensities.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/contamination/verifyIDintensity.csv</span></code> aggregated table of contamination scores.</p></li>
-</ul>
-</div></blockquote>
-<figure class="align-default" id="fig-contamination-workflow">
-<img alt="../_images/contamination.png" src="../_images/contamination.png" />
-<figcaption>
-<p><span class="caption-number">Fig. 3 </span><span class="caption-text">The contamination sub-workflow.
+<p><a class="reference internal" href="../_images/bcf_contamination.svg"><img alt="bcf_input_contamination" src="../_images/bcf_contamination.svg" width="45%" /></a> <a class="reference internal" href="../_images/gtc_contamination.svg"><img alt="gtc_input_contamination" src="../_images/gtc_contamination.svg" width="45%" /></a></p>
+<p>The contamination sub-workflow.
 This workflow will estimate contamination using verifyIDintensity on each sample individually.
-It requires that you have GTC/IDAT files.
+It requires that you have aggregated BCF or GTC files.
 It first pulls B-allele frequencies from the 1000 Genomes VCF file.
-It then estimate contamination for each sample and aggregates these results.
-Finally, it also estimates the per sample median IDAT intensity, which is used to filter contamination results in the <a class="reference internal" href="sample_qc.html#sample-qc"><span class="std std-ref">Sample QC Sub-workflow</span></a></span><a class="headerlink" href="#fig-contamination-workflow" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
+It then estimates contamination for each sample and aggregates these results.</p>
 </section>
 
 
@@ -225,7 +219,7 @@ Finally, it also estimates the per sample median IDAT intensity, which is used t
         <a href="sample_qc.html" class="btn btn-neutral float-right" title="Sample QC Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="entry_points.html" class="btn btn-neutral float-left" title="Entry Points Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="intensity_check.html" class="btn btn-neutral float-left" title="Intensity check Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

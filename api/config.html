@@ -93,6 +93,7 @@
 <p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/intensity_check.html">Intensity check Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
@@ -207,6 +208,12 @@
 
 <dl class="py attribute">
 <dt>
+<code class="sig-name descname">DD_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/reporting/QC_Report_Data_Dictionary.xlsx')</em></dt>
+<dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">reporting/QC_Report_Data_Dictionary.xlsx</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt>
 <code class="sig-name descname">MODULE_DIR</code><em class="property">: pathlib.Path</em><em class="property"> = PosixPath('/home/runner/work/GwasQcPipeline/GwasQcPipeline/src/cgr_gwas_qc/workflow/modules')</em></dt>
 <dd><p>The absolute path to the <code class="docutils literal notranslate"><span class="pre">workflow/modules</span></code>.</p>
 </dd></dl>
@@ -277,6 +284,12 @@
 <span class="go">0.2</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">data_dictionary</code></dt>
+<dd><p>Return the path to the qc report data dictioanry.</p>
 </dd></dl>
 
 <dl class="py method">

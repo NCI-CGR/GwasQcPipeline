@@ -107,6 +107,7 @@
 <p><span class="caption-text">QC Sub Workflows</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/intensity_check.html">Intensity check Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
@@ -372,7 +373,7 @@ I will walk through each section below and end this page with a full example.</p
 </td>
 <td colspan="2"><p><em>User Files</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>User file namespace. User files include the user provided genotype data in IDAT/GTC, PED/MAP, or BED/BIM/FAM formats.</p></td>
+<tr class="row-even"><td colspan="2"><p>User file namespace. User files include the user provided genotype data in BCF, IDAT/GTC, PED/MAP or BED/BIM/FAM formats.</p></td>
 </tr>
 <tr class="row-odd"><td><p>type</p></td>
 <td><p><em>namespace</em></p></td>
@@ -437,7 +438,7 @@ You should not need to edit this section unless you want to
 <tr class="row-odd"><td colspan="3"><p>properties</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p><strong>illumina_manifest_file</strong></p></li>
+<li><p>illumina_manifest_file</p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Illumina Manifest File</em></p></td>
@@ -565,9 +566,15 @@ Though in reality as long as <code class="docutils literal notranslate"><span cl
 <span class="w">    </span><span class="nt">fam</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.fam</span>
 </pre></div>
 </div>
+<p>or</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">user_files</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">output_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{prefix}/{file_type}.{ext}&#39;</span>
+<span class="w">    </span><span class="nt">bcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/samples.bcf</span>
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The IDAT/GTC patterns, PED/MAP paths, and BED/BIM/FAM paths are mutually exclusive.
+<p>The BCF file, IDAT/GTC patterns, PED/MAP paths, BED/BIM/FAM paths are all mutually exclusive.
 You should only provide one set of patterns/paths.</p>
 </aside>
 </td>
@@ -676,6 +683,20 @@ You should only provide one set of patterns/paths.</p>
 <td colspan="2"><p><em>Fam</em></p></td>
 </tr>
 <tr class="row-odd"><td colspan="2"><p>The full path to an aggregated FAM file if the sample level GTC files are not available.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>bcf</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Bcf</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>The full path to an aggregated BCF/VCF file perferably encoding the GenCall scores.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -1237,7 +1258,7 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
-<td><p>20240823162018</p></td>
+<td><p>20240926142908</p></td>
 </tr>
 </tbody>
 </table>

@@ -93,6 +93,7 @@
 <p><span class="caption-text">QC Sub Workflows</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intensity_check.html">Intensity check Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Subject QC Sub-workflow</a><ul>
@@ -228,7 +229,7 @@
 </div></blockquote>
 <figure class="align-default" id="fig-subject-qc-workflow">
 <img alt="../_images/subject_qc.svg" src="../_images/subject_qc.svg" /><figcaption>
-<p><span class="caption-number">Fig. 5 </span><span class="caption-text">The subject-qc sub-workflow.
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">The subject-qc sub-workflow.
 This runs additional QC checks at the subject and population level.</span><a class="headerlink" href="#fig-subject-qc-workflow" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
@@ -248,7 +249,7 @@ This runs additional QC checks at the subject and population level.</span><a cla
 </div></blockquote>
 <p>During <a class="reference internal" href="sample_qc.html#sample-qc"><span class="std std-ref">Sample QC Sub-workflow</span></a> we build the <code class="docutils literal notranslate"><span class="pre">sample_level/sample_qc.csv</span></code>.
 In this table we have a flag <code class="docutils literal notranslate"><span class="pre">is_subject_representative</span></code> to indicate if a sample was selected to represent the subject.
-The <code class="docutils literal notranslate"><span class="pre">subject_level?subject_qc.csv</span></code> is simply the <code class="docutils literal notranslate"><span class="pre">sample_level/sample_qc.csv</span></code> but only with subject representatives.
+The <code class="docutils literal notranslate"><span class="pre">subject_level/subject_qc.csv</span></code> is simply the <code class="docutils literal notranslate"><span class="pre">sample_level/sample_qc.csv</span></code> but only with subject representatives.
 We then pull out these samples from <code class="docutils literal notranslate"><span class="pre">sample_level/call_rate_2/samples.{bed,bim,fam}</span></code> and rename them to subject IDs.</p>
 </section>
 <section id="population-level-analysis">

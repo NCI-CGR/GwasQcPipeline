@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview: module code &mdash; GwasQcPipeline 1.6.0 documentation</title>
+  <title>Intensity check Sub-workflow &mdash; GwasQcPipeline 1.6.0 documentation</title>
   
 
   
@@ -36,7 +37,9 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contamination Sub-workflow" href="contamination.html" />
+    <link rel="prev" title="Entry Points Sub-workflow" href="entry_points.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -88,13 +91,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started/configuration.html">Configuration Files</a></li>
 </ul>
 <p><span class="caption-text">QC Sub Workflows</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/entry_points.html">Entry Points Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/intensity_check.html">Intensity check Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/contamination.html">Contamination Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/sample_qc.html">Sample QC Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/subject_qc.html">Subject QC Sub-workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sub_workflows/delivery.html">Delivery Sub-workflow</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="entry_points.html">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Intensity check Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="delivery.html">Delivery Sub-workflow</a></li>
 </ul>
 <p><span class="caption-text">User Reference</span></p>
 <ul>
@@ -156,10 +159,14 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Overview: module code</li>
+      <li>Intensity check Sub-workflow</li>
     
     
       <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/sub_workflows/intensity_check.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -171,24 +178,44 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="cgr_gwas_qc/config.html">cgr_gwas_qc.config</a></li>
-<li><a href="cgr_gwas_qc/parsers/bim.html">cgr_gwas_qc.parsers.bim</a></li>
-<li><a href="cgr_gwas_qc/parsers/bpm.html">cgr_gwas_qc.parsers.bpm</a></li>
-<li><a href="cgr_gwas_qc/parsers/eigensoft.html">cgr_gwas_qc.parsers.eigensoft</a></li>
-<li><a href="cgr_gwas_qc/parsers/graf.html">cgr_gwas_qc.parsers.graf</a></li>
-<li><a href="cgr_gwas_qc/parsers/illumina/IlluminaBeadArrayFiles.html">cgr_gwas_qc.parsers.illumina.IlluminaBeadArrayFiles</a></li>
-<li><a href="cgr_gwas_qc/parsers/illumina/adpc.html">cgr_gwas_qc.parsers.illumina.adpc</a></li>
-<li><a href="cgr_gwas_qc/parsers/king.html">cgr_gwas_qc.parsers.king</a></li>
-<li><a href="cgr_gwas_qc/parsers/plink.html">cgr_gwas_qc.parsers.plink</a></li>
-<li><a href="cgr_gwas_qc/testing/data.html">cgr_gwas_qc.testing.data</a></li>
-<li><a href="pathlib.html">pathlib</a></li>
+  <section id="intensity-check-sub-workflow">
+<span id="intensity"></span><h1>Intensity check Sub-workflow<a class="headerlink" href="#intensity-check-sub-workflow" title="Permalink to this headline">¶</a></h1>
+<dl class="simple">
+<dt><strong>Workflow File</strong>:</dt><dd><p><a class="reference external" href="https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/intensity_check.smk">https://github.com/NCI-CGR/GwasQcPipeline/blob/default/src/cgr_gwas_qc/workflow/sub_workflows/intensity_check.smk</a></p>
+</dd>
+</dl>
+<p><strong>Config Options</strong>: see <a class="reference internal" href="../getting_started/configuration.html#config-yaml"><span class="std std-ref">The config.yml</span></a> for more details</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.bcf</span></code> or <code class="docutils literal notranslate"><span class="pre">user_files.idat_pattern</span></code></p></li>
 </ul>
+</div></blockquote>
+<p><strong>Major Outputs</strong>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_level/contamination/median_idat_intensity.csv</span></code> aggregated table of median IDAT intensities.</p></li>
+</ul>
+</div></blockquote>
+<p><a class="reference internal" href="../_images/bcf_intensity.svg"><img alt="bcf_input_intensity" src="../_images/bcf_intensity.svg" width="45%" /></a> <a class="reference internal" href="../_images/idat_intensity.svg"><img alt="idat_input_intensity" src="../_images/idat_intensity.svg" width="45%" /></a></p>
+<p>The Intensity check sub-workflow.
+This workflow will calculate the median intensity for each sample individually.
+It requires that you have an aggregated BCF or IDAT files.</p>
+</section>
+
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contamination.html" class="btn btn-neutral float-right" title="Contamination Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="entry_points.html" class="btn btn-neutral float-left" title="Entry Points Sub-workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

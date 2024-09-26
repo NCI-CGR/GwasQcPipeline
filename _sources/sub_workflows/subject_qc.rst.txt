@@ -52,7 +52,7 @@ Selecting Subject Representative
 
 During :ref:`sample-qc` we build the ``sample_level/sample_qc.csv``.
 In this table we have a flag ``is_subject_representative`` to indicate if a sample was selected to represent the subject.
-The ``subject_level?subject_qc.csv`` is simply the ``sample_level/sample_qc.csv`` but only with subject representatives.
+The ``subject_level/subject_qc.csv`` is simply the ``sample_level/sample_qc.csv`` but only with subject representatives.
 We then pull out these samples from ``sample_level/call_rate_2/samples.{bed,bim,fam}`` and rename them to subject IDs.
 
 Population Level Analysis

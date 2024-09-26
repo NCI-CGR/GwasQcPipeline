@@ -38,7 +38,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Contamination Sub-workflow" href="contamination.html" />
+    <link rel="next" title="Intensity check Sub-workflow" href="intensity_check.html" />
     <link rel="prev" title="Configuration Files" href="../getting_started/configuration.html" /> 
 </head>
 
@@ -93,6 +93,7 @@
 <p><span class="caption-text">QC Sub Workflows</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Entry Points Sub-workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intensity_check.html">Intensity check Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contamination.html">Contamination Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sample_qc.html">Sample QC Sub-workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="subject_qc.html">Subject QC Sub-workflow</a></li>
@@ -193,6 +194,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">user_files.bed</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">user_files.bim</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">user_files.fam</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_files.bcf</span></code></p></li>
 </ul>
 </div></blockquote>
 <p><strong>Major Outputs</strong>:</p>
@@ -203,7 +205,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">sample_level/samples.fam</span></code></p></li>
 </ul>
 </div></blockquote>
-<p>There are three paths we can take to create these files:</p>
+<p>There are four paths we can take to create these files:</p>
 <ol class="arabic simple">
 <li><p>If GTC files are provided using <code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code> then we will</p></li>
 </ol>
@@ -217,6 +219,7 @@ If per sample GTC files are provided, then we will convert these files to the PE
 <ol class="arabic simple" start="2">
 <li><p>If an aggregated PED/MAP is provided using <code class="docutils literal notranslate"><span class="pre">user_files.ped</span></code> and <code class="docutils literal notranslate"><span class="pre">user_files.map</span></code> then we will convert the PED/MAP to BED/BIM/FAM.</p></li>
 <li><p>If an aggregated BED/BIM/FAM is provided using <code class="docutils literal notranslate"><span class="pre">user_files.bed</span></code>, <code class="docutils literal notranslate"><span class="pre">user_files.bim</span></code>, <code class="docutils literal notranslate"><span class="pre">user_files.fam</span></code> then we will create a symbolic link.</p></li>
+<li><p>If an aggregated BCF file is provided using <code class="docutils literal notranslate"><span class="pre">user_files.bcf</span></code> then we will convert the BCF to BED/BIM/FAM.</p></li>
 </ol>
 </section>
 
@@ -228,7 +231,7 @@ If per sample GTC files are provided, then we will convert these files to the PE
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="contamination.html" class="btn btn-neutral float-right" title="Contamination Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="intensity_check.html" class="btn btn-neutral float-right" title="Intensity check Sub-workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../getting_started/configuration.html" class="btn btn-neutral float-left" title="Configuration Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
