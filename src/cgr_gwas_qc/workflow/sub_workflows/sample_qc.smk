@@ -2,8 +2,8 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
-BIG_TIME = {1: 10, 2: 48, 3: 96}
-
+mtime = cfg.config.workflow_params.max_time_hr
+BIG_TIME = dict.fromkeys(range(1, 4), mtime) if mtime else {1: 10, 2: 48, 3: 96}
 
 use_contamination = (
     cfg.config.user_files.idat_pattern

@@ -9,8 +9,8 @@ import math
 
 cfg = load_config()
 
-PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
-BIG_TIME = {1: 8, 2: 24, 3: 48}
+mtime = cfg.config.workflow_params.max_time_hr
+BIG_TIME = dict.fromkeys(range(1, 4), mtime) if mtime else {1: 8, 2: 24, 3: 48}
 
 
 localrules:
@@ -280,7 +280,7 @@ use rule genome from plink as population_level_ibd with:
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd.genome",
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        mem_mb=lambda wildcards, attempt, input: max((attempt + 1) * input.size_mb, 1024),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
 
 
