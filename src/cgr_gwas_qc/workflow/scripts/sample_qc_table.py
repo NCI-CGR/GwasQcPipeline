@@ -505,6 +505,58 @@ def _get_reason(sample_qc: pd.DataFrame, flags: Mapping[str, str]):
     return sample_qc.apply(reason_string, axis=1)
 
 
+def _retain_valid_discordant_replicates(sample_qc: pd.DataFrame,) -> pd.DataFrame:
+    """Check and update the status of a pair of samples labeled as
+       discordant expected replicates.
+
+    This function verifies if the provided sample pair is labeled as
+    discordant expected replicates.
+    If they are, it checks for contamination or low call rate flags on
+    each sample.
+    If one of the samples is found to be contaminated or has a low call
+    rate, the function retains the non-contaminated and non-low-call-rate
+    sample, updating its status to remove the expected replicate label.
+    """
+
+    # Iterate through each sample in the DataFrame
+    for index, row in sample_qc.iterrows():
+        # Check if the sample is a discordant expected replicate
+        if row["is_discordant_replicate"]:
+            # Get the list of other samples it is discordant with
+            discordant_samples = row["replicate_ids"].split("|")
+
+            # Initialize flags for contamination and call rate issues
+            is_current_sample_contaminated = row["is_contaminated"]
+            is_current_sample_low_call_rate = row["is_cr2_filtered"]
+
+            # Initialize a flag to track if all discordant samples have issues
+            all_other_samples_issue = True
+
+            # Check each discordant sample
+            for sample_id in discordant_samples:
+                if sample_id == row.name:
+                    continue
+                else:
+                    # Get the row for the discordant sample
+                    discordant_row = sample_qc.loc[sample_id]
+                    if not discordant_row.empty:
+                        # Check if the discordant sample is contaminated or has a low call rate
+                        if (
+                            not discordant_row["is_contaminated"]
+                            and not discordant_row["is_cr2_filtered"]
+                        ):
+                            all_other_samples_issue = False
+                            break
+
+            # If the current sample is not contaminated or low call rate
+            if not is_current_sample_contaminated and not is_current_sample_low_call_rate:
+                # If all other samples have issues, update the current sample's status
+                if all_other_samples_issue:
+                    sample_qc.at[index, "is_discordant_replicate"] = False
+
+    return sample_qc
+
+
 def _add_analytic_exclusion(
     sample_qc: pd.DataFrame, remove_contam: bool, remove_rep_discordant: bool,
 ) -> pd.DataFrame:
@@ -521,6 +573,8 @@ def _add_analytic_exclusion(
         "is_cr1_filtered": "Call Rate 1 Filtered",
         "is_cr2_filtered": "Call Rate 2 Filtered",
     }
+
+    _retain_valid_discordant_replicates(sample_qc)
 
     if remove_contam:
         exclusion_criteria["is_contaminated"] = "Contamination"

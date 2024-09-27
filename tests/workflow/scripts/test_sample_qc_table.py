@@ -248,6 +248,7 @@ def fake_sample_qc() -> pd.DataFrame:
     columns = [
         "Sample_ID",
         "Group_By_Subject_ID",
+        "replicate_ids",
         "is_sample_exclusion",
         "is_internal_control",
         "Call_Rate_2",
@@ -256,37 +257,75 @@ def fake_sample_qc() -> pd.DataFrame:
         "is_contaminated",
         "is_discordant_replicate",
     ]
+
     data = [
-        ("SP00001", "SB00001", False, False, 0.99, False, False, False, False),
-        ("SP00002", "SB00002", False, False, 0.82, False, True, False, False),
-        ("SP00003", "SB00003", False, False, 0.99, False, False, True, True),
-        ("SP00004", "SB00003", False, False, 0.99, False, False, False, True),
-        ("SP00005", "SB00004", False, False, 0.99, False, False, False, True),
-        ("SP00006", "SB00004", False, False, 0.99, False, False, False, True),
-        ("SP00007", "SB00005", False, False, 0.99, False, False, False, False),
-        ("SP00008", "SB00006", False, False, 0.99, False, False, False, False),
-        ("SP00009", "SB00007", False, False, 0.99, False, False, False, False),
-        ("SP00010", "SB00008", False, False, 0.99, False, False, False, False),
-        ("SP00011", "SB00008", False, False, 0.94, False, False, False, False),
-        ("SP00012", "SB00009", False, False, 0.99, False, False, False, False),
-        ("SP00013", "SB00009", False, False, 0.98, False, False, False, False),
-        ("SP00014", "SB00009", False, False, 0.97, False, False, False, False),
+        ("SP00001", "SB00001", "", False, False, 0.99, False, False, False, False),
+        ("SP00002", "SB00002", "", False, False, 0.82, False, True, False, False),
+        ("SP00003", "SB00003", "SP00003|SP00004", False, False, 0.99, False, False, True, True),
+        ("SP00004", "SB00003", "SP00003|SP00004", False, False, 0.99, False, False, False, True),
+        ("SP00005", "SB00004", "SP00005|SP00006", False, False, 0.99, False, False, False, True),
+        ("SP00006", "SB00004", "SP00005|SP00006", False, False, 0.99, False, False, False, True),
+        ("SP00007", "SB00005", "", False, False, 0.99, False, False, False, False),
+        ("SP00008", "SB00006", "", False, False, 0.99, False, False, False, False),
+        ("SP00009", "SB00007", "", False, False, 0.99, False, False, False, False),
+        ("SP00010", "SB00008", "SP00010|SP00011", False, False, 0.99, False, False, False, False),
+        ("SP00011", "SB00008", "SP00010|SP00011", False, False, 0.94, False, False, False, False),
+        (
+            "SP00012",
+            "SB00009",
+            "SP00012|SP00013|SP00014",
+            False,
+            False,
+            0.99,
+            False,
+            False,
+            False,
+            False,
+        ),
+        (
+            "SP00013",
+            "SB00009",
+            "SP00012|SP00013|SP00014",
+            False,
+            False,
+            0.98,
+            False,
+            False,
+            False,
+            False,
+        ),
+        (
+            "SP00014",
+            "SB00009",
+            "SP00012|SP00013|SP00014",
+            False,
+            False,
+            0.97,
+            False,
+            False,
+            False,
+            False,
+        ),
+        ("SP00015", "SB00010", "SP00015|SP00016", False, False, 0.99, False, True, False, True),
+        ("SP00016", "SB00010", "SP00015|SP00016", False, False, 0.99, False, False, False, True),
     ]
     return pd.DataFrame(data, columns=columns).set_index("Sample_ID")
 
 
 @pytest.mark.parametrize(
     "contam,rep_discordant,num_removed",
-    [(False, False, 1), (True, False, 2), (False, True, 5), (True, True, 5)],  # call rate filtered
+    [(False, False, 2), (True, False, 3), (False, True, 5), (True, True, 5)],  # call rate filtered
 )
 def test_add_analytic_exclusion(fake_sample_qc, contam, rep_discordant, num_removed):
+    pd.set_option("display.max_columns", None)
     sample_qc_table._add_analytic_exclusion(fake_sample_qc, contam, rep_discordant)
     assert num_removed == fake_sample_qc.analytic_exclusion.sum()
 
 
+# change these since I updated fake_sample_qc
 @pytest.mark.parametrize(
     "contam,rep_discordant,num_subjects",
-    [(False, False, 8), (True, False, 8), (False, True, 6), (True, True, 6)],
+    [(False, False, 9), (True, False, 9), (False, True, 8), (True, True, 8)],
 )
 def test_add_subject_representative(fake_sample_qc, contam, rep_discordant, num_subjects):
     sample_qc_table._add_analytic_exclusion(fake_sample_qc, contam, rep_discordant)
@@ -296,7 +335,7 @@ def test_add_subject_representative(fake_sample_qc, contam, rep_discordant, num_
 
 @pytest.mark.parametrize(
     "contam,rep_discordant,num_subjects",
-    [(False, False, 1), (True, False, 1), (False, True, 3), (True, True, 3)],
+    [(False, False, 1), (True, False, 1), (False, True, 2), (True, True, 2)],
 )
 def test_add_subject_dropped_from_study(fake_sample_qc, contam, rep_discordant, num_subjects):
     sample_qc_table._add_analytic_exclusion(fake_sample_qc, contam, rep_discordant)
