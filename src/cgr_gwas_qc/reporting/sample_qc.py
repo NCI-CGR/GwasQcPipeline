@@ -217,7 +217,6 @@ class Ancestry:
         # Issue 281: Ensure 'Other' ancestry output from graf-pop captured in table 3
 
         # Add 'Other' to the categories and full blanks with "Other"
-        sample_qc["Ancestry"] = sample_qc["Ancestry"].cat.add_categories(["Other"])
         sample_qc["Ancestry"] = sample_qc["Ancestry"].fillna("Other")
 
         return (
