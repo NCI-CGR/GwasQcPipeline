@@ -58,7 +58,14 @@ class AdpcRecord:
     def __iter__(self):
         """This allows tuple unpacking"""
         return iter(
-            (self.x_raw, self.y_raw, self.x_norm, self.y_norm, self.genotype_score, self.genotype,)
+            (
+                self.x_raw,
+                self.y_raw,
+                self.x_norm,
+                self.y_norm,
+                self.genotype_score,
+                self.genotype,
+            )
         )
 
     def __str__(self):

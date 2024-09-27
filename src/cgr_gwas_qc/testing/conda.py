@@ -13,6 +13,7 @@ be changed by setting ``XDG_CACHE_HOME``).
 Then the ``copy_env()`` method is used to copy conda environments into the
 testing directory.
 """
+
 import hashlib
 import os
 import shutil

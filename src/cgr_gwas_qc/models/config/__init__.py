@@ -1,4 +1,5 @@
 """Configuration system data models."""
+
 from enum import Enum
 from logging import getLogger
 from pathlib import Path

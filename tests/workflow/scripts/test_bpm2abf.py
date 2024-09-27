@@ -4,6 +4,7 @@ For contamination checking we need to have the population level allele
 frequencies. We pull these allele frequencies from the 1KG project for each
 SNP in the BPM.
 """
+
 import pandas as pd
 import pytest
 from typer.testing import CliRunner

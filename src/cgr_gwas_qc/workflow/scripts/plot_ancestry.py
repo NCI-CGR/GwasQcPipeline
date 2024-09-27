@@ -9,6 +9,7 @@ Output:
     ``sample_level/ancestry.png``
 
 """
+
 import os
 from pathlib import Path
 from typing import Optional

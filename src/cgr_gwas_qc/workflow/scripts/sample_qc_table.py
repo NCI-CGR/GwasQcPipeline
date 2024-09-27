@@ -54,6 +54,7 @@ would have to make modifications to add new components.
     identifiler_reason, string, The QC problem that needs checked with Identifiler.
 
 """
+
 from pathlib import Path
 from typing import Mapping, Optional
 from warnings import warn
@@ -192,7 +193,9 @@ def main(
     )
 
     add_qc_columns(
-        sample_qc, remove_contam, remove_rep_discordant,
+        sample_qc,
+        remove_contam,
+        remove_rep_discordant,
     )
 
     sample_qc = sample_qc.rename(
@@ -412,7 +415,8 @@ def _read_contam(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.DataFram
 
     if file_name is None:
         return pd.DataFrame(
-            index=Sample_IDs, columns=["Contamination_Rate", "is_contaminated"],
+            index=Sample_IDs,
+            columns=["Contamination_Rate", "is_contaminated"],
         ).astype({"Contamination_Rate": "float", "is_contaminated": "boolean"})
 
     return (
@@ -455,12 +459,16 @@ def _read_intensity(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.Serie
 
 
 def add_qc_columns(
-    sample_qc: pd.DataFrame, remove_contam: bool, remove_rep_discordant: bool,
+    sample_qc: pd.DataFrame,
+    remove_contam: bool,
+    remove_rep_discordant: bool,
 ) -> pd.DataFrame:
     add_call_rate_flags(sample_qc)
     _add_identifiler(sample_qc)
     _add_analytic_exclusion(
-        sample_qc, remove_contam, remove_rep_discordant,
+        sample_qc,
+        remove_contam,
+        remove_rep_discordant,
     )
     _add_subject_representative(sample_qc)
     _add_subject_dropped_from_study(sample_qc)
@@ -505,7 +513,9 @@ def _get_reason(sample_qc: pd.DataFrame, flags: Mapping[str, str]):
     return sample_qc.apply(reason_string, axis=1)
 
 
-def _retain_valid_discordant_replicates(sample_qc: pd.DataFrame,) -> pd.DataFrame:
+def _retain_valid_discordant_replicates(
+    sample_qc: pd.DataFrame,
+) -> pd.DataFrame:
     """Check and update the status of a pair of samples labeled as
        discordant expected replicates.
 
@@ -558,7 +568,9 @@ def _retain_valid_discordant_replicates(sample_qc: pd.DataFrame,) -> pd.DataFram
 
 
 def _add_analytic_exclusion(
-    sample_qc: pd.DataFrame, remove_contam: bool, remove_rep_discordant: bool,
+    sample_qc: pd.DataFrame,
+    remove_contam: bool,
+    remove_rep_discordant: bool,
 ) -> pd.DataFrame:
     """Adds a flag to remove samples based on provided conditions.
 

@@ -47,6 +47,7 @@ References:
       Robust relationship inference in genome-wide association studies.
       Bioinformatics 26(22):2867-2873
 """
+
 import pandas as pd
 
 from cgr_gwas_qc.typing import PathLike

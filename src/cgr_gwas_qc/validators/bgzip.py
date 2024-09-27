@@ -3,6 +3,7 @@
 A number of file types use the BGZIP format. Here we focus on the VCF.gz and
 VCF.gz.tbi.
 """
+
 from pathlib import Path
 
 from cgr_gwas_qc.exceptions import BgzipMagicNumberError, BgzipTruncatedFileError

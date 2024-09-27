@@ -8,6 +8,7 @@ Output:
     ``population_level/{population}/autosomal_heterozygosity.png``
 
 """
+
 from pathlib import Path
 from typing import Tuple
 

@@ -80,7 +80,9 @@ def read(filename: PathLike) -> pd.DataFrame:
 
 @app.command()
 def main(
-    sample_qc_csv: Path, sample_concordance_csv: Path, outfile: Path,
+    sample_qc_csv: Path,
+    sample_concordance_csv: Path,
+    outfile: Path,
 ):
     (
         sample_qc_table.read(sample_qc_csv)

@@ -42,6 +42,7 @@ References:
       identical and closely related subjects in large databases using genotype
       data. PLoS One. 12(6):e0179106.
 """
+
 import pandas as pd
 
 from cgr_gwas_qc.typing import PathLike

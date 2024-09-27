@@ -14,6 +14,7 @@ Aggregate Population Level Concordance
     PLINK_is_ge_pi_hat, boolean, True if PI_HAT was greater than ``software_params.pi_hat_cutoff``
     PLINK_is_ge_concordance, boolean, True if concordance was greater than ``software_params.dup_concordance_cutoff``
 """
+
 from pathlib import Path
 from typing import List
 

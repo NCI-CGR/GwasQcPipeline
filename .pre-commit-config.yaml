@@ -15,7 +15,7 @@ repos:
 #         additional_dependencies:
 #         - tomli
 -   repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 24.8.0
     hooks:
     -   id: black
 -   repo: https://github.com/PyCQA/flake8.git
@@ -31,6 +31,6 @@ repos:
     hooks:
     -   id: isort
 -   repo: https://github.com/snakemake/snakefmt
-    rev: v0.8.4
+    rev: v0.10.2
     hooks:
     -   id: snakefmt

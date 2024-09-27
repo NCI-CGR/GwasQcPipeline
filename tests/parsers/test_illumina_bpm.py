@@ -1,4 +1,5 @@
 """Test parsing of Illumina BPM files."""
+
 import pytest
 
 from cgr_gwas_qc.parsers.illumina import BeadPoolManifest

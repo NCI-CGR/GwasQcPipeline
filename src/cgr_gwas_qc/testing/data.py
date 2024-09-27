@@ -19,6 +19,7 @@ filtering steps and downstream parts of the workflow. This data also includes
 all outputs for these samples from the Production workflow. This will allow
 regression testing of most parts of the workflow.
 """
+
 import os
 import shutil
 import subprocess

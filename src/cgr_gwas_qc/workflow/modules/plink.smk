@@ -29,7 +29,7 @@ rule sample_call_rate_filter:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_hr=lambda wildcards, attempt: attempt ** 2,
+        time_hr=lambda wildcards, attempt: attempt**2,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -62,7 +62,7 @@ rule snp_call_rate_filter:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
-        time_hr=lambda wildcards, attempt: attempt ** 2,
+        time_hr=lambda wildcards, attempt: attempt**2,
     shell:
         "plink "
         "--bed {input.bed} "
@@ -598,10 +598,10 @@ rule gwas:
     shell:
         """
         sleep 10 && plink \
-	    --bed {input.bed} \
+        --bed {input.bed} \
         --bim {input.bim} \
         --fam {input.fam} \
-	    --pheno {input.gwasfile} \
+        --pheno {input.gwasfile} \
         --pheno-name case \
         --ci 0.95 \
         --assoc \

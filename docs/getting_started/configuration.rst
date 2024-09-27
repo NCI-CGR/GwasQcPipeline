@@ -65,7 +65,7 @@ If you are on another system then you most provide the correct paths and version
 The ``illumina_manifest_file`` is provided by Illumina.
 The ``thousand_genome_vcf`` and ``thousand_genome_tbi`` files can be downloaded from the 1000 Genome's website.
 The ``illumina_cluster_file`` is the EGT file used to generate GTCs; this file is not required and is only referenced in the QC report if present.
-The ``reference_fasta`` is used convert GTCs to VCF and needed if GTCs are provided. 
+The ``reference_fasta`` is used convert GTCs to VCF and needed if GTCs are provided.
 
 1000 Genomes reference files download links
    * **hg37**: `VCF <http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz>`__,

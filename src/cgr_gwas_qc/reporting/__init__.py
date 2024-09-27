@@ -3,6 +3,7 @@
 These tools include report templates and various constants used during
 reporting.
 """
+
 from .constants import (
     CASE_CONTROL_COLORS,
     CASE_CONTROL_DTYPE,

@@ -30,7 +30,11 @@ def sorted_file_equal(file1: PathLike, file2: PathLike) -> bool:
 
 
 def file_rows_almost_equal(
-    file1: PathLike, file2: PathLike, fuzzy_col: int, sep: str = "\t", header: bool = False,
+    file1: PathLike,
+    file2: PathLike,
+    fuzzy_col: int,
+    sep: str = "\t",
+    header: bool = False,
 ) -> bool:
     """Compares two files row by row and makes sure they are almost equal"""
     results = []
@@ -118,7 +122,10 @@ def assert_legacy_dev_sample_qc_equal(legacy_file: PathLike, dev_file: PathLike)
     )
     assert_series_equal(legacy["Call_Rate_2"], dev["Call_Rate_2"])
     assert_series_equal(
-        legacy["Low Call Rate"], dev["is_call_rate_filtered"], check_dtype=False, check_names=False,
+        legacy["Low Call Rate"],
+        dev["is_call_rate_filtered"],
+        check_dtype=False,
+        check_names=False,
     )
 
     # --------------------

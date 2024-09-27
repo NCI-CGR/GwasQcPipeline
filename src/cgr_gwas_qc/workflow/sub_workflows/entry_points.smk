@@ -10,6 +10,7 @@ All entry points should create:
     - sample_level/samples.bim
     - sample_level/samples.fam
 """
+
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.parsers import sample_sheet
 

@@ -3,6 +3,7 @@
 IDAT validation is not well developed. It is based on me looking at the
 binary output and trying to get a sense of what makes a good IDAT file.
 """
+
 import pytest
 
 from cgr_gwas_qc.testing.data import FakeData

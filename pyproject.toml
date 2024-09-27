@@ -22,8 +22,8 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-typer = "^0.3.2"
+python = "^3.8.1"
+typer = "^0.12.5"
 pandas = "^2.0.3"
 snakemake = "^6.0.0"
 pysam = "^0.21.0"
@@ -40,10 +40,10 @@ markupsafe = "~2.0"
 pulp = "2.7.0"
 
 [tool.poetry.dev-dependencies]
-black = { version = "^19.10b0", allow-prereleases = true }
+black = { version = "24.8.0" }
 flake8 = { version = "^5.0.0", python = ">=3.8,<4.0"}
-snakefmt = "^0.1.4"
-importlib-metadata = "^3.10.1"
+snakefmt = "^0.10.2"
+importlib-metadata = "^8.5.0"
 pytest = "^7.4.1"
 mypy = "^1.5.1"
 isort = "^5.12.0"

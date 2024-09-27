@@ -41,6 +41,7 @@ References:
     - :class:`cgr_gwas_qc.parsers.eigensoft.Eigenvec`
 
 """
+
 from pathlib import Path
 from typing import List
 

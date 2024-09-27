@@ -13,4 +13,3 @@ plink \
 --allow-no-sex
 
 ml -plink/1.9
-

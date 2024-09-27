@@ -1,4 +1,5 @@
 """Parse Illumina sample sheet sections into usable pieces."""
+
 import re
 from io import StringIO
 from pathlib import Path

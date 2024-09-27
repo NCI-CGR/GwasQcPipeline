@@ -21,6 +21,7 @@ aggregates/summarizes results into an internal SNP level QC report.
     snp_cr2_removed, boolean, True if the SNP was removed by the second call rate filter.
 
 """
+
 from pathlib import Path
 
 import pandas as pd

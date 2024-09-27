@@ -9,6 +9,7 @@ Output:
     ``sample_level/call_rate.png``
 
 """
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt

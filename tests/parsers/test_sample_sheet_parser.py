@@ -1,4 +1,5 @@
 """Testing parsing of the Illumina sample sheet."""
+
 from pathlib import Path
 from textwrap import dedent
 
