@@ -90,11 +90,41 @@ module grafpop:
 # -------------------------------------------------------------------------------
 # Call Rate Filters
 # -------------------------------------------------------------------------------
-use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
+
+
+rule impute_sex:
     input:
         bed="sample_level/samples.bed",
         bim="sample_level/samples.bim",
         fam="sample_level/samples.fam",
+    params:
+        out_prefix="sample_level/impute_sex/samples",
+    output:
+        bed="sample_level/impute_sex/samples.bed",
+        bim="sample_level/impute_sex/samples.bim",
+        fam="sample_level/impute_sex/samples.fam",
+        nosex="sample_level/impute_sex/samples.nosex",
+    threads: lambda wildcards, attempt: attempt * 2
+    resources:
+        mem_mb=lambda wildcards, attempt: attempt * 1024,
+    conda:
+        cfg.conda("plink2")
+    shell:
+        "sleep 10 && plink "
+        "--bed {input.bed} "
+        "--bim {input.bim} "
+        "--fam {input.fam} "
+        "--impute-sex --make-bed "
+        "--threads {threads} "
+        "--memory {resources.mem_mb} "
+        "--out {params.out_prefix}"
+
+
+use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
+    input:
+        bed="sample_level/impute_sex/samples.bed",
+        bim="sample_level/impute_sex/samples.bim",
+        fam="sample_level/impute_sex/samples.fam",
     params:
         geno=1 - cfg.config.software_params.snp_call_rate_1,
         out_prefix="sample_level/call_rate_1/samples_p1",
@@ -163,14 +193,14 @@ use rule sample_call_rate_filter from plink as sample_call_rate_filter_2 with:
 # -------------------------------------------------------------------------------
 use rule miss from plink as plink_call_rate_initial with:
     input:
-        bed="sample_level/samples.bed",
-        bim="sample_level/samples.bim",
-        fam="sample_level/samples.fam",
+        bed="sample_level/impute_sex/samples.bed",
+        bim="sample_level/impute_sex/samples.bim",
+        fam="sample_level/impute_sex/samples.fam",
     params:
-        out_prefix="sample_level/samples",
+        out_prefix="sample_level/impute_sex/samples",
     output:
-        imiss="sample_level/samples.imiss",
-        lmiss="sample_level/samples.lmiss",
+        imiss="sample_level/impute_sex/samples.imiss",
+        lmiss="sample_level/impute_sex/samples.lmiss",
 
 
 use rule miss from plink as plink_call_rate_post1 with:
