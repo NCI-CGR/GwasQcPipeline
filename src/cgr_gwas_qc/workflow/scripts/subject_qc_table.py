@@ -103,11 +103,11 @@ def _fix_hyphen_in_ancestry_name(df: pd.DataFrame) -> pd.DataFrame:
 
 def _sample_qc_to_subject_qc(df: pd.DataFrame) -> pd.DataFrame:
     include_contam = list(DTYPES.keys()) + ["is_contaminated"]
-    return (
-        df.query("is_subject_representative")
-        .reindex(include_contam, axis=1)
-        .dropna(how="all", axis=1)
-    )
+    # Filter the DataFrame based on the query and reindex
+    df = df.query("is_subject_representative").reindex(include_contam, axis=1)
+    # Drop columns that are entirely NA, but keep "is_contaminated"
+    df = df.loc[:, df.notna().any(axis=0) | df.columns.isin(["is_contaminated"])]
+    return df
 
 
 def _add_unexpected_replicate_ids(df: pd.DataFrame, sample_concordance_csv: Path) -> pd.DataFrame:
@@ -173,7 +173,7 @@ def _add_unexpected_replicate_status(df: pd.DataFrame) -> pd.DataFrame:
             other_subject = "".join([str(subid) for subid in pair if subid != current_subject])
 
             # Check contamination status of current subject
-            if not df.loc[index, "is_contaminated"]:
+            if pd.isna(df.loc[index, "is_contaminated"]) or not df.loc[index, "is_contaminated"]:
                 other_subject_index = df[df["Group_By_Subject_ID"] == other_subject].index
                 other_subject_row = df.iloc[other_subject_index]
                 is_contaminated = other_subject_row["is_contaminated"]

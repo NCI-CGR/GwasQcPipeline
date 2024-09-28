@@ -417,7 +417,7 @@ def _read_contam(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.DataFram
         return pd.DataFrame(
             index=Sample_IDs,
             columns=["Contamination_Rate", "is_contaminated"],
-        ).astype({"Contamination_Rate": "float", "is_contaminated": "boolean"})
+        ).astype({"Contamination_Rate": pd.NA, "is_contaminated": pd.NA})
 
     return (
         agg_contamination.read(file_name)
@@ -528,6 +528,10 @@ def _retain_valid_discordant_replicates(
     sample, updating its status to remove the expected replicate label.
     """
 
+    # Assuming sample_qc is your DataFrame
+    if "Sample_ID" in sample_qc.columns:
+        sample_qc = sample_qc.set_index("Sample_ID")
+
     # Iterate through each sample in the DataFrame
     for index, row in sample_qc.iterrows():
         # Check if the sample is a discordant expected replicate
@@ -536,8 +540,10 @@ def _retain_valid_discordant_replicates(
             discordant_samples = row["replicate_ids"].split("|")
 
             # Initialize flags for contamination and call rate issues
-            is_current_sample_contaminated = row["is_contaminated"]
             is_current_sample_low_call_rate = row["is_cr2_filtered"]
+            is_current_sample_contaminated = (
+                row["is_contaminated"] if not pd.isna(row["is_contaminated"]) else False
+            )
 
             # Initialize a flag to track if all discordant samples have issues
             all_other_samples_issue = True
@@ -550,11 +556,15 @@ def _retain_valid_discordant_replicates(
                     # Get the row for the discordant sample
                     discordant_row = sample_qc.loc[sample_id]
                     if not discordant_row.empty:
+                        contaminated = (
+                            discordant_row["is_contaminated"]
+                            if not pd.isna(discordant_row["is_contaminated"])
+                            else False
+                        )
+                        low_call_rate = discordant_row["is_cr2_filtered"]
+
                         # Check if the discordant sample is contaminated or has a low call rate
-                        if (
-                            not discordant_row["is_contaminated"]
-                            and not discordant_row["is_cr2_filtered"]
-                        ):
+                        if not contaminated and not low_call_rate:
                             all_other_samples_issue = False
                             break
 
