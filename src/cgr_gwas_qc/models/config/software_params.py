@@ -28,7 +28,6 @@ class SoftwareParams(BaseModel):
             pi_hat_threshold: 0.2
 
             autosomal_het_threshold: 0.1
-
     """
 
     strand: str = Field(

@@ -1,4 +1,5 @@
 import time
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -23,6 +24,7 @@ class WorkflowParams(BaseModel):
             lims_upload: true
             lims_output_dir: /DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/
             case_control_gwas: false
+            max_time_hr:
             time_start:
     """
 
@@ -87,6 +89,12 @@ class WorkflowParams(BaseModel):
         False,
         description="A plink logistic regression gwas will be performed with case_control phenotype.",
     )
+
+    max_time_hr: Optional[int] = Field(
+        None,
+        description="Allocates the specified number of hours for the execution of the ``sample_concordance_plink`` and ``population_level_ibd`` rules.",
+    )
+
     time_start: str = Field(
         timestr,
         description="Date and time at which the workflow starts. This creates a unique id for the run.",
