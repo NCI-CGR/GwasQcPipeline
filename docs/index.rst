@@ -35,8 +35,8 @@ This lets us take advantage of snakemake_'s amazing workflow management system, 
    sub_workflows/subject_qc
    sub_workflows/delivery
 
-|cgr| is broken into 5 sub-workflows.
-Each sub-workflow can be run independently, as long as all previous sub-workflows are complete.
+|cgr| is divided into six sub-workflows.
+Each of which can be run independently, provided that all previous sub-workflows completed.
 For example, the *Sample QC* sub-workflow requires the *Entry Points* sub-workflow (and optionally the *Contamination*) to be complete.
 Here we describe the various steps that each sub-workflow runs, the config options, and a summary of the generated outputs.
 
