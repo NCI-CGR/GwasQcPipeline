@@ -234,7 +234,14 @@
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This allows tuple unpacking&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span>
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_raw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_raw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_norm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_norm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">genotype_score</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">genotype</span><span class="p">,)</span>
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x_raw</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y_raw</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x_norm</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y_norm</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">genotype_score</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">genotype</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

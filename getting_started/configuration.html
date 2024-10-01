@@ -1078,6 +1078,7 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <span class="w">    </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">lims_output_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/</span>
 <span class="w">    </span><span class="nt">case_control_gwas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">max_time_hr</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">time_start</span><span class="p">:</span>
 </pre></div>
 </div>
@@ -1246,19 +1247,30 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <tr class="row-even"><td><p>default</p></td>
 <td><p>False</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>max_time_hr</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Max Time Hr</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Allocates the specified number of hours for the execution of the <code class="docutils literal notranslate"><span class="pre">sample_concordance_plink</span></code> and <code class="docutils literal notranslate"><span class="pre">population_level_ibd</span></code> rules.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
 <li><p>time_start</p></li>
 </ul>
 </td>
 <td colspan="2"><p><em>Time Start</em></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p>Date and time at which the workflow starts. This creates a unique id for the run.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Date and time at which the workflow starts. This creates a unique id for the run.</p></td>
 </tr>
-<tr class="row-odd"><td><p>type</p></td>
+<tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
 </tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>20240926142908</p></td>
+<tr class="row-odd"><td><p>default</p></td>
+<td><p>20241001152427</p></td>
 </tr>
 </tbody>
 </table>
