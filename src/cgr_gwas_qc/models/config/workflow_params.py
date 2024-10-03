@@ -92,7 +92,7 @@ class WorkflowParams(BaseModel):
 
     max_time_hr: Optional[int] = Field(
         None,
-        description="Allocates the specified number of hours for the execution of the ``sample_concordance_plink`` and ``population_level_ibd`` rules.",
+        description="Allocates the specified number of hours to the following rules: ``sample_concordance_plink``, ``sample_concordance_king``, ``sample_concordance_summary``, ``sample_level_ibd``, and ``population_level_ibd``.",
     )
 
     time_start: str = Field(
