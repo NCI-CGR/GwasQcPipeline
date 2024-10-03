@@ -25,6 +25,7 @@ class WorkflowParams(BaseModel):
             lims_output_dir: /DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/
             case_control_gwas: false
             max_time_hr:
+            max_mem_mb:
             time_start:
     """
 
@@ -92,7 +93,12 @@ class WorkflowParams(BaseModel):
 
     max_time_hr: Optional[int] = Field(
         None,
-        description="Allocates the specified number of hours to the following rules: ``sample_concordance_plink``, ``sample_concordance_king``, ``sample_concordance_summary``, ``sample_level_ibd``, and ``population_level_ibd``.",
+        description="The maximum amount of time that can be requested, in hours.",
+    )
+
+    max_mem_mb: Optional[int] = Field(
+        None,
+        description="The maximum amount of memory that can be requests, in megabytes.",
     )
 
     time_start: str = Field(

@@ -9,9 +9,6 @@ import math
 
 cfg = load_config()
 
-mtime = cfg.config.workflow_params.max_time_hr
-BIG_TIME = dict.fromkeys(range(1, 4), mtime) if mtime else {1: 8, 2: 24, 3: 48}
-
 
 localrules:
     all_subject_qc,
@@ -279,9 +276,6 @@ use rule genome from plink as population_level_ibd with:
         out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd",
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd.genome",
-    resources:
-        mem_mb=lambda wildcards, attempt, input: max((attempt + 1) * input.size_mb, 1024),
-        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
 
 
 rule population_level_concordance_plink:

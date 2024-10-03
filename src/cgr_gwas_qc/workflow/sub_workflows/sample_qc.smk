@@ -2,8 +2,8 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
-mtime = cfg.config.workflow_params.max_time_hr
-BIG_TIME = dict.fromkeys(range(1, 4), mtime) if mtime else {1: 10, 2: 48, 3: 96}
+max_time = cfg.config.workflow_params.max_time_hr
+BIG_TIME = dict.fromkeys(range(1, 4), max_time) if max_time else {1: 10, 2: 48, 3: 96}
 
 use_contamination = (
     cfg.config.user_files.idat_pattern
@@ -335,9 +335,6 @@ use rule genome from plink as sample_level_ibd with:
         out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
     output:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
-    resources:
-        mem_mb=lambda wildcards, attempt, input: max((attempt + 1) * input.size_mb, 1024),
-        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
 
 
 rule sample_concordance_plink:
@@ -356,7 +353,7 @@ rule sample_concordance_plink:
     output:
         "sample_level/concordance/plink.csv",
     resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     script:
         "../scripts/concordance_table.py"
@@ -381,7 +378,7 @@ use rule relatedness from graf as sample_concordance_graf with:
     output:
         "sample_level/concordance/graf.tsv",
     resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
     log:
         "sample_level/concordance/graf.log",
 
@@ -405,7 +402,7 @@ rule sample_concordance_king:
         "sample_level/concordance/king.log",
     threads: 8
     resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     shell:
         # king does not always output all files so touch for snakemake
@@ -426,7 +423,7 @@ rule sample_concordance_summary:
     output:
         "sample_level/concordance/summary.csv",
     resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     script:
         "../scripts/sample_concordance.py"
@@ -455,7 +452,7 @@ use rule grafpop_populations from grafpop as graf_populations with:
     output:
         "sample_level/ancestry/grafpop_populations.txt",
     resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1000),
+        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
     log:
         "sample_level/ancestry/grafpop_populations.log",
 
