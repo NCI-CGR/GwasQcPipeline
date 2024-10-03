@@ -2,8 +2,22 @@ from cgr_gwas_qc import load_config
 
 cfg = load_config()
 
-PLINK_BIG_MEM = {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
-BIG_TIME = {1: 8, 2: 24, 3: 48}
+
+max_mem = cfg.config.workflow_params.max_mem_mb
+max_time = cfg.config.workflow_params.max_time_hr
+
+PLINK_BIG_MEM = (
+    {1: max_mem / 3, 2: max_mem / 2, 3: max_mem}
+    if max_mem
+    else {1: 1024 * 4, 2: 1024 * 64, 3: 1024 * 250}
+)
+
+BIG_TIME = (
+    # request maxtime from the get-go
+    dict.fromkeys(range(1, 4), max_time)
+    if max_time
+    else {1: 10, 2: 48, 3: 96}
+)
 
 
 ################################################################################
@@ -99,10 +113,11 @@ rule maf_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        ''' 
+        """ 
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --maf {params.maf} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
-        '''
+        """
+
 
 rule ld_filter:
     """Subsets the dataset only keeping variants in linkage equilibrium.
@@ -164,10 +179,11 @@ rule snps_only_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        '''
+        """
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --snps-only --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
-        '''
+        """
+
 
 rule autosome_only_filter:
     """Exclude all unplaced and non-autosomal variants"""
@@ -190,10 +206,11 @@ rule autosome_only_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        '''
+        """
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --autosome --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
-        '''
+        """
+
 
 rule keep_ids:
     input:
@@ -217,10 +234,11 @@ rule keep_ids:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
         time_hr=lambda wildcards, attempt: attempt**2,
     shell:
-        '''
+        """
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --keep {input.to_keep} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
-        '''
+        """
+
 
 rule remove_ids:
     input:
@@ -479,6 +497,7 @@ rule frq:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     conda:
         cfg.conda("plink2")
     shell:
@@ -504,6 +523,7 @@ rule hwe:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     conda:
         cfg.conda("plink2")
     shell:
@@ -537,7 +557,7 @@ rule genome:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
-        time_hr=lambda wildcards, attempt: attempt**2,
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     conda:
         cfg.conda("plink2")
     shell:
@@ -566,6 +586,7 @@ rule het:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     conda:
         cfg.conda("plink2")
     shell:
@@ -593,6 +614,7 @@ rule gwas:
     threads: lambda wildcards, attempt: attempt * 2
     resources:
         mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     conda:
         cfg.conda("plink2")
     shell:
