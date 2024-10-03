@@ -335,6 +335,9 @@ use rule genome from plink as sample_level_ibd with:
         out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
     output:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
+    resources:
+        mem_mb=lambda wildcards, attempt, input: max((attempt + 1) * input.size_mb, 1024),
+        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
 
 
 rule sample_concordance_plink:
