@@ -13,6 +13,7 @@ All entry points should create:
 
 from cgr_gwas_qc import load_config
 from cgr_gwas_qc.parsers import sample_sheet
+from math import ceil
 
 cfg = load_config()
 
@@ -55,119 +56,224 @@ rule plink_conda:
 
 
 ################################################################################
+# Imports
+################################################################################
+module bcf_module:
+    snakefile:
+        cfg.modules("bcf")
+    config:
+        {}
+
+
+################################################################################
 # Workflow Rules
 ################################################################################
 if cfg.config.user_files.gtc_pattern:
+
+    def _get_gtc(wildcards):
+        return cfg.expand(
+            cfg.config.user_files.gtc_pattern,
+            query=f"Sample_ID == '{wildcards.Sample_ID}'",
+        )[0]
 
     ################################################################################
     # GTC To Plink
     ################################################################################
 
-    if config.get("cluster_mode", False):
+    if not cfg.config.workflow_params.convert_gtc2bcf:
+        if config.get("cluster_mode", False):
 
-        rule grouped_gtc_to_bed:
-            input:
-                sample_sheet_csv="cgr_sample_sheet.csv",
-                bpm_file=cfg.config.reference_files.illumina_manifest_file,
-                _=rules.plink_conda.output[0],
-            params:
-                grp="{grp}",
-                gtc_pattern=lambda wc: cfg.config.user_files.gtc_pattern,
-                strand=cfg.config.software_params.strand,
-                out_prefix="sample_level/{grp}/samples",
-                conda_env=cfg.conda("plink2"),
-                notemp=config.get("notemp", False),
+            rule grouped_gtc_to_bed:
+                input:
+                    sample_sheet_csv="cgr_sample_sheet.csv",
+                    bpm_file=cfg.config.reference_files.illumina_manifest_file,
+                    _=rules.plink_conda.output[0],
+                params:
+                    grp="{grp}",
+                    gtc_pattern=lambda wc: cfg.config.user_files.gtc_pattern,
+                    strand=cfg.config.software_params.strand,
+                    out_prefix="sample_level/{grp}/samples",
+                    conda_env=cfg.conda("plink2"),
+                    notemp=config.get("notemp", False),
+                output:
+                    bed=temp("sample_level/{grp}/samples.bed"),
+                    bim=temp("sample_level/{grp}/samples.bim"),
+                    fam=temp("sample_level/{grp}/samples.fam"),
+                    nosex=temp("sample_level/{grp}/samples.nosex"),
+                threads: 12
+                resources:
+                    mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
+                    time_hr=lambda wildcards, attempt: 4 * attempt,
+                benchmark:
+                    "benchmarks/gtc_to_bed.{grp}" + ".tsv"
+                script:
+                    "../scripts/grouped_gtc_to_bed.py"
+
+            rule merge_grouped_beds:
+                input:
+                    bed=expand("sample_level/{grp}/samples.bed", grp=cfg.cluster_groups),
+                    bim=expand("sample_level/{grp}/samples.bim", grp=cfg.cluster_groups),
+                    fam=expand("sample_level/{grp}/samples.fam", grp=cfg.cluster_groups),
+                    _=rules.plink_conda.output[0],
+                params:
+                    out_prefix="sample_level/samples",
+                    conda_env=cfg.conda("plink2"),
+                    notemp=config.get("notemp", False),
+                output:
+                    bed="sample_level/samples.bed",
+                    bim="sample_level/samples.bim",
+                    fam="sample_level/samples.fam",
+                    nosex="sample_level/samples.nosex",
+                log:
+                    "sample_level/samples.log",
+                threads: 8
+                resources:
+                    mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+                    time_hr=lambda wildcards, attempt: 4 * attempt,
+                benchmark:
+                    "benchmarks/plink_merge" + ".tsv"
+                script:
+                    "../scripts/plink_merge.py"
+
+        else:
+
+            rule per_sample_gtc_to_ped:
+                """Converts a sample's GTC/BPM to PED/MAP.
+
+                .. warning::
+                    This is a submission hot spot creating 1 job per sample.
+                """
+                input:
+                    gtc=_get_gtc,
+                    bpm=cfg.config.reference_files.illumina_manifest_file,
+                params:
+                    strand=cfg.config.software_params.strand,
+                output:
+                    ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
+                    map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
+                resources:
+                    mem_mb=lambda wildcards, attempt: attempt * 1024,
+                script:
+                    "../scripts/gtc2plink.py"
+
+            rule merge_gtc_sample_peds:
+                """Merges multiple samples using ``plink --merge-list``.
+
+                Merge and convert sample(s) into an aggregated binary ``plink``
+                format.
+                """
+                input:
+                    ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
+                    map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
+                    _=rules.plink_conda.output[0],
+                params:
+                    out_prefix="sample_level/samples",
+                    conda_env=cfg.conda("plink2"),
+                    notemp=config.get("notemp", False),
+                output:
+                    bed="sample_level/samples.bed",
+                    bim="sample_level/samples.bim",
+                    fam="sample_level/samples.fam",
+                    nosex="sample_level/samples.nosex",
+                log:
+                    "sample_level/samples.log",
+                threads: 8
+                resources:
+                    mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+                    time_hr=lambda wildcards, attempt: 4 * attempt,
+                script:
+                    "../scripts/plink_merge.py"
+
+    ################################################################################
+    # GTC To BCF
+    ################################################################################
+
+    if cfg.config.workflow_params.convert_gtc2bcf:
+
+        localrules:
+            gtc2bcf_conda,
+            write_gtc_pathlist,
+
+        rule gtc2bcf_conda:
             output:
-                bed=temp("sample_level/{grp}/samples.bed"),
-                bim=temp("sample_level/{grp}/samples.bim"),
-                fam=temp("sample_level/{grp}/samples.fam"),
-                nosex=temp("sample_level/{grp}/samples.nosex"),
-            threads: 12
-            resources:
-                mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
-                time_hr=lambda wildcards, attempt: 4 * attempt,
-            script:
-                "../scripts/grouped_gtc_to_bed.py"
+                temp(".bcftools-gtc2vcf-plugin_env_built"),
+            conda:
+                cfg.conda("bcftools-gtc2vcf-plugin")
+            shell:
+                "touch {output[0]}"
 
-        rule merge_grouped_beds:
-            input:
-                bed=expand("sample_level/{grp}/samples.bed", grp=cfg.cluster_groups),
-                bim=expand("sample_level/{grp}/samples.bim", grp=cfg.cluster_groups),
-                fam=expand("sample_level/{grp}/samples.fam", grp=cfg.cluster_groups),
-                _=rules.plink_conda.output[0],
-            params:
-                out_prefix="sample_level/samples",
-                conda_env=cfg.conda("plink2"),
-                notemp=config.get("notemp", False),
-            output:
-                bed="sample_level/samples.bed",
-                bim="sample_level/samples.bim",
-                fam="sample_level/samples.fam",
-                nosex="sample_level/samples.nosex",
-            log:
-                "sample_level/samples.log",
-            threads: 8
-            resources:
-                mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
-                time_hr=lambda wildcards, attempt: 4 * attempt,
-            script:
-                "../scripts/plink_merge.py"
+        if config.get("cluster_mode", False) and len(cfg.cluster_groups) > 2:
 
+            def _get_n_samples(wildcards):
+                return len(cfg.ss.query(f'cluster_group=="{wildcards.grp}"'))
 
-    else:
+            use rule write_gtc_pathlist from bcf_module with:
+                params:
+                    grp=cfg.cluster_groups,
+                output:
+                    temp("sample_level/{grp}/gtc.tsv"),
 
-        def _get_gtc(wildcards):
-            return cfg.expand(
-                cfg.config.user_files.gtc_pattern,
-                query=f"Sample_ID == '{wildcards.Sample_ID}'",
-            )[0]
+            use rule gtc_to_bcf from bcf_module with:
+                input:
+                    gtcs=rules.write_gtc_pathlist.output[0],
+                benchmark:
+                    "benchmarks/gtc_to_bcf.{grp}" + ".tsv"
+                resources:
+                    time_hr=lambda wc: ceil(
+                        ((_get_n_samples(wc) + 1) * (cfg.config.num_snps * 3e-6)) / 3600
+                    )
+                    + 1,
+                    mem_mb=lambda wc: ceil(
+                        (_get_n_samples(wc) * (cfg.config.num_snps * 1.06e-6))
+                        + (cfg.config.num_snps * 2e-3)
+                    )
+                    + 200,
+                output:
+                    bcf="sample_level/{grp}/samples.bcf",
 
-        rule per_sample_gtc_to_ped:
-            """Converts a sample's GTC/BPM to PED/MAP.
+            rule merge_gtc_to_bcf_batches:
+                """Merges grouped bcf files to single merged bcf"""
+                input:
+                    bcf_batches=expand("sample_level/{grp}/samples.bcf", grp=cfg.cluster_groups),
+                output:
+                    bcf="sample_level/samples.bcf",
+                conda:
+                    cfg.conda("bcftools-gtc2vcf-plugin")
+                benchmark:
+                    (
+                        "benchmarks/merge_gtc_to_bcf_batches"
+                        + "."
+                        + str(len(cfg.cluster_groups))
+                        + "."
+                        + str(len(cfg.ss))
+                        + ".tsv"
+                    )
+                threads: 44
+                resources:
+                    time_hr=ceil((len(cfg.ss) * 0.2) / 3600 + 1),
+                    mem_mb=len(cfg.cluster_groups) * 70,
+                shell:
+                    "bcftools merge --threads {threads} --merge none {input.bcf_batches} -Ob -o {output}"
 
-            .. warning::
-                This is a submission hot spot creating 1 job per sample.
-            """
-            input:
-                gtc=_get_gtc,
-                bpm=cfg.config.reference_files.illumina_manifest_file,
-            params:
-                strand=cfg.config.software_params.strand,
-            output:
-                ped=temp("sample_level/per_sample_plink_files/{Sample_ID}.ped"),
-                map_=temp("sample_level/per_sample_plink_files/{Sample_ID}.map"),
-            resources:
-                mem_mb=lambda wildcards, attempt: attempt * 1024,
-            script:
-                "../scripts/gtc2plink.py"
+            use rule convert_bcf_to_plink_bed from bcf_module with:
+                input:
+                    bcf=rules.merge_gtc_to_bcf_batches.output[0],
 
-        rule merge_gtc_sample_peds:
-            """Merges multiple samples using ``plink --merge-list``.
+        else:
 
-            Merge and convert sample(s) into an aggregated binary ``plink``
-            format.
-            """
-            input:
-                ped=cfg.expand(rules.per_sample_gtc_to_ped.output.ped),
-                map_=cfg.expand(rules.per_sample_gtc_to_ped.output.map_),
-                _=rules.plink_conda.output[0],
-            params:
-                out_prefix="sample_level/samples",
-                conda_env=cfg.conda("plink2"),
-                notemp=config.get("notemp", False),
-            output:
-                bed="sample_level/samples.bed",
-                bim="sample_level/samples.bim",
-                fam="sample_level/samples.fam",
-                nosex="sample_level/samples.nosex",
-            log:
-                "sample_level/samples.log",
-            threads: 8
-            resources:
-                mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
-                time_hr=lambda wildcards, attempt: 4 * attempt,
-            script:
-                "../scripts/plink_merge.py"
+            use rule write_gtc_pathlist from bcf_module with:
+                params:
+                    grp="",
+                output:
+                    "sample_level/gtc.tsv",
+
+            use rule gtc_to_bcf from bcf_module with:
+                output:
+                    bcf="sample_level/samples.bcf",
+
+            use rule convert_bcf_to_plink_bed from bcf_module with:
+                input:
+                    bcf=rules.gtc_to_bcf.output[0],
 
 elif cfg.config.user_files.ped and cfg.config.user_files.map:
 
@@ -237,31 +343,6 @@ elif cfg.config.user_files.bcf:
     localrules:
         convert_bcf_to_plink_bed,
 
-    rule convert_bcf_to_plink_bed:
-        """Converts BCF to plink BED file
-
-        Path to aggregated BCF file is expected in user_files in config. The expected
-        VCF should be created using BCFtools/gtc2vcf. The BCF will be converted to BED
-        file for processing.
-        """
+    use rule convert_bcf_to_plink_bed from bcf_module with:
         input:
             bcf=cfg.config.user_files.bcf,
-        params:
-            prefix="sample_level/samples",
-        output:
-            bed="sample_level/samples.bed",
-            bim="sample_level/samples.bim",
-            fam="sample_level/samples.fam",
-        log:
-            "sample_level/samples.log",
-        conda:
-            cfg.conda("plink2")
-        resources:
-            mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
-        shell:
-            "plink "
-            "--allow-extra-chr 0 --keep-allele-order --double-id "
-            "--bcf {input.bcf} "
-            "--make-bed "
-            "--out {params.prefix} "
-            "--memory {resources.mem_mb}"
