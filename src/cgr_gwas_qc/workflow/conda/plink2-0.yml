@@ -1,0 +1,4 @@
+channels:
+  - bioconda
+dependencies:
+  - plink2=2.00a5.12

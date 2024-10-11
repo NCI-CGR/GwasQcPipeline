@@ -1,10 +1,11 @@
 # default conda environment
-conda/
+
 
 # IDEs
 .vscode
 .idea
 .devcontainer
+.ipynb_checkpoints
 
 # OSX hidden files
 .DS_Store
@@ -54,6 +55,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+tests/data/
 
 # Sphinx documentation
 docs/_build/
