@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installing GwasQcPipeline &mdash; GwasQcPipeline 1.7.0-rc1 documentation</title>
+  <title>Installing GwasQcPipeline &mdash; GwasQcPipeline 1.7.0 documentation</title>
   
 
   
@@ -196,7 +196,7 @@ $ conda activate GwasQcPipeline
 </pre></div>
 </div>
 <p>Install the current release of the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0-rc1/cgr_gwas_qc-1.7.0-rc1-py3-none-any.whl
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0/cgr_gwas_qc-1.7.0-py3-none-any.whl
 $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 </pre></div>
 </div>
@@ -209,7 +209,7 @@ $ cgr --help
 <p>To update the latest version of <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module load miniconda/4.8.3
 $ conda activate GwasQcPipeline
-$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0-rc1/cgr_gwas_qc-1.7.0-rc1-py3-none-any.whl
+$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0/cgr_gwas_qc-1.7.0-py3-none-any.whl
 # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 </pre></div>
 </div>
@@ -217,10 +217,10 @@ $ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releas
 <section id="installing-on-ccad2">
 <h2>Installing on ccad2<a class="headerlink" href="#installing-on-ccad2" title="Permalink to this headline">¶</a></h2>
 <p>Install miniconda and then create a GwasQcPipeline production environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir /scratch/myfolder/GwasQcPipeline_v1.7.0-rc1
-$ cd /scratch/myfolder/GwasQcPipeline_v1.7.0-rc1
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir /scratch/myfolder/GwasQcPipeline_v1.7.0
+$ cd /scratch/myfolder/GwasQcPipeline_v1.7.0
 $ wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh
-$ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -p /scratch/myfolder/GwasQcPipeline_v1.7.0-rc1/conda -b
+$ bash Miniconda3-py39_4.12.0-Linux-x86_64.sh -p /scratch/myfolder/GwasQcPipeline_v1.7.0/conda -b
 $ source conda/bin/activate base
 (base) $ conda update -n base -c defaults conda
 (base) $ conda install -n base -c conda-forge mamba
@@ -229,11 +229,11 @@ $ source conda/bin/activate base
 </pre></div>
 </div>
 <p>Next install the latest version of the GwasQcPipeline environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ source /scratch/myfolder/GwasQcPipeline_v1.7.0-rc1/conda/bin/activate GwasQcPipeline
-(GwasQcPipeline) $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0-rc1/cgr_gwas_qc-1.7.0-rc1-py3-none-any.whl
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ source /scratch/myfolder/GwasQcPipeline_v1.7.0/conda/bin/activate GwasQcPipeline
+(GwasQcPipeline) $ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0/cgr_gwas_qc-1.7.0-py3-none-any.whl
 (GwasQcPipeline) $ cgr --help
 (GwasQcPipeline) $ cgr version
-v1.7.0-rc1
+v1.7.0
 </pre></div>
 </div>
 </section>
@@ -255,7 +255,7 @@ $ conda deactivate
 </div>
 <p>Next install the latest version of the GwasQcPipeline environment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ source /&lt;location of miniconda installation&gt;/conda/bin/activate GwasQcPipeline
-$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0-rc1/cgr_gwas_qc-1.7.0-rc1-py3-none-any.whl
+$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0/cgr_gwas_qc-1.7.0-py3-none-any.whl
 $ cgr --help
 $ cgr version
 </pre></div>
@@ -268,7 +268,7 @@ We suggest you first install <a class="reference external" href="https://docs.co
 Once you have <code class="docutils literal notranslate"><span class="pre">conda</span></code> installed, you need to create a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment and install the <code class="docutils literal notranslate"><span class="pre">GwasQcPipeline</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n GwasQcPipeline -y python=3.8 pip
 $ conda activate GwasQcPipeline
-$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0-rc1/cgr_gwas_qc-1.7.0-rc1-py3-none-any.whl
+$ pip install https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0/cgr_gwas_qc-1.7.0-py3-none-any.whl
 $ cgr --help  # Should provide help information for running the GwasQcPipeline.
 </pre></div>
 </div>
@@ -279,7 +279,7 @@ $ cgr --help
 </div>
 <p>And to update:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate GwasQcPipeline
-$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0-rc1/cgr_gwas_qc-1.7.0-rc1-py3-none-any.whl
+$ pip install --force-reinstall https://github.com/NCI-CGR/GwasQcPipeline/releases/download/v1.7.0/cgr_gwas_qc-1.7.0-py3-none-any.whl
 # See https://github.com/NCI-CGR/GwasQcPipeline/releases for a list of releases
 </pre></div>
 </div>
