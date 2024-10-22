@@ -72,6 +72,7 @@ def run_plink_merge(merge_list, out_prefix, conda_env, threads, mem_mb):
         f" --out {out_prefix}"
         f" --threads {threads}"
         f" --memory {mem_mb}"
+        f" && touch {out_prefix}.nosex"
     )
     return sp.check_output(cmd, shell=True, executable="/bin/bash")
 
