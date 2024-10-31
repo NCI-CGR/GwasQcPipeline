@@ -196,9 +196,9 @@ if cfg.config.user_files.gtc_pattern:
 
         rule gtc2bcf_conda:
             output:
-                temp(".bcftools-gtc2vcf-plugin_env_built"),
+                temp(".bcftools_env_built"),
             conda:
-                cfg.conda("bcftools-gtc2vcf-plugin")
+                cfg.conda("bcftools")
             shell:
                 "touch {output[0]}"
 
@@ -238,7 +238,7 @@ if cfg.config.user_files.gtc_pattern:
                 output:
                     bcf="sample_level/samples.bcf",
                 conda:
-                    cfg.conda("bcftools-gtc2vcf-plugin")
+                    cfg.conda("bcftools")
                 benchmark:
                     (
                         "benchmarks/merge_gtc_to_bcf_batches"

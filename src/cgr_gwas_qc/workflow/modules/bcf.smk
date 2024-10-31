@@ -89,18 +89,19 @@ rule gtc_to_bcf:
         additional_params=_get_add_params_for_gtc2bcf,
         bpm=cfg.config.reference_files.illumina_manifest_file,
         reference_fasta=cfg.config.reference_files.reference_fasta,
+        gtc2vcf_location=cfg.SRC_DIR.as_posix() + "/parsers/bcftools-plugins/gtc2vcf.so",
     output:
         bcf="sample_level/samples.bcf",
     threads: 4
     benchmark:
         "benchmarks/gtc_to_bcf." + str(len(cfg.ss)) + ".tsv"
     conda:
-        cfg.conda("bcftools-gtc2vcf-plugin")
+        cfg.conda("bcftools")
     resources:
         time_hr=ceil(((len(cfg.ss) + 1) * (cfg.config.num_snps * 3e-6)) / 3600) + 1,
         mem_mb=ceil((len(cfg.ss) * (cfg.config.num_snps * 1.06e-6)) + (cfg.config.num_snps * 2e-3))
         + 200,
     shell:
         """
-        bcftools +gtc2vcf --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ob --check-ref x -f {params.reference_fasta} --multiallelics -any --write-index --output {output.bcf}
+        bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ob --check-ref x -f {params.reference_fasta} --multiallelics -any --write-index --output {output.bcf}
         """
