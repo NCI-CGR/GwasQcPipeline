@@ -40,7 +40,7 @@ rule convert_bcf_to_plink_bed:
         "benchmarks/convert_bcf_to_plink_bed." + str(len(cfg.ss)) + ".tsv"
     threads: 44
     resources:
-        mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+        mem_mb=ceil((0.07 * len(cfg.ss))) + 1024,
         time_hr=ceil((0.11 * len(cfg.ss)) / 3600),
     shell:
         "plink2 --allow-extra-chr 0 --keep-allele-order --double-id --bcf {input.bcf} --update-sex {params.unknown_sex} --output-chr 26 --split-par hg38 --make-pgen --out sample_level/bcf2plink  --memory {resources.mem_mb} --threads {threads} ;"
