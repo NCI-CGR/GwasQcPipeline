@@ -4,7 +4,7 @@ from typing import Optional
 import pandas as pd
 from pydantic import BaseModel, Field, validator
 
-from cgr_gwas_qc.exceptions import csvbpmMissingRequiredColumnsError, csvbpmMultiGenomeError
+from cgr_gwas_qc.exceptions import CsvBpmMissingRequiredColumnsError, CsvBpmMultiGenomeError
 
 
 class ReferenceFiles(BaseModel):
@@ -91,7 +91,7 @@ class ReferenceFiles(BaseModel):
         columns_in_illumina_csv_bpm = get_illumina_csv_cols(v, assay_lineno)
         missing_columns = set(required_columns) - set(columns_in_illumina_csv_bpm)
         if not len(missing_columns) == 0:
-            raise csvbpmMissingRequiredColumnsError(missing_columns)
+            raise CsvBpmMissingRequiredColumnsError(missing_columns)
 
         GenomeBuilds = pd.read_csv(
             v,
@@ -102,7 +102,7 @@ class ReferenceFiles(BaseModel):
         )["GenomeBuild"].cat.categories.to_list()
 
         if len(GenomeBuilds) > 1:
-            raise csvbpmMultiGenomeError(GenomeBuilds)
+            raise CsvBpmMultiGenomeError(GenomeBuilds)
 
         return v
 
