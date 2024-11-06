@@ -107,12 +107,12 @@ class WorkflowParams(BaseModel):
     )
     convert_gtc2bcf: bool = Field(
         False,
-        description="If input is GTC, this switches between gtc2vcf (True) and gtc2ped (False - default) for conversion to BED",
+        description="If input is GTC, this switches between gtc2vcf (True) and gtc2ped (False - default) for conversion to BED.",
     )
 
     additional_params_for_gtc2bcf: str = Field(
         "--use-gtc-sample-names",
-        description="Additional/optional parameters not hardcoded to be used or skipped in gtc2bcf for specific analysis",
+        description="Additional/optional parameters not hardcoded to be used or skipped in gtc2bcf for specific analysis.",
     )
 
     @staticmethod
