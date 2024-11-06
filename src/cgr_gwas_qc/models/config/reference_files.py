@@ -36,7 +36,8 @@ class ReferenceFiles(BaseModel):
     )
 
     reference_fasta: Optional[Path] = Field(
-        None, description="Path to Reference fasta file to be used to convert gtc to bcf"
+        None,
+        description="Path to Reference fasta file to be used to convert gtc to bcf. This could be a compressed fasta file and have .bgz or .gz extension.",
     )
 
     illumina_csv_bpm: Optional[Path] = Field(
