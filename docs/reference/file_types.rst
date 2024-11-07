@@ -522,6 +522,26 @@ Per sample SNP weights based on an external reference panel.
 
 
 .. T
+vcf/bcf (Variant call format)
+---------------------------
+
+Variant call format (VCF) is a standard tab delimited text file to represent variants. The binary variant call format (BCF) refers to the binary compressed version of the vcf file. The BCF file typically offers storage and compute efficiency with BCFtools.
+The VCF file begins with a header where each line is commented with ``##`` and describes the VCF version, reference genome contigs and each TAG in the INFO/FILTER/FORMAT fields. The header is followed by data section where each variant is described by a row.
+The data section contains following standard fields:
+
+.. rubric:: Fields
+
+:CHROM: Chromosome contig name from the reference genome assembly
+:POS: The choromosomal position of the variant.
+:ID: The identifier for the variant. Typically dbSNP rsid.
+:REF: The reference allele.
+:ALT: The alternate allele.
+:QUAL: Phred Scale quality of the vairant.
+:FILTER: Any soft filters to tag the variant.
+:FORMAT: The format of the sample field.
+:SAMPLE1 ... SAMPLEn: The genotypes and any genotype quality scores for each sample. The genotypes for each sample is represented by a separate column.
+
+https://samtools.github.io/hts-specs/VCFv4.2.pdf
 
 .. U
 
