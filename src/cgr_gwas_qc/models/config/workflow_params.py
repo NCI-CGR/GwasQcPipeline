@@ -27,6 +27,8 @@ class WorkflowParams(BaseModel):
             max_time_hr:
             max_mem_mb:
             time_start:
+            convert_gtc2bcf: false
+            additional_params_for_gtc2bcf: --use-gtc-sample-names
     """
 
     subject_id_column: str = Field(
