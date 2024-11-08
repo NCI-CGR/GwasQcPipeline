@@ -9,11 +9,13 @@ cfg = load_config()
 
 
 def _create_unknown_sex(wildcards):
-    path_to_unknown_sex_lst = temp("unknown_sex.lst")
+    import tempfile
+
+    path_to_unknown_sex_lst = tempfile.NamedTemporaryFile(delete=False)
     cfg.ss.rename(columns={"Sample_ID": "#IID"}).assign(Sex="U").to_csv(
         path_to_unknown_sex_lst, sep="\t", index=False
     )
-    return path_to_unknown_sex_lst
+    return path_to_unknown_sex_lst.name
 
 
 rule convert_bcf_to_plink_bed:
@@ -46,7 +48,7 @@ rule convert_bcf_to_plink_bed:
         "plink2 --allow-extra-chr 0 --keep-allele-order --double-id --bcf {input.bcf} --update-sex {params.unknown_sex} --output-chr 26 --split-par hg38 --make-pgen --out sample_level/bcf2plink  --memory {resources.mem_mb} --threads {threads} ;"
         "plink2 --pfile sample_level/bcf2plink --make-pgen --sort-vars --out sample_level/bcf2plink-sorted --threads {threads} --memory {resources.mem_mb}  ;"
         "plink2 --pfile sample_level/bcf2plink-sorted --make-bed --out sample_level/samples --threads {threads} --memory {resources.mem_mb} ;"
-        "rm sample_level/bcf2plink.{{pgen,psam,pvar,log}} sample_level/bcf2plink-sorted.{{pgen,psam,pvar,log}}"
+        "rm sample_level/bcf2plink.{{pgen,psam,pvar,log}} sample_level/bcf2plink-sorted.{{pgen,psam,pvar,log}} {params.unknown_sex}"
 
 
 rule write_gtc_pathlist:
