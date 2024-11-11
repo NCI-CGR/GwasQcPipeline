@@ -56,6 +56,27 @@ class BpmEntryError(BpmError):
 
 
 ################################################################################
+# CSV bpm
+################################################################################
+class CsvBpmError(GwasQcValidationError):
+    pass
+
+
+class CsvBpmMissingRequiredColumnsError(CsvBpmError):
+    def __init__(self, missing_required_columns: List[str]):
+        col_str = ", ".join(missing_required_columns)
+        message = f"illumina_csv_bpm appears outdated and incompatible with gtc-to-bcf. The illumina_csv_bpm is missing required columns: {col_str}"
+        super().__init__(message)
+
+
+class CsvBpmMultiGenomeError(CsvBpmError):
+    def __init__(self, GenomeBuilds: List[str]):
+        genomebuild_str = ", ".join(GenomeBuilds)
+        message = f"illumina_csv_bpm appears outdated and incompatible with gtc-to-bcf. The illumina_csv_bpm has multiple genome builds: {genomebuild_str}"
+        super().__init__(message)
+
+
+################################################################################
 # GTC
 ################################################################################
 class GtcError(GwasQcValidationError):

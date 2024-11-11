@@ -27,6 +27,8 @@ class WorkflowParams(BaseModel):
             max_time_hr:
             max_mem_mb:
             time_start:
+            convert_gtc2bcf: false
+            additional_params_for_gtc2bcf: --use-gtc-sample-names
     """
 
     subject_id_column: str = Field(
@@ -104,6 +106,15 @@ class WorkflowParams(BaseModel):
     time_start: str = Field(
         timestr,
         description="Date and time at which the workflow starts. This creates a unique id for the run.",
+    )
+    convert_gtc2bcf: bool = Field(
+        False,
+        description="If input is GTC, this switches between gtc2vcf (True) and gtc2ped (False - default) for conversion to BED.",
+    )
+
+    additional_params_for_gtc2bcf: str = Field(
+        "--use-gtc-sample-names",
+        description="Additional/optional parameters not hardcoded to be used or skipped in gtc2bcf for specific analysis.",
     )
 
     @staticmethod

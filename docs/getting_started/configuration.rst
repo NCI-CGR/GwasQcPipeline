@@ -96,14 +96,18 @@ By default we assume you will be starting with IDAT and GTC files.
 Though we also accept aggregated PED/MAP and aggregated BED/BIM/FAM files.
 In the example, ``{Project}`` and ``{Sample_ID}`` will be filled by values from ``Project`` and ``Sample_ID`` columns in ``cgr_sample_sheet.csv``.
 
-If the ``gtc_pattern`` is given, then this will trigger the GTC entry point.
-We will convert each sample's GTC to a PED/MAP and then aggregate all samples and convert to a single BED/BIM/FAM at ``sample_level/samples.{bed,bim,fam}``.
+If the ``gtc_pattern`` is given, then this will trigger the GTC entry point. There are two methods to convert gtc files to ``sample_level/samples.{bed,bim,fam}``.
+If ``workflow_params.convert_gtc2bcf=false`` (default), we will convert each sample's GTC to a PED/MAP and then aggregate all samples and convert to a single BED/BIM/FAM at ``sample_level/samples.{bed,bim,fam}``.
+If ``workflow_params.convert_gtc2bcf=true``, we will convert GTCs to an aggregated BCF and convert to BED/BIM/FAM at ``sample_level/samples.{bed,bim,fam}``.
 
 If the PED/MAP files are given, then this will trigger the PED/MAP entry point.
 Which will convert these files to a single BED/BIM/FAM at ``sample_level/samples.{bed,bim,fam}``.
 
 If the BED/BIM/FAM files are given, then this will trigger the BED/BIM/FAM entry point.
 Which will create a symbolic link from your BED/BIM/FAM to ``sample_level/samples.{bed,bim,fam}``.
+
+If a BCF is given, then this will trigger the BCF entry point.
+Which will convert BCF to BED/BIM/FAM at ``sample_level/samples.{bed,bim,fam}``.
 
 .. pydantic:: cgr_gwas_qc.models.config.software_params.SoftwareParams
 
@@ -173,5 +177,6 @@ Full Example
       lims_upload: true
       lims_output_dir: /example/location/to/place/lims/upload/file
       time_start: '20240227130627'
+      convert_gtc2bcf: false
    Sample_IDs_to_remove:
       - Sample0001
