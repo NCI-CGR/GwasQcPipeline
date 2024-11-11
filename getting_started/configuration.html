@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; GwasQcPipeline 1.7.0 documentation</title>
+  <title>Configuration Files &mdash; GwasQcPipeline 1.8.0-rc1 documentation</title>
   
 
   
@@ -273,7 +273,7 @@ I will walk through each section below and end this page with a full example.</p
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td><p>v1.7.0</p></td>
+<td><p>v1.8.0-rc1</p></td>
 </tr>
 <tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>slurm_partition</p></li>
@@ -425,6 +425,7 @@ You should not need to edit this section unless you want to
 <tr class="row-odd"><td colspan="3"><p>A list of reference files used by the pipeline.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">reference_files</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
+<span class="w">    </span><span class="nt">illumina_csv_bpm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/csv/file/GSAMD-24v1-0_20011747_A1.csv</span>
 <span class="w">    </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
 <span class="w">    </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
 <span class="w">    </span><span class="nt">reference_fasta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/reference/fasta/GCA_000001405.15_GRCh38_full_analysis_set.fna.bgz</span>
@@ -499,7 +500,21 @@ You should not need to edit this section unless you want to
 </td>
 <td colspan="2"><p><em>Reference Fasta</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>Path to Reference fasta file to be used to convert gtc to vcf</p></td>
+<tr class="row-odd"><td colspan="2"><p>Path to Reference fasta file to be used to convert gtc to bcf. This could be compressed with bgzip but not gzip.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>path</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>illumina_csv_bpm</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Illumina Csv Bpm</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p>Path to CSV bead pool manifest provided by Illumina to be used for gtc to bcf conversion. If csv_bpm is not provided, insertions/deletions will be skipped in gtc-to-bcf conversion.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>string</em></p></td>
@@ -711,12 +726,15 @@ You should only provide one set of patterns/paths.</p>
 By default we assume you will be starting with IDAT and GTC files.
 Though we also accept aggregated PED/MAP and aggregated BED/BIM/FAM files.
 In the example, <code class="docutils literal notranslate"><span class="pre">{Project}</span></code> and <code class="docutils literal notranslate"><span class="pre">{Sample_ID}</span></code> will be filled by values from <code class="docutils literal notranslate"><span class="pre">Project</span></code> and <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> columns in <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.</p>
-<p>If the <code class="docutils literal notranslate"><span class="pre">gtc_pattern</span></code> is given, then this will trigger the GTC entry point.
-We will convert each sample’s GTC to a PED/MAP and then aggregate all samples and convert to a single BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">gtc_pattern</span></code> is given, then this will trigger the GTC entry point. There are two methods to convert gtc files to <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">workflow_params.convert_gtc2bcf=false</span></code> (default), we will convert each sample’s GTC to a PED/MAP and then aggregate all samples and convert to a single BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">workflow_params.convert_gtc2bcf=true</span></code>, we will convert GTCs to an aggregated BCF and convert to BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
 <p>If the PED/MAP files are given, then this will trigger the PED/MAP entry point.
 Which will convert these files to a single BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
 <p>If the BED/BIM/FAM files are given, then this will trigger the BED/BIM/FAM entry point.
 Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
+<p>If a BCF is given, then this will trigger the BCF entry point.
+Which will convert BCF to BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
 <section id="software-parameters">
 <h3>Software Parameters<a class="headerlink" href="#software-parameters" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
@@ -1081,6 +1099,8 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <span class="w">    </span><span class="nt">max_time_hr</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">max_mem_mb</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">time_start</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">convert_gtc2bcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">additional_params_for_gtc2bcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--use-gtc-sample-names</span>
 </pre></div>
 </div>
 </td>
@@ -1282,7 +1302,35 @@ Which will create a symbolic link from your BED/BIM/FAM to <code class="docutils
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-even"><td><p>default</p></td>
-<td><p>20241016131440</p></td>
+<td><p>20241111175456</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>convert_gtc2bcf</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Convert Gtc2Bcf</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>If input is GTC, this switches between gtc2vcf (True) and gtc2ped (False - default) for conversion to BED.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>False</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>additional_params_for_gtc2bcf</p></li>
+</ul>
+</td>
+<td colspan="2"><p><em>Additional Params For Gtc2Bcf</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p>Additional/optional parameters not hardcoded to be used or skipped in gtc2bcf for specific analysis.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td><p>–use-gtc-sample-names</p></td>
 </tr>
 </tbody>
 </table>
@@ -1345,6 +1393,7 @@ These samples will be indicated as <code class="docutils literal notranslate"><s
 <span class="w">   </span><span class="nt">lims_upload</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">   </span><span class="nt">lims_output_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/example/location/to/place/lims/upload/file</span>
 <span class="w">   </span><span class="nt">time_start</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;20240227130627&#39;</span>
+<span class="w">   </span><span class="nt">convert_gtc2bcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="nt">Sample_IDs_to_remove</span><span class="p">:</span>
 <span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sample0001</span>
 </pre></div>

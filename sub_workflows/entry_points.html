@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Entry Points Sub-workflow &mdash; GwasQcPipeline 1.7.0 documentation</title>
+  <title>Entry Points Sub-workflow &mdash; GwasQcPipeline 1.8.0-rc1 documentation</title>
   
 
   
@@ -205,18 +205,31 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">sample_level/samples.fam</span></code></p></li>
 </ul>
 </div></blockquote>
-<p>There are four paths we can take to create these files:</p>
+<p>The pipeline accepts either per-sample GTC files or an aggregated dataset file:</p>
+<p><strong>per-sample GTC files</strong>:</p>
+<p>The pipeline supports two different methods for converting per-sample GTCs to aggregated BED/BIM/FAM:</p>
 <ol class="arabic simple">
-<li><p>If GTC files are provided using <code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code> then we will</p></li>
+<li><p>If GTC files are provided using <code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code> and <code class="docutils literal notranslate"><span class="pre">workflow_params.convert_gtc2bcf=false</span></code> (default) then following rulegraph will be followed:</p></li>
 </ol>
 <figure class="align-default" id="fig-entry-points-gtc">
 <img alt="../_images/entry-points_gtc.png" src="../_images/entry-points_gtc.png" />
 <figcaption>
-<p><span class="caption-number">Fig. 2 </span><span class="caption-text">The GTC entry-point workflow.
-If per sample GTC files are provided, then we will convert these files to the PED/MAP format and merge them together.</span><a class="headerlink" href="#fig-entry-points-gtc" title="Permalink to this image">¶</a></p>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">The entry-point workflow with GTCs and <code class="docutils literal notranslate"><span class="pre">convert_gtc2bcf=false</span></code>.
+If per sample GTC files are provided and convert_gtc2bcf is false, then we will convert these files to the PED/MAP format and merge them together.</span><a class="headerlink" href="#fig-entry-points-gtc" title="Permalink to this image">¶</a></p>
 </figcaption>
 </figure>
 <ol class="arabic simple" start="2">
+<li><p>If GTC files are provided using <code class="docutils literal notranslate"><span class="pre">user_files.gtc_pattern</span></code> and <code class="docutils literal notranslate"><span class="pre">workflow_params.convert_gtc2bcf=true</span></code> then the following rulegraph will be followed:</p></li>
+</ol>
+<figure class="align-default" id="fig-entry-points-gtc-to-bcf">
+<img alt="../_images/entry-points_gtc-to-bcf.svg" src="../_images/entry-points_gtc-to-bcf.svg" /><figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">The entry-point workflow with GTCs and <code class="docutils literal notranslate"><span class="pre">convert_gtc2bcf=true</span></code>.
+If per sample GTC files are provided and convert_gtc2bcf is true, then we will convert these files to an aggregated BCF file and load the BCF file into Plink to create a BED/BIM/FAM set.</span><a class="headerlink" href="#fig-entry-points-gtc-to-bcf" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p><strong>Aggregated dataset</strong>:</p>
+<p>If a reanalysis for previous dataset is desired or GTC files are unavailable, an aggregated file encoding genotypes for all samples can be provided. The pipeline currently supports following three aggregated file formats:</p>
+<ol class="arabic simple">
 <li><p>If an aggregated PED/MAP is provided using <code class="docutils literal notranslate"><span class="pre">user_files.ped</span></code> and <code class="docutils literal notranslate"><span class="pre">user_files.map</span></code> then we will convert the PED/MAP to BED/BIM/FAM.</p></li>
 <li><p>If an aggregated BED/BIM/FAM is provided using <code class="docutils literal notranslate"><span class="pre">user_files.bed</span></code>, <code class="docutils literal notranslate"><span class="pre">user_files.bim</span></code>, <code class="docutils literal notranslate"><span class="pre">user_files.fam</span></code> then we will create a symbolic link.</p></li>
 <li><p>If an aggregated BCF file is provided using <code class="docutils literal notranslate"><span class="pre">user_files.bcf</span></code> then we will convert the BCF to BED/BIM/FAM.</p></li>

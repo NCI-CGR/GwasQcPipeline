@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>File Type Reference &mdash; GwasQcPipeline 1.7.0 documentation</title>
+  <title>File Type Reference &mdash; GwasQcPipeline 1.8.0-rc1 documentation</title>
   
 
   
@@ -127,6 +127,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#snp-eigensoft">snp (<code class="docutils literal notranslate"><span class="pre">eigensoft</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#snpwt-snpweights">snpwt.* (<code class="docutils literal notranslate"><span class="pre">SNPweights</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#snpweights-snpweights">snpweights (<code class="docutils literal notranslate"><span class="pre">SNPweights</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vcf-bcf-variant-call-format">vcf/bcf (Variant call format)</a></li>
 </ul>
 </li>
 </ul>
@@ -938,6 +939,43 @@ The seventh and eighth fields are allele calls for the first variant in the .map
 <dt class="field-even">Percent ASI (CHB + CHD) Ancestry<span class="colon">:</span></dt>
 <dd class="field-even"><p></p></dd>
 </dl>
+</section>
+<section id="vcf-bcf-variant-call-format">
+<h2>vcf/bcf (Variant call format)<a class="headerlink" href="#vcf-bcf-variant-call-format" title="Permalink to this headline">¶</a></h2>
+<p>Variant call format (VCF) is a standard tab delimited text file to represent variants. The binary variant call format (BCF) refers to the binary compressed version of the vcf file. The BCF file typically offers storage and compute efficiency with BCFtools.
+The VCF file begins with a header where each line is commented with <code class="docutils literal notranslate"><span class="pre">##</span></code> and describes the VCF version, reference genome contigs and each TAG in the INFO/FILTER/FORMAT fields. The header is followed by data section where each variant is described by a row.
+The data section contains following standard fields:</p>
+<p class="rubric">Fields</p>
+<dl class="field-list simple">
+<dt class="field-odd">CHROM<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Chromosome contig name from the reference genome assembly</p>
+</dd>
+<dt class="field-even">POS<span class="colon">:</span></dt>
+<dd class="field-even"><p>The choromosomal position of the variant.</p>
+</dd>
+<dt class="field-odd">ID<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The identifier for the variant. Typically dbSNP rsid.</p>
+</dd>
+<dt class="field-even">REF<span class="colon">:</span></dt>
+<dd class="field-even"><p>The reference allele.</p>
+</dd>
+<dt class="field-odd">ALT<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The alternate allele.</p>
+</dd>
+<dt class="field-even">QUAL<span class="colon">:</span></dt>
+<dd class="field-even"><p>Phred Scale quality of the vairant.</p>
+</dd>
+<dt class="field-odd">FILTER<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any soft filters to tag the variant.</p>
+</dd>
+<dt class="field-even">FORMAT<span class="colon">:</span></dt>
+<dd class="field-even"><p>The format of the sample field.</p>
+</dd>
+<dt class="field-odd">SAMPLE1 … SAMPLEn<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The genotypes and any genotype quality scores for each sample. The genotypes for each sample is represented by a separate column.</p>
+</dd>
+</dl>
+<p><a class="reference external" href="https://samtools.github.io/hts-specs/VCFv4.2.pdf">https://samtools.github.io/hts-specs/VCFv4.2.pdf</a></p>
 </section>
 </section>
 
