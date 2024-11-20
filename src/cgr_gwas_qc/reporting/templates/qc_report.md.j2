@@ -83,7 +83,6 @@ Internal QC samples (from the 1000G project) are added to each 96-well plate to 
 
 Similar to internal QC controls, technical replicates of study samples are included in every project to assess overall quality by comparing replicate concordance (proportion IBS2).
 In this project the minimum concordance of replicates was {{ sample_qc.expected_replicates.min_concordance | toPct | numFormat }}% and the mean concordance was {{ sample_qc.expected_replicates.mean_concordance | toPct | numFormat }}%.
-We removed {{ sample_qc.expected_replicates.num_low_concordance | numFormat }} study samples with low replicate concordance.
 
 ### Replicate Pruning (Subject Representative)
 
