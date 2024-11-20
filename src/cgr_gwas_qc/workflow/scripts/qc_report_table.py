@@ -187,6 +187,7 @@ _SUBJECT_QC_COLUMNS = [
     "Case/Control_Status",
     "Unexpected Replicate",
     "unexpected_replicate_ids",
+    "unexpected_replicate_status",
     "Expected_Sex",
     "Predicted_Sex",
     "ChrX_Inbreed_estimate",
