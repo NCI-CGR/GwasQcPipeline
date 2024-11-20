@@ -14,6 +14,7 @@ Internal Subject QC Report
     case_control, CASE_CONTROL_DTYPE, Phenotype status {Case, Control, QC, Unknown}
     is_unexpected_replicate, boolean, True if two subjects had high concordance.
     unexpected_replicate_ids, string, Concatenated Sample_IDs that are unexpected replicates.
+    unexpected_replicate_status, UNEXPECTED_REPLICATE_STATUS_DTYPE, Identifies unexpected replicates and their retainment status after contamination assessment.
     expected_sex, SEX_DTYPE, The expected sex from the provided sample sheet.
     predicted_sex, SEX_DTYPE, The predicted sex based on X chromosome heterozygosity.
     X_inbreeding_coefficient, float, The X chromosome F coefficient.
@@ -95,7 +96,7 @@ def main(
     )
 
 
-# Needed with graf-pop implementarion that returns Asian-Pacific_Islander which the hyphen isn't supported by snakemake wildcares
+# Needed with graf-pop implementation that returns Asian-Pacific_Islander which the hyphen isn't supported by snakemake wildcares
 def _fix_hyphen_in_ancestry_name(df: pd.DataFrame) -> pd.DataFrame:
     df["Ancestry"] = df["Ancestry"].str.replace("-", "_")
     return df
@@ -140,9 +141,10 @@ def _add_unexpected_replicate_ids(df: pd.DataFrame, sample_concordance_csv: Path
         .astype("string")
     )
 
-    return df.merge(flags.join(unexpected_ids), on="Group_By_Subject_ID", how="left").fillna(
+    df = df.merge(flags.join(unexpected_ids), on="Group_By_Subject_ID", how="left").fillna(
         {"is_unexpected_replicate": False}
     )
+    return df
 
 
 def _add_unexpected_replicate_status(df: pd.DataFrame) -> pd.DataFrame:
@@ -166,33 +168,38 @@ def _add_unexpected_replicate_status(df: pd.DataFrame) -> pd.DataFrame:
         # Check if unexpected replicate and extract information
         if row["is_unexpected_replicate"]:
             pair = row["unexpected_replicate_ids"].split("|")
-            current_subject = df.loc[
-                index, "Group_By_Subject_ID"
-            ]  # get the subject ID of current row
 
-            other_subject = "".join([str(subid) for subid in pair if subid != current_subject])
+            # get the subject ID of current row
+            current_subject = df.loc[index, "Group_By_Subject_ID"]
+            other_subjects = [subid.strip() for subid in pair if subid.strip() != current_subject]
 
             # Check contamination status of current subject
             if pd.isna(df.loc[index, "is_contaminated"]) or not df.loc[index, "is_contaminated"]:
-                other_subject_index = df[df["Group_By_Subject_ID"] == other_subject].index
-                other_subject_row = df.iloc[other_subject_index]
-                is_contaminated = other_subject_row["is_contaminated"]
+                # Check contamination status of other subjects
+                other_contaminated = df[df["Group_By_Subject_ID"].isin(other_subjects)][
+                    "is_contaminated"
+                ]
 
-                # Update status of current subject if other subject is contaminated
-                if is_contaminated.all():
+                # other_contam=False if any are_not contaminated or are NaN
+                if any(other_contaminated.isin([False])) or any(pd.isna(other_contaminated)):
+                    other_contaminated = False
+                else:
+                    other_contaminated = True
+
+                # Update status of current subject if other subjects are contaminated
+                # all other subjects are contaminated (yes status change)
+                if other_contaminated:
                     df.loc[index, "unexpected_replicate_status"] = 1
                     df.loc[index, "is_unexpected_replicate"] = False
-
                 else:
-                    # Neither contaminated, no change
+                    # Not all other subjects are not contaminated (no status change)
                     df.loc[index, "unexpected_replicate_status"] = 3
 
             # Current subject is contaminated (no status change)
             else:
                 df.loc[index, "unexpected_replicate_status"] = 2
-                current_subject = typer.style(current_subject, fg=typer.colors.RED)
 
-        # Not an unexpected replicate (no change)
+        # Not an unexpected replicate (no status change)
         else:
             df.loc[index, "unexpected_replicate_status"] = 0
 
