@@ -45,16 +45,10 @@ rule sample_call_rate_filter:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
         time_hr=lambda wildcards, attempt: attempt**2,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--mind {params.mind} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        """
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --mind {params.mind} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        """
 
 rule snp_call_rate_filter:
     input:
@@ -78,16 +72,10 @@ rule snp_call_rate_filter:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
         time_hr=lambda wildcards, attempt: attempt**2,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--geno {params.geno} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        """
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --geno {params.geno} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        """
 
 rule maf_filter:
     """Filter SNPs based on minor allele frequency."""
@@ -147,16 +135,10 @@ rule ld_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--extract {input.to_keep} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        """
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --extract {input.to_keep} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        """
 
 rule snps_only_filter:
     """Exclude all variants with one or more multi-character allele codes"""
@@ -261,16 +243,10 @@ rule remove_ids:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--remove {input.to_remove} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        """
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --remove {input.to_remove} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        """
 
 rule keep_bfile:
     """Tell snakemake to keep the file.
@@ -298,15 +274,10 @@ rule keep_bfile:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        """
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        """
 
 ################################################################################
 # Converters
@@ -332,16 +303,10 @@ rule rename_ids:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--update-ids {input.id_map} "
-        "--make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        """
+        plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --update-ids {input.id_map} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        """
 
 rule bed_to_ped:
     input:
@@ -418,15 +383,10 @@ rule ld:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        "sleep 10 && plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--indep-pairwise 50 5 {params.r2}  "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
-
+        """
+        sleep 10 && plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --indep-pairwise 50 5 {params.r2} --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
+        touch {output.nosex}
+        """
 
 rule miss:
     """Runs ``plink`` missingness statistics.
