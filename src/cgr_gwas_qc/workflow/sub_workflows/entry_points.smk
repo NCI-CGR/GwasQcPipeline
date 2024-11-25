@@ -65,10 +65,67 @@ module bcf_module:
         {}
 
 
+module idat_module:
+    snakefile:
+        cfg.modules("idat")
+    config:
+        {}
+
+
 ################################################################################
 # Workflow Rules
 ################################################################################
-if cfg.config.user_files.gtc_pattern:
+if cfg.config.workflow_params.convert_idat2gtc and cfg.config.user_files.idat_pattern:
+    ################################################################################
+    # IDAT to GTC
+    ################################################################################
+
+    if config.get("cluster_mode", False) and len(cfg.cluster_groups) > 2:
+
+        localrules:
+            write_idat2gtc_ss,
+            write_gtc_pathlist,
+
+        use rule write_idat2gtc_ss from idat_module with:
+            params:
+                grp=cfg.cluster_groups,
+            output:
+                temp("sample_level/{grp}/idat.csv"),
+
+        use rule idat2gtc from idat_module with:
+            output:
+                output_folder=directory("sample_level/{grp}/gtcs/"),
+
+        use rule write_gtc_pathlist from bcf_module with:
+            input:
+                rules.idat2gtc.output.output_folder,
+            params:
+                pattern=lambda wc: rules.idat2gtc.output.output_folder
+                + "/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
+                grp=cfg.cluster_groups,
+            output:
+                temp("sample_level/{grp}/gtc.tsv"),
+
+    else:
+
+        use rule write_idat2gtc_ss from idat_module with:
+            params:
+                grp="",
+
+        use rule idat2gtc from idat_module with:
+            output:
+                output_folder=directory("sample_level/gtcs"),
+
+        use rule write_gtc_pathlist from bcf_module with:
+            input:
+                rules.idat2gtc.output.output_folder,
+            params:
+                pattern=lambda wc: rules.idat2gtc.output.output_folder
+                + "/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
+                grp="",
+
+
+if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2gtc:
 
     def _get_gtc(wildcards):
         return cfg.expand(
@@ -188,7 +245,10 @@ if cfg.config.user_files.gtc_pattern:
     # GTC To BCF
     ################################################################################
 
-    if cfg.config.workflow_params.convert_gtc2bcf:
+    if (
+        cfg.config.workflow_params.convert_gtc2bcf
+        or cfg.config.workflow_params.convert_idat2gtc
+    ):
 
         localrules:
             gtc2bcf_conda,
@@ -207,11 +267,13 @@ if cfg.config.user_files.gtc_pattern:
             def _get_n_samples(wildcards):
                 return len(cfg.ss.query(f'cluster_group=="{wildcards.grp}"'))
 
-            use rule write_gtc_pathlist from bcf_module with:
-                params:
-                    grp=cfg.cluster_groups,
-                output:
-                    temp("sample_level/{grp}/gtc.tsv"),
+            if not cfg.config.workflow_params.convert_idat2gtc:
+
+                use rule write_gtc_pathlist from bcf_module with:
+                    params:
+                        grp=cfg.cluster_groups,
+                    output:
+                        temp("sample_level/{grp}/gtc.tsv"),
 
             use rule gtc_to_bcf from bcf_module with:
                 input:
@@ -261,11 +323,13 @@ if cfg.config.user_files.gtc_pattern:
 
         else:
 
-            use rule write_gtc_pathlist from bcf_module with:
-                params:
-                    grp="",
-                output:
-                    "sample_level/gtc.tsv",
+            if not cfg.config.workflow_params.convert_idat2gtc:
+
+                use rule write_gtc_pathlist from bcf_module with:
+                    params:
+                        grp="",
+                    output:
+                        "sample_level/gtc.tsv",
 
             use rule gtc_to_bcf from bcf_module with:
                 output:
