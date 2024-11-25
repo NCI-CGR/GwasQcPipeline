@@ -29,6 +29,8 @@ class WorkflowParams(BaseModel):
             time_start:
             convert_gtc2bcf: false
             additional_params_for_gtc2bcf: --use-gtc-sample-names
+            convert_idat2gtc: false
+            dragena_location:
     """
 
     subject_id_column: str = Field(
@@ -115,6 +117,16 @@ class WorkflowParams(BaseModel):
     additional_params_for_gtc2bcf: str = Field(
         "--use-gtc-sample-names",
         description="Additional/optional parameters not hardcoded to be used or skipped in gtc2bcf for specific analysis.",
+    )
+
+    convert_idat2gtc: bool = Field(
+        False,
+        description="If idat_pattern is provided and `convert_idat2gtc` is `True`, idat2gtc will be triggered in entry_points.",
+    )
+
+    dragena_location: str = Field(
+        None,
+        description="Path to dragena binary. If dragena is not available as a module on HPC and IDAT entry_point is used, `dragena_location` will be used to convert idat2gtc.",
     )
 
     @staticmethod
