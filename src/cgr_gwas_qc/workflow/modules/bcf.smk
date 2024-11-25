@@ -56,14 +56,16 @@ rule write_gtc_pathlist:
     """
     params:
         grp="",
+        pattern=lambda wc: cfg.config.user_files.gtc_pattern,
     output:
         "sample_level/gtc.tsv",
     run:
         if params.grp == "":
-            gtcList = cfg.expand(cfg.config.user_files.gtc_pattern)
+            gtcList = cfg.expand(params.pattern)
         else:
+            params.pattern = expand(params.pattern, grp=wildcards.grp, allow_missing=True)
             gtcList = cfg.expand(
-                cfg.config.user_files.gtc_pattern, query=f'cluster_group=="{wildcards.grp}"'
+                params.pattern, query='cluster_group=="{grp}"'.format(grp=wildcards.grp)
             )
         with open(output[0], "w") as f:
             for line in gtcList:
