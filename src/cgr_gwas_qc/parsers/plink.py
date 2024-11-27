@@ -74,7 +74,7 @@ def read_hwe(filename: PathLike) -> pd.DataFrame:
     )
 
 
-def read_genome(filename: PathLike) -> pd.DataFrame:
+def read_genome(filename: PathLike, required_cols=None) -> pd.DataFrame:
     """Parse PLINK's genome file format.
 
     Each row of the genome file is a pairwise combinations of
@@ -140,12 +140,17 @@ def read_genome(filename: PathLike) -> pd.DataFrame:
         x.rename(columns={"IID1": "ID1", "IID2": "ID2"}, inplace=True)
         return x
 
+    if required_cols is None:
+
+        def required_cols(col_name):
+            return lambda col_name: col_name not in ["FID1", "FID2"]
+
     return _sort_ids(
         pd.read_csv(
             filename,
             delim_whitespace=True,
             dtype=DTYPES,
-            usecols=lambda col_name: col_name not in ["FID1", "FID2"],
+            usecols=required_cols,
         )
     )
 

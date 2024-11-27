@@ -60,7 +60,9 @@ def read(filename: PathLike) -> pd.DataFrame:
 
 def build(filename: Path, concordance_threshold: float, pi_hat_threshold: float) -> pd.DataFrame:
     return (
-        plink.read_genome(filename)
+        plink.read_genome(
+            filename, required_cols=["IID1", "IID2", "PI_HAT", "IBS0", "IBS1", "IBS2"]
+        )
         .assign(is_ge_pi_hat=lambda x: x.PI_HAT >= pi_hat_threshold)
         .assign(concordance=lambda x: x.IBS2 / (x.IBS0 + x.IBS1 + x.IBS2))
         .assign(is_ge_concordance=lambda x: x.concordance >= concordance_threshold)
