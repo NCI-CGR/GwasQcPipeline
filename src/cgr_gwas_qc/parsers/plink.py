@@ -114,6 +114,26 @@ def read_genome(filename: PathLike) -> pd.DataFrame:
         - https://www.cog-genomics.org/plink/1.9/formats#genome
     """
 
+    DTYPES = {
+        "IID1": "string",
+        "IID2": "string",
+        "RT": "category",
+        "EZ": "category",
+        "Z0": np.float32,
+        "Z1": np.float32,
+        "Z2": np.float32,
+        "PI_HAT": np.float32,
+        "PHE": "category",
+        "DST": np.float32,
+        "PPC": np.float32,
+        "RATIO": np.float32,
+        "IBS0": np.uint32,
+        "IBS1": np.uint32,
+        "IBS2": np.uint32,
+        "HOMHOM": np.uint32,
+        "HETHET": np.uint32,
+    }
+
     def _sort_ids(x: pd.DataFrame):
         """Sort IDs alphanumerically."""
         x.IID1, x.IID2 = np.where(x.IID1 < x.IID2, [x.IID1, x.IID2], [x.IID2, x.IID1])
@@ -124,7 +144,7 @@ def read_genome(filename: PathLike) -> pd.DataFrame:
         pd.read_csv(
             filename,
             delim_whitespace=True,
-            dtype={"IID1": "string", "IID2": "string"},
+            dtype=DTYPES,
             usecols=lambda col_name: col_name not in ["FID1", "FID2"],
         )
     )
