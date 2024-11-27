@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from cgr_gwas_qc.typing import PathLike
@@ -113,20 +114,19 @@ def read_genome(filename: PathLike) -> pd.DataFrame:
         - https://www.cog-genomics.org/plink/1.9/formats#genome
     """
 
-    def _sort_ids(x: pd.Series):
+    def _sort_ids(x: pd.DataFrame):
         """Sort IDs alphanumerically."""
-        x["ID1"], x["ID2"] = sorted([x.IID1, x.IID2])
+        x.IID1, x.IID2 = np.where(x.IID1 < x.IID2, [x.IID1, x.IID2], [x.IID2, x.IID1])
+        x.rename(columns={"IID1": "ID1", "IID2": "ID2"}, inplace=True)
         return x
 
-    return (
+    return _sort_ids(
         pd.read_csv(
             filename,
             delim_whitespace=True,
             dtype={"FID1": "string", "IID1": "string", "FID2": "string", "IID2": "string"},
         )
-        .apply(_sort_ids, axis=1)
-        .drop(["IID1", "IID2", "FID1", "FID2"], axis=1)
-    )
+    ).drop(["FID1", "FID2"], axis=1)
 
 
 def read_imiss(filename: PathLike) -> pd.DataFrame:
