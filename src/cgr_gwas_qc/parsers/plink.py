@@ -124,9 +124,10 @@ def read_genome(filename: PathLike) -> pd.DataFrame:
         pd.read_csv(
             filename,
             delim_whitespace=True,
-            dtype={"FID1": "string", "IID1": "string", "FID2": "string", "IID2": "string"},
+            dtype={"IID1": "string", "IID2": "string"},
+            usecols=lambda col_name: col_name not in ["FID1", "FID2"],
         )
-    ).drop(["FID1", "FID2"], axis=1)
+    )
 
 
 def read_imiss(filename: PathLike) -> pd.DataFrame:
