@@ -17,8 +17,13 @@ Reads the plink ``.genome`` format file and calculates concordance as
 
 """
 
+import concurrent.futures
+import functools
+import subprocess
+import tempfile
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import typer
 
@@ -38,8 +43,14 @@ DTYPES = {
 
 
 @app.command()
-def main(filename: Path, concordance_threshold: float, pi_hat_threshold: float, outfile: Path):
-    build(filename, concordance_threshold, pi_hat_threshold).to_csv(outfile, index=False)
+def main(
+    filename: Path,
+    concordance_threshold: float,
+    pi_hat_threshold: float,
+    outfile: Path,
+    threads: int = 1,
+):
+    build(filename, concordance_threshold, pi_hat_threshold, outfile, threads)
 
 
 def read(filename: PathLike) -> pd.DataFrame:
@@ -58,16 +69,63 @@ def read(filename: PathLike) -> pd.DataFrame:
     return pd.read_csv(filename, dtype=DTYPES)
 
 
-def build(filename: Path, concordance_threshold: float, pi_hat_threshold: float) -> pd.DataFrame:
+def _sort_ids(x: pd.DataFrame):
+    """ "Sort IDs alphanumerically."""
+    x.IID1, x.IID2 = np.where(x.IID1 < x.IID2, [x.IID1, x.IID2], [x.IID2, x.IID1])
+    x.rename(columns={"IID1": "ID1", "IID2": "ID2"}, inplace=True)
+    return x
+
+
+def prep_concordance_table(pi_hat_threshold: float, concordance_threshold: float, x: pd.DataFrame):
+    """ "Prepares the concordance_table by appending new columns based on thresholds."""
     return (
-        plink.read_genome(
-            filename, required_cols=["IID1", "IID2", "PI_HAT", "IBS0", "IBS1", "IBS2"]
-        )
+        _sort_ids(x)
         .assign(is_ge_pi_hat=lambda x: x.PI_HAT >= pi_hat_threshold)
         .assign(concordance=lambda x: x.IBS2 / (x.IBS0 + x.IBS1 + x.IBS2))
         .assign(is_ge_concordance=lambda x: x.concordance >= concordance_threshold)
         .reindex(DTYPES.keys(), axis=1)
     )
+
+
+def process_genome_chunk(pi_hat_threshold: float, concordance_threshold: float, chunk):
+    """ "Processes each chunk of genome file."""
+    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    prep_concordance_table(pi_hat_threshold, concordance_threshold, chunk).to_csv(
+        temp_file.name, index=False, header=False
+    )
+    return temp_file.name
+
+
+def build(
+    filename: Path,
+    concordance_threshold: float,
+    pi_hat_threshold: float,
+    outfile: Path,
+    threads: int,
+):
+
+    plink_genome_file = plink.read_genome(
+        filename, required_cols=["IID1", "IID2", "PI_HAT", "IBS0", "IBS1", "IBS2"], chunksize=100000
+    )
+
+    temp_files = []
+
+    header = tempfile.NamedTemporaryFile(delete=False)
+    temp_files.append(header.name)
+    pd.DataFrame(columns=DTYPES.keys()).to_csv(header.name, index=False)
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=threads) as executor:
+        results = executor.map(
+            functools.partial(process_genome_chunk, pi_hat_threshold, concordance_threshold),
+            plink_genome_file,
+        )
+
+    temp_files = temp_files + list(results)
+    with open(outfile, "wb") as outputfile:
+        subprocess.run(["cat"] + temp_files, stdout=outputfile)
+
+    for f in temp_files:
+        Path(f).unlink
 
 
 if __name__ == "__main__":
