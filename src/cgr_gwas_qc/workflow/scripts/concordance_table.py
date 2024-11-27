@@ -28,8 +28,8 @@ from cgr_gwas_qc.typing import PathLike
 app = typer.Typer(add_completion=False)
 
 DTYPES = {
-    "ID1": "string",
-    "ID2": "string",
+    "ID1": "category",
+    "ID2": "category",
     "PI_HAT": "float",
     "concordance": "float",
     "is_ge_pi_hat": "boolean",
