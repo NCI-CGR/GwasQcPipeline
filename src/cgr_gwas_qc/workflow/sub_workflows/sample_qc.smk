@@ -350,11 +350,12 @@ rule sample_concordance_plink:
     params:
         concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
         pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
+    threads: 1
     output:
         "sample_level/concordance/plink.csv",
     resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
-        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
+        mem_mb=2000,
+        time_hr=4,
     script:
         "../scripts/concordance_table.py"
 
