@@ -1,4 +1,5 @@
 from cgr_gwas_qc import load_config
+from math import floor
 
 cfg = load_config()
 
@@ -101,7 +102,7 @@ rule maf_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        """ 
+        """
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --maf {params.maf} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
@@ -512,25 +513,33 @@ rule genome:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
         out_prefix="{prefix}",
+        n_chunks=2,
+        n_threads=min(10, workflow.cores),
+        n_tasks=floor(max(1, workflow.cores / min(10, workflow.cores))),
     output:
         "{prefix}.genome",
-    threads: lambda wildcards, attempt: attempt * 2
+    threads: workflow.cores
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
-        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
+        mem_mb=lambda wildcards, attempt: attempt * 16000,
+        time_hr=lambda wildcards, attempt: attempt * 3,
     conda:
         cfg.conda("plink2")
     shell:
-        "sleep 10 && plink "
+        "seq 1 {params.n_chunks} |"
+        "xargs -n1 -P{params.n_tasks} -I 'piece' bash -c 'idx=piece;"
+        "plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
         "--genome full "
         "--min {params.ibd_min} "
         "--max {params.ibd_max} "
-        "--threads {threads} "
+        "--threads {params.n_threads} "
         "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix}.chunk "
+        "--parallel $idx {params.n_chunks} ';"
+        "cat {params.out_prefix}.chunk* > {params.out_prefix}.genome ;"
+        "rm {params.out_prefix}.chunk*"
 
 
 rule het:
