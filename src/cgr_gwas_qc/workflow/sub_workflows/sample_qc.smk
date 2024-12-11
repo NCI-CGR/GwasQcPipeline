@@ -50,6 +50,13 @@ if use_contamination:
     targets.append("sample_level/contamination/summary.csv")
 
 
+if cfg.config.workflow_params.concordance_tools.king:
+    targets.append("sample_level/concordance/king.kin")
+
+if cfg.config.workflow_params.concordance_tools.graf:
+    targets.append("sample_level/concordance/graf.tsv")
+
+
 rule all_sample_qc:
     input:
         targets,
@@ -440,8 +447,6 @@ rule sample_concordance_summary:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
         plink_file=rules.sample_concordance_plink.output[0],
-        graf_file=rules.sample_concordance_graf.output[0],
-        king_file=rules.sample_concordance_king.output.between_family,
     output:
         "sample_level/concordance/summary.csv",
     resources:

@@ -7,6 +7,17 @@ from pydantic import BaseModel, Field
 timestr = time.strftime("%Y%m%d%H%M%S")
 
 
+class ConcordanceTools(BaseModel):
+    graf: bool = Field(
+        False,
+        description="Is graf relatedness results needed? Even if True, the results won't be used in sample_concordance.",
+    )
+    king: bool = Field(
+        False,
+        description="Is king relateness results needed? Even if True, the results won't be used in sample_concordance.",
+    )
+
+
 class WorkflowParams(BaseModel):
     """This set of parameters control what parts and how the workflow is run.
 
@@ -31,6 +42,9 @@ class WorkflowParams(BaseModel):
             additional_params_for_gtc2bcf: --use-gtc-sample-names
             convert_idat2gtc: false
             dragena_location:
+            concordance_tools:
+                graf: false
+                king: false
     """
 
     subject_id_column: str = Field(
@@ -132,6 +146,11 @@ class WorkflowParams(BaseModel):
     dragena_location: str = Field(
         None,
         description="Path to dragena binary. If dragena is not available as a module on HPC and IDAT entry_point is used, `dragena_location` will be used to convert idat2gtc.",
+    concordance_tools: Optional["ConcordanceTools"] = Field(
+        ConcordanceTools(),
+        description="The sample_concordance_summary only uses Plink."
+        "If the outputs of graf and king relationship checks are needed, this option can be configured"
+        "Please note if even graf and king reledness checks are requested and executed, these would be for reference purpose only and not considered sample_concordance_summary.",
     )
 
     @staticmethod
