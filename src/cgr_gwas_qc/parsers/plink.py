@@ -87,8 +87,8 @@ def read_genome(filename: PathLike, required_cols=None, chunksize=100000) -> pd.
             .. csv-table::
                 :header: name, dtype, description
 
-                ID1, string, First Sample or Subject ID (alphanumerically)
-                ID2, string, Second Sample or Subject ID (alphanumerically)
+                IID1, string, First Sample or Subject ID (alphanumerically)
+                IID2, string, Second Sample or Subject ID (alphanumerically)
                 RT, category, Relationship type inferred from .fam/.ped file {FS: Full Sib, HS, Half Sib, PO: Parent-Offspring, OT; Other}
                 EZ, object, IBD sharing expected value, based on just .fam/.ped relationship
                 Z0, float, P(IBD=0)
