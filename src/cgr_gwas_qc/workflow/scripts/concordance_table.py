@@ -125,7 +125,7 @@ def build(
         subprocess.run(["cat"] + temp_files, stdout=outputfile)
 
     for f in temp_files:
-        Path(f).unlink
+        Path(f).unlink()
 
 
 if __name__ == "__main__":
