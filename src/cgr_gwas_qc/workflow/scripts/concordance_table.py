@@ -105,7 +105,7 @@ def build(
 ):
 
     plink_genome_file = plink.read_genome(
-        filename, required_cols=["IID1", "IID2", "PI_HAT", "IBS0", "IBS1", "IBS2"], chunksize=100000
+        filename, required_cols=["IID1", "IID2", "PI_HAT", "IBS0", "IBS1", "IBS2"]
     )
 
     temp_files = []

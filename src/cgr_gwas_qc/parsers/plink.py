@@ -74,7 +74,7 @@ def read_hwe(filename: PathLike) -> pd.DataFrame:
     )
 
 
-def read_genome(filename: PathLike, required_cols=None, chunksize=1000000) -> pd.DataFrame:
+def read_genome(filename: PathLike, required_cols=None, chunksize=100000) -> pd.DataFrame:
     """Parse PLINK's genome file format.
 
     Each row of the genome file is a pairwise combinations of
