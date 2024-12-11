@@ -70,14 +70,14 @@ def read(filename: PathLike) -> pd.DataFrame:
 
 
 def _sort_ids(x: pd.DataFrame):
-    """ "Sort IDs alphanumerically."""
+    """Sort IDs alphanumerically."""
     x.IID1, x.IID2 = np.where(x.IID1 < x.IID2, [x.IID1, x.IID2], [x.IID2, x.IID1])
     x.rename(columns={"IID1": "ID1", "IID2": "ID2"}, inplace=True)
     return x
 
 
 def prep_concordance_table(pi_hat_threshold: float, concordance_threshold: float, x: pd.DataFrame):
-    """ "Prepares the concordance_table by appending new columns based on thresholds."""
+    """Prepares the concordance_table by appending new columns based on thresholds."""
     return (
         _sort_ids(x)
         .assign(is_ge_pi_hat=lambda x: x.PI_HAT >= pi_hat_threshold)
@@ -88,7 +88,7 @@ def prep_concordance_table(pi_hat_threshold: float, concordance_threshold: float
 
 
 def process_genome_chunk(pi_hat_threshold: float, concordance_threshold: float, chunk):
-    """ "Processes each chunk of genome file."""
+    """Processes each chunk of genome file."""
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     prep_concordance_table(pi_hat_threshold, concordance_threshold, chunk).to_csv(
         temp_file.name, index=False, header=False
