@@ -77,6 +77,10 @@ def main(ctx: typer.Context):
     if not is_arg(args, ["--use-conda"]):
         args.append("--use-conda")
 
+    # appending the --use-envmodules needed for loading cluster modules as in idat2gtc entrypoint.
+    # no impact on conda or other use cases so loading by default.
+    args.append("--use-envmodules")
+
     if is_arg(args, ["--notemp", "--nt"]):
         # Adds config["notemp"] to help custom scripts know if they should
         # delete temp files.

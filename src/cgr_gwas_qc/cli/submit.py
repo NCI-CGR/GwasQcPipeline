@@ -155,6 +155,10 @@ def main(
         " ".join("=".join([k, str(v)]) for k, v in snake_config.items())
     )
 
+    # appending the --use-envmodules needed for loading cluster modules as in idat2gtc entrypoint.
+    # no impact on conda or other use cases so loading by default.
+    payload["added_options"] += "--use-envmodules"
+
     cfg = load_config()
     sample_size = cfg.ss.shape[0]
     if sample_size < 1_000:  # need less walltime for smaller sample size
