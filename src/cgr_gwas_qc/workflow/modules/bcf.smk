@@ -45,7 +45,7 @@ rule convert_bcf_to_plink_bed:
         mem_mb=ceil((0.07 * len(cfg.ss))) + 1024,
         time_hr=ceil((0.11 * len(cfg.ss)) / 3600),
     shell:
-        "plink2 --allow-extra-chr 0 --keep-allele-order --double-id --bcf {input.bcf} --update-sex {params.unknown_sex} --output-chr 26 --split-par hg38 --make-pgen --out sample_level/bcf2plink  --memory {resources.mem_mb} --threads {threads} ;"
+        "plink2 --allow-extra-chr 0 --keep-allele-order --double-id --bcf {input.bcf} --vcf-filter --update-sex {params.unknown_sex} --output-chr 26 --split-par hg38 --make-pgen --out sample_level/bcf2plink  --memory {resources.mem_mb} --threads {threads} ;"
         "plink2 --pfile sample_level/bcf2plink --make-pgen --sort-vars --out sample_level/bcf2plink-sorted --threads {threads} --memory {resources.mem_mb}  ;"
         "plink2 --pfile sample_level/bcf2plink-sorted --make-bed --out sample_level/samples --threads {threads} --memory {resources.mem_mb} ;"
         "rm sample_level/bcf2plink.{{pgen,psam,pvar,log}} sample_level/bcf2plink-sorted.{{pgen,psam,pvar,log}} {params.unknown_sex}"
@@ -107,5 +107,6 @@ rule gtc_to_bcf:
         + 200,
     shell:
         """
-        bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ob --check-ref x -f {params.reference_fasta} --multiallelics -any --write-index --output {output.bcf}
+        bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ou --check-ref x -f {params.reference_fasta} --multiallelics -any |
+        bcftools filter --exclude 'REF==ALT' --soft-filter 'int_only' -Ob --write-index --output {output.bcf}
         """
