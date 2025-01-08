@@ -14,14 +14,20 @@ rule write_idat2gtc_ss:
         import pandas as pd
 
         if params.grp == "":
-            red = cfg.expand(cfg.config.user_files.idat_pattern.red)
-            green = cfg.expand(cfg.config.user_files.idat_pattern.green)
-        else:
             red = cfg.expand(
-                cfg.config.user_files.idat_pattern.red, query=f'cluster_group=="{wildcards.grp}"'
+                cfg.config.user_files.idat_pattern.red, query="is_missing_idats==False"
             )
             green = cfg.expand(
-                cfg.config.user_files.idat_pattern.green, query=f'cluster_group=="{wildcards.grp}"'
+                cfg.config.user_files.idat_pattern.green, query="is_missing_idats==False"
+            )
+        else:
+            red = cfg.expand(
+                cfg.config.user_files.idat_pattern.red,
+                query=f'cluster_group=="{wildcards.grp}"&is_missing_idats==False',
+            )
+            green = cfg.expand(
+                cfg.config.user_files.idat_pattern.green,
+                query=f'cluster_group=="{wildcards.grp}"&is_missing_idats==False',
             )
         pd.DataFrame({"Green IDAT Path": green, "Red IDAT Path": red}).to_csv(
             output[0], index=False
