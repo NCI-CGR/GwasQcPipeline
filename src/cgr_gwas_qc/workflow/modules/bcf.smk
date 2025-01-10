@@ -61,11 +61,12 @@ rule write_gtc_pathlist:
         "sample_level/gtc.tsv",
     run:
         if params.grp == "":
-            gtcList = cfg.expand(params.pattern)
+            gtcList = cfg.expand(params.pattern, query="is_missing_gtc==False")
         else:
             params.pattern = expand(params.pattern, grp=wildcards.grp, allow_missing=True)
             gtcList = cfg.expand(
-                params.pattern, query='cluster_group=="{grp}"'.format(grp=wildcards.grp)
+                params.pattern,
+                query='cluster_group=="{grp}"&is_missing_gtc==False'.format(grp=wildcards.grp),
             )
         with open(output[0], "w") as f:
             for line in gtcList:

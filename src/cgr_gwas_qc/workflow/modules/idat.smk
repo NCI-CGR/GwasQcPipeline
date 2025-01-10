@@ -51,3 +51,36 @@ rule idat2gtc:
         if [ "{params.dragena_location}" != "None" ];then dragena='{params.dragena_location}';else  dragena='dragena';fi
         $dragena genotype call --bpm-manifest {params.bpm} --cluster-file {params.egt} --idat-sample-sheet {input.idat_ss} --num-threads {threads} --output-folder {output.output_folder}
         """
+
+
+rule check_gtc_creation:
+    """Checks if GTC files are created. If not, it will mark the sample as missing GTC.
+    """
+    input:
+        "sample_level/gtcs",
+    output:
+        "sample_level/gtcs_check.done",
+    run:
+        from cgr_gwas_qc import load_config
+        import pandas as pd
+        from pathlib import Path
+        from itertools import chain
+
+        cfg = load_config()
+
+
+        def get_gtcs(input):
+            gtcList = [str(p.stem) for p in Path(input).rglob("*.gtc")]
+            return gtcList
+
+
+        if isinstance(input, list):
+            gtcList = list(chain(*(map(get_gtcs, input))))
+        else:
+            gtcList = get_gtcs(input[0])
+        cfg.ss.is_missing_gtc = pd.Series(
+            barcode not in gtcList
+            for barcode in cfg.expand("{SentrixBarcode_A}_{SentrixPosition_A}")
+        )
+        cfg.ss.to_csv("cgr_sample_sheet.csv")
+        Path("sample_level/gtcs_check.done").touch()

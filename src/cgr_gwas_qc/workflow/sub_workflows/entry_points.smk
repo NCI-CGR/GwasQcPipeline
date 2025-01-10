@@ -84,6 +84,7 @@ if cfg.config.workflow_params.convert_idat2gtc and cfg.config.user_files.idat_pa
 
         localrules:
             write_idat2gtc_ss,
+            check_gtc_creation,
             write_gtc_pathlist,
 
         use rule write_idat2gtc_ss from idat_module with:
@@ -96,9 +97,16 @@ if cfg.config.workflow_params.convert_idat2gtc and cfg.config.user_files.idat_pa
             output:
                 output_folder=directory("sample_level/{grp}/gtcs/"),
 
+        use rule check_gtc_creation from idat_module with:
+            input:
+                expand("sample_level/{grp}/gtcs", grp=cfg.cluster_groups),
+            output:
+                "sample_level/gtcs_check.done",
+
         use rule write_gtc_pathlist from bcf_module with:
             input:
                 rules.idat2gtc.output.output_folder,
+                rules.check_gtc_creation.output,
             params:
                 pattern=lambda wc: rules.idat2gtc.output.output_folder
                 + "/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
@@ -116,9 +124,14 @@ if cfg.config.workflow_params.convert_idat2gtc and cfg.config.user_files.idat_pa
             output:
                 output_folder=directory("sample_level/gtcs"),
 
+        use rule check_gtc_creation from idat_module with:
+            output:
+                "sample_level/gtcs_check.done",
+
         use rule write_gtc_pathlist from bcf_module with:
             input:
                 rules.idat2gtc.output.output_folder,
+                rules.check_gtc_creation.output,
             params:
                 pattern=lambda wc: rules.idat2gtc.output.output_folder
                 + "/{SentrixBarcode_A}_{SentrixPosition_A}.gtc",
