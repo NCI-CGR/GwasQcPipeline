@@ -43,7 +43,7 @@ rule illuminaio_conda:
 ################################################################################
 # Workflow Rules
 ################################################################################
-if cfg.config.user_files.bcf:
+if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
     if config.get("cluster_mode", False):
 
         localrules:
@@ -53,7 +53,7 @@ if cfg.config.user_files.bcf:
             """Calculate median intensity from raw intensities using VCF/BCF input."""
             input:
                 sample_sheet_csv="cgr_sample_sheet.csv",
-                vcf_file=cfg.config.user_files.bcf,
+                vcf_file="sample_level/samples.bcf",
             params:
                 grp="{grp}",
                 notemp=config.get("notemp", False),
@@ -84,7 +84,7 @@ if cfg.config.user_files.bcf:
         rule per_sample_median_intensity_from_vcf:
             """Calculate median intensity from raw intensities using VCF/BCF input."""
             input:
-                vcf_file=cfg.config.user_files.bcf,
+                vcf_file="sample_level/samples.bcf",
             params:
                 sample_id="{Sample_ID}",
             output:

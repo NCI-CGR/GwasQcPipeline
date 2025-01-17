@@ -89,7 +89,7 @@ rule gtc_to_bcf:
     """Converts a list of GTC files to BCF.
     """
     input:
-        gtcs=rules.write_gtc_pathlist.output[0],
+        gtcs="sample_level/gtc.tsv",
     params:
         additional_params=_get_add_params_for_gtc2bcf,
         bpm=cfg.config.reference_files.illumina_manifest_file,
@@ -111,3 +111,14 @@ rule gtc_to_bcf:
         bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ou --check-ref x -f {params.reference_fasta} --multiallelics -any |
         bcftools filter --exclude 'REF==ALT' --soft-filter 'int_only' -Ob --write-index --output {output.bcf}
         """
+
+
+rule symlink_bcf:
+    """Symlinks BCF file to user specified location
+    """
+    input:
+        bcf=cfg.config.user_files.bcf,
+    output:
+        "sample_level/samples.bcf",
+    shell:
+        "ln -s {input.bcf} {output}"

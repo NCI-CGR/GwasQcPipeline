@@ -341,10 +341,13 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                 use rule write_gtc_pathlist from bcf_module with:
                     params:
                         grp="",
+                        pattern=lambda wc: cfg.config.user_files.gtc_pattern,
                     output:
                         "sample_level/gtc.tsv",
 
             use rule gtc_to_bcf from bcf_module with:
+                input:
+                    gtcs=rules.write_gtc_pathlist.output[0],
                 output:
                     bcf="sample_level/samples.bcf",
 
@@ -420,6 +423,10 @@ elif cfg.config.user_files.bcf:
     localrules:
         convert_bcf_to_plink_bed,
 
-    use rule convert_bcf_to_plink_bed from bcf_module with:
+    use rule symlink_bcf from bcf_module with:
         input:
             bcf=cfg.config.user_files.bcf,
+
+    use rule convert_bcf_to_plink_bed from bcf_module with:
+        input:
+            bcf=rules.symlink_bcf.output[0],
