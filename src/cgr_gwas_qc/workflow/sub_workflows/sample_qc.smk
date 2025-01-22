@@ -90,34 +90,59 @@ module grafpop:
 # -------------------------------------------------------------------------------
 # Call Rate Filters
 # -------------------------------------------------------------------------------
+sex_chr_included = cfg.config.workflow_params.sex_chr_included
 
+if sex_chr_included:
 
-rule impute_sex:
-    input:
-        bed="sample_level/samples.bed",
-        bim="sample_level/samples.bim",
-        fam="sample_level/samples.fam",
-    params:
-        out_prefix="sample_level/impute_sex/samples",
-    output:
-        bed="sample_level/impute_sex/samples.bed",
-        bim="sample_level/impute_sex/samples.bim",
-        fam="sample_level/impute_sex/samples.fam",
-        nosex="sample_level/impute_sex/samples.nosex",
-    threads: lambda wildcards, attempt: attempt * 2
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    conda:
-        cfg.conda("plink2")
-    shell:
-        "sleep 10 && plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--impute-sex --make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
+    # issue # 373
+    rule impute_sex:
+        input:
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+        params:
+            out_prefix="sample_level/impute_sex/samples",
+        output:
+            bed="sample_level/impute_sex/samples.bed",
+            bim="sample_level/impute_sex/samples.bim",
+            fam="sample_level/impute_sex/samples.fam",
+            nosex="sample_level/impute_sex/samples.nosex",
+        threads: lambda wildcards, attempt: attempt * 2
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+        conda:
+            cfg.conda("plink2")
+        shell:
+            "sleep 10 && plink "
+            "--bed {input.bed} "
+            "--bim {input.bim} "
+            "--fam {input.fam} "
+            "--impute-sex --make-bed "
+            "--threads {threads} "
+            "--memory {resources.mem_mb} "
+            "--out {params.out_prefix}"
+
+else:
+
+    rule impute_sex:
+        input:
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+        params:
+            out_prefix="sample_level/impute_sex/samples",
+        output:
+            bed="sample_level/impute_sex/samples.bed",
+            bim="sample_level/impute_sex/samples.bim",
+            fam="sample_level/impute_sex/samples.fam",
+            nosex="sample_level/impute_sex/samples.nosex",
+        shell:
+            """
+            cp {input.bed} {output.bed}
+            cp {input.bim} {output.bim}
+            cp {input.fam} {output.fam}
+            touch {output.nosex}
+            """
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
@@ -487,7 +512,6 @@ rule snp_qc_table:
 #### i212 ####
 # create empty table if sex chromosome is not inicluded
 
-sex_chr_included = cfg.config.workflow_params.sex_chr_included
 if sex_chr_included:
     print("sex_chr_included ", sex_chr_included)
 
