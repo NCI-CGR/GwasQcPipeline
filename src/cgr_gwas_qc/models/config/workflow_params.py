@@ -52,6 +52,11 @@ class WorkflowParams(BaseModel):
         description="True if the sex chromosome is included in the microarray and a sex concordance check can be performed.",
     )
 
+    ancestry_snps_included: bool = Field(
+        True,
+        description="True if the ancestry informative SNPs are included in the microarray and a GRAF ancestry check can be performed.",
+    )
+
     case_control_column: str = Field(
         "Case/Control_Status",
         description="The name of the colun in the sample sheet which identifies Case/Control status. "

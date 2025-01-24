@@ -470,24 +470,62 @@ rule split_sample_concordance:
 # -------------------------------------------------------------------------------
 # Ancestry
 # -------------------------------------------------------------------------------
-use rule grafpop_populations from grafpop as graf_populations with:
-    input:
-        bed=rules.update_samples_to_1kg_rsIDs.output.bed,
-        bim=rules.update_samples_to_1kg_rsIDs.output.bim,
-        fam=rules.update_samples_to_1kg_rsIDs.output.fam,
-    output:
-        "sample_level/ancestry/grafpop_populations.txt",
-    resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
-    log:
-        "sample_level/ancestry/grafpop_populations.log",
+if cfg.config.workflow_params.ancestry_snps_included:
 
+    use rule grafpop_populations from grafpop as graf_populations with:
+        input:
+            bed=rules.update_samples_to_1kg_rsIDs.output.bed,
+            bim=rules.update_samples_to_1kg_rsIDs.output.bim,
+            fam=rules.update_samples_to_1kg_rsIDs.output.fam,
+        output:
+            "sample_level/ancestry/grafpop_populations.txt",
+        resources:
+            mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
+        log:
+            "sample_level/ancestry/grafpop_populations.log",
 
-use rule grafpop_ancestry from grafpop as graf_ancestry with:
-    input:
-        rules.grafpop_populations.output[0],
-    output:
-        "sample_level/ancestry/graf_ancestry.txt",
+    use rule grafpop_ancestry from grafpop as graf_ancestry with:
+        input:
+            rules.grafpop_populations.output[0],
+        output:
+            "sample_level/ancestry/graf_ancestry.txt",
+
+else:
+
+    # for issue #374 when array do not have ancestry snps.
+    rule grafpop_ancestry:
+        input:
+            bed=rules.update_samples_to_1kg_rsIDs.output.bed,
+            bim=rules.update_samples_to_1kg_rsIDs.output.bim,
+            fam=rules.update_samples_to_1kg_rsIDs.output.fam,
+        output:
+            "sample_level/ancestry/grafpop_populations.txt",
+        run:
+            import pandas as pd
+            from cgr_gwas_qc.parsers import sample_sheet
+
+            ss = sample_sheet.read("cgr_sample_sheet.csv")
+            graf = pd.DataFrame(
+                columns=[
+                    "Subject",
+                    "#SNPs",
+                    "Self-reported ancestry",
+                    "GD1",
+                    "GD2",
+                    "GD3",
+                    "GD4",
+                    "P_f (%)",
+                    "P_e (%)",
+                    "P_a (%)",
+                    "PopID",
+                    "Computed population",
+                ]
+            )
+            graf.Subject = ss.Sample_ID
+            graf[["GD1", "GD2", "GD3", "GD4", "P_f (%)", "P_e (%)", "P_a (%)"]] = 0.0
+            graf["#SNPs"] = 0
+            graf["PopID"] = 9
+            graf.to_csv(output[0], sep="\t", index=False)
 
 
 # -------------------------------------------------------------------------------
