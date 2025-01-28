@@ -238,24 +238,24 @@ use rule maf_filter from plink as population_level_maf_filter with:
         nosex=temp("subject_level/{population}/subjects_maf{maf}.nosex"),
     log:
         "subject_level/{population}/subjects_maf{maf}.log",
-
+populations = _get_populations
 rule merge_ancestry_beds:
     input:
-        bed=cfg.expand(rules.population_level_maf_filter.output.bed),
-        bim=cfg.expand(rules.population_level_maf_filter.output.bim),
-        fam=cfg.expand(rules.population_level_maf_filter.output.fam),
+        bed=expand("subject_level/{population}/sujects.bed",population=populations),
+        bim=expand("subject_level/{population}/sujects.bim",population=populations),
+        fam=expand("subject_level/{population}/subjects.fam", population=populations),
         _=rules.plink_conda.output[0],
     params:
-        out_prefix="subject_level/merged/subjects_merged",
+        out_prefix="subject_level/subjects_merged",
         conda_env=cfg.conda("plink2"),
         notemp=config.get("notemp", False),
     output:
-        bed="subject_level/merged/subjects_merged.bed",
-        bim="subject_level/merged/subjects_merged.bim",
-        fam="subject_level/merged/subjects_merged.fam",
-        nosex="subject_level/merged/subjects_merged.nosex",
+        bed="subject_level/subjects_merged.bed",
+        bim="subject_level/subjects_merged.bim",
+        fam="subject_level/subjects_merged.fam",
+        nosex="subject_level/subjects_merged.nosex",
     log:
-        "subject_level/merged/subjects_merged.log",
+        "subject_level/subjects_merged.log",
     threads: 8
     resources:
         mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
@@ -272,15 +272,15 @@ use rule ld from plink as population_level_ld_estimate_merged with:
         fam=rules.merge_ancestry_beds.output.fam,
     params:
         r2="{ld}",  # r2 threshold: currently 0.1
-        out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_estimate_merged",
+        out_prefix="subject_level/subjects_maf{maf}_ld{ld}_estimate_merged",
     output:
         # Markers in approx. linkage equilibrium
-        to_keep=temp("subject_level/merged/subjects_maf{maf}_ld{ld}_estimate_merged.prune.in"),
+        to_keep=temp("subject_level/subjects_maf{maf}_ld{ld}_estimate_merged.prune.in"),
         # Markers in LD
-        to_remove=temp("subject_level/merged/subjects_maf{maf}_ld{ld}_estimate_merged.prune.out"),
-        nosex=temp("subject_level/merged/subjects_maf{maf}_ld{ld}_estimate_merged.nosex"),
+        to_remove=temp("subject_level/subjects_maf{maf}_ld{ld}_estimate_merged.prune.out"),
+        nosex=temp("subject_level/subjects_maf{maf}_ld{ld}_estimate_merged.nosex"),
     log:
-        "subject_level/merged/subjects_maf{maf}_ld{ld}_estimate_merged.log", 
+        "subject_level/subjects_maf{maf}_ld{ld}_estimate_merged.log", 
 
 use rule ld_filter from plink as population_level_ld_pruned_merged with:
     input:
@@ -289,14 +289,14 @@ use rule ld_filter from plink as population_level_ld_pruned_merged with:
         fam=rules.merge_ancestry_beds.output.fam,
         to_keep=rules.population_level_ld_estimate_merged.output.to_keep,
     params:
-        out_prefix="subject_level/merged/subjects_maf{maf}_ld{ld}_merged",
+        out_prefix="subject_level/subjects_maf{maf}_ld{ld}_merged",
     output:
-        bed="subject_level/merged/subjects_maf{maf}_ld{ld}_merged.bed",
-        bim="subject_level/merged/subjects_maf{maf}_ld{ld}_merged.bim",
-        fam="subject_level/merged/subjects_maf{maf}_ld{ld}_merged.fam",
-        nosex="subject_level/merged/subjects_maf{maf}_ld{ld}_merged.nosex",
+        bed="subject_level/subjects_maf{maf}_ld{ld}_merged.bed",
+        bim="subject_level/subjects_maf{maf}_ld{ld}_merged.bim",
+        fam="subject_level/subjects_maf{maf}_ld{ld}_merged.fam",
+        nosex="subject_level/subjects_maf{maf}_ld{ld}_merged.nosex",
     log:
-        "subject_level/merged/subjects_maf{maf}_ld{ld}_merged.log",
+        "subject_level/subjects_maf{maf}_ld{ld}_merged.log",
 
 use rule genome from plink as population_level_ibd_merged with:
     input:
@@ -306,9 +306,9 @@ use rule genome from plink as population_level_ibd_merged with:
     params:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
-        out_prefix="subject_level/merged/subjects_maf{maf}_ld{ld}_ibd_merged",
+        out_prefix="subject_level/subjects_maf{maf}_ld{ld}_ibd_merged",
     output:
-        "subject_level/merged/subjects_maf{maf}_ld{ld}_ibd_merged.genome",
+        "subject_level/subjects_maf{maf}_ld{ld}_ibd_merged.genome",
 
 rule population_level_concordance_plink_merged:
     input:
@@ -317,7 +317,7 @@ rule population_level_concordance_plink_merged:
         concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
         pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
     output:
-        "subject_level/merged/subjects_maf{maf}_ld{ld}_merged.concordance.csv",
+        "subject_level/subjects_maf{maf}_ld{ld}_merged.concordance.csv",
     script:
         "../scripts/concordance_table.py"
 
@@ -330,8 +330,8 @@ rule population_level_related_subjects_merged:
             allow_missing=True,
         ),
     output:
-        relatives="subject_level/merged/relatives_merged.csv",
-        to_remove="subject_level/merged/related_subjects_to_remove_merged.txt",
+        relatives="subject_level/relatives_merged.csv",
+        to_remove="subject_level/related_subjects_to_remove_merged.txt",
     script:
         "../scripts/related_subjects.py"
 
@@ -342,14 +342,14 @@ use rule remove_ids from plink as population_level_remove_related_subjects_merge
         fam=rules.merge_ancestry_beds.output.fam,
         to_remove=rules.population_level_related_subjects_merged.output.to_remove,
     params:
-        out_prefix="subject_level/merged/subjects_unrelated_merged",
+        out_prefix="subject_level/subjects_unrelated_merged",
     output:
-        bed="subject_level/merged/subjects_unrelated_merged.bed",
-        bim="subject_level/merged/subjects_unrelated_merged.bim",
-        fam="subject_level/merged/subjects_unrelated_merged.fam",
-        nosex="subject_level/merged/subjects_unrelated_merged.nosex",
+        bed="subject_level/subjects_unrelated_merged.bed",
+        bim="subject_level/subjects_unrelated_merged.bim",
+        fam="subject_level/subjects_unrelated_merged.fam",
+        nosex="subject_level/subjects_unrelated_merged.nosex",
     log:
-        "subject_level/merged/subjects_unrelated_merged.log",
+        "subject_level/subjects_unrelated_merged.log",
 
 use rule maf_filter from plink as population_level_unrelated_maf_filter_merged with:
     input:
@@ -358,14 +358,14 @@ use rule maf_filter from plink as population_level_unrelated_maf_filter_merged w
         fam=rules.population_level_remove_related_subjects_merged.output.fam,
     params:
         maf="{maf}",
-        out_prefix="subject_level/merged/subjects_unrelated_maf{maf}_merged",
+        out_prefix="subject_level/subjects_unrelated_maf{maf}_merged",
     output:
-        bed=temp("subject_level/merged/subjects_unrelated_maf{maf}_merged.bed"),
-        bim=temp("subject_level/merged/subjects_unrelated_maf{maf}_merged.bim"),
-        fam=temp("subject_level/merged/subjects_unrelated_maf{maf}_merged.fam"),
-        nosex=temp("subject_level/merged/subjects_unrelated_maf{maf}_merged.nosex"),
+        bed=temp("subject_level/subjects_unrelated_maf{maf}_merged.bed"),
+        bim=temp("subject_level/subjects_unrelated_maf{maf}_merged.bim"),
+        fam=temp("subject_level/subjects_unrelated_maf{maf}_merged.fam"),
+        nosex=temp("subject_level/subjects_unrelated_maf{maf}_merged.nosex"),
     log:
-        "subject_level/merged/subjects_unrelated_maf{maf}_merged.log",
+        "subject_level/subjects_unrelated_maf{maf}_merged.log",
 
 use rule ld from plink as population_level_unrelated_ld_estimate_merged with:
     input:
@@ -374,19 +374,19 @@ use rule ld from plink as population_level_unrelated_ld_estimate_merged with:
         fam=rules.population_level_unrelated_maf_filter_merged.output.fam,
     params:
         r2="{ld}",  # r2 threshold: currently 0.1
-        out_prefix="subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}__merged_estimate",
+        out_prefix="subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate",
     output:
         # Markers in approx. linkage equilibrium
         to_keep=temp(
-            "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate.prune.in"
+            "subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate.prune.in"
         ),
         # Markers in LD
         to_remove=temp(
-            "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate.prune.out"
+            "subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate.prune.out"
         ),
-        nosex=temp("subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate.nosex"),
+        nosex=temp("subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate.nosex"),
     log:
-        "subject_level/{population}/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate.log",
+        "subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged_estimate.log",
 
 
 use rule ld_filter from plink as population_level_unrelated_ld_pruned_merged with:
@@ -396,14 +396,14 @@ use rule ld_filter from plink as population_level_unrelated_ld_pruned_merged wit
         fam=rules.population_level_unrelated_maf_filter_merged.output.fam,
         to_keep=rules.population_level_unrelated_ld_estimate_merged.output.to_keep,
     params:
-        out_prefix="subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_merged",
+        out_prefix="subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged",
     output:
-        bed="subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_merged.bed",
-        bim="subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_merged.bim",
-        fam="subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_merged.fam",
-        nosex="subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_merged.nosex",
+        bed="subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged.bed",
+        bim="subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged.bim",
+        fam="subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged.fam",
+        nosex="subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged.nosex",
     log:
-        "subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_merged.log",
+        "subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged.log",
 
 use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped_merged with:
     input:
@@ -411,12 +411,12 @@ use rule bed_to_ped from plink as population_level_unrelated_bed_to_ped_merged w
         bim=rules.population_level_unrelated_ld_pruned_merged.output.bim,
         fam=rules.population_level_unrelated_ld_pruned_merged.output.fam,
     output:
-        ped=temp("subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_merged.ped"),
-        map_=temp("subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_merged.map"),
+        ped=temp("subject_level/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_merged.ped"),
+        map_=temp("subject_level/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_merged.map"),
     params:
-        out_prefix="subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_merged",
+        out_prefix="subject_level/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_merged",
     log:
-        "subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_merged.log",
+        "subject_level/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_merged.log",
 
 rule trim_ids_merged:
     """EIGENSOFT convert requires sample/snp IDs are <39 characters."""
@@ -425,10 +425,10 @@ rule trim_ids_merged:
         map_=rules.population_level_unrelated_bed_to_ped_merged.output.map_,
     output:
         ped=temp(
-            "subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_trimmed_merged.ped"
+            "subject_level/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_trimmed_merged.ped"
         ),
         map_=temp(
-            "subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_trimmed_merged.map"
+            "subject_level/subjects_unrelated_maf{maf}_ld{ld}_ped_to_bed_trimmed_merged.map"
         ),
     script:
         "../scripts/trim_ped_map_ids.py"
@@ -438,10 +438,10 @@ use rule convert from eigensoft as population_level_unrelated_convert_to_eigenso
         ped=rules.trim_ids_merged.output.ped,
         map_=rules.trim_ids_merged.output.map_,
     output:
-        par=temp("subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}.convert_merged.par"),
-        gen=temp("subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}__merged.gen"),
-        snp=temp("subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}__merged.snp"),
-        ind=temp("subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}__merged.ind"),
+        par=temp("subject_level/subjects_unrelated_maf{maf}_ld{ld}.convert_merged.par"),
+        gen=temp("subject_level/subjects_unrelated_maf{maf}_ld{ld}__merged.gen"),
+        snp=temp("subject_level/subjects_unrelated_maf{maf}_ld{ld}__merged.snp"),
+        ind=temp("subject_level/subjects_unrelated_maf{maf}_ld{ld}__merged.ind"),
 
 use rule smartpca from eigensoft as population_level_unrelated_smartpca_merged with:
     input:
@@ -449,8 +449,8 @@ use rule smartpca from eigensoft as population_level_unrelated_smartpca_merged w
         snp=rules.population_level_unrelated_convert_to_eigensoft_merged.output.snp,
         ind=rules.population_level_unrelated_convert_to_eigensoft_merged.output.ind,
     output:
-        par=temp("subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_merged.pca.par"),
-        eigenvec="subject_level/merged/subjects_unrelated_maf{maf}_ld{ld}_merged.eigenvec",
+        par=temp("subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged.pca.par"),
+        eigenvec="subject_level/subjects_unrelated_maf{maf}_ld{ld}_merged.eigenvec",
 
 rule plot_pca_merged:
     input:
