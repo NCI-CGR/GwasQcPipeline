@@ -49,7 +49,12 @@ rule idat2gtc:
     shell:
         """
         if [ "{params.dragena_location}" != "None" ];then dragena='{params.dragena_location}';else  dragena='dragena';fi
-        $dragena genotype call --bpm-manifest {params.bpm} --cluster-file {params.egt} --idat-sample-sheet {input.idat_ss} --num-threads {threads} --output-folder {output.output_folder}
+        if ! command -v $dragena &> /dev/null; then
+            echo "Error: Dragena executable not found. Ensure that 'dragena/1.0.0' module is loaded or provide a valid 'dragena_location' in the config." >&2
+            exit 1
+        else
+            $dragena genotype call --bpm-manifest {params.bpm} --cluster-file {params.egt} --idat-sample-sheet {input.idat_ss} --num-threads {threads} --output-folder {output.output_folder}
+        fi
         """
 
 
