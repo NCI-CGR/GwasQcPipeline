@@ -178,7 +178,8 @@ checkpoint population_checkpoint:
         path.mkdir(exist_ok=True, parents=True)
 
         for population in populations:
-            (path / population).touch()
+            if population != "merged":
+                (path / population).touch()
 
 
 def _get_populations(wildcards):
