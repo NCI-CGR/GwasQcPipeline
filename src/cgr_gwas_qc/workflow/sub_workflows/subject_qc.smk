@@ -232,18 +232,29 @@ use rule maf_filter from plink as population_level_maf_filter with:
         maf="{maf}",
         out_prefix="subject_level/{population}/subjects_maf{maf}",
     output:
-        bed=temp("subject_level/{population}/subjects_maf{maf}.bed"),
-        bim=temp("subject_level/{population}/subjects_maf{maf}.bim"),
-        fam=temp("subject_level/{population}/subjects_maf{maf}.fam"),
-        nosex=temp("subject_level/{population}/subjects_maf{maf}.nosex"),
+        bed="subject_level/{population}/subjects_maf{maf}.bed",
+        bim="subject_level/{population}/subjects_maf{maf}.bim",
+        fam="subject_level/{population}/subjects_maf{maf}.fam",
+        nosex="subject_level/{population}/subjects_maf{maf}.nosex",
     log:
         "subject_level/{population}/subjects_maf{maf}.log",
-populations = _get_populations
+def _population_plink_maf_files(wildcards):
+    populations = _get_populations(wildcards)
+
+    if not populations:
+        return []
+
+    return expand(
+        "subject_level/{population}/subjects_maf{maf}",
+        population=populations,
+        maf=cfg.config.software_params.maf_for_ibd
+    )
+
 rule merge_ancestry_beds:
     input:
-        bed=expand("subject_level/{population}/sujects.bed",population=populations),
-        bim=expand("subject_level/{population}/sujects.bim",population=populations),
-        fam=expand("subject_level/{population}/subjects.fam", population=populations),
+        bed=str(_population_plink_maf_files)+".bed",
+        bim=str(_population_plink_maf_files)+".bim",
+        fam=str(_population_plink_maf_files)+".fam",
         _=rules.plink_conda.output[0],
     params:
         out_prefix="subject_level/subjects_merged",
