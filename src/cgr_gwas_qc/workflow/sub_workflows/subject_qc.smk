@@ -187,7 +187,7 @@ def _get_populations(wildcards):
     return [
         x
         for x in glob_wildcards(Path(checkpoint_output, "{population}")).population
-        if not x.startswith(".snakemake")
+        if not x.startswith(".snakemake") & not x.startswith("merged")
     ]
 
 
