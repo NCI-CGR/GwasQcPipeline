@@ -5,11 +5,7 @@ cfg = load_config()
 max_time = cfg.config.workflow_params.max_time_hr
 BIG_TIME = dict.fromkeys(range(1, 4), max_time) if max_time else {1: 10, 2: 48, 3: 96}
 
-use_contamination = (
-    cfg.config.user_files.idat_pattern
-    and cfg.config.user_files.gtc_pattern
-    and cfg.config.workflow_params.remove_contam
-)
+use_contamination = cfg.config.user_files.idat_pattern and cfg.config.workflow_params.remove_contam
 
 idat_intensity_retrieved = Path("sample_level/contamination/median_idat_intensity.csv").is_file()
 
