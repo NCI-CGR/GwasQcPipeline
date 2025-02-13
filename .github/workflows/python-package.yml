@@ -15,7 +15,7 @@ jobs:
     if: "!startsWith(github.event.head_commit.message, 'noci') && startsWith(github.event.head_commit.message, 'docs')"
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -51,21 +51,19 @@ jobs:
     if: "!startsWith(github.event.head_commit.message, 'noci') && !startsWith(github.event.head_commit.message, 'docs')"
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: "recursive"
-    - name: setup-conda
-      uses: s-weigand/setup-conda@v1
+
+    - name: Setup Conda
+      uses: conda-incubator/setup-miniconda@v2
       with:
-        # Whether to activate the conda base env (Default: 'true')
-        activate-conda: true
-        # If conda should be updated before running other commands (Default: 'false')
-        update-conda: true
-        # Python version which should be installed with conda (default: 'Default')
-        python-version: 3.8
-        # Additional channels like 'conda-forge' which can be used to install packages
-        conda-channels: conda-forge, bioconda, default
-    - name: Install dependencies
+        miniconda-version: "latest"
+        auto-update-conda: true
+        python-version: 3.8 
+        channels: conda-forge,bioconda,default
+
+    - name: Install Dependencies
       shell: bash
       run: |
         conda install -y mamba
