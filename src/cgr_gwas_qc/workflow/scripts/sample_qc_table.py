@@ -336,13 +336,14 @@ def _read_GRAF(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     graf = graf.assign(
         Sample_ID=lambda x: x["Subject"].astype(str)
     )  # Issue 216: When subject IDs are numeric reindex fails. This makes sure index Sample_ID will always be as a character
-    graf = graf.assign(Ancestry=lambda x: x["Computed population"].str.replace(" ", "_"))
+    graf = graf.assign(
+        Ancestry=lambda x: x["Computed population"].fillna("Other").str.replace(" ", "_")
+    )
     graf = graf.assign(AFR=lambda x: x["P_f (%)"] / 100)
     graf = graf.assign(EUR=lambda x: x["P_e (%)"] / 100)
     graf = graf.assign(ASN=lambda x: x["P_a (%)"] / 100)
     graf = graf.set_index("Sample_ID")
     graf = graf.loc[:, ("AFR", "EUR", "ASN", "Ancestry")]
-    graf["Ancestry"] = graf["Ancestry"].fillna("Other")
     graf = graf.reindex(Sample_IDs)
     return graf
 

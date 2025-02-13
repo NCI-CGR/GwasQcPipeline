@@ -45,7 +45,7 @@ rule convert_bcf_to_plink_bed:
         mem_mb=ceil((0.07 * len(cfg.ss))) + 1024,
         time_hr=ceil((0.11 * len(cfg.ss)) / 3600),
     shell:
-        "plink2 --allow-extra-chr 0 --keep-allele-order --double-id --bcf {input.bcf} --update-sex {params.unknown_sex} --output-chr 26 --split-par hg38 --make-pgen --out sample_level/bcf2plink  --memory {resources.mem_mb} --threads {threads} ;"
+        "plink2 --allow-extra-chr 0 --keep-allele-order --double-id --bcf {input.bcf} --vcf-filter --update-sex {params.unknown_sex} --output-chr 26 --split-par hg38 --make-pgen --out sample_level/bcf2plink  --memory {resources.mem_mb} --threads {threads} ;"
         "plink2 --pfile sample_level/bcf2plink --make-pgen --sort-vars --out sample_level/bcf2plink-sorted --threads {threads} --memory {resources.mem_mb}  ;"
         "plink2 --pfile sample_level/bcf2plink-sorted --make-bed --out sample_level/samples --threads {threads} --memory {resources.mem_mb} ;"
         "rm sample_level/bcf2plink.{{pgen,psam,pvar,log}} sample_level/bcf2plink-sorted.{{pgen,psam,pvar,log}} {params.unknown_sex}"
@@ -56,14 +56,17 @@ rule write_gtc_pathlist:
     """
     params:
         grp="",
+        pattern=lambda wc: cfg.config.user_files.gtc_pattern,
     output:
         "sample_level/gtc.tsv",
     run:
         if params.grp == "":
-            gtcList = cfg.expand(cfg.config.user_files.gtc_pattern)
+            gtcList = cfg.expand(params.pattern, query="is_missing_gtc==False")
         else:
+            params.pattern = expand(params.pattern, grp=wildcards.grp, allow_missing=True)
             gtcList = cfg.expand(
-                cfg.config.user_files.gtc_pattern, query=f'cluster_group=="{wildcards.grp}"'
+                params.pattern,
+                query='cluster_group=="{grp}"&is_missing_gtc==False'.format(grp=wildcards.grp),
             )
         with open(output[0], "w") as f:
             for line in gtcList:
@@ -86,7 +89,7 @@ rule gtc_to_bcf:
     """Converts a list of GTC files to BCF.
     """
     input:
-        gtcs=rules.write_gtc_pathlist.output[0],
+        gtcs="sample_level/gtc.tsv",
     params:
         additional_params=_get_add_params_for_gtc2bcf,
         bpm=cfg.config.reference_files.illumina_manifest_file,
@@ -105,5 +108,17 @@ rule gtc_to_bcf:
         + 200,
     shell:
         """
-        bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ob --check-ref x -f {params.reference_fasta} --multiallelics -any --write-index --output {output.bcf}
+        bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ou --check-ref x -f {params.reference_fasta} --multiallelics -any |
+        bcftools filter --exclude 'INFO/INTENSITY_ONLY=1' --soft-filter 'int_only' -Ob --write-index --output {output.bcf}
         """
+
+
+rule symlink_bcf:
+    """Symlinks BCF file to user specified location
+    """
+    input:
+        bcf=cfg.config.user_files.bcf,
+    output:
+        "sample_level/samples.bcf",
+    shell:
+        "ln -s {input.bcf} {output}"
