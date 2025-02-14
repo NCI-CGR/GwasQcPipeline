@@ -146,6 +146,8 @@ class WorkflowParams(BaseModel):
     dragena_location: str = Field(
         None,
         description="Path to dragena binary. If dragena is not available as a module on HPC and IDAT entry_point is used, `dragena_location` will be used to convert idat2gtc.",
+    )
+
     concordance_tools: Optional["ConcordanceTools"] = Field(
         ConcordanceTools(),
         description="The sample_concordance_summary only uses Plink."
