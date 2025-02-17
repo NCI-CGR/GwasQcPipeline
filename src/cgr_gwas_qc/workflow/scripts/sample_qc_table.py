@@ -576,7 +576,7 @@ def _add_analytic_exclusion(
     sample_qc: pd.DataFrame,
     remove_contam: bool,
     remove_rep_discordant: bool,
-    concordance_checked: bool,
+    concordance_checked: bool = True,
 ) -> pd.DataFrame:
     """Adds a flag to remove samples based on provided conditions.
 
