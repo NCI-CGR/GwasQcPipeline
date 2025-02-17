@@ -16,6 +16,10 @@ class ConcordanceTools(BaseModel):
         False,
         description="Is king relateness results needed? Even if True, the results won't be used in sample_concordance.",
     )
+    plink: bool = Field(
+        True,
+        description="Is plink ibd relateness results needed? It is the primary tool used in sample_qc report. If false, no replicate/relatedness check would be considered in sample_qc",
+    )
 
 
 class WorkflowParams(BaseModel):

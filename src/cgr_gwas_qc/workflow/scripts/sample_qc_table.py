@@ -165,8 +165,8 @@ def main(
         ..., help="Path to plink_filter_call_rate_1/samples.sexcheck"
     ),
     ancestry: Path = typer.Argument(..., help="Path to ancestry/graf_ancestry_calls.txt"),
-    sample_concordance_csv: Path = typer.Argument(..., help=""),
     # Optional inputs
+    sample_concordance_csv: Optional[Path] = typer.Option(None, help=""),
     contam: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_contamination_test.csv"
     ),
@@ -174,6 +174,7 @@ def main(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
     # Params
+    concordance_checked: bool = True,
     remove_contam: bool = True,
     remove_rep_discordant: bool = True,
     # Outputs
@@ -190,13 +191,10 @@ def main(
         sample_concordance_csv,
         contam,
         intensity,
+        concordance_checked,
     )
 
-    add_qc_columns(
-        sample_qc,
-        remove_contam,
-        remove_rep_discordant,
-    )
+    add_qc_columns(sample_qc, remove_contam, remove_rep_discordant, concordance_checked)
 
     sample_qc = sample_qc.rename(
         columns={
@@ -215,9 +213,10 @@ def build(
     imiss_cr2: Path,
     sexcheck_cr1: Path,
     ancestry: Path,
-    sample_concordance_csv: Path,
+    sample_concordance_csv: Optional[Path],
     contam: Optional[Path],
     intensity: Optional[Path],
+    concordance_checked: bool,
 ) -> pd.DataFrame:
     Sample_IDs = ss.index
     return (
@@ -229,7 +228,7 @@ def build(
                 _read_imiss(imiss_cr2, Sample_IDs, "Call_Rate_2"),
                 _read_sexcheck_cr1(sexcheck_cr1, ss.expected_sex),
                 _read_ancestry(ancestry, Sample_IDs),
-                _read_concordance(sample_concordance_csv, Sample_IDs),
+                _read_concordance(sample_concordance_csv, Sample_IDs, concordance_checked),
                 _read_contam(contam, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
                 # TO-ADD: call function you created to parse/summarize new file
@@ -371,7 +370,9 @@ def _read_SNPweights(file_name: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
     )
 
 
-def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
+def _read_concordance(
+    filename: Optional[Path], Sample_IDs: pd.Index, concordance_checked: bool
+) -> pd.DataFrame:
     """Create a flag of known replicates that show low concordance.
 
     Given a set of samples that are known to be from the same Subject. Flag
@@ -384,22 +385,29 @@ def _read_concordance(filename: Path, Sample_IDs: pd.Index) -> pd.DataFrame:
               a concordance below the supplied threshold. Otherwise False.
             - is_unexpected_replicate
     """
-    df = sample_concordance.read(filename)
-    return (
-        df.melt(
-            id_vars=["is_discordant_replicate", "is_unexpected_replicate"],
-            value_vars=["Sample_ID1", "Sample_ID2"],
-            var_name="To_Drop",
-            value_name="Sample_ID",
+    if concordance_checked:
+        df = sample_concordance.read(filename)
+        return (
+            df.melt(
+                id_vars=["is_discordant_replicate", "is_unexpected_replicate"],
+                value_vars=["Sample_ID1", "Sample_ID2"],
+                var_name="To_Drop",
+                value_name="Sample_ID",
+            )
+            .drop("To_Drop", axis=1)
+            .groupby("Sample_ID")
+            .max()  # Flag a sample as True if it is True for any comparison.
+            .astype("boolean")
+            .reindex(Sample_IDs)
+            .replace("", False)
+            .fillna(False)
         )
-        .drop("To_Drop", axis=1)
-        .groupby("Sample_ID")
-        .max()  # Flag a sample as True if it is True for any comparison.
-        .astype("boolean")
-        .reindex(Sample_IDs)
-        .replace("", False)
-        .fillna(False)
-    )
+    else:
+        return pd.DataFrame(
+            {"is_discordant_replicate": pd.NA, "is_unexpected_replicate": pd.NA},
+            index=Sample_IDs,
+            dtype="boolean",
+        )
 
 
 def _read_contam(file_name: Optional[Path], Sample_IDs: pd.Index) -> pd.DataFrame:
@@ -463,13 +471,10 @@ def add_qc_columns(
     sample_qc: pd.DataFrame,
     remove_contam: bool,
     remove_rep_discordant: bool,
+    concordance_checked: bool,
 ) -> pd.DataFrame:
     add_call_rate_flags(sample_qc)
-    _add_analytic_exclusion(
-        sample_qc,
-        remove_contam,
-        remove_rep_discordant,
-    )
+    _add_analytic_exclusion(sample_qc, remove_contam, remove_rep_discordant, concordance_checked)
     _add_identifiler(sample_qc)
     _add_subject_representative(sample_qc)
     _add_subject_dropped_from_study(sample_qc)
@@ -571,6 +576,7 @@ def _add_analytic_exclusion(
     sample_qc: pd.DataFrame,
     remove_contam: bool,
     remove_rep_discordant: bool,
+    concordance_checked: bool,
 ) -> pd.DataFrame:
     """Adds a flag to remove samples based on provided conditions.
 
@@ -586,12 +592,13 @@ def _add_analytic_exclusion(
         "is_cr2_filtered": "Call Rate 2 Filtered",
     }
 
-    sample_qc = _retain_valid_discordant_replicates(sample_qc)
+    if concordance_checked:
+        sample_qc = _retain_valid_discordant_replicates(sample_qc)
 
     if remove_contam:
         exclusion_criteria["is_contaminated"] = "Contamination"
 
-    if remove_rep_discordant:
+    if remove_rep_discordant and concordance_checked:
         exclusion_criteria["is_discordant_replicate"] = "Replicate Discordance"
 
     # adding this new column which is a boolean. Checks for any T in a  series (e.g., {F, F, F, F, T}.any())

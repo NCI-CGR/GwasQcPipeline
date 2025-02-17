@@ -31,19 +31,22 @@ localrules:
 targets = [
     "sample_level/sample_qc.csv",
     "sample_level/snp_qc.csv",
-    "sample_level/concordance/KnownReplicates.csv",
-    "sample_level/concordance/InternalQcKnown.csv",
-    "sample_level/concordance/StudySampleKnown.csv",
-    "sample_level/concordance/UnknownReplicates.csv",
     "sample_level/summary_stats.txt",
     "sample_level/qc_failures/low_call_rate.txt",
     "sample_level/qc_failures/contaminated.txt",
     "sample_level/qc_failures/sex_discordant.txt",
-    "sample_level/qc_failures/replicate_discordant.txt",
     "sample_level/internal_controls.txt",
     "sample_level/call_rate.png",
     "sample_level/chrx_inbreeding.png",
     "sample_level/ancestry.png",
+]
+
+concordance_targets = [
+    "sample_level/concordance/KnownReplicates.csv",
+    "sample_level/concordance/InternalQcKnown.csv",
+    "sample_level/concordance/StudySampleKnown.csv",
+    "sample_level/concordance/UnknownReplicates.csv",
+    "sample_level/qc_failures/replicate_discordant.txt",
 ]
 
 if use_contamination:
@@ -55,6 +58,9 @@ if cfg.config.workflow_params.concordance_tools.king:
 
 if cfg.config.workflow_params.concordance_tools.graf:
     targets.append("sample_level/concordance/graf.tsv")
+
+if cfg.config.workflow_params.concordance_tools.plink:
+    targets.extend(concordance_targets)
 
 
 rule all_sample_qc:
@@ -597,6 +603,13 @@ def _intensity(wildcards):
     return []
 
 
+def _concordance_check(wildcards):
+    if cfg.config.workflow_params.concordance_tools.plink:
+        return "sample_level/concordance/summary.csv"
+    else:
+        return []
+
+
 rule sample_qc_table:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
@@ -605,12 +618,13 @@ rule sample_qc_table:
         imiss_cr2=rules.plink_call_rate_post2.output.imiss,
         sexcheck_cr1=rules.sample_level_sexcheck.output[0],
         ancestry=rules.grafpop_ancestry.output[0],
-        sample_concordance_csv=rules.sample_concordance_summary.output[0],
+        sample_concordance_csv=_concordance_check,
         contam=_contam,
         intensity=_intensity,
     params:
         remove_contam=cfg.config.workflow_params.remove_contam,
         remove_rep_discordant=cfg.config.workflow_params.remove_rep_discordant,
+        concordance_checked=cfg.config.workflow_params.concordance_tools.plink,
     output:
         "sample_level/sample_qc.csv",
     script:
