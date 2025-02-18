@@ -28,7 +28,6 @@ localrules:
     plot_hwe,
     agg_control_plots,
     plink_conda,
-    plot_pca_merged,
 
 rule plink_conda:
     output:
@@ -59,7 +58,7 @@ targets = [
     "subject_level/.population_plots.done",
     "subject_level/.control_plots.done",
     "delivery/gwas.assoc",
-    "subject_level/pca_plots/merged.png",
+    "subject_level/merged_pca.png",
 ]
 
 
@@ -125,7 +124,6 @@ use rule keep_ids from plink as pull_selected_subjects with:
     input:
         bed="sample_level/call_rate_2/samples.bed",
         bim="sample_level/call_rate_2/samples.bim",
-        fam="sample_level/call_rate_2/samples.fam",
         to_keep=rules.selected_Subject_IDs.output.selected,
     params:
         out_prefix="subject_level/samples",
@@ -184,10 +182,12 @@ checkpoint population_checkpoint:
 
 def _get_populations(wildcards):
     checkpoint_output = checkpoints.population_checkpoint.get(**wildcards).output[0]
+    print(checkpoint_output)
+    print("here")
     return [
         x
         for x in glob_wildcards(Path(checkpoint_output, "{population}")).population
-        if not x.startswith(".snakemake") & not x.startswith("merged")
+        if not x.startswith(".snakemake") and not x.startswith("merged")
     ]
 
 
@@ -883,11 +883,23 @@ rule agg_control_plots:
     output:
         touch("subject_level/.control_plots.done"),
 
+def _population_plink_bed_files(wildcards):
+    populations = _get_populations(wildcards)
+    return expand("subject_level/{population}/subjects_maf{maf}.bed",population=populations, maf= cfg.config.software_params.maf_for_ibd)
+
+def _population_plink_bim_files(wildcards):
+    populations = _get_populations(wildcards)
+    return expand("subject_level/{population}/subjects_maf{maf}.bim",population=populations, maf= cfg.config.software_params.maf_for_ibd)
+
+def _population_plink_fam_files(wildcards):
+    populations = _get_populations(wildcards)
+    return expand("subject_level/{population}/subjects_maf{maf}.fam",population=populations, maf= cfg.config.software_params.maf_for_ibd)
+
 rule merge_ancestry_beds:
     input:
-        bed=str(_population_plink_maf_files)+".bed",
-        bim=str(_population_plink_maf_files)+".bim",
-        fam=str(_population_plink_maf_files)+".fam",
+        bed=_population_plink_bed_files,
+        bim=_population_plink_bim_files,
+        fam=_population_plink_fam_files,
         _=rules.plink_conda.output[0],
     params:
         out_prefix="subject_level/subjects_merged",
@@ -1078,6 +1090,7 @@ rule trim_ids_merged:
         "../scripts/trim_ped_map_ids.py"
 
 use rule convert from eigensoft as population_level_unrelated_convert_to_eigensoft_merged with:
+use rule convert from eigensoft as population_level_unrelated_convert_to_eigensoft_merged with:
     input:
         ped=rules.trim_ids_merged.output.ped,
         map_=rules.trim_ids_merged.output.map_,
@@ -1106,9 +1119,9 @@ rule plot_pca_merged:
             allow_missing=True,
         )[0],
     params:
-        population="merged",
+        population="",
     output:
-        "subject_level/pca_plots/merged.png",
+        "subject_level/merged_pca.png",
     script:
         "../scripts/plot_pca.py"
 
