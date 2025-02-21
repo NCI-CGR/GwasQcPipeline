@@ -17,7 +17,7 @@ from cgr_gwas_qc.cluster_profiles import (
 
 @dataclass
 class Ccad2Options(ClusterOptions):
-    queue: Set[str] = field(default_factory=lambda: {"defq", "bigmemq"})
+    queue: Set[str] = field(default_factory=lambda: {"defq", "bigmemq", "cgrq"})
     log: str = "logs/{rulename}_{job_id}.%j"
 
     def __str__(self):
