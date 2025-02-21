@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import grp
 from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Set
@@ -15,9 +16,16 @@ from cgr_gwas_qc.cluster_profiles import (
 )
 
 
+def get_allowed_queue():
+    if "ncicgr_staff" in [g.gr_name for g in grp.getgrall()]:
+        return {"defq", "bigmemq", "cgrq"}
+    else:
+        return {"defq", "bigmemq"}
+
+
 @dataclass
 class Ccad2Options(ClusterOptions):
-    queue: Set[str] = field(default_factory=lambda: {"defq", "bigmemq"})
+    queue: Set[str] = field(default_factory=get_allowed_queue)
     log: str = "logs/{rulename}_{job_id}.%j"
 
     def __str__(self):

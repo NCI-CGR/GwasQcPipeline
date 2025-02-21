@@ -323,7 +323,7 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                         + str(len(cfg.ss))
                         + ".tsv"
                     )
-                threads: 44
+                threads: workflow.cores
                 resources:
                     time_hr=ceil((len(cfg.ss) * 0.2) / 3600 + 1),
                     mem_mb=len(cfg.cluster_groups) * 70,

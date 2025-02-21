@@ -40,7 +40,7 @@ rule convert_bcf_to_plink_bed:
         cfg.conda("plink2-0")
     benchmark:
         "benchmarks/convert_bcf_to_plink_bed." + str(len(cfg.ss)) + ".tsv"
-    threads: 44
+    threads: workflow.cores
     resources:
         mem_mb=ceil((0.07 * len(cfg.ss))) + 1024,
         time_hr=ceil((0.11 * len(cfg.ss)) / 3600),
