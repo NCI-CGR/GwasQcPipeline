@@ -36,7 +36,7 @@ wildcard_constraints:
 ################################################################################
 # Subject QC Targets
 ################################################################################
-targets = [
+subjectqc_targets = [
     "subject_level/subject_qc.csv",
     "subject_level/samples.bed",
     "subject_level/samples.bim",
@@ -55,7 +55,7 @@ targets = [
 
 rule all_subject_qc:
     input:
-        targets,
+        subjectqc_targets,
 
 
 ################################################################################

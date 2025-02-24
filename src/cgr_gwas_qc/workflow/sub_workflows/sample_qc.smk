@@ -28,7 +28,7 @@ localrules:
 ################################################################################
 # Sample QC Targets
 ################################################################################
-targets = [
+sample_qc_targets = [
     "sample_level/sample_qc.csv",
     "sample_level/snp_qc.csv",
     "sample_level/summary_stats.txt",
@@ -41,7 +41,7 @@ targets = [
     "sample_level/ancestry.png",
 ]
 
-concordance_targets = [
+concordance_sample_qc_targets = [
     "sample_level/concordance/KnownReplicates.csv",
     "sample_level/concordance/InternalQcKnown.csv",
     "sample_level/concordance/StudySampleKnown.csv",
@@ -50,22 +50,26 @@ concordance_targets = [
 ]
 
 if use_contamination:
-    targets.append("sample_level/contamination/summary.csv")
+
+    include: cfg.subworkflow("contamination")
+    include: cfg.subworkflow("intensity_check")
+
+    sample_qc_targets.append("sample_level/contamination/summary.csv")
 
 
 if cfg.config.workflow_params.concordance_tools.king:
-    targets.append("sample_level/concordance/king.kin")
+    sample_qc_targets.append("sample_level/concordance/king.kin")
 
 if cfg.config.workflow_params.concordance_tools.graf:
-    targets.append("sample_level/concordance/graf.tsv")
+    sample_qc_targets.append("sample_level/concordance/graf.tsv")
 
 if cfg.config.workflow_params.concordance_tools.plink:
-    targets.extend(concordance_targets)
+    sample_qc_targets.extend(concordance_sample_qc_targets)
 
 
 rule all_sample_qc:
     input:
-        targets,
+        sample_qc_targets,
 
 
 ################################################################################

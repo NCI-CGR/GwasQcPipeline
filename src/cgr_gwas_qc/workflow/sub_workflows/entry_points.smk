@@ -21,7 +21,7 @@ cfg = load_config()
 ################################################################################
 # Entry Points Targets
 ################################################################################
-targets = [
+entry_points_targets = [
     "sample_level/samples.bed",
     "sample_level/samples.bim",
     "sample_level/samples.fam",
@@ -30,7 +30,7 @@ targets = [
 
 rule all_entry_points:
     input:
-        targets,
+        entry_points_targets,
 
 
 ################################################################################
