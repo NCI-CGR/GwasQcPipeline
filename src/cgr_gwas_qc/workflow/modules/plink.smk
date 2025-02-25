@@ -51,6 +51,7 @@ rule sample_call_rate_filter:
         touch {output.nosex}
         """
 
+
 rule snp_call_rate_filter:
     input:
         bed="{prefix}.bed",
@@ -77,6 +78,7 @@ rule snp_call_rate_filter:
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --geno {params.geno} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
+
 
 rule maf_filter:
     """Filter SNPs based on minor allele frequency."""
@@ -140,6 +142,7 @@ rule ld_filter:
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --extract {input.to_keep} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
+
 
 rule snps_only_filter:
     """Exclude all variants with one or more multi-character allele codes"""
@@ -249,6 +252,7 @@ rule remove_ids:
         touch {output.nosex}
         """
 
+
 rule keep_bfile:
     """Tell snakemake to keep the file.
 
@@ -280,6 +284,7 @@ rule keep_bfile:
         touch {output.nosex}
         """
 
+
 ################################################################################
 # Converters
 ################################################################################
@@ -308,6 +313,7 @@ rule rename_ids:
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --update-ids {input.id_map} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
+
 
 rule bed_to_ped:
     input:
@@ -388,6 +394,7 @@ rule ld:
         sleep 10 && plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --indep-pairwise 50 5 {params.r2} --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
+
 
 rule miss:
     """Runs ``plink`` missingness statistics.
@@ -538,7 +545,7 @@ rule genome:
         "--memory {resources.mem_mb} "
         "--out {params.out_prefix}.chunk "
         "--parallel $idx {params.n_chunks} ';"
-        "cat {params.out_prefix}.chunk* > {params.out_prefix}.genome ;"
+        "cat {params.out_prefix}.chunk.genome.* > {params.out_prefix}.genome ;"
         "rm {params.out_prefix}.chunk*"
 
 
