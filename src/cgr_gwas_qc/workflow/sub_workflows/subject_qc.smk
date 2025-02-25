@@ -124,6 +124,7 @@ use rule keep_ids from plink as pull_selected_subjects with:
     input:
         bed="sample_level/call_rate_2/samples.bed",
         bim="sample_level/call_rate_2/samples.bim",
+        fam="sample_level/call_rate_2/samples.fam",
         to_keep=rules.selected_Subject_IDs.output.selected,
     params:
         out_prefix="subject_level/samples",
