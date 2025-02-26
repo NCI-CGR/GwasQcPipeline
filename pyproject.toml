@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cgr_gwas_qc"
-version = "1.8.0-rc2"
+version = "1.8.0"
 description = "The CGR GWAS QC Pipeline"
 authors = [
     "Justin Fear <justin.fear@nih.gov>",
@@ -12,7 +12,8 @@ authors = [
     "Bin Zhu <bin.zhu2@nih.gov>",
     "Kevin Liao <kliao@rti.org>",
     "Caryn Willis <cdwillis@rti.org>",
-    "Jesse Marks <jmarks@rti.org>"
+    "Jesse Marks <jmarks@rti.org>",
+    "Rahim Rajwani <rahim.rajwani@nih.gov>"
 ]
 readme = "README.md"
 repository = "https://github.com/NCI-CGR/GwasQcPipeline.git"
