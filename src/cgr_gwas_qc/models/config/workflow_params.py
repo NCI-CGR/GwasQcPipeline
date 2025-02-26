@@ -7,8 +7,23 @@ from pydantic import BaseModel, Field
 timestr = time.strftime("%Y%m%d%H%M%S")
 
 
+class ConcordanceTools(BaseModel):
+    graf: bool = Field(
+        True,
+        description="Are graf relatedness results needed? Even if True, the results won't be used in sample_concordance.",
+    )
+    king: bool = Field(
+        True,
+        description="Are king relateness results needed? Even if True, the results won't be used in sample_concordance.",
+    )
+    plink: bool = Field(
+        True,
+        description="Are plink ibd relateness results needed? It is the primary tool used in sample_qc report. If false, no replicate/relatedness check would be considered in sample_qc",
+    )
+
+
 class WorkflowParams(BaseModel):
-    """This set of parameters control what parts and how the workflow is run.
+    """This set of parameters controls which parts of the workflow are run and how they are executed
 
     .. code-block:: yaml
 
@@ -31,6 +46,10 @@ class WorkflowParams(BaseModel):
             additional_params_for_gtc2bcf: --use-gtc-sample-names
             convert_idat2gtc: false
             dragena_location:
+            concordance_tools:
+                graf: true
+                king: true
+                plink: true
     """
 
     subject_id_column: str = Field(
@@ -132,6 +151,13 @@ class WorkflowParams(BaseModel):
     dragena_location: str = Field(
         None,
         description="Path to dragena binary. If dragena is not available as a module on HPC and IDAT entry_point is used, `dragena_location` will be used to convert idat2gtc.",
+    )
+
+    concordance_tools: Optional["ConcordanceTools"] = Field(
+        ConcordanceTools(),
+        description="The sample_concordance_summary only uses Plink."
+        "If the outputs of graf and king relationship checks are needed, this option can be configured"
+        "Please note even if graf and king relatedness checks are requested and executed, these would be for reference purpose only and not considered sample_concordance_summary.",
     )
 
     @staticmethod

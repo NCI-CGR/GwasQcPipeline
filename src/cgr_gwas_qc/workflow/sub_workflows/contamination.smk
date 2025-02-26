@@ -8,14 +8,14 @@ cfg = load_config()
 ################################################################################
 # Contamination Targets
 ################################################################################
-targets = [
+contamination_targets = [
     "sample_level/contamination/verifyIDintensity.csv",
 ]
 
 
 rule all_contamination:
     input:
-        targets,
+        contamination_targets,
 
 
 ################################################################################

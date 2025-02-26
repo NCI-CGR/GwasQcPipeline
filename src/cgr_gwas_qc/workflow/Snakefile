@@ -19,85 +19,19 @@ rule all:
 ################################################################################
 # Import All Sub-workflows
 ################################################################################
-targets = []
 
 
-module entry_points:
-    snakefile:
-        cfg.subworkflow("entry_points")
-    config:
-        config
+include: cfg.subworkflow("entry_points")
+include: cfg.subworkflow("sample_qc")
 
 
-use rule * from entry_points
+targets = rules.all_sample_qc.input + rules.all_entry_points.input
+if cfg.config.workflow_params.concordance_tools.plink:
 
+    include: cfg.subworkflow("delivery")
+    include: cfg.subworkflow("subject_qc")
 
-targets.extend(entry_points.targets)
-
-
-module sample_qc:
-    snakefile:
-        cfg.subworkflow("sample_qc")
-    config:
-        config
-
-
-use rule * from sample_qc
-
-
-targets.extend(sample_qc.targets)
-
-
-if sample_qc.use_contamination or cfg.config.user_files.bcf:
-
-    module contamination:
-        snakefile:
-            cfg.subworkflow("contamination")
-        config:
-            config
-
-    use rule * from contamination
-
-    targets.extend(contamination.targets)
-
-
-if sample_qc.use_contamination or cfg.config.user_files.bcf:
-
-    module intensity_check:
-        snakefile:
-            cfg.subworkflow("intensity_check")
-        config:
-            config
-
-    use rule * from intensity_check
-
-    targets.extend(intensity_check.targets)
-
-
-module subject_qc:
-    snakefile:
-        cfg.subworkflow("subject_qc")
-    config:
-        config
-
-
-use rule * from subject_qc
-
-
-targets.extend(subject_qc.targets)
-
-
-module delivery:
-    snakefile:
-        cfg.subworkflow("delivery")
-    config:
-        config
-
-
-use rule * from delivery
-
-
-targets.extend(delivery.targets)
+    targets.extend(rules.all_subject_qc.input + rules.all_delivery.input)
 
 
 ################################################################################

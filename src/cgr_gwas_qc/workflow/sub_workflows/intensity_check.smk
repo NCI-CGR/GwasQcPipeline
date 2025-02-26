@@ -8,14 +8,14 @@ cfg = load_config()
 ################################################################################
 # Intensity Targets
 ################################################################################
-targets = [
+intensity_check_targets = [
     "sample_level/contamination/median_idat_intensity.csv",
 ]
 
 
-rule all_contamination:
+rule all_intensity_check:
     input:
-        targets,
+        intensity_check_targets,
 
 
 ################################################################################

@@ -46,7 +46,7 @@ wildcard_constraints:
 ################################################################################
 # Delivery Targets
 ################################################################################
-targets = [
+delivery_targets = [
     "delivery/samples.bed",
     "delivery/samples.bim",
     "delivery/samples.fam",
@@ -70,7 +70,7 @@ if cfg.config.workflow_params.lims_upload:
     # The CGEMs/CCAD cluster has a cron job running that looks for this file in
     # the root run directory. If it is there then it will automatically upload
     # to the LIMs system. This is only useful on CGEMs/CCAD.
-    targets.append(
+    delivery_targets.append(
         output_pattern.format(
             prefix=cfg.config.workflow_params.lims_output_dir, file_type=file_type_lims, ext="csv"
         )
@@ -79,7 +79,7 @@ if cfg.config.workflow_params.lims_upload:
 
 rule all_delivery:
     input:
-        targets,
+        delivery_targets,
 
 
 ################################################################################
