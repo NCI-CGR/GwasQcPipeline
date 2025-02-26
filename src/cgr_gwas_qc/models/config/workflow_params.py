@@ -9,21 +9,21 @@ timestr = time.strftime("%Y%m%d%H%M%S")
 
 class ConcordanceTools(BaseModel):
     graf: bool = Field(
-        False,
-        description="Is graf relatedness results needed? Even if True, the results won't be used in sample_concordance.",
+        True,
+        description="Are graf relatedness results needed? Even if True, the results won't be used in sample_concordance.",
     )
     king: bool = Field(
-        False,
-        description="Is king relateness results needed? Even if True, the results won't be used in sample_concordance.",
+        True,
+        description="Are king relateness results needed? Even if True, the results won't be used in sample_concordance.",
     )
     plink: bool = Field(
         True,
-        description="Is plink ibd relateness results needed? It is the primary tool used in sample_qc report. If false, no replicate/relatedness check would be considered in sample_qc",
+        description="Are plink ibd relateness results needed? It is the primary tool used in sample_qc report. If false, no replicate/relatedness check would be considered in sample_qc",
     )
 
 
 class WorkflowParams(BaseModel):
-    """This set of parameters control what parts and how the workflow is run.
+    """This set of parameters controls which parts of the workflow are run and how they are executed
 
     .. code-block:: yaml
 
@@ -47,8 +47,9 @@ class WorkflowParams(BaseModel):
             convert_idat2gtc: false
             dragena_location:
             concordance_tools:
-                graf: false
-                king: false
+                graf: true
+                king: true
+                plink: true
     """
 
     subject_id_column: str = Field(
@@ -156,7 +157,7 @@ class WorkflowParams(BaseModel):
         ConcordanceTools(),
         description="The sample_concordance_summary only uses Plink."
         "If the outputs of graf and king relationship checks are needed, this option can be configured"
-        "Please note if even graf and king reledness checks are requested and executed, these would be for reference purpose only and not considered sample_concordance_summary.",
+        "Please note even if graf and king relatedness checks are requested and executed, these would be for reference purpose only and not considered sample_concordance_summary.",
     )
 
     @staticmethod

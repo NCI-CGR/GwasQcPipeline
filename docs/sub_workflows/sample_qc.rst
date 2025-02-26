@@ -93,6 +93,7 @@ Replicate Concordance
    - ``software_params.pi_hat_threshold``
    - ``workflow_params.remove_contam``
    - ``workflow_params.remove_rep_discordant``
+   - ``workflow_params.concordance_tools``
 
 **Major Outputs**:
 
@@ -100,10 +101,11 @@ Replicate Concordance
 
 It is common to include multiple replicates for a subset of samples as a QC metric.
 Here we check these replicates and make sure that they are highly concordant.
-We report 3 methods for checking relatedness/concordance (PLINK IBD, GRAF, and KING).
-We mostly rely on IBD results but report the others in our summary tables.
-For all three methods, we do all pairwise comparisons to determine which samples are related/replicated.
-We flag two samples as concordant (``is_ge_concordance``) if concordance (proportion IBD2) > dup_concordance_cutoff.
+The pipeline can check for relatedness/concordance using three tools : PLINK IBD, GRAF, and KING.
+We only rely on and report IBD results in our summary tables.
+To save compute resources on large datasets, the outputs for GRAF and KING relatedness checks can be disabled
+by setting ``workflow_params.concordance_tools.graf`` and ``workflow_params.concordance_tools.king`` to `False`.
+In the sumary tables, we flag two samples as concordant (``is_ge_concordance``) if concordance (proportion IBD2) > dup_concordance_cutoff.
 We flag two samples as related (``is_ge_pi_hat``) if PLINK's PI_HAT is >= pi_hat_threshold.
 
 Ancestry
