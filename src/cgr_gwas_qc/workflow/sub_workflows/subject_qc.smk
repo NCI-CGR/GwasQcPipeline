@@ -6,6 +6,7 @@ from cgr_gwas_qc import load_config
 from cgr_gwas_qc.workflow.scripts import subject_qc_table
 import shutil
 import math
+from math import ceil, floor
 
 cfg = load_config()
 
