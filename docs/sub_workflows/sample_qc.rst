@@ -105,6 +105,10 @@ The pipeline can check for relatedness/concordance using three tools : PLINK IBD
 We only rely on and report IBD results in our summary tables.
 To save compute resources on large datasets, the outputs for GRAF and KING relatedness checks can be disabled
 by setting ``workflow_params.concordance_tools.graf`` and ``workflow_params.concordance_tools.king`` to `False`.
+If PLINK IBD is not needed either, ``workflow_params.concordance_tools.plink`` can also be set to `False`.
+In this case, PLINK IBD will be skipped. Since PLINK IBD is the main tool used for replicate checks,
+columns related to replicate checks will be empty in the sample_qc table including `Expected Replicate Discordance` and `Unexpected Replicate`.
+The workflow will sucessfully complete the sample_qc with all other QC metrics but not proceed to subject QC.
 In the sumary tables, we flag two samples as concordant (``is_ge_concordance``) if concordance (proportion IBD2) > dup_concordance_cutoff.
 We flag two samples as related (``is_ge_pi_hat``) if PLINK's PI_HAT is >= pi_hat_threshold.
 
