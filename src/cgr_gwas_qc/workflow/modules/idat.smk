@@ -43,7 +43,7 @@ rule idat2gtc:
         dragena_location=cfg.config.workflow_params.dragena_location,
     output:
         output_folder=directory("sample_level/gtcs"),
-    threads: 44
+    threads: workflow.cores
     envmodules:
         "dragena/1.0.0",
     shell:
