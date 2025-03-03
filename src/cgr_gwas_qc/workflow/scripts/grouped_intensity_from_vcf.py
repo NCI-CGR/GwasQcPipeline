@@ -22,7 +22,9 @@ def main(
     notemp: bool = False,
     threads: int = 8,
 ):
-    ss = sample_sheet.read(sample_sheet_csv).query(f"cluster_group == '{grp}'")
+    ss = sample_sheet.read(sample_sheet_csv).query(
+        f"cluster_group == '{grp}'&is_missing_gtc==False"
+    )
     tmp_dir = Path(outfile).parent / "temp_median_idat"
     tmp_dir.mkdir(exist_ok=True, parents=True)
 
