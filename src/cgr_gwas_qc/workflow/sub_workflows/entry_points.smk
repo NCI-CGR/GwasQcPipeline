@@ -284,6 +284,7 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
 
                 use rule write_gtc_pathlist from bcf_module with:
                     params:
+                        pattern=lambda wc: cfg.config.user_files.gtc_pattern,
                         grp=cfg.cluster_groups,
                     output:
                         temp("sample_level/{grp}/gtc.tsv"),
