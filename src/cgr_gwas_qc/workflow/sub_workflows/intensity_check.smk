@@ -53,7 +53,7 @@ if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
             """Calculate median intensity from raw intensities using VCF/BCF input."""
             input:
                 sample_sheet_csv="cgr_sample_sheet.csv",
-                vcf_file="sample_level/samples.bcf",
+                vcf_file="sample_level/{grp}/samples.bcf",
             params:
                 grp="{grp}",
                 notemp=config.get("notemp", False),

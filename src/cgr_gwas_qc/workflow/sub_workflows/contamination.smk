@@ -98,7 +98,7 @@ if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
             """
             input:
                 sample_sheet_csv="cgr_sample_sheet.csv",
-                bcf_file="sample_level/samples.bcf",
+                bcf_file="sample_level/{grp}/samples.bcf",
                 abf_file=rules.pull_b_allele_freq_from_1kg.output.abf_file,
                 _=rules.verifyidintensity_conda.output[0],
             params:
