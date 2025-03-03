@@ -80,7 +80,7 @@ def main(
         "Ignored if using `--cgems`.",
     ),
     cores: int = typer.Option(
-        8,
+        None,
         help="The maximum number of threads a rule can request. If pipeline is executed in `cluster_mode`, this will scale down the threads to `cores`.",
     ),
 ):
