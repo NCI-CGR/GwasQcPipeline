@@ -1,0 +1,8 @@
+channels:
+  - https://raw.githubusercontent.com/NCI-CGR/conda-cgr/default/conda-cgr
+  - conda-forge
+dependencies:
+  - r-base=4.4.2
+  - r-smartsnp
+  - r-genio
+  - r-dplyr
