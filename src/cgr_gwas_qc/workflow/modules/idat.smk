@@ -46,6 +46,9 @@ rule idat2gtc:
     threads: workflow.cores
     envmodules:
         "dragena/1.0.0",
+    resources:
+        mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+        time_hr=lambda wildcards, attempt: 5 * attempt,
     shell:
         """
         if [ "{params.dragena_location}" != "None" ];then dragena='{params.dragena_location}';else  dragena='dragena';fi
@@ -87,5 +90,5 @@ rule check_gtc_creation:
             barcode not in gtcList
             for barcode in cfg.expand("{SentrixBarcode_A}_{SentrixPosition_A}")
         )
-        cfg.ss.to_csv("cgr_sample_sheet.csv")
+        cfg.ss.to_csv("cgr_sample_sheet.csv", index=False)
         Path("sample_level/gtcs_check.done").touch()
