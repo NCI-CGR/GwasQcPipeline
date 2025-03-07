@@ -43,7 +43,7 @@ rule convert_bcf_to_plink_bed:
     threads: workflow.cores
     resources:
         mem_mb=ceil((0.07 * len(cfg.ss))) + 1024,
-        time_hr=ceil((0.11 * len(cfg.ss)) / 3600),
+        time_hr=ceil((0.22 * len(cfg.ss)) + (9e-4 * cfg.config.num_snps) / 3600),
     shell:
         "plink2 --allow-extra-chr 0 --keep-allele-order --double-id --bcf {input.bcf} --vcf-filter --update-sex {params.unknown_sex} --output-chr 26 --split-par hg38 --make-pgen --out sample_level/bcf2plink  --memory {resources.mem_mb} --threads {threads} ;"
         "plink2 --pfile sample_level/bcf2plink --make-pgen --sort-vars --out sample_level/bcf2plink-sorted --threads {threads} --memory {resources.mem_mb}  ;"
@@ -109,7 +109,7 @@ rule gtc_to_bcf:
     shell:
         """
         bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ou --check-ref x -f {params.reference_fasta} --multiallelics -any |
-        bcftools filter --exclude 'INFO/INTENSITY_ONLY=1' --soft-filter 'int_only' -Ob --write-index --output {output.bcf}
+        bcftools filter --exclude 'REF==ALT|INFO/INTENSITY_ONLY=1' --soft-filter 'int_only' -Ob --write-index --output {output.bcf}
         """
 
 
