@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import grp
 from dataclasses import dataclass, field
-from datetime import timedelta
 from typing import Set
 
 from snakemake.utils import read_job_properties
@@ -41,8 +40,9 @@ class Ccad2Options(ClusterOptions):
             " --parsable"
         )
 
-        if self.time > timedelta(hours=4):
-            self.queue.discard("defq")
+        # see issue #386
+        # if self.time > timedelta(hours=4):
+        #    self.queue.discard("defq")
 
         formatted_time = f"{self.time.days}-{self.time.seconds // 3600}"  # days-hours for slurm
 
