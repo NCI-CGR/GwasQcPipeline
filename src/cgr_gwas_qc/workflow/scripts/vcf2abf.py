@@ -14,7 +14,14 @@ app = typer.Typer(add_completion=False)
 
 
 def is_biallelic_snp(rec):
-    return len(rec.ref) == 1 and len(rec.alts[0]) == 1
+    return len(rec.ref) == 1 and len(get_first_alt(rec)) == 1
+
+
+def get_first_alt(rec):
+    if rec.alts is not None:
+        return rec.alts[0]
+    else:
+        return str(None)
 
 
 @app.command()
@@ -56,7 +63,7 @@ def main(
                 rec.chrom,
                 rec.pos,
                 rec.ref[0],
-                rec.alts[0],
+                get_first_alt(rec),
                 is_biallelic_snp(rec),
                 # rec.info["IGC"],
                 rec.info["ALLELE_A"],
