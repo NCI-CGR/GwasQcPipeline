@@ -26,7 +26,7 @@ def main(
     threads: int = 8,
 ):
     ss = sample_sheet.read(sample_sheet_csv).query(
-        f"cluster_group == '{grp}'&is_missing_gtc==False"
+        f"cluster_group == '{grp}'&is_missing_gtc==False&is_missing_idats==False"
     )
     tmp_dir = Path(outfile).parent / "temp_median_idat"
     tmp_dir.mkdir(exist_ok=True, parents=True)
