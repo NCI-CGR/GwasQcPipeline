@@ -6,6 +6,7 @@ from cgr_gwas_qc import load_config
 from cgr_gwas_qc.workflow.scripts import subject_qc_table
 import shutil
 import math
+from math import ceil, floor
 
 cfg = load_config()
 
@@ -44,7 +45,7 @@ wildcard_constraints:
 ################################################################################
 # Subject QC Targets
 ################################################################################
-targets = [
+subjectqc_targets = [
     "subject_level/subject_qc.csv",
     "subject_level/samples.bed",
     "subject_level/samples.bim",
@@ -64,7 +65,7 @@ targets = [
 
 rule all_subject_qc:
     input:
-        targets,
+        subjectqc_targets,
 
 
 ################################################################################
@@ -297,6 +298,9 @@ use rule genome from plink as population_level_ibd with:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
         out_prefix="subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd",
+        n_chunks=max(2, ceil(len(cfg.cluster_groups) / 2)),
+        n_threads=min(10, workflow.cores),
+        n_tasks=floor(max(1, workflow.cores / min(10, workflow.cores))),
     output:
         "subject_level/{population}/subjects_maf{maf}_ld{ld}_ibd.genome",
 

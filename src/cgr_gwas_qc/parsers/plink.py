@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from cgr_gwas_qc.typing import PathLike
@@ -73,59 +74,69 @@ def read_hwe(filename: PathLike) -> pd.DataFrame:
     )
 
 
-def read_genome(filename: PathLike) -> pd.DataFrame:
+def read_genome(filename: PathLike, required_cols=None, chunksize=100000) -> pd.DataFrame:
     """Parse PLINK's genome file format.
 
     Each row of the genome file is a pairwise combinations of
-    samples/subjects. I am unsure of how plink assigns IID order. Here I sort
-    IDs alphanumerically which will make searching for pairs easier because
-    you can assume the order.
-
-    >>> ID1, ID2 = sort([IID1, IID2])
+    samples/subjects.
 
     Returns:
         pd.DataFrame:
-            A (n x 5) table with the following columns
+            A (n x 17) table with the following columns
 
             .. csv-table::
                 :header: name, dtype, description
 
-                ID1, object, First Sample or Subject ID (alphanumerically)
-                ID2, object, Second Sample or Subject ID (alphanumerically)
-                RT, object, Relationship type inferred from .fam/.ped file {FS: Full Sib, HS, Half Sib, PO: Parent-Offspring, OT; Other}
+                IID1, string, First Sample or Subject ID (alphanumerically)
+                IID2, string, Second Sample or Subject ID (alphanumerically)
+                RT, category, Relationship type inferred from .fam/.ped file {FS: Full Sib, HS, Half Sib, PO: Parent-Offspring, OT; Other}
                 EZ, object, IBD sharing expected value, based on just .fam/.ped relationship
                 Z0, float, P(IBD=0)
                 Z1, float, P(IBD=1)
                 Z2, float, P(IBD=2)
                 PI_HAT, float, Proportion IBD, i.e. P(IBD=2) + 0.5*P(IBD=1)
-                PHE, int, Pairwise phenotypic code (1, 0, -1 = case-case, case-ctrl, and ctrl-ctrl pairs, respectively)
+                PHE, category, Pairwise phenotypic code (1, 0, -1 = case-case, case-ctrl, and ctrl-ctrl pairs, respectively)
                 DST, float, IBS distance, i.e. (IBS2 + 0.5*IBS1) / (IBS0 + IBS1 + IBS2)
                 PPC, float, IBS binomial test
                 RATIO, float, HETHET: IBS0 SNP ratio (expected value 2)
                 IBS0, int, Number of IBS 0 nonmissing variants
                 IBS1, int, Number of IBS 1 nonmissing variants
                 IBS2, int, Number of IBS 2 nonmissing variants
-                HOMHOM, float, Number of IBS 0 SNP pairs used in PPC test
-                HETHET, float, Number of IBS 2 het/het SNP pairs used in PPC test
+                HOMHOM, int, Number of IBS 0 SNP pairs used in PPC test
+                HETHET, int, Number of IBS 2 het/het SNP pairs used in PPC test
 
     References:
         - https://www.cog-genomics.org/plink/1.9/ibd
         - https://www.cog-genomics.org/plink/1.9/formats#genome
     """
 
-    def _sort_ids(x: pd.Series):
-        """Sort IDs alphanumerically."""
-        x["ID1"], x["ID2"] = sorted([x.IID1, x.IID2])
-        return x
+    DTYPES = {
+        "IID1": "string",
+        "IID2": "string",
+        "RT": "category",
+        "EZ": "category",
+        "Z0": np.float32,
+        "Z1": np.float32,
+        "Z2": np.float32,
+        "PI_HAT": np.float32,
+        "PHE": "category",
+        "DST": np.float32,
+        "PPC": np.float32,
+        "RATIO": np.float32,
+        "IBS0": np.uint32,
+        "IBS1": np.uint32,
+        "IBS2": np.uint32,
+        "HOMHOM": np.uint32,
+        "HETHET": np.uint32,
+    }
 
-    return (
-        pd.read_csv(
-            filename,
-            delim_whitespace=True,
-            dtype={"FID1": "string", "IID1": "string", "FID2": "string", "IID2": "string"},
-        )
-        .apply(_sort_ids, axis=1)
-        .drop(["IID1", "IID2", "FID1", "FID2"], axis=1)
+    if required_cols is None:
+
+        def required_cols(col_name):
+            return lambda col_name: col_name not in ["FID1", "FID2"]
+
+    return pd.read_csv(
+        filename, delim_whitespace=True, dtype=DTYPES, usecols=required_cols, chunksize=chunksize
     )
 
 

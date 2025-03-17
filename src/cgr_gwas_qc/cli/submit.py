@@ -79,9 +79,9 @@ def main(
         "If you have a very large project >50k samples, you may want to increase the number of CPUs used for this job. "
         "Ignored if using `--cgems`.",
     ),
-    max_threads: int = typer.Option(
+    cores: int = typer.Option(
         8,
-        help="The maximum number of threads a rule can request. If pipeline is executed in `cluster_mode`, this will scale down the threads to `max-threads`.",
+        help="The maximum number of threads a rule can request. If pipeline is executed in `cluster_mode`, this will scale down the threads to `cores`.",
     ),
 ):
     """Submit the CGR GwasQcPipeline to a cluster for execution.
@@ -147,13 +147,17 @@ def main(
     if subworkflow:
         payload["added_options"] += f"--subworkflow {subworkflow} "  # type: ignore
 
-    if max_threads:
-        payload["added_options"] += f"--max-threads {max_threads} "
+    if cores:
+        payload["added_options"] += f"--cores {cores} "
 
     # add global config options only used in cluster mode.
     payload["added_options"] += "--config {} ".format(  # type: ignore
         " ".join("=".join([k, str(v)]) for k, v in snake_config.items())
     )
+
+    # appending the --use-envmodules needed for loading cluster modules as in idat2gtc entrypoint.
+    # no impact on conda or other use cases so loading by default.
+    payload["added_options"] += "--use-envmodules"
 
     cfg = load_config()
     sample_size = cfg.ss.shape[0]

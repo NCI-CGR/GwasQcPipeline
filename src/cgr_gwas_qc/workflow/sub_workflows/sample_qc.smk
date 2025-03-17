@@ -1,15 +1,12 @@
 from cgr_gwas_qc import load_config
+from math import ceil, floor
 
 cfg = load_config()
 
 max_time = cfg.config.workflow_params.max_time_hr
 BIG_TIME = dict.fromkeys(range(1, 4), max_time) if max_time else {1: 10, 2: 48, 3: 96}
 
-use_contamination = (
-    cfg.config.user_files.idat_pattern
-    and cfg.config.user_files.gtc_pattern
-    and cfg.config.workflow_params.remove_contam
-)
+use_contamination = cfg.config.user_files.idat_pattern and cfg.config.workflow_params.remove_contam
 
 idat_intensity_retrieved = Path("sample_level/contamination/median_idat_intensity.csv").is_file()
 
@@ -32,31 +29,48 @@ localrules:
 ################################################################################
 # Sample QC Targets
 ################################################################################
-targets = [
+sample_qc_targets = [
     "sample_level/sample_qc.csv",
     "sample_level/snp_qc.csv",
-    "sample_level/concordance/KnownReplicates.csv",
-    "sample_level/concordance/InternalQcKnown.csv",
-    "sample_level/concordance/StudySampleKnown.csv",
-    "sample_level/concordance/UnknownReplicates.csv",
     "sample_level/summary_stats.txt",
     "sample_level/qc_failures/low_call_rate.txt",
     "sample_level/qc_failures/contaminated.txt",
     "sample_level/qc_failures/sex_discordant.txt",
-    "sample_level/qc_failures/replicate_discordant.txt",
     "sample_level/internal_controls.txt",
     "sample_level/call_rate.png",
     "sample_level/chrx_inbreeding.png",
     "sample_level/ancestry.png",
 ]
 
+concordance_sample_qc_targets = [
+    "sample_level/concordance/KnownReplicates.csv",
+    "sample_level/concordance/InternalQcKnown.csv",
+    "sample_level/concordance/StudySampleKnown.csv",
+    "sample_level/concordance/UnknownReplicates.csv",
+    "sample_level/qc_failures/replicate_discordant.txt",
+]
+
 if use_contamination:
-    targets.append("sample_level/contamination/summary.csv")
+
+    include: cfg.subworkflow("contamination")
+    include: cfg.subworkflow("intensity_check")
+
+    sample_qc_targets.append("sample_level/contamination/summary.csv")
+
+
+if cfg.config.workflow_params.concordance_tools.king:
+    sample_qc_targets.append("sample_level/concordance/king.kin")
+
+if cfg.config.workflow_params.concordance_tools.graf:
+    sample_qc_targets.append("sample_level/concordance/graf.tsv")
+
+if cfg.config.workflow_params.concordance_tools.plink:
+    sample_qc_targets.extend(concordance_sample_qc_targets)
 
 
 rule all_sample_qc:
     input:
-        targets,
+        sample_qc_targets,
 
 
 ################################################################################
@@ -90,34 +104,59 @@ module grafpop:
 # -------------------------------------------------------------------------------
 # Call Rate Filters
 # -------------------------------------------------------------------------------
+sex_chr_included = cfg.config.workflow_params.sex_chr_included
 
+if sex_chr_included:
 
-rule impute_sex:
-    input:
-        bed="sample_level/samples.bed",
-        bim="sample_level/samples.bim",
-        fam="sample_level/samples.fam",
-    params:
-        out_prefix="sample_level/impute_sex/samples",
-    output:
-        bed="sample_level/impute_sex/samples.bed",
-        bim="sample_level/impute_sex/samples.bim",
-        fam="sample_level/impute_sex/samples.fam",
-        nosex="sample_level/impute_sex/samples.nosex",
-    threads: lambda wildcards, attempt: attempt * 2
-    resources:
-        mem_mb=lambda wildcards, attempt: attempt * 1024,
-    conda:
-        cfg.conda("plink2")
-    shell:
-        "sleep 10 && plink "
-        "--bed {input.bed} "
-        "--bim {input.bim} "
-        "--fam {input.fam} "
-        "--impute-sex --make-bed "
-        "--threads {threads} "
-        "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
+    # issue # 373
+    rule impute_sex:
+        input:
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+        params:
+            out_prefix="sample_level/impute_sex/samples",
+        output:
+            bed="sample_level/impute_sex/samples.bed",
+            bim="sample_level/impute_sex/samples.bim",
+            fam="sample_level/impute_sex/samples.fam",
+            nosex="sample_level/impute_sex/samples.nosex",
+        threads: lambda wildcards, attempt: attempt * 2
+        resources:
+            mem_mb=lambda wildcards, attempt: attempt * 1024,
+        conda:
+            cfg.conda("plink2")
+        shell:
+            "sleep 10 && plink "
+            "--bed {input.bed} "
+            "--bim {input.bim} "
+            "--fam {input.fam} "
+            "--impute-sex --make-bed "
+            "--threads {threads} "
+            "--memory {resources.mem_mb} "
+            "--out {params.out_prefix}"
+
+else:
+
+    rule impute_sex:
+        input:
+            bed="sample_level/samples.bed",
+            bim="sample_level/samples.bim",
+            fam="sample_level/samples.fam",
+        params:
+            out_prefix="sample_level/impute_sex/samples",
+        output:
+            bed="sample_level/impute_sex/samples.bed",
+            bim="sample_level/impute_sex/samples.bim",
+            fam="sample_level/impute_sex/samples.fam",
+            nosex="sample_level/impute_sex/samples.nosex",
+        shell:
+            """
+            cp {input.bed} {output.bed}
+            cp {input.bim} {output.bim}
+            cp {input.fam} {output.fam}
+            touch {output.nosex}
+            """
 
 
 use rule snp_call_rate_filter from plink as snp_call_rate_filter_1 with:
@@ -333,6 +372,9 @@ use rule genome from plink as sample_level_ibd with:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
         out_prefix="sample_level/call_rate_2/samples_maf{maf}_ld{ld}",
+        n_chunks=max(2, ceil(len(cfg.cluster_groups) / 2)),
+        n_threads=min(10, workflow.cores),
+        n_tasks=floor(max(1, workflow.cores / min(10, workflow.cores))),
     output:
         "sample_level/call_rate_2/samples_maf{maf}_ld{ld}.genome",
 
@@ -350,11 +392,12 @@ rule sample_concordance_plink:
     params:
         concordance_threshold=cfg.config.software_params.dup_concordance_cutoff,
         pi_hat_threshold=cfg.config.software_params.pi_hat_threshold,
+    threads: 1
     output:
         "sample_level/concordance/plink.csv",
     resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
-        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
+        mem_mb=2000,
+        time_hr=4,
     script:
         "../scripts/concordance_table.py"
 
@@ -418,8 +461,6 @@ rule sample_concordance_summary:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
         plink_file=rules.sample_concordance_plink.output[0],
-        graf_file=rules.sample_concordance_graf.output[0],
-        king_file=rules.sample_concordance_king.output.between_family,
     output:
         "sample_level/concordance/summary.csv",
     resources:
@@ -444,24 +485,62 @@ rule split_sample_concordance:
 # -------------------------------------------------------------------------------
 # Ancestry
 # -------------------------------------------------------------------------------
-use rule grafpop_populations from grafpop as graf_populations with:
-    input:
-        bed=rules.update_samples_to_1kg_rsIDs.output.bed,
-        bim=rules.update_samples_to_1kg_rsIDs.output.bim,
-        fam=rules.update_samples_to_1kg_rsIDs.output.fam,
-    output:
-        "sample_level/ancestry/grafpop_populations.txt",
-    resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
-    log:
-        "sample_level/ancestry/grafpop_populations.log",
+if cfg.config.workflow_params.ancestry_snps_included:
 
+    use rule grafpop_populations from grafpop as graf_populations with:
+        input:
+            bed=rules.update_samples_to_1kg_rsIDs.output.bed,
+            bim=rules.update_samples_to_1kg_rsIDs.output.bim,
+            fam=rules.update_samples_to_1kg_rsIDs.output.fam,
+        output:
+            "sample_level/ancestry/grafpop_populations.txt",
+        resources:
+            mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
+        log:
+            "sample_level/ancestry/grafpop_populations.log",
 
-use rule grafpop_ancestry from grafpop as graf_ancestry with:
-    input:
-        rules.grafpop_populations.output[0],
-    output:
-        "sample_level/ancestry/graf_ancestry.txt",
+    use rule grafpop_ancestry from grafpop as graf_ancestry with:
+        input:
+            rules.grafpop_populations.output[0],
+        output:
+            "sample_level/ancestry/graf_ancestry.txt",
+
+else:
+
+    # for issue #374 when array do not have ancestry snps.
+    rule grafpop_ancestry:
+        input:
+            bed=rules.update_samples_to_1kg_rsIDs.output.bed,
+            bim=rules.update_samples_to_1kg_rsIDs.output.bim,
+            fam=rules.update_samples_to_1kg_rsIDs.output.fam,
+        output:
+            "sample_level/ancestry/grafpop_populations.txt",
+        run:
+            import pandas as pd
+            from cgr_gwas_qc.parsers import sample_sheet
+
+            ss = sample_sheet.read("cgr_sample_sheet.csv")
+            graf = pd.DataFrame(
+                columns=[
+                    "Subject",
+                    "#SNPs",
+                    "Self-reported ancestry",
+                    "GD1",
+                    "GD2",
+                    "GD3",
+                    "GD4",
+                    "P_f (%)",
+                    "P_e (%)",
+                    "P_a (%)",
+                    "PopID",
+                    "Computed population",
+                ]
+            )
+            graf.Subject = ss.Sample_ID
+            graf[["GD1", "GD2", "GD3", "GD4", "P_f (%)", "P_e (%)", "P_a (%)"]] = 0.0
+            graf["#SNPs"] = 0
+            graf["PopID"] = 9
+            graf.to_csv(output[0], sep="\t", index=False)
 
 
 # -------------------------------------------------------------------------------
@@ -486,7 +565,6 @@ rule snp_qc_table:
 #### i212 ####
 # create empty table if sex chromosome is not inicluded
 
-sex_chr_included = cfg.config.workflow_params.sex_chr_included
 if sex_chr_included:
     print("sex_chr_included ", sex_chr_included)
 
@@ -533,6 +611,13 @@ def _intensity(wildcards):
     return []
 
 
+def _concordance_check(wildcards):
+    if cfg.config.workflow_params.concordance_tools.plink:
+        return "sample_level/concordance/summary.csv"
+    else:
+        return []
+
+
 rule sample_qc_table:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
@@ -541,12 +626,13 @@ rule sample_qc_table:
         imiss_cr2=rules.plink_call_rate_post2.output.imiss,
         sexcheck_cr1=rules.sample_level_sexcheck.output[0],
         ancestry=rules.grafpop_ancestry.output[0],
-        sample_concordance_csv=rules.sample_concordance_summary.output[0],
+        sample_concordance_csv=_concordance_check,
         contam=_contam,
         intensity=_intensity,
     params:
         remove_contam=cfg.config.workflow_params.remove_contam,
         remove_rep_discordant=cfg.config.workflow_params.remove_rep_discordant,
+        concordance_checked=cfg.config.workflow_params.concordance_tools.plink,
     output:
         "sample_level/sample_qc.csv",
     script:

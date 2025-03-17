@@ -38,7 +38,9 @@ def main(
     notemp: bool = typer.Argument(False, help="No temporary files should be created"),
     threads: int = typer.Argument(8, help="number of threads"),
 ):
-    ss = sample_sheet.read(sample_sheet_csv).query(f"cluster_group == '{grp}'")
+    ss = sample_sheet.read(sample_sheet_csv).query(
+        f"cluster_group == '{grp}'&is_missing_gtc==False"
+    )
 
     # Make temp folders
     outdir = Path(outfile).parent
@@ -54,7 +56,7 @@ def main(
     contam_pattern = (tmp_contam / "{Sample_ID}.txt").as_posix()
 
     # If BCF file is input, Convert VCF to ADPC per sample
-    if cfg.config.user_files.bcf:
+    if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
         convert_vcf_to_adpc(ss, bcf_file, adpc_pattern, threads)
     # Otherwise, Convert GTC to ADPC - default
     else:

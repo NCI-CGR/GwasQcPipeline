@@ -64,7 +64,7 @@ If you are on ``CGEMS/CCAD`` then the paths of the reference files are correctly
 If you are on another system then you most provide the correct paths and versions of these files.
 The ``illumina_manifest_file`` is provided by Illumina.
 The ``thousand_genome_vcf`` and ``thousand_genome_tbi`` files can be downloaded from the 1000 Genome's website.
-The ``illumina_cluster_file`` is the EGT file used to generate GTCs; this file is not required and is only referenced in the QC report if present.
+The ``illumina_cluster_file`` is the EGT file used to generate GTCs; this file is required if an IDAT entry_point is used.
 The ``reference_fasta`` is used convert GTCs to VCF and needed if GTCs are provided.
 
 1000 Genomes reference files download links
@@ -95,6 +95,10 @@ The ``user_files`` section has a number of different mutually exclusive configur
 By default we assume you will be starting with IDAT and GTC files.
 Though we also accept aggregated PED/MAP and aggregated BED/BIM/FAM files.
 In the example, ``{Project}`` and ``{Sample_ID}`` will be filled by values from ``Project`` and ``Sample_ID`` columns in ``cgr_sample_sheet.csv``.
+
+If the ``idat_pattern`` is given and ``workflow_params.convert_idat2gtc=true``, then this will trigger IDAT entry point. It will convert idats to gtcs and resume per gtc entry_point aftwards.
+To convert idats to gtcs, we use Illumina's dragen array software which should be available either as a module or path to binary must be provided using ``workflow_params.dragena_location``.
+If you are on CCAD2, we already have a module installed and ``dragena_location`` is not neeeded. You might also need to provide cluster egt file using ``reference_files.illumina_cluster_file``.
 
 If the ``gtc_pattern`` is given, then this will trigger the GTC entry point. There are two methods to convert gtc files to ``sample_level/samples.{bed,bim,fam}``.
 If ``workflow_params.convert_gtc2bcf=false`` (default), we will convert each sample's GTC to a PED/MAP and then aggregate all samples and convert to a single BED/BIM/FAM at ``sample_level/samples.{bed,bim,fam}``.

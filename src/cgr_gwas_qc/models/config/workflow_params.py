@@ -7,8 +7,23 @@ from pydantic import BaseModel, Field
 timestr = time.strftime("%Y%m%d%H%M%S")
 
 
+class ConcordanceTools(BaseModel):
+    graf: bool = Field(
+        True,
+        description="Are graf relatedness results needed? Even if True, the results won't be used in sample_concordance.",
+    )
+    king: bool = Field(
+        True,
+        description="Are king relateness results needed? Even if True, the results won't be used in sample_concordance.",
+    )
+    plink: bool = Field(
+        True,
+        description="Are plink ibd relateness results needed? It is the primary tool used in sample_qc report. If false, no replicate/relatedness check would be considered in sample_qc",
+    )
+
+
 class WorkflowParams(BaseModel):
-    """This set of parameters control what parts and how the workflow is run.
+    """This set of parameters controls which parts of the workflow are run and how they are executed
 
     .. code-block:: yaml
 
@@ -29,6 +44,12 @@ class WorkflowParams(BaseModel):
             time_start:
             convert_gtc2bcf: false
             additional_params_for_gtc2bcf: --use-gtc-sample-names
+            convert_idat2gtc: false
+            dragena_location:
+            concordance_tools:
+                graf: true
+                king: true
+                plink: true
     """
 
     subject_id_column: str = Field(
@@ -48,6 +69,11 @@ class WorkflowParams(BaseModel):
     sex_chr_included: bool = Field(
         True,
         description="True if the sex chromosome is included in the microarray and a sex concordance check can be performed.",
+    )
+
+    ancestry_snps_included: bool = Field(
+        True,
+        description="True if the ancestry informative SNPs are included in the microarray and a GRAF ancestry check can be performed.",
     )
 
     case_control_column: str = Field(
@@ -115,6 +141,23 @@ class WorkflowParams(BaseModel):
     additional_params_for_gtc2bcf: str = Field(
         "--use-gtc-sample-names",
         description="Additional/optional parameters not hardcoded to be used or skipped in gtc2bcf for specific analysis.",
+    )
+
+    convert_idat2gtc: bool = Field(
+        False,
+        description="If idat_pattern is provided and `convert_idat2gtc` is `True`, idat2gtc will be triggered in entry_points.",
+    )
+
+    dragena_location: str = Field(
+        None,
+        description="Path to dragena binary. If dragena is not available as a module on HPC and IDAT entry_point is used, `dragena_location` will be used to convert idat2gtc.",
+    )
+
+    concordance_tools: Optional["ConcordanceTools"] = Field(
+        ConcordanceTools(),
+        description="The sample_concordance_summary only uses Plink."
+        "If the outputs of graf and king relationship checks are needed, this option can be configured"
+        "Please note even if graf and king relatedness checks are requested and executed, these would be for reference purpose only and not considered sample_concordance_summary.",
     )
 
     @staticmethod

@@ -8,14 +8,14 @@ cfg = load_config()
 ################################################################################
 # Contamination Targets
 ################################################################################
-targets = [
+contamination_targets = [
     "sample_level/contamination/verifyIDintensity.csv",
 ]
 
 
 rule all_contamination:
     input:
-        targets,
+        contamination_targets,
 
 
 ################################################################################
@@ -28,11 +28,11 @@ module thousand_genomes:
         {}
 
 
-if cfg.config.user_files.bcf:
+if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
 
     use rule pull_b_allele_freq_from_1kg_bcfinput from thousand_genomes as pull_b_allele_freq_from_1kg with:
         input:
-            bcf_file=cfg.config.user_files.bcf,
+            bcf_file="sample_level/samples.bcf",
             kgvcf_file=cfg.config.reference_files.thousand_genome_vcf,
 
 else:
@@ -66,7 +66,7 @@ rule verifyidintensity_conda:
 # Workflow Rules
 ################################################################################
 # If BCF file is input
-if cfg.config.user_files.bcf:
+if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
     if config.get("cluster_mode", False):
 
         localrules:
@@ -98,7 +98,7 @@ if cfg.config.user_files.bcf:
             """
             input:
                 sample_sheet_csv="cgr_sample_sheet.csv",
-                bcf_file=cfg.config.user_files.bcf,
+                bcf_file="sample_level/samples.bcf",
                 abf_file=rules.pull_b_allele_freq_from_1kg.output.abf_file,
                 _=rules.verifyidintensity_conda.output[0],
             params:
@@ -140,7 +140,7 @@ if cfg.config.user_files.bcf:
                 This is a submission hot spot creating 1 job per sample.
             """
             input:
-                bcf_file=cfg.config.user_files.bcf,
+                bcf_file="sample_level/samples.bcf",
             params:
                 target_sample="{Sample_ID}",
             output:

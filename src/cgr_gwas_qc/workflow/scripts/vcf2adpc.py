@@ -67,6 +67,11 @@ def main(
         ],
         axis=1,
     )
+
+    # setting negative normalized intensities to nan
+    vcf_info.NORMX = np.where((vcf_info.NORMX < 0), np.nan, vcf_info.NORMX)
+    vcf_info.NORMY = np.where((vcf_info.NORMY < 0), np.nan, vcf_info.NORMY)
+
     vcf_info["genotype"] = np.nan  # setting missing by default.
     vcf_info.loc[
         (vcf_info["GT1"] == vcf_info["ALLELE_A"]) & (vcf_info["GT2"] == vcf_info["ALLELE_A"]),

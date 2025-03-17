@@ -1,4 +1,5 @@
 from cgr_gwas_qc import load_config
+from math import floor
 
 cfg = load_config()
 
@@ -50,6 +51,7 @@ rule sample_call_rate_filter:
         touch {output.nosex}
         """
 
+
 rule snp_call_rate_filter:
     input:
         bed="{prefix}.bed",
@@ -77,6 +79,7 @@ rule snp_call_rate_filter:
         touch {output.nosex}
         """
 
+
 rule maf_filter:
     """Filter SNPs based on minor allele frequency."""
     input:
@@ -101,7 +104,7 @@ rule maf_filter:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 1024,
     shell:
-        """ 
+        """
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --maf {params.maf} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
@@ -139,6 +142,7 @@ rule ld_filter:
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --extract {input.to_keep} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
+
 
 rule snps_only_filter:
     """Exclude all variants with one or more multi-character allele codes"""
@@ -248,6 +252,7 @@ rule remove_ids:
         touch {output.nosex}
         """
 
+
 rule keep_bfile:
     """Tell snakemake to keep the file.
 
@@ -279,6 +284,7 @@ rule keep_bfile:
         touch {output.nosex}
         """
 
+
 ################################################################################
 # Converters
 ################################################################################
@@ -307,6 +313,7 @@ rule rename_ids:
         plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --update-ids {input.id_map} --make-bed --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
+
 
 rule bed_to_ped:
     input:
@@ -387,6 +394,7 @@ rule ld:
         sleep 10 && plink --bed {input.bed} --bim {input.bim} --fam {input.fam} --indep-pairwise 50 5 {params.r2} --threads {threads} --memory {resources.mem_mb} --out {params.out_prefix}
         touch {output.nosex}
         """
+
 
 rule miss:
     """Runs ``plink`` missingness statistics.
@@ -512,25 +520,33 @@ rule genome:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
         out_prefix="{prefix}",
+        n_chunks=2,
+        n_threads=min(10, workflow.cores),
+        n_tasks=floor(max(1, workflow.cores / min(10, workflow.cores))),
     output:
         "{prefix}.genome",
-    threads: lambda wildcards, attempt: attempt * 2
+    threads: workflow.cores
     resources:
-        mem_mb=lambda wildcards, attempt: PLINK_BIG_MEM[attempt],
-        time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
+        mem_mb=lambda wildcards, attempt: attempt * 16000,
+        time_hr=lambda wildcards, attempt: attempt * 3,
     conda:
         cfg.conda("plink2")
     shell:
-        "sleep 10 && plink "
+        "seq 1 {params.n_chunks} |"
+        "xargs -n1 -P{params.n_tasks} -I 'piece' bash -c 'idx=piece;"
+        "plink "
         "--bed {input.bed} "
         "--bim {input.bim} "
         "--fam {input.fam} "
         "--genome full "
         "--min {params.ibd_min} "
         "--max {params.ibd_max} "
-        "--threads {threads} "
+        "--threads {params.n_threads} "
         "--memory {resources.mem_mb} "
-        "--out {params.out_prefix}"
+        "--out {params.out_prefix}.chunk "
+        "--parallel $idx {params.n_chunks} ';"
+        "cat {params.out_prefix}.chunk.genome.* > {params.out_prefix}.genome ;"
+        "rm {params.out_prefix}.chunk*"
 
 
 rule het:
