@@ -28,9 +28,9 @@ localrules:
     population_controls_Subject_IDs,
     plot_hwe,
     agg_control_plots,
-    plink_conda,
+    plink_conda2,
 
-rule plink_conda:
+rule plink_conda2:
     output:
         temp(".plink_env_built"),
     conda:
@@ -906,7 +906,7 @@ rule merge_ancestry_beds:
         bed=_population_plink_bed_files,
         bim=_population_plink_bim_files,
         fam=_population_plink_fam_files,
-        _=rules.plink_conda.output[0],
+        _=rules.plink_conda2.output[0],
     params:
         out_prefix="subject_level/subjects_merged",
         conda_env=cfg.conda("plink2"),
@@ -969,6 +969,9 @@ use rule genome from plink as population_level_ibd_merged with:
         ibd_min=cfg.config.software_params.ibd_pi_hat_min,
         ibd_max=cfg.config.software_params.ibd_pi_hat_max,
         out_prefix="subject_level/subjects_maf{maf}_ld{ld}_ibd_merged",
+        n_chunks=max(2,ceil(len(cfg.cluster_groups) / 2)),
+        n_threads=min(10, workflow.cores),
+        n_tasks=floor(max(1, workflow.cores / min(10, workflow.cores))),
     output:
         "subject_level/subjects_maf{maf}_ld{ld}_ibd_merged.genome",
 
