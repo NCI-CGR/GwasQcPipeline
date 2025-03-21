@@ -38,6 +38,9 @@ rule smartpca:
         eigenvec="{prefix}.eigenvec",
     conda:
         cfg.conda("eigensoft")
+    resources:
+        time_hr=10,
+
     shell:
         """
         echo 'genotypename: {input.gen}' > {output.par} \
