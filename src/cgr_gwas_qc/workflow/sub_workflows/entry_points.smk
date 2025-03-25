@@ -27,6 +27,14 @@ entry_points_targets = [
     "sample_level/samples.fam",
 ]
 
+if cfg.config.workflow_params.convert_gtc2bcf:
+    if config.get("cluster_mode", False) and len(cfg.cluster_groups) > 2:
+        entry_points_targets.append(
+            expand("sample_level/{grp}/samples.zarr", grp=cfg.cluster_groups)
+        )
+    else:
+        entry_points_targets.append("sample_level/samples.zarr")
+
 
 rule all_entry_points:
     input:
@@ -295,9 +303,10 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                 benchmark:
                     "benchmarks/gtc_to_bcf.{grp}" + ".tsv"
                 resources:
-                    time_hr=lambda wc: ceil(
-                        ((_get_n_samples(wc) + 1) * (cfg.config.num_snps * 3e-6)) / 3600
+                    time_hr=lambda wc, attempt: ceil(
+                        ((_get_n_samples(wc) + 1) * (cfg.config.num_snps * 1e-5)) / 3600
                     )
+                    * attempt
                     + 1,
                     mem_mb=lambda wc: ceil(
                         (_get_n_samples(wc) * (cfg.config.num_snps * 1.06e-6))
@@ -306,6 +315,29 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                     + 200,
                 output:
                     bcf="sample_level/{grp}/samples.bcf",
+
+            use rule bcf2zarr from bcf_module with:
+                input:
+                    bcf="sample_level/{grp}/samples.bcf",
+                output:
+                    directory("sample_level/{grp}/samples.zarr"),
+                resources:
+                    tmpdir="temp/",
+                    mem_mb=lambda wildcards, attempt: max(
+                        ceil(
+                            (cfg.config.num_samples / len(cfg.cluster_groups))
+                            * (cfg.config.num_snps * 2e-6)
+                        )
+                        + 300,
+                        3000,
+                    )
+                    * attempt,
+                    time_hr=lambda wildcards, attempt: ceil(
+                        (cfg.config.num_samples / len(cfg.cluster_groups))
+                        * (cfg.config.num_snps * 6e-6)
+                        / 3600
+                    )
+                    * attempt,
 
             rule merge_gtc_to_bcf_batches:
                 """Merges grouped bcf files to single merged bcf"""
@@ -326,10 +358,11 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                     )
                 threads: workflow.cores
                 resources:
-                    time_hr=ceil((len(cfg.ss) * 0.4) / 3600 + 1),
+                    time_hr=lambda wildcards, attempt: ceil((len(cfg.ss) * 0.4) / 3600 + 1)
+                    * attempt,
                     mem_mb=len(cfg.cluster_groups) * 70,
                 shell:
-                    "bcftools merge --threads {threads} --merge none {input.bcf_batches} -Ob -o {output}"
+                    "bcftools merge --threads {threads} --merge none {input.bcf_batches} -Ob -o {output} --write-index"
 
             use rule convert_bcf_to_plink_bed from bcf_module with:
                 input:
@@ -351,6 +384,12 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                     gtcs=rules.write_gtc_pathlist.output[0],
                 output:
                     bcf="sample_level/samples.bcf",
+
+            use rule bcf2zarr from bcf_module with:
+                input:
+                    bcf=rules.gtc_to_bcf.output[0],
+                output:
+                    directory("sample_level/samples.zarr"),
 
             use rule convert_bcf_to_plink_bed from bcf_module with:
                 input:
