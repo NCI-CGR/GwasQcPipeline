@@ -1,6 +1,7 @@
 import pandas as pd
 
 from cgr_gwas_qc import load_config
+from math import ceil
 
 cfg = load_config()
 
@@ -30,10 +31,19 @@ module thousand_genomes:
 
 if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
 
-    use rule pull_b_allele_freq_from_1kg_bcfinput from thousand_genomes as pull_b_allele_freq_from_1kg with:
-        input:
-            bcf_file="sample_level/samples.bcf",
-            kgvcf_file=cfg.config.reference_files.thousand_genome_vcf,
+    if config.get("cluster_mode", False) and len(cfg.cluster_groups) > 2:
+
+        use rule pull_b_allele_freq_from_1kg_bcfinput from thousand_genomes as pull_b_allele_freq_from_1kg with:
+            input:
+                bcf_file=expand("sample_level/{grp}/samples.bcf", grp=cfg.cluster_groups)[0],
+                kgvcf_file=cfg.config.reference_files.thousand_genome_vcf,
+
+    else:
+
+        use rule pull_b_allele_freq_from_1kg_bcfinput from thousand_genomes as pull_b_allele_freq_from_1kg with:
+            input:
+                bcf_file="sample_level/samples.bcf",
+                kgvcf_file=cfg.config.reference_files.thousand_genome_vcf,
 
 else:
 
@@ -67,53 +77,37 @@ rule verifyidintensity_conda:
 ################################################################################
 # If BCF file is input
 if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
-    if config.get("cluster_mode", False):
+    if config.get("cluster_mode", False) and len(cfg.cluster_groups) > 2:
 
         localrules:
             agg_verifyidintensity,
 
         rule grouped_contamination:
-            """Extracts normalized intensities and other metrics from an aggregated
-            BCF file and writes to Illumina ADPC.BIN per sample.
-
-            This is the format required by ``verifyIDintensity``. The script also
-            runs some sanity checks (intensities and normalized intensities > 0;
-            genotypes are one of {0, 1, 2, 3}) while processing each file.
-
-            .. warning::
-                This is a submission hot spot creating 1 job per sample.
-
-            Find contaminated samples using allele intensities.
-
-            Uses ``verifyIDintensity`` to find samples with allele intensities that deviate from the
-            population.
-
-            .. warning::
-                This is a submission hot spot creating 1 job per sample.
-
-            .. note::
-                Here we are running ``verifyIDintensity`` in single sample mode. This software also has a
-                multi-sample mode which may be faster and give better estimates. The problem with
-                multi-sample mode is that it only works when you have a "large" number of samples.
-            """
             input:
-                sample_sheet_csv="cgr_sample_sheet.csv",
-                bcf_file="sample_level/{grp}/samples.bcf",
-                abf_file=rules.pull_b_allele_freq_from_1kg.output.abf_file,
-                _=rules.verifyidintensity_conda.output[0],
+                zarr_ds="sample_level/{grp}/samples.zarr",
+                abf=rules.pull_b_allele_freq_from_1kg.output.abf_file,
             params:
-                grp="{grp}",
-                snps=cfg.config.num_snps,
-                conda_env=cfg.conda("verifyidintensity"),
-                notemp=config.get("notemp", False),
+                adpc=None,
+                batch_size=100,
+            conda:
+                cfg.conda("bio2zarr")
             output:
-                temp("sample_level/contamination/{grp}/verifyIDintensity.csv"),
-            threads: 12
+                outfile=temp("sample_level/contamination/{grp}/verifyIDintensity.csv"),
+            threads: 6
             resources:
-                mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
-                time_hr=lambda wildcards, attempt: 4 * attempt,
+                mem_mb=lambda wildcards, attempt: (0.01 * cfg.config.num_snps)
+                + (0.03 * (cfg.config.num_samples / len(cfg.cluster_groups)))
+                + 1000 * attempt,
+                time_hr=lambda wildcards, attempt: ceil(
+                    (
+                        (0.0015 * cfg.config.num_snps)
+                        + (0.00088 * (cfg.config.num_samples / len(cfg.cluster_groups)))
+                    )
+                    / 3600
+                )
+                * attempt,
             script:
-                "../scripts/grouped_contamination.py"
+                "../scripts/zarr_contamination.py"
 
         rule agg_verifyidintensity:
             input:
@@ -128,66 +122,28 @@ if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
 
     else:
 
-        rule per_sample_vcf_to_adpc:
-            """From an aggregated BCF input file, extracts normalized intensities and
-            other metrics  for the target sample and writes to Illumina ADPC.BIN per sample.
-
-            This is the format required by ``verifyIDintensity``. The script also
-            runs some sanity checks (intensities and normalized intensities > 0;
-            genotypes are one of {0, 1, 2, 3}) while processing each file.
-
-            .. warning::
-                This is a submission hot spot creating 1 job per sample.
-            """
-            input:
-                bcf_file="sample_level/samples.bcf",
-            params:
-                target_sample="{Sample_ID}",
-            output:
-                temp("sample_level/per_sample_adpc/{Sample_ID}.adpc.bin"),
-            resources:
-                mem_mb=lambda wildcards, attempt: attempt * 1024,
-            script:
-                "../scripts/vcf2adpc.py"
-
-        rule per_sample_contamination_verifyIDintensity:
-            """Find contaminated samples using allele intensities.
-
-            Uses ``verifyIDintensity`` to find samples with allele intensities that deviate from the
-            population.
-
-            .. warning::
-                This is a submission hot spot creating 1 job per sample.
-
-            .. note::
-                Here we are running ``verifyIDintensity`` in single sample mode. This software also has a
-                multi-sample mode which may be faster and give better estimates. The problem with
-                multi-sample mode is that it only works when you have a "large" number of samples.
-            """
-            input:
-                adpc=rules.per_sample_vcf_to_adpc.output[0],
-                abf=rules.pull_b_allele_freq_from_1kg.output.abf_file,
-                _=rules.verifyidintensity_conda.output[0],
-            params:
-                snps=cfg.config.num_snps,
-                conda_env=cfg.conda("verifyidintensity"),
-            output:
-                temp("sample_level/per_sample_contamination_test/{Sample_ID}.contam.out"),
-            resources:
-                mem_mb=lambda wildcards, attempt: attempt * 1024,
-            script:
-                "../scripts/verifyidintensity.py"
-
         rule agg_verifyidintensity:
             input:
-                cfg.expand(rules.per_sample_contamination_verifyIDintensity.output[0]),
+                zarr_ds="sample_level/samples.zarr",
+                abf=rules.pull_b_allele_freq_from_1kg.output.abf_file,
+            params:
+                adpc=None,
+                batch_size=100,
+            conda:
+                cfg.conda("bio2zarr")
             output:
-                "sample_level/contamination/verifyIDintensity.csv",
+                outfile="sample_level/contamination/verifyIDintensity.csv",
             resources:
-                mem_gb=lambda wildcards, attempt: attempt * 4,
-                time_hr=lambda wildcards, attempt: attempt**2,
+                mem_mb=lambda wildcards, attempt: (0.01 * cfg.config.num_snps)
+                + (0.03 * cfg.config.num_samples)
+                + 2000 * attempt,
+                time_hr=lambda wildcards, attempt: ceil(
+                    ((0.0015 * cfg.config.num_snps) + (0.00088 * cfg.config.num_samples)) / 3600
+                )
+                * attempt,
+            threads: 6
             script:
-                "../scripts/agg_verifyidintensity.py"
+                "../scripts/zarr_contamination.py"
 
 else:
     if config.get("cluster_mode", False):
