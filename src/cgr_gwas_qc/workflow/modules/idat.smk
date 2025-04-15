@@ -47,7 +47,7 @@ rule idat2gtc:
     envmodules:
         "dragena/1.0.0",
     resources:
-        mem_mb=lambda wildcards, attempt: 1024 * 8 * attempt,
+        mem_mb=lambda wildcards, attempt: 1024 * 100 * attempt,
         time_hr=lambda wildcards, attempt: 5 * attempt,
     shell:
         """
