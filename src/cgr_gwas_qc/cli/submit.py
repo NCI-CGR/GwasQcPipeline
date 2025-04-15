@@ -164,6 +164,9 @@ def main(
     if sample_size < 1_000:  # need less walltime for smaller sample size
         payload["time_hr"] = 8
 
+    if sample_size > 50_000:
+        payload["local_mem_mb"] = 100000  # need more memory for larger sample size
+
     if cgems:
         payload["profile"] = get_profile("cgems")
         payload["queue"] = queue or ("all.q" if time_hr <= 24 else "long.q")
