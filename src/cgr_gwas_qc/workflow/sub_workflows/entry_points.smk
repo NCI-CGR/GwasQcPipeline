@@ -308,11 +308,14 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                     )
                     * attempt
                     + 1,
-                    mem_mb=lambda wc: ceil(
-                        (_get_n_samples(wc) * (cfg.config.num_snps * 1.06e-6))
-                        + (cfg.config.num_snps * 2e-3)
+                    mem_mb=lambda wc, attempt: (
+                        ceil(
+                            (_get_n_samples(wc) * (cfg.config.num_snps * 1.06e-6))
+                            + (cfg.config.num_snps * 2e-3)
+                        )
+                        + 200
                     )
-                    + 200,
+                    * attempt,
                 output:
                     bcf="sample_level/{grp}/samples.bcf",
 
