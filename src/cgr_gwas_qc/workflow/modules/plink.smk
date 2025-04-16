@@ -528,7 +528,7 @@ rule genome:
     threads: workflow.cores
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000,
-        time_hr=lambda wildcards, attempt: attempt * 3,
+        time_hr=lambda wildcards, attempt: attempt * 6,
     conda:
         cfg.conda("plink2")
     shell:
