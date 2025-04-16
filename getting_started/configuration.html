@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; GwasQcPipeline 1.8.0-rc3 documentation</title>
+  <title>Configuration Files &mdash; GwasQcPipeline 1.9.0-rc1 documentation</title>
   
 
   
@@ -273,7 +273,7 @@ I will walk through each section below and end this page with a full example.</p
 <td><p><em>string</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
-<td><p>v1.8.0-rc3</p></td>
+<td><p>v1.9.0-rc1</p></td>
 </tr>
 <tr class="row-even"><td rowspan="3"><ul class="simple">
 <li><p>slurm_partition</p></li>
@@ -426,6 +426,7 @@ You should not need to edit this section unless you want to
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">reference_files</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">illumina_manifest_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/bpm/file/GSAMD-24v1-0_20011747_A1.bpm</span>
 <span class="w">    </span><span class="nt">illumina_csv_bpm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/csv/file/GSAMD-24v1-0_20011747_A1.csv</span>
+<span class="w">    </span><span class="nt">illumina_cluster_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/egt-cluster/file/</span>
 <span class="w">    </span><span class="nt">thousand_genome_vcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz</span>
 <span class="w">    </span><span class="nt">thousand_genome_tbi</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/thousand/genome/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5.20130502.sites.vcf.gz.tbi</span>
 <span class="w">    </span><span class="nt">reference_fasta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/reference/fasta/GCA_000001405.15_GRCh38_full_analysis_set.fna.bgz</span>
@@ -529,7 +530,7 @@ You should not need to edit this section unless you want to
 If you are on another system then you most provide the correct paths and versions of these files.
 The <code class="docutils literal notranslate"><span class="pre">illumina_manifest_file</span></code> is provided by Illumina.
 The <code class="docutils literal notranslate"><span class="pre">thousand_genome_vcf</span></code> and <code class="docutils literal notranslate"><span class="pre">thousand_genome_tbi</span></code> files can be downloaded from the 1000 Genome’s website.
-The <code class="docutils literal notranslate"><span class="pre">illumina_cluster_file</span></code> is the EGT file used to generate GTCs; this file is not required and is only referenced in the QC report if present.
+The <code class="docutils literal notranslate"><span class="pre">illumina_cluster_file</span></code> is the EGT file used to generate GTCs; this file is required if an IDAT entry_point is used.
 The <code class="docutils literal notranslate"><span class="pre">reference_fasta</span></code> is used convert GTCs to VCF and needed if GTCs are provided.</p>
 <dl class="simple">
 <dt>1000 Genomes reference files download links</dt><dd><ul class="simple">
@@ -726,6 +727,9 @@ You should only provide one set of patterns/paths.</p>
 By default we assume you will be starting with IDAT and GTC files.
 Though we also accept aggregated PED/MAP and aggregated BED/BIM/FAM files.
 In the example, <code class="docutils literal notranslate"><span class="pre">{Project}</span></code> and <code class="docutils literal notranslate"><span class="pre">{Sample_ID}</span></code> will be filled by values from <code class="docutils literal notranslate"><span class="pre">Project</span></code> and <code class="docutils literal notranslate"><span class="pre">Sample_ID</span></code> columns in <code class="docutils literal notranslate"><span class="pre">cgr_sample_sheet.csv</span></code>.</p>
+<p>If the <code class="docutils literal notranslate"><span class="pre">idat_pattern</span></code> is given and <code class="docutils literal notranslate"><span class="pre">workflow_params.convert_idat2gtc=true</span></code>, then this will trigger IDAT entry point. It will convert idats to gtcs and resume per gtc entry_point aftwards.
+To convert idats to gtcs, we use Illumina’s dragen array software which should be available either as a module or path to binary must be provided using <code class="docutils literal notranslate"><span class="pre">workflow_params.dragena_location</span></code>.
+If you are on CCAD2, we already have a module installed and <code class="docutils literal notranslate"><span class="pre">dragena_location</span></code> is not neeeded. You might also need to provide cluster egt file using <code class="docutils literal notranslate"><span class="pre">reference_files.illumina_cluster_file</span></code>.</p>
 <p>If the <code class="docutils literal notranslate"><span class="pre">gtc_pattern</span></code> is given, then this will trigger the GTC entry point. There are two methods to convert gtc files to <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.
 If <code class="docutils literal notranslate"><span class="pre">workflow_params.convert_gtc2bcf=false</span></code> (default), we will convert each sample’s GTC to a PED/MAP and then aggregate all samples and convert to a single BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.
 If <code class="docutils literal notranslate"><span class="pre">workflow_params.convert_gtc2bcf=true</span></code>, we will convert GTCs to an aggregated BCF and convert to BED/BIM/FAM at <code class="docutils literal notranslate"><span class="pre">sample_level/samples.{bed,bim,fam}</span></code>.</p>
@@ -1083,7 +1087,7 @@ Which will convert BCF to BED/BIM/FAM at <code class="docutils literal notransla
 <h3>Workflow Parameters<a class="headerlink" href="#workflow-parameters" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td colspan="3"><p>This set of parameters control what parts and how the workflow is run.</p>
+<tr class="row-odd"><td colspan="4"><p>This set of parameters controls which parts of the workflow are run and how they are executed</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">workflow_params</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">subject_id_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group_By</span>
 <span class="w">    </span><span class="nt">expected_sex_column</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Expected_Sex</span>
@@ -1101,9 +1105,307 @@ Which will convert BCF to BED/BIM/FAM at <code class="docutils literal notransla
 <span class="w">    </span><span class="nt">time_start</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">convert_gtc2bcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">    </span><span class="nt">additional_params_for_gtc2bcf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--use-gtc-sample-names</span>
+<span class="w">    </span><span class="nt">convert_idat2gtc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">dragena_location</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">concordance_tools</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">graf</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">king</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">plink</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
 </div>
 </td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="3"><p><em>object</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><p>properties</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>subject_id_column</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Subject Id Column</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>The column in your sample sheet that contains the subject ID. We expect that there may be multiple samples (rows) that have the sample subject ID. If there are multiple columns that you want use for subject ID, you can create a special column named <code class="docutils literal notranslate"><span class="pre">Group_By</span></code>. This would be a column that contains the column name to use as subject ID for that given samples (row).</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>Group_By</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>expected_sex_column</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Expected Sex Column</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>The name of the column in the sample sheet which identifies expected sex of samples. Allowed values in this columns are [<code class="docutils literal notranslate"><span class="pre">F</span></code> | <code class="docutils literal notranslate"><span class="pre">M</span></code> | <code class="docutils literal notranslate"><span class="pre">U</span></code>]</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>Expected_Sex</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>sex_chr_included</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Sex Chr Included</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>True if the sex chromosome is included in the microarray and a sex concordance check can be performed.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>ancestry_snps_included</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Ancestry Snps Included</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>True if the ancestry informative SNPs are included in the microarray and a GRAF ancestry check can be performed.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>case_control_column</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Case Control Column</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>The name of the colun in the sample sheet which identifies Case/Control status. Allowed values in this column are [<code class="docutils literal notranslate"><span class="pre">Control</span></code> | <code class="docutils literal notranslate"><span class="pre">Case</span></code> | <code class="docutils literal notranslate"><span class="pre">QC</span></code> | <code class="docutils literal notranslate"><span class="pre">Unknown</span></code>].</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>Case/Control_Status</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>remove_contam</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Remove Contam</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>True if you want to remove contaminated samples before running the subject level QC.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>remove_rep_discordant</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Remove Rep Discordant</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>True if you want to remove discordant replicates before running the subject level QC.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="5"><ul class="simple">
+<li><p>minimum_pop_subjects</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Minimum Pop Subjects</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>The minimum number of samples needed to use a population for population level QC (PCA, Autosomal Heterozygosity).</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
+<td colspan="2"><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td colspan="2"><p>50</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="5"><ul class="simple">
+<li><p>control_hwp_threshold</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Control Hwp Threshold</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>The minimum number of control samples needed to use a population for population level QC (HWE).</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td><p>exclusiveMinimum</p></td>
+<td colspan="2"><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>50</p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>lims_upload</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Lims Upload</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>For <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code> use only, will place a copy of the LimsUpload file in the root directory.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>default</p></td>
+<td colspan="2"><p>True</p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>lims_output_dir</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Lims Output Dir</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td colspan="2"><p>/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>case_control_gwas</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Case Control Gwas</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>A plink logistic regression gwas will be performed with case_control phenotype.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td colspan="2"><p>False</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>max_time_hr</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Max Time Hr</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>The maximum amount of time that can be requested, in hours.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>max_mem_mb</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Max Mem Mb</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>The maximum amount of memory that can be requests, in megabytes.</p></td>
+</tr>
+<tr class="row-even"><td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>time_start</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Time Start</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>Date and time at which the workflow starts. This creates a unique id for the run.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td colspan="2"><p>20250416193341</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>convert_gtc2bcf</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Convert Gtc2Bcf</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>If input is GTC, this switches between gtc2vcf (True) and gtc2ped (False - default) for conversion to BED.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td colspan="2"><p>False</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>additional_params_for_gtc2bcf</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Additional Params For Gtc2Bcf</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>Additional/optional parameters not hardcoded to be used or skipped in gtc2bcf for specific analysis.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td colspan="2"><p>–use-gtc-sample-names</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="4"><ul class="simple">
+<li><p>convert_idat2gtc</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Convert Idat2Gtc</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>If idat_pattern is provided and <cite>convert_idat2gtc</cite> is <cite>True</cite>, idat2gtc will be triggered in entry_points.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td colspan="2"><p>False</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>dragena_location</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Dragena Location</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p>Path to dragena binary. If dragena is not available as a module on HPC and IDAT entry_point is used, <cite>dragena_location</cite> will be used to convert idat2gtc.</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="4"><ul class="simple">
+<li><p>concordance_tools</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>Concordance Tools</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p>The sample_concordance_summary only uses Plink.If the outputs of graf and king relationship checks are needed, this option can be configuredPlease note even if graf and king relatedness checks are requested and executed, these would be for reference purpose only and not considered sample_concordance_summary.</p></td>
+</tr>
+<tr class="row-even"><td><p>default</p></td>
+<td colspan="2"><p>OrderedDict([(‘graf’, True), (‘king’, True), (‘plink’, True)])</p></td>
+</tr>
+<tr class="row-odd"><td><p>allOf</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p><span class="xref std std-ref">#/definitions/ConcordanceTools</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><p>definitions</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="15"><ul class="simple">
+<li><p>ConcordanceTools</p></li>
+</ul>
+</td>
+<td colspan="3"><p><em>ConcordanceTools</em></p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td colspan="2"><p><em>object</em></p></td>
@@ -1111,40 +1413,12 @@ Which will convert BCF to BED/BIM/FAM at <code class="docutils literal notransla
 <tr class="row-odd"><td colspan="3"><p>properties</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>subject_id_column</p></li>
+<li><p>graf</p></li>
 </ul>
 </td>
-<td colspan="2"><p><em>Subject Id Column</em></p></td>
+<td colspan="2"><p><em>Graf</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>The column in your sample sheet that contains the subject ID. We expect that there may be multiple samples (rows) that have the sample subject ID. If there are multiple columns that you want use for subject ID, you can create a special column named <code class="docutils literal notranslate"><span class="pre">Group_By</span></code>. This would be a column that contains the column name to use as subject ID for that given samples (row).</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>Group_By</p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>expected_sex_column</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Expected Sex Column</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>The name of the column in the sample sheet which identifies expected sex of samples. Allowed values in this columns are [<code class="docutils literal notranslate"><span class="pre">F</span></code> | <code class="docutils literal notranslate"><span class="pre">M</span></code> | <code class="docutils literal notranslate"><span class="pre">U</span></code>]</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>Expected_Sex</p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>sex_chr_included</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Sex Chr Included</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>True if the sex chromosome is included in the microarray and a sex concordance check can be performed.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Are graf relatedness results needed? Even if True, the results won’t be used in sample_concordance.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
@@ -1153,26 +1427,12 @@ Which will convert BCF to BED/BIM/FAM at <code class="docutils literal notransla
 <td><p>True</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>case_control_column</p></li>
+<li><p>king</p></li>
 </ul>
 </td>
-<td colspan="2"><p><em>Case Control Column</em></p></td>
+<td colspan="2"><p><em>King</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>The name of the colun in the sample sheet which identifies Case/Control status. Allowed values in this column are [<code class="docutils literal notranslate"><span class="pre">Control</span></code> | <code class="docutils literal notranslate"><span class="pre">Case</span></code> | <code class="docutils literal notranslate"><span class="pre">QC</span></code> | <code class="docutils literal notranslate"><span class="pre">Unknown</span></code>].</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>Case/Control_Status</p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>remove_contam</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Remove Contam</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>True if you want to remove contaminated samples before running the subject level QC.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Are king relateness results needed? Even if True, the results won’t be used in sample_concordance.</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
@@ -1181,156 +1441,18 @@ Which will convert BCF to BED/BIM/FAM at <code class="docutils literal notransla
 <td><p>True</p></td>
 </tr>
 <tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>remove_rep_discordant</p></li>
+<li><p>plink</p></li>
 </ul>
 </td>
-<td colspan="2"><p><em>Remove Rep Discordant</em></p></td>
+<td colspan="2"><p><em>Plink</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p>True if you want to remove discordant replicates before running the subject level QC.</p></td>
+<tr class="row-odd"><td colspan="2"><p>Are plink ibd relateness results needed? It is the primary tool used in sample_qc report. If false, no replicate/relatedness check would be considered in sample_qc</p></td>
 </tr>
 <tr class="row-even"><td><p>type</p></td>
 <td><p><em>boolean</em></p></td>
 </tr>
 <tr class="row-odd"><td><p>default</p></td>
 <td><p>True</p></td>
-</tr>
-<tr class="row-even"><td rowspan="5"><ul class="simple">
-<li><p>minimum_pop_subjects</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Minimum Pop Subjects</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>The minimum number of samples needed to use a population for population level QC (PCA, Autosomal Heterozygosity).</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>50</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="5"><ul class="simple">
-<li><p>control_hwp_threshold</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Control Hwp Threshold</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>The minimum number of control samples needed to use a population for population level QC (HWE).</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
-</tr>
-<tr class="row-even"><td><p>exclusiveMinimum</p></td>
-<td><p>0</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>50</p></td>
-</tr>
-<tr class="row-even"><td rowspan="4"><ul class="simple">
-<li><p>lims_upload</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Lims Upload</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>For <code class="docutils literal notranslate"><span class="pre">CGEMS/CCAD</span></code> use only, will place a copy of the LimsUpload file in the root directory.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
-<td><p>True</p></td>
-</tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
-<li><p>lims_output_dir</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Lims Output Dir</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>/DCEG/CGF/Laboratory/LIMS/drop-box-prod/gwas_primaryqc/</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>case_control_gwas</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Case Control Gwas</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>A plink logistic regression gwas will be performed with case_control phenotype.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="3"><ul class="simple">
-<li><p>max_time_hr</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Max Time Hr</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>The maximum amount of time that can be requested, in hours.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
-</tr>
-<tr class="row-even"><td rowspan="3"><ul class="simple">
-<li><p>max_mem_mb</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Max Mem Mb</em></p></td>
-</tr>
-<tr class="row-odd"><td colspan="2"><p>The maximum amount of memory that can be requests, in megabytes.</p></td>
-</tr>
-<tr class="row-even"><td><p>type</p></td>
-<td><p><em>integer</em></p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>time_start</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Time Start</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Date and time at which the workflow starts. This creates a unique id for the run.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>20241121155030</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>convert_gtc2bcf</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Convert Gtc2Bcf</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>If input is GTC, this switches between gtc2vcf (True) and gtc2ped (False - default) for conversion to BED.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>boolean</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-odd"><td rowspan="4"><ul class="simple">
-<li><p>additional_params_for_gtc2bcf</p></li>
-</ul>
-</td>
-<td colspan="2"><p><em>Additional Params For Gtc2Bcf</em></p></td>
-</tr>
-<tr class="row-even"><td colspan="2"><p>Additional/optional parameters not hardcoded to be used or skipped in gtc2bcf for specific analysis.</p></td>
-</tr>
-<tr class="row-odd"><td><p>type</p></td>
-<td><p><em>string</em></p></td>
-</tr>
-<tr class="row-even"><td><p>default</p></td>
-<td><p>–use-gtc-sample-names</p></td>
 </tr>
 </tbody>
 </table>

@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Sample QC Sub-workflow &mdash; GwasQcPipeline 1.8.0-rc3 documentation</title>
+  <title>Sample QC Sub-workflow &mdash; GwasQcPipeline 1.9.0-rc1 documentation</title>
   
 
   
@@ -291,6 +291,7 @@ We then will flag a sample <code class="docutils literal notranslate"><span clas
 <li><p><code class="docutils literal notranslate"><span class="pre">software_params.pi_hat_threshold</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.remove_contam</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.remove_rep_discordant</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow_params.concordance_tools</span></code></p></li>
 </ul>
 </div></blockquote>
 <p><strong>Major Outputs</strong>:</p>
@@ -301,10 +302,15 @@ We then will flag a sample <code class="docutils literal notranslate"><span clas
 </div></blockquote>
 <p>It is common to include multiple replicates for a subset of samples as a QC metric.
 Here we check these replicates and make sure that they are highly concordant.
-We report 3 methods for checking relatedness/concordance (PLINK IBD, GRAF, and KING).
-We mostly rely on IBD results but report the others in our summary tables.
-For all three methods, we do all pairwise comparisons to determine which samples are related/replicated.
-We flag two samples as concordant (<code class="docutils literal notranslate"><span class="pre">is_ge_concordance</span></code>) if concordance (proportion IBD2) &gt; dup_concordance_cutoff.
+The pipeline can check for relatedness/concordance using three tools : PLINK IBD, GRAF, and KING.
+We only rely on and report IBD results in our summary tables.
+To save compute resources on large datasets, the outputs for GRAF and KING relatedness checks can be disabled
+by setting <code class="docutils literal notranslate"><span class="pre">workflow_params.concordance_tools.graf</span></code> and <code class="docutils literal notranslate"><span class="pre">workflow_params.concordance_tools.king</span></code> to <cite>False</cite>.
+If PLINK IBD is not needed either, <code class="docutils literal notranslate"><span class="pre">workflow_params.concordance_tools.plink</span></code> can also be set to <cite>False</cite>.
+In this case, PLINK IBD will be skipped. Since PLINK IBD is the main tool used for replicate checks,
+columns related to replicate checks will be empty in the sample_qc table including <cite>Expected Replicate Discordance</cite> and <cite>Unexpected Replicate</cite>.
+The workflow will successfully complete the sample_qc with all other QC metrics but not proceed to subject QC.
+In the summary tables, we flag two samples as concordant (<code class="docutils literal notranslate"><span class="pre">is_ge_concordance</span></code>) if concordance (proportion IBD2) &gt; dup_concordance_cutoff.
 We flag two samples as related (<code class="docutils literal notranslate"><span class="pre">is_ge_pi_hat</span></code>) if PLINK’s PI_HAT is &gt;= pi_hat_threshold.</p>
 </section>
 <section id="ancestry">

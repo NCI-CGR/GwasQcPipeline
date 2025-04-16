@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Entry Points Sub-workflow &mdash; GwasQcPipeline 1.8.0-rc3 documentation</title>
+  <title>Entry Points Sub-workflow &mdash; GwasQcPipeline 1.9.0-rc1 documentation</title>
   
 
   
@@ -205,7 +205,10 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">sample_level/samples.fam</span></code></p></li>
 </ul>
 </div></blockquote>
-<p>The pipeline accepts either per-sample GTC files or an aggregated dataset file:</p>
+<p>The pipeline is an end-to-end workflow. It can accept raw IDAT files and generate a QC report. However, it can also continue from various other stages in analysis such as per-sample GTC files or an aggregated dataset file:</p>
+<p><strong>per-sample IDAT files</strong>:
+Given <code class="docutils literal notranslate"><span class="pre">user_files.idat_pattern</span></code> and <code class="docutils literal notranslate"><span class="pre">workflow_params.convert_idat2gtc=true</span></code>, it would use the Illumina’s dragen array software to convert idats to gtcs and subsequently convert gtcs to aggregated BED/BIM/FAM.
+To start with idat files, a cluster egt file using <code class="docutils literal notranslate"><span class="pre">reference_files.illumina_cluster_file</span></code> must be provided and dragen array sofware should be accesible either as module or a path provided using <code class="docutils literal notranslate"><span class="pre">workflow_params.dragena_location</span></code></p>
 <p><strong>per-sample GTC files</strong>:</p>
 <p>The pipeline supports two different methods for converting per-sample GTCs to aggregated BED/BIM/FAM:</p>
 <ol class="arabic simple">

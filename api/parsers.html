@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Parsers &mdash; GwasQcPipeline 1.8.0-rc3 documentation</title>
+  <title>Parsers &mdash; GwasQcPipeline 1.9.0-rc1 documentation</title>
   
 
   
@@ -555,18 +555,13 @@ alphanumerically.</p>
 <span id="plink-parsers"></span><h2>Plink Parsers<a class="headerlink" href="#module-cgr_gwas_qc.parsers.plink" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="cgr_gwas_qc.parsers.plink.read_genome">
-<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_genome" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgr_gwas_qc.parsers.plink.</code><code class="sig-name descname">read_genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>os.PathLike<span class="p">[</span>str<span class="p">]</span><span class="p">, </span>pathlib.Path<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">required_cols</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">chunksize</span><span class="o">=</span><span class="default_value">100000</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/cgr_gwas_qc/parsers/plink.html#read_genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cgr_gwas_qc.parsers.plink.read_genome" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse PLINK’s genome file format.</p>
 <p>Each row of the genome file is a pairwise combinations of
-samples/subjects. I am unsure of how plink assigns IID order. Here I sort
-IDs alphanumerically which will make searching for pairs easier because
-you can assume the order.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ID1</span><span class="p">,</span> <span class="n">ID2</span> <span class="o">=</span> <span class="n">sort</span><span class="p">([</span><span class="n">IID1</span><span class="p">,</span> <span class="n">IID2</span><span class="p">])</span>
-</pre></div>
-</div>
+samples/subjects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><p>A (n x 5) table with the following columns</p>
+<dd class="field-odd"><p><p>A (n x 17) table with the following columns</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>name</p></th>
@@ -580,8 +575,8 @@ you can assume the order.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>ID1</p></td>
-<td><p>object</p></td>
+<tr class="row-even"><td><p>IID1</p></td>
+<td><p>string</p></td>
 <td><p>First Sample or Subject ID (alphanumerically)</p></td>
 <td></td>
 <td></td>
@@ -589,8 +584,8 @@ you can assume the order.</p>
 <td></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>ID2</p></td>
-<td><p>object</p></td>
+<tr class="row-odd"><td><p>IID2</p></td>
+<td><p>string</p></td>
 <td><p>Second Sample or Subject ID (alphanumerically)</p></td>
 <td></td>
 <td></td>
@@ -599,7 +594,7 @@ you can assume the order.</p>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>RT</p></td>
-<td><p>object</p></td>
+<td><p>category</p></td>
 <td><p>Relationship type inferred from .fam/.ped file {FS: Full Sib</p></td>
 <td><p>HS</p></td>
 <td><p>Half Sib</p></td>
@@ -653,7 +648,7 @@ you can assume the order.</p>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>PHE</p></td>
-<td><p>int</p></td>
+<td><p>category</p></td>
 <td><p>Pairwise phenotypic code (1</p></td>
 <td><p>0</p></td>
 <td><p>-1 = case-case</p></td>
@@ -716,7 +711,7 @@ you can assume the order.</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>HOMHOM</p></td>
-<td><p>float</p></td>
+<td><p>int</p></td>
 <td><p>Number of IBS 0 SNP pairs used in PPC test</p></td>
 <td></td>
 <td></td>
@@ -725,7 +720,7 @@ you can assume the order.</p>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>HETHET</p></td>
-<td><p>float</p></td>
+<td><p>int</p></td>
 <td><p>Number of IBS 2 het/het SNP pairs used in PPC test</p></td>
 <td></td>
 <td></td>

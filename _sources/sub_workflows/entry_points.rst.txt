@@ -23,7 +23,12 @@ Entry Points Sub-workflow
    - ``sample_level/samples.bim``
    - ``sample_level/samples.fam``
 
-The pipeline accepts either per-sample GTC files or an aggregated dataset file:
+The pipeline is an end-to-end workflow. It can accept raw IDAT files and generate a QC report. However, it can also continue from various other stages in analysis such as per-sample GTC files or an aggregated dataset file:
+
+**per-sample IDAT files**:
+Given ``user_files.idat_pattern`` and ``workflow_params.convert_idat2gtc=true``, it would use the Illumina's dragen array software to convert idats to gtcs and subsequently convert gtcs to aggregated BED/BIM/FAM.
+To start with idat files, a cluster egt file using ``reference_files.illumina_cluster_file`` must be provided and dragen array sofware should be accesible either as module or a path provided using ``workflow_params.dragena_location``
+
 
 **per-sample GTC files**:
 

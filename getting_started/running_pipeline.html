@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Running the Pipeline &mdash; GwasQcPipeline 1.8.0-rc3 documentation</title>
+  <title>Running the Pipeline &mdash; GwasQcPipeline 1.9.0-rc1 documentation</title>
   
 
   
@@ -693,14 +693,9 @@ You would then submit this script directly to your cluster (i.e., <cite>qsub .sn
 </dd></dl>
 
 <dl class="std option">
-<dt id="cmdoption-cgr-submit-max-threads">
-<code class="sig-name descname">--max-threads</code><code class="sig-prename descclassname"> &lt;max_threads&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-max-threads" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum number of threads a rule can request. If pipeline is executed in <cite>cluster_mode</cite>, this will scale down the threads to <cite>max-threads</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p>8</p>
-</dd>
-</dl>
+<dt id="cmdoption-cgr-submit-cores">
+<code class="sig-name descname">--cores</code><code class="sig-prename descclassname"> &lt;cores&gt;</code><a class="headerlink" href="#cmdoption-cgr-submit-cores" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum number of threads a rule can request. If pipeline is executed in <cite>cluster_mode</cite>, this will scale down the threads to <cite>cores</cite>.</p>
 </dd></dl>
 
 </section>
