@@ -7,22 +7,27 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import List
 
+import typer
 from snakemake.rules import expand
 
 from cgr_gwas_qc.parsers import sample_sheet
-from cgr_gwas_qc.typing import PathLike
 from cgr_gwas_qc.workflow.scripts import agg_median_idat_intensity, median_intensity_from_vcf
 
+app = typer.Typer(add_completion=False)
 
+
+@app.command()
 def main(
-    vcf_file: PathLike,
-    sample_sheet_csv: PathLike,
+    vcf_file: Path,
+    sample_sheet_csv: Path,
     grp: str,
-    outfile: PathLike,
+    outfile: Path,
     notemp: bool = False,
     threads: int = 8,
 ):
-    ss = sample_sheet.read(sample_sheet_csv).query(f"cluster_group == '{grp}'")
+    ss = sample_sheet.read(sample_sheet_csv).query(
+        f"cluster_group == '{grp}'&is_missing_gtc==False&is_missing_idats==False"
+    )
     tmp_dir = Path(outfile).parent / "temp_median_idat"
     tmp_dir.mkdir(exist_ok=True, parents=True)
 
@@ -56,10 +61,13 @@ def calculate_median_intensity_from_vcf(ss, vcf_file, outdir, threads) -> List[P
     return outfiles
 
 
-if __name__ == "__main__" and "snakemake" in locals():
-    main(
-        **{k: v for k, v in snakemake.input.items()},  # type: ignore # noqa
-        **{k: v for k, v in snakemake.params.items()},  # type: ignore # noqa
-        outfile=snakemake.output[0],  # type: ignore # noqa
-        threads=snakemake.threads or 2,  # type: ignore # noqa
-    )
+if __name__ == "__main__":
+    if "snakemake" in locals():
+        main(
+            **{k: v for k, v in snakemake.input.items()},  # type: ignore # noqa
+            **{k: v for k, v in snakemake.params.items()},  # type: ignore # noqa
+            outfile=snakemake.output[0],  # type: ignore # noqa
+            threads=snakemake.threads or 2,  # type: ignore # noqa
+        )
+    else:
+        app()

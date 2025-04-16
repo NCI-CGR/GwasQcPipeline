@@ -1,0 +1,10 @@
+channels:
+  - bioconda
+dependencies:
+  - verifyidintensity=0.0.1
+  - python>=3.9
+  - pysam
+  - pip
+  - pip:
+    - bio2zarr==0.1.4
+    - sgkit==0.9.0

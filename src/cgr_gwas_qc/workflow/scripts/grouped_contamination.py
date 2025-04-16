@@ -39,7 +39,7 @@ def main(
     threads: int = typer.Argument(8, help="number of threads"),
 ):
     ss = sample_sheet.read(sample_sheet_csv).query(
-        f"cluster_group == '{grp}'&is_missing_gtc==False"
+        f"cluster_group == '{grp}'&is_missing_gtc==False&is_missing_idats==False"
     )
 
     # Make temp folders

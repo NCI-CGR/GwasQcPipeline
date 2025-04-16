@@ -59,7 +59,7 @@ DTYPES = {
 }
 
 
-def read(filename: PathLike):
+def read(filename: PathLike, **kwargs) -> pd.DataFrame:
     """Read the sample concordance table
 
     Returns:
@@ -80,7 +80,7 @@ def read(filename: PathLike):
         - PLINK_is_ge_pi_hat
         - PLINK_is_ge_concordance
     """
-    return pd.read_csv(filename, dtype=DTYPES)
+    return pd.read_csv(filename, dtype=DTYPES, **kwargs)
 
 
 @app.command()

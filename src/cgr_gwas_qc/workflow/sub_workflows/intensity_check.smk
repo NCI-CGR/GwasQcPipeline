@@ -1,6 +1,7 @@
 import pandas as pd
 
 from cgr_gwas_qc import load_config
+from math import ceil
 
 cfg = load_config()
 
@@ -29,6 +30,7 @@ rule all_intensity_check:
 # sure that the conda env exists.
 localrules:
     illuminaio_conda,
+    bio2zarr_conda,
 
 
 rule illuminaio_conda:
@@ -40,35 +42,58 @@ rule illuminaio_conda:
         "touch {output[0]}"
 
 
+rule bio2zarr_conda:
+    output:
+        temp(".bio2zarr_env_built"),
+    conda:
+        cfg.conda("bio2zarr")
+    shell:
+        "touch {output[0]}"
+
+
+################################################################################
+# Imports
+################################################################################
+module bcf_module:
+    snakefile:
+        cfg.modules("bcf")
+    config:
+        {}
+
+
 ################################################################################
 # Workflow Rules
 ################################################################################
 if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
-    if config.get("cluster_mode", False):
+    if config.get("cluster_mode", False) and len(cfg.cluster_groups) > 2:
 
         localrules:
             agg_median_idat_intensity,
 
-        rule grouped_median_intensity_from_vcf:
-            """Calculate median intensity from raw intensities using VCF/BCF input."""
+        rule grouped_median_intensity_from_zarr:
+            """Calculate median intensity from raw intensities using Zarr dataset."""
             input:
-                sample_sheet_csv="cgr_sample_sheet.csv",
-                vcf_file="sample_level/samples.bcf",
-            params:
-                grp="{grp}",
-                notemp=config.get("notemp", False),
+                zarr_ds="sample_level/{grp}/samples.zarr",
             output:
                 temp("sample_level/contamination/{grp}/median_idat_intensity.csv"),
-            threads: 12
+            conda:
+                cfg.conda("bio2zarr")
+            threads: 2
             resources:
-                mem_mb=lambda wildcards, attempt: 1024 * 12 * attempt,
-                time_hr=lambda wildcards, attempt: 4 * attempt,
+                mem_mb=lambda wildcards, attempt: 9e-6
+                * cfg.config.num_snps
+                * (cfg.config.num_samples / len(cfg.cluster_groups))
+                * attempt,
+                time_hr=lambda wildcards, attempt: ceil(
+                    0.001 * (cfg.config.num_samples / len(cfg.cluster_groups)) / 3600
+                )
+                * attempt,
             script:
-                "../scripts/grouped_intensity_from_vcf.py"
+                "../scripts/median_intensity_from_zarr.py"
 
         rule agg_median_idat_intensity:
             input:
-                expand(rules.grouped_median_intensity_from_vcf.output[0], grp=cfg.cluster_groups),
+                expand(rules.grouped_median_intensity_from_zarr.output[0], grp=cfg.cluster_groups),
             params:
                 notemp=config.get("notemp", False),
             output:
@@ -81,29 +106,24 @@ if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
 
     else:
 
-        rule per_sample_median_intensity_from_vcf:
-            """Calculate median intensity from raw intensities using VCF/BCF input."""
-            input:
-                vcf_file="sample_level/samples.bcf",
-            params:
-                sample_id="{Sample_ID}",
-            output:
-                temp("sample_level/contamination/per_sample_median_idat_intensity/{Sample_ID}.csv"),
-            resources:
-                mem_mb=lambda wildcards, attempt: attempt * 1024,
-            script:
-                "../scripts/median_intensity_from_vcf.py"
-
         rule agg_median_idat_intensity:
+            """Calculate median intensity from raw intensities using Zarr dataset."""
             input:
-                cfg.expand(rules.per_sample_median_intensity_from_vcf.output[0]),
+                zarr_ds="sample_level/samples.zarr",
             output:
                 "sample_level/contamination/median_idat_intensity.csv",
+            conda:
+                cfg.conda("bio2zarr")
+            threads: 2
             resources:
-                mem_gb=lambda wildcards, attempt: attempt * 4,
-                time_hr=lambda wildcards, attempt: attempt**2,
+                mem_mb=lambda wildcards, attempt: 9e-6
+                * cfg.config.num_snps
+                * cfg.config.num_samples
+                * attempt,
+                time_hr=lambda wildcards, attempt: ceil((0.001 * cfg.config.num_samples / 3600))
+                * attempt,
             script:
-                "../scripts/agg_median_idat_intensity.py"
+                "../scripts/median_intensity_from_zarr.py"
 
 else:
     if config.get("cluster_mode", False):

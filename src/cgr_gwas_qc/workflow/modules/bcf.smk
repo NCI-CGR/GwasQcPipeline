@@ -43,7 +43,10 @@ rule convert_bcf_to_plink_bed:
     threads: workflow.cores
     resources:
         mem_mb=ceil((0.07 * len(cfg.ss))) + 1024,
-        time_hr=ceil((0.11 * len(cfg.ss)) / 3600),
+        time_hr=lambda wc, attempt: ceil(
+            ((0.22 * len(cfg.ss)) + (9e-4 * cfg.config.num_snps)) / 3600
+        )
+        * attempt,
     shell:
         "plink2 --allow-extra-chr 0 --keep-allele-order --double-id --bcf {input.bcf} --vcf-filter --update-sex {params.unknown_sex} --output-chr 26 --split-par hg38 --make-pgen --out sample_level/bcf2plink  --memory {resources.mem_mb} --threads {threads} ;"
         "plink2 --pfile sample_level/bcf2plink --make-pgen --sort-vars --out sample_level/bcf2plink-sorted --threads {threads} --memory {resources.mem_mb}  ;"
@@ -103,13 +106,15 @@ rule gtc_to_bcf:
     conda:
         cfg.conda("bcftools")
     resources:
-        time_hr=ceil(((len(cfg.ss) + 1) * (cfg.config.num_snps * 3e-6)) / 3600) + 1,
+        time_hr=lambda wc, attempt: ceil(((len(cfg.ss) + 1) * (cfg.config.num_snps * 3e-6)) / 3600)
+        * attempt
+        + 1,
         mem_mb=ceil((len(cfg.ss) * (cfg.config.num_snps * 1.06e-6)) + (cfg.config.num_snps * 2e-3))
         + 200,
     shell:
         """
         bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ou --check-ref x -f {params.reference_fasta} --multiallelics -any |
-        bcftools filter --exclude 'INFO/INTENSITY_ONLY=1' --soft-filter 'int_only' -Ob --write-index --output {output.bcf}
+        bcftools filter --exclude 'REF==ALT|INFO/INTENSITY_ONLY=1' --soft-filter 'int_only' -Ob --write-index --output {output.bcf}
         """
 
 
@@ -122,3 +127,29 @@ rule symlink_bcf:
         "sample_level/samples.bcf",
     shell:
         "ln -s {input.bcf} {output}"
+
+
+rule bcf2zarr:
+    """Converts BCF to Zarr format"""
+    input:
+        bcf="sample_level/samples.bcf",
+    params:
+        variants_chunk_size=min(100000, cfg.config.num_snps),
+        samples_chunk_size=min(100, int(len(cfg.ss) / len(cfg.cluster_groups))),
+    output:
+        directory("sample_level/samples.zarr"),
+    conda:
+        cfg.conda("bio2zarr")
+    threads: 2
+    resources:
+        tmpdir="temp/",
+        mem_mb=lambda wildcards, attempt: max(
+            ceil(len(cfg.ss) * cfg.config.num_snps * 1e-6) + 300, 3000
+        )
+        * attempt,
+        time_hr=lambda wildcards, attempt: ceil(
+            (len(cfg.ss) * (cfg.config.num_snps * 3e-6)) / 3600
+        )
+        * attempt,
+    shell:
+        "vcf2zarr convert --variants-chunk-size {params.variants_chunk_size} --samples-chunk-size {params.samples_chunk_size} --worker-processes {threads} {input.bcf} {output}"

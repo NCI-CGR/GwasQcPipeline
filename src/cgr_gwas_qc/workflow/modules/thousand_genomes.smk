@@ -49,6 +49,9 @@ rule pull_b_allele_freq_from_1kg_bcfinput:
             cfg.config.snp_array,
             cfg.config.software_params.contam_population,
         ),
+    resources:
+        mem_mb=2000,
+        time_hr=lambda wildcards, attempt: 2 * attempt,
     script:
         "../scripts/vcf2abf.py"
 

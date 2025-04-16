@@ -161,6 +161,20 @@ def read_unknown_sample_concordance(filename: PathLike) -> pd.DataFrame:
     return pd.read_csv(filename, dtype=UNKNOWN_DTYPES)
 
 
+def get_row_indices_where_true(
+    sample_concordance_csv: pd.DataFrame,
+    col_name: str,
+) -> list:
+    """Get the row indices of the concordance table where a Boolean column is True. This can be used to skip rows."""
+    # Prepare list of indicies to be skipped where is_expected_replicate is False.
+    bool_column = sample_concordance.read(sample_concordance_csv, usecols=[col_name], engine="c")[
+        col_name
+    ]
+    bool_column = bool_column[~bool_column].index
+    bool_column += 1
+    return bool_column.tolist()
+
+
 @app.command()
 def main(
     sample_concordance_csv: Path,
@@ -169,12 +183,18 @@ def main(
     known_study_csv: Path,
     unknown_csv: Path,
 ):
-    # Load sample level concordance information
-    concordance = sample_concordance.read(sample_concordance_csv)
+    # Prepare list of indicies to be skipped where is_expected_replicate is False.
+    is_expected_replicate = get_row_indices_where_true(
+        sample_concordance_csv, "is_expected_replicate"
+    )
 
+    # Load sample level concordance information
+    # skip rows where is_expected_replicate is False
     # Save Known Replicates
-    known_df = concordance.query("is_expected_replicate").rename(
-        {"Subject_ID1": "Subject_ID"}, axis=1
+    known_df = (
+        sample_concordance.read(sample_concordance_csv, skiprows=is_expected_replicate, engine="c")
+        .query("is_expected_replicate")
+        .rename({"Subject_ID1": "Subject_ID"}, axis=1)
     )
     known_df.reindex(KNOWN_DTYPES, axis=1).to_csv(known_csv, index=False)
 
@@ -189,8 +209,13 @@ def main(
     ).to_csv(known_study_csv, index=False)
 
     # Save Unexpected Replicates
+    is_unexpected_replicate = get_row_indices_where_true(
+        sample_concordance_csv, "is_unexpected_replicate"
+    )
     (
-        concordance.query("is_unexpected_replicate")
+        sample_concordance.read(
+            sample_concordance_csv, skiprows=is_unexpected_replicate, engine="c"
+        )
         .reindex(UNKNOWN_DTYPES, axis=1)
         .to_csv(unknown_csv, index=False)
     )

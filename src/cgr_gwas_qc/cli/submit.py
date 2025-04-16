@@ -80,7 +80,7 @@ def main(
         "Ignored if using `--cgems`.",
     ),
     cores: int = typer.Option(
-        8,
+        None,
         help="The maximum number of threads a rule can request. If pipeline is executed in `cluster_mode`, this will scale down the threads to `cores`.",
     ),
 ):
@@ -163,6 +163,9 @@ def main(
     sample_size = cfg.ss.shape[0]
     if sample_size < 1_000:  # need less walltime for smaller sample size
         payload["time_hr"] = 8
+
+    if sample_size > 50_000:
+        payload["local_mem_mb"] = 100000  # need more memory for larger sample size
 
     if cgems:
         payload["profile"] = get_profile("cgems")
