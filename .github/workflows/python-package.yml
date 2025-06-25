@@ -26,7 +26,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: 3.8
+        python-version: 3.9.18
 
     - name: Install dependencies
       shell: bash
@@ -60,7 +60,7 @@ jobs:
       with:
         miniconda-version: "latest"
         mamba-version: "*"
-        python-version: 3.8 
+        python-version: 3.9.18
         auto-update-conda: true
         channels: conda-forge,bioconda,default
 
@@ -84,7 +84,7 @@ jobs:
       shell: bash -l {0}
       run: |
         poetry run black --check --exclude=tests/data .
-      
+
     - name: If needed, commit black changes to the pull request
       if: failure()
       shell: bash -l {0}
@@ -96,9 +96,8 @@ jobs:
         git checkout $GITHUB_HEAD_REF
         git commit -am "fixup: Format Python code with Black"
         git push
-    
+
     - name: Test with pytest
       shell: bash -l {0}
       run: |
         poetry run pytest
-
