@@ -125,12 +125,12 @@ def main(
 def check_config(filename: Path) -> Config:
     try:
         data = yaml.load(filename)
-        config = Config.parse_obj(data)
+        config = Config.model_validate(data)
     except Exception as err:
         if isinstance(err, OSError):
             msg = err.args[1]
         elif isinstance(err, ValidationError):
-            msg = str(err.args[0][0].exc).replace("\n", " ")
+            msg = str(err).replace("\n", " ")
         else:
             msg = err.args[0]
         typer.secho(f"Config ERROR: ({filename.as_posix()})\n\t{msg}\n", fg=typer.colors.RED)
