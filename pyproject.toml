@@ -65,6 +65,7 @@ sphinx-jsonschema = "1.15"
 Sphinx-Substitution-Extensions = "2020.9.30"
 sphinx-click = "3.0.1"
 prompt-toolkit = "^3.0.51"
+flake8 = "^7.3.0"
 
 [tool.poetry.scripts]
 cgr = "cgr_gwas_qc.cli:app"
