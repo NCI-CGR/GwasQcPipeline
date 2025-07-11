@@ -108,6 +108,8 @@ DTYPES = {  # Header for main QC table
     "Ancestry": "category",
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
+    "chrY_sex": "category",
+    "chrX_sex": SEX_DTYPE,
 }
 
 
@@ -173,6 +175,7 @@ def main(
     intensity: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
+    chrY_sex: Optional[Path] = typer.Option(None, help="Path to sample_level/samples.chrY_sex.csv"),
     # Params
     concordance_checked: bool = True,
     remove_contam: bool = True,
@@ -192,7 +195,13 @@ def main(
         contam,
         intensity,
         concordance_checked,
+        chrY_sex,
     )
+
+    if not sample_qc.chrY_sex.isna().any():
+        sample_qc["predicted_sex"] = sample_qc.chrY_sex
+    else:
+        sample_qc["predicted_sex"] = sample_qc.pred
 
     add_qc_columns(sample_qc, remove_contam, remove_rep_discordant, concordance_checked)
 
@@ -217,6 +226,7 @@ def build(
     contam: Optional[Path],
     intensity: Optional[Path],
     concordance_checked: bool,
+    chrY_sex: Optional[Path],
 ) -> pd.DataFrame:
     Sample_IDs = ss.index
     return (
@@ -231,6 +241,7 @@ def build(
                 _read_concordance(sample_concordance_csv, Sample_IDs, concordance_checked),
                 _read_contam(contam, Sample_IDs),
                 _read_intensity(intensity, Sample_IDs),
+                _read_chromosome_y_sex(chrY_sex),
                 # TO-ADD: call function you created to parse/summarize new file
             ],
             axis=1,
@@ -238,6 +249,28 @@ def build(
         .rename_axis("Sample_ID")
         .reset_index()
     )
+
+
+def _read_chromosome_y_sex(filename: Optional[Path]) -> pd.Series:
+    """Read the sex prediction based on chromsome Y.
+
+    Returns:
+        pd.Series:
+            - Sample_ID (pd.Index)
+            - chrY_sex (category): Male, Female
+    """
+    if filename:
+        return (
+            pd.read_csv(
+                filename,
+                usecols=["Sample_ID", "chrY_sex"],
+                dtype={"Sample_ID": "string", "chrY_sex": "category"},
+            )
+            .set_index("Sample_ID")
+            .chrY_sex
+        )
+    else:
+        return pd.Series(index=pd.Index([], dtype="string", name="Sample_ID"), dtype="category")
 
 
 def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Series:
@@ -271,7 +304,7 @@ def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
             - Sample_ID (pd.Index)
             - X_inbreeding_coefficient (float64): PLINK's inbreeding coefficient
               from sexcheck.
-            - predicted_sex (str): M/F/U based on PLINK sex predictions.
+            - chrX_sex (str): M/F/U based on PLINK sex predictions.
               are different. U if prediction was U.
             - is_sex_discordant (bool): True if SexMatch == "N"
     """
@@ -280,10 +313,10 @@ def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
         plink.read_sexcheck(filename)
         .rename_axis("Sample_ID")
         .rename({"F": "X_inbreeding_coefficient"}, axis=1)
-        .assign(predicted_sex=lambda x: x.SNPSEX.map(plink_sex_code))
-        .astype({"predicted_sex": SEX_DTYPE})
+        .assign(chrX_sex=lambda x: x.SNPSEX.map(plink_sex_code))
+        .astype({"chrX_sex": SEX_DTYPE})
         .reindex(expected_sex.index)
-        .reindex(["X_inbreeding_coefficient", "predicted_sex"], axis=1)
+        .reindex(["X_inbreeding_coefficient", "chrX_sex"], axis=1)
     )
 
     # Update PLINK predicted_sex Calls

@@ -80,7 +80,7 @@ def _get_add_params_for_gtc2bcf(wildcards):
     if cfg.config.reference_files.illumina_csv_bpm:
         return (
             "--csv "
-            + str(cfg.config.reference_files.illumina_csv_bpm)
+            + str(cfg.config.reference_files.illumina_csv_bpm.path)
             + " "
             + str(cfg.config.workflow_params.additional_params_for_gtc2bcf)
         )
@@ -153,3 +153,19 @@ rule bcf2zarr:
         * attempt,
     shell:
         "vcf2zarr convert --variants-chunk-size {params.variants_chunk_size} --samples-chunk-size {params.samples_chunk_size} --worker-processes {threads} {input.bcf} {output}"
+
+
+rule predict_sex_based_on_chromsome_y:
+    """Predict genetic sex based on chromosome Y"""
+    input:
+        zarr_ds="sample_level/samples.zarr",
+    params:
+        sd_cutoff=1.0,
+        median_cutoff=-1.6,
+    output:
+        "sample_level/samples.chrY_sex.csv",
+    threads: 1
+    conda:
+        cfg.conda("bio2zarr")
+    script:
+        "../scripts/LRRSex_from_zarr.py"
