@@ -109,7 +109,6 @@ DTYPES = {  # Header for main QC table
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
     "chrY_sex": "category",
-    "chrX_sex": SEX_DTYPE,
 }
 
 
@@ -198,10 +197,10 @@ def main(
         chrY_sex,
     )
 
-    if not sample_qc.chrY_sex.isna().any():
-        sample_qc["predicted_sex"] = sample_qc.chrY_sex
-    else:
-        sample_qc["predicted_sex"] = sample_qc.pred
+    # if not sample_qc.chrY_sex.isna().any():
+    #     sample_qc["predicted_sex"] = sample_qc.chrY_sex
+    # else:
+    #     sample_qc["predicted_sex"] = sample_qc.pred
 
     add_qc_columns(sample_qc, remove_contam, remove_rep_discordant, concordance_checked)
 
@@ -304,7 +303,7 @@ def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
             - Sample_ID (pd.Index)
             - X_inbreeding_coefficient (float64): PLINK's inbreeding coefficient
               from sexcheck.
-            - chrX_sex (str): M/F/U based on PLINK sex predictions.
+            - predicted_sex (str): M/F/U based on PLINK sex predictions.
               are different. U if prediction was U.
             - is_sex_discordant (bool): True if SexMatch == "N"
     """
@@ -313,10 +312,10 @@ def _read_sexcheck_cr1(filename: Path, expected_sex: pd.Series) -> pd.DataFrame:
         plink.read_sexcheck(filename)
         .rename_axis("Sample_ID")
         .rename({"F": "X_inbreeding_coefficient"}, axis=1)
-        .assign(chrX_sex=lambda x: x.SNPSEX.map(plink_sex_code))
-        .astype({"chrX_sex": SEX_DTYPE})
+        .assign(predicted_sex=lambda x: x.SNPSEX.map(plink_sex_code))
+        .astype({"predicted_sex": SEX_DTYPE})
         .reindex(expected_sex.index)
-        .reindex(["X_inbreeding_coefficient", "chrX_sex"], axis=1)
+        .reindex(["X_inbreeding_coefficient", "predicted_sex"], axis=1)
     )
 
     # Update PLINK predicted_sex Calls
