@@ -645,8 +645,13 @@ def _concordance_check(wildcards):
 
 
 def _chrY_sex_check(wildcards):
-    if cfg.config.reference_files.illumina_csv_bpm.chromosome_y_included:
+    if (
+        cfg.config.reference_files.illumina_csv_bpm.chromosome_y_included
+        and cfg.config.workflow_params.convert_gtc2bcf
+    ):
         return "sample_level/samples.chrY_sex.csv"
+    else:
+        return []
 
 
 rule sample_qc_table:
