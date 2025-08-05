@@ -123,7 +123,9 @@ if cfg.config.reference_files.illumina_csv_bpm.chromosome_y_included:
 
         use rule predict_sex_based_on_chromsome_y from bcf as sex_based_on_chrY with:
             input:
-                zarr_ds=cfg.expand("sample_level/{cluster_group}/samples.zarr"),
+                zarr_ds=expand(
+                    "sample_level/{cluster_group}/samples.zarr", cluster_group=cfg.cluster_groups
+                ),
 
     else:
 
@@ -522,6 +524,7 @@ if cfg.config.workflow_params.ancestry_snps_included:
             "sample_level/ancestry/grafpop_populations.txt",
         resources:
             mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
+            time_hr=4,
         log:
             "sample_level/ancestry/grafpop_populations.log",
 
