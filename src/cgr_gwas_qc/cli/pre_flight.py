@@ -8,7 +8,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set
 import pandas as pd
 import typer
 from more_itertools import chunked
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 
 from cgr_gwas_qc import parsers, validators, yaml
 from cgr_gwas_qc.config import config_to_yaml
