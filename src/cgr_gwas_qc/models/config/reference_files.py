@@ -101,12 +101,12 @@ class IlluminaCsvBpm(BaseModel):
     @computed_field
     def chromosome_x_included(self) -> bool:
         """Check if chromosome X is included in the Illumina CSV BPM."""
-        return "X" in self.contigs
+        return any(chr_x in self.contigs for chr_x in ["chrX", "X", "ChrX"])
 
     @computed_field
     def chromosome_y_included(self) -> bool:
         """Check if chromosome Y is included in the Illumina CSV BPM."""
-        return "Y" in self.contigs
+        return any(chr_y in self.contigs for chr_y in ["chrY", "Y", "ChrY"])
 
     @field_validator("required_columns_present", mode="after")
     @classmethod
