@@ -133,8 +133,8 @@ def main(
     predicted_sex["sd_LRR"] = z.call_LRR.std(axis=0).astype(np.float16).compute().values
     predicted_sex["chrY_sex"] = xr.where(
         (predicted_sex["median_LRR"] < median_cutoff) | (predicted_sex["sd_LRR"] > sd_cutoff),
-        "Female",
-        "Male",
+        "F",
+        "M",
     )
 
     np.savetxt(
