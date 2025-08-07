@@ -108,7 +108,7 @@ DTYPES = {  # Header for main QC table
     "Ancestry": "category",
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
-    "chrY_sex": "category",
+    "predicted_sex_syndrome": "category",
 }
 
 
@@ -193,14 +193,9 @@ def main(
         sample_concordance_csv,
         contam,
         intensity,
-        concordance_checked,
-        chrY_sex,
+        concordance_checked
     )
 
-    # if not sample_qc.chrY_sex.isna().any():
-    #     sample_qc["predicted_sex"] = sample_qc.chrY_sex
-    # else:
-    #     sample_qc["predicted_sex"] = sample_qc.pred
 
     add_qc_columns(sample_qc, remove_contam, remove_rep_discordant, concordance_checked)
 
@@ -211,6 +206,11 @@ def main(
         }
     )
 
+    if chrY_sex:
+        sample_qc["predicted_sex_syndrome"] = sample_qc.Sample_ID.map(_predict_sex_syndrome(_read_chromosome_y_sex(chrY_sex),sample_qc.set_index("Sample_ID")["predicted_sex"]))
+    else:    
+        sample_qc["predicted_sex_syndrome"] = ""
+        
     save(sample_qc, outfile)
 
 
@@ -225,7 +225,6 @@ def build(
     contam: Optional[Path],
     intensity: Optional[Path],
     concordance_checked: bool,
-    chrY_sex: Optional[Path],
 ) -> pd.DataFrame:
     Sample_IDs = ss.index
     return (
@@ -239,8 +238,7 @@ def build(
                 _read_ancestry(ancestry, Sample_IDs),
                 _read_concordance(sample_concordance_csv, Sample_IDs, concordance_checked),
                 _read_contam(contam, Sample_IDs),
-                _read_intensity(intensity, Sample_IDs),
-                _read_chromosome_y_sex(chrY_sex),
+                _read_intensity(intensity, Sample_IDs)
                 # TO-ADD: call function you created to parse/summarize new file
             ],
             axis=1,
@@ -270,6 +268,37 @@ def _read_chromosome_y_sex(filename: Optional[Path]) -> pd.Series:
         )
     else:
         return pd.Series(index=pd.Index([], dtype="string", name="Sample_ID"), dtype="category")
+
+def _predict_sex_syndrome(
+    chrY_sex_values: pd.Series,
+    chrX_sex_values: pd.Series,
+) -> pd.Series:
+    """
+    Compare chrX_sex and chrY_sex and return sex syndrome predictions.
+
+    Rules:
+        - if chrX_sex == 'M' and chrY_sex == 'F' → "Turner syndrome (X0) or XX with mosaicism/IDB"
+        - if chrX_sex == 'F' and chrY_sex == 'M' → "Klinefelter syndrome (XXY)"
+        - else (including NaNs) → ""
+
+    Returns:
+        pd.Series:
+            - index: Sample_ID (aligned from input indices)
+            - values: predicted_sex_syndrome (category)
+    """
+    # Align both Series by index
+    chrX_sex, chrY_sex = chrX_sex_values.align(chrY_sex_values, join='inner')
+
+    # Initialize with empty string
+    predicted_sex_syndrome = pd.Series(data=[""] * len(chrX_sex), index=chrX_sex.index, dtype=pd.CategoricalDtype(
+        categories=["", "Klinefelter syndrome (XXY)", "Turner syndrome (X0) or XX with mosaicism/IDB"]
+    ))
+
+    # Apply conditions
+    predicted_sex_syndrome[(chrX_sex == 'M') & (chrY_sex == 'F')] = "Turner syndrome (X0) or XX with mosaicism/IDB"
+    predicted_sex_syndrome[(chrX_sex == 'F') & (chrY_sex == 'M')] = "Klinefelter syndrome (XXY)"
+
+    return predicted_sex_syndrome
 
 
 def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Series:
