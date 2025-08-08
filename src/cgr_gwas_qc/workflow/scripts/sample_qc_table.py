@@ -193,9 +193,8 @@ def main(
         sample_concordance_csv,
         contam,
         intensity,
-        concordance_checked
+        concordance_checked,
     )
-
 
     add_qc_columns(sample_qc, remove_contam, remove_rep_discordant, concordance_checked)
 
@@ -207,10 +206,14 @@ def main(
     )
 
     if chrY_sex:
-        sample_qc["predicted_sex_syndrome"] = sample_qc.Sample_ID.map(_predict_sex_syndrome(_read_chromosome_y_sex(chrY_sex),sample_qc.set_index("Sample_ID")["predicted_sex"]))
-    else:    
+        sample_qc["predicted_sex_syndrome"] = sample_qc.Sample_ID.map(
+            _predict_sex_syndrome(
+                _read_chromosome_y_sex(chrY_sex), sample_qc.set_index("Sample_ID")["predicted_sex"]
+            )
+        )
+    else:
         sample_qc["predicted_sex_syndrome"] = ""
-        
+
     save(sample_qc, outfile)
 
 
@@ -238,7 +241,7 @@ def build(
                 _read_ancestry(ancestry, Sample_IDs),
                 _read_concordance(sample_concordance_csv, Sample_IDs, concordance_checked),
                 _read_contam(contam, Sample_IDs),
-                _read_intensity(intensity, Sample_IDs)
+                _read_intensity(intensity, Sample_IDs),
                 # TO-ADD: call function you created to parse/summarize new file
             ],
             axis=1,
@@ -269,6 +272,7 @@ def _read_chromosome_y_sex(filename: Optional[Path]) -> pd.Series:
     else:
         return pd.Series(index=pd.Index([], dtype="string", name="Sample_ID"), dtype="category")
 
+
 def _predict_sex_syndrome(
     chrY_sex_values: pd.Series,
     chrX_sex_values: pd.Series,
@@ -277,7 +281,7 @@ def _predict_sex_syndrome(
     Compare chrX_sex and chrY_sex and return sex syndrome predictions.
 
     Rules:
-        - if chrX_sex == 'M' and chrY_sex == 'F' → "Turner syndrome (X0) or XX with mosaicism/IDB"
+        - if chrX_sex == 'M' and chrY_sex == 'F' → "XX with IBD / mosaicism or Turner syndrome (X0)"
         - if chrX_sex == 'F' and chrY_sex == 'M' → "Klinefelter syndrome (XXY)"
         - else (including NaNs) → ""
 
@@ -287,16 +291,26 @@ def _predict_sex_syndrome(
             - values: predicted_sex_syndrome (category)
     """
     # Align both Series by index
-    chrX_sex, chrY_sex = chrX_sex_values.align(chrY_sex_values, join='inner')
+    chrX_sex, chrY_sex = chrX_sex_values.align(chrY_sex_values, join="inner")
 
     # Initialize with empty string
-    predicted_sex_syndrome = pd.Series(data=[""] * len(chrX_sex), index=chrX_sex.index, dtype=pd.CategoricalDtype(
-        categories=["", "Klinefelter syndrome (XXY)", "Turner syndrome (X0) or XX with mosaicism/IDB"]
-    ))
+    predicted_sex_syndrome = pd.Series(
+        data=[""] * len(chrX_sex),
+        index=chrX_sex.index,
+        dtype=pd.CategoricalDtype(
+            categories=[
+                "",
+                "Klinefelter syndrome (XXY)",
+                "XX with IBD / mosaicism or Turner syndrome (X0)",
+            ]
+        ),
+    )
 
     # Apply conditions
-    predicted_sex_syndrome[(chrX_sex == 'M') & (chrY_sex == 'F')] = "Turner syndrome (X0) or XX with mosaicism/IDB"
-    predicted_sex_syndrome[(chrX_sex == 'F') & (chrY_sex == 'M')] = "Klinefelter syndrome (XXY)"
+    predicted_sex_syndrome[(chrX_sex == "M") & (chrY_sex == "F")] = (
+        "XX with IBD / mosaicism or Turner syndrome (X0)"
+    )
+    predicted_sex_syndrome[(chrX_sex == "F") & (chrY_sex == "M")] = "Klinefelter syndrome (XXY)"
 
     return predicted_sex_syndrome
 
