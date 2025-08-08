@@ -31,6 +31,7 @@ class WorkflowParams(BaseModel):
             subject_id_column: Group_By
             expected_sex_column: Expected_Sex
             sex_chr_included: true
+            chromosome_y_included: true
             case_control_column: Case/Control_Status
             remove_contam: true
             remove_rep_discordant: true
@@ -148,7 +149,7 @@ class WorkflowParams(BaseModel):
         description="If idat_pattern is provided and `convert_idat2gtc` is `True`, idat2gtc will be triggered in entry_points.",
     )
 
-    dragena_location: str = Field(
+    dragena_location: Optional[str] = Field(
         None,
         description="Path to dragena binary. If dragena is not available as a module on HPC and IDAT entry_point is used, `dragena_location` will be used to convert idat2gtc.",
     )

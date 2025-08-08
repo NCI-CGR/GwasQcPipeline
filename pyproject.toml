@@ -29,7 +29,7 @@ pandas = "^2.0.3"
 snakemake = "^6.0.0"
 pysam = "^0.21.0"
 ryd = "^0.7.1"
-pydantic = "^1.0.0"
+pydantic = "^2.11.7"
 networkx = "^3.1"
 Jinja2 = "^3.1.6"
 more-itertools = "^10.1.0"
@@ -40,8 +40,8 @@ openpyxl = "^3.1.2"
 markupsafe = "~2.0"
 pulp = "2.7.0"
 
-[tool.poetry.dev-dependencies]
-black = { version = "24.8.0" }
+[tool.poetry.group.dev.dependencies]
+black = "24.8.0"
 snakefmt = "^0.10.2"
 importlib-metadata = "^8.5.0"
 pytest = "^7.4.1"
@@ -64,13 +64,12 @@ sphinx-pydantic = "0.1.1"
 sphinx-jsonschema = "1.15"
 Sphinx-Substitution-Extensions = "2020.9.30"
 sphinx-click = "3.0.1"
+prompt-toolkit = "^3.0.51"
+flake8 = "^7.3.0"
 
 [tool.poetry.scripts]
 cgr = "cgr_gwas_qc.cli:app"
 legacy_compare = "cgr_gwas_qc.scripts.legacy_compare:app"
-
-[tool.poetry.group.dev.dependencies]
-flake8 = "^7.3.0"
 
 [tool.isort]
 profile = "black"

@@ -67,7 +67,7 @@ class ConfigMgr:
         self.sample_sheet_file: Path = sample_sheet_file
 
         data = yaml.load(self.user_config)
-        self._config = Config.parse_obj(data)
+        self._config = Config.model_validate(data)
         self._sample_sheet: pd.DataFrame = sample_sheet.read(self.sample_sheet_file)
         self._cluster_groups = sorted(self.ss.cluster_group.unique())
 

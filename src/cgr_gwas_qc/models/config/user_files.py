@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, model_validator, validator
 
 
 class UserFiles(BaseModel):
@@ -130,7 +130,7 @@ class UserFiles(BaseModel):
 
         return v
 
-    @root_validator
+    @model_validator(mode="before")
     def check_ped_map(cls, values):
         ped, map_ = values.get("ped"), values.get("map")
         if ped is not None and map_ is None:
@@ -141,7 +141,7 @@ class UserFiles(BaseModel):
 
         return values
 
-    @root_validator
+    @model_validator(mode="before")
     def check_bed_bim_fam(cls, values):
         bed, bim, fam = values.get("bed"), values.get("bim"), values.get("fam")
 

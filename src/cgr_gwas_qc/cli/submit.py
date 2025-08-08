@@ -140,6 +140,8 @@ def main(
     }
     snake_config = {"cluster_mode": True, "notemp": False}
 
+    payload["added_options"] += "--conda-frontend conda "  # type: ignore
+
     if notemp:
         payload["added_options"] += "--notemp "  # type: ignore
         snake_config["notemp"] = True

@@ -108,6 +108,7 @@ DTYPES = {  # Header for main QC table
     "Ancestry": "category",
     "identifiler_needed": "boolean",
     "identifiler_reason": "string",
+    "predicted_sex_syndrome": "category",
 }
 
 
@@ -173,6 +174,7 @@ def main(
     intensity: Optional[Path] = typer.Option(
         None, help="Path to sample_filters/agg_median_idat_intensity.csv"
     ),
+    chrY_sex: Optional[Path] = typer.Option(None, help="Path to sample_level/samples.chrY_sex.csv"),
     # Params
     concordance_checked: bool = True,
     remove_contam: bool = True,
@@ -202,6 +204,15 @@ def main(
             "is_discordant_replicate": "Expected Replicate Discordance",
         }
     )
+
+    if chrY_sex:
+        sample_qc["predicted_sex_syndrome"] = sample_qc.Sample_ID.map(
+            _predict_sex_syndrome(
+                _read_chromosome_y_sex(chrY_sex), sample_qc.set_index("Sample_ID")["predicted_sex"]
+            )
+        )
+    else:
+        sample_qc["predicted_sex_syndrome"] = ""
 
     save(sample_qc, outfile)
 
@@ -238,6 +249,70 @@ def build(
         .rename_axis("Sample_ID")
         .reset_index()
     )
+
+
+def _read_chromosome_y_sex(filename: Optional[Path]) -> pd.Series:
+    """Read the sex prediction based on chromsome Y.
+
+    Returns:
+        pd.Series:
+            - Sample_ID (pd.Index)
+            - chrY_sex (category): Male, Female
+    """
+    if filename:
+        return (
+            pd.read_csv(
+                filename,
+                usecols=["Sample_ID", "chrY_sex"],
+                dtype={"Sample_ID": "string", "chrY_sex": "category"},
+            )
+            .set_index("Sample_ID")
+            .chrY_sex
+        )
+    else:
+        return pd.Series(index=pd.Index([], dtype="string", name="Sample_ID"), dtype="category")
+
+
+def _predict_sex_syndrome(
+    chrY_sex_values: pd.Series,
+    chrX_sex_values: pd.Series,
+) -> pd.Series:
+    """
+    Compare chrX_sex and chrY_sex and return sex syndrome predictions.
+
+    Rules:
+        - if chrX_sex == 'M' and chrY_sex == 'F' → "XX with IBD / mosaicism or Turner syndrome (X0)"
+        - if chrX_sex == 'F' and chrY_sex == 'M' → "Klinefelter syndrome (XXY)"
+        - else (including NaNs) → ""
+
+    Returns:
+        pd.Series:
+            - index: Sample_ID (aligned from input indices)
+            - values: predicted_sex_syndrome (category)
+    """
+    # Align both Series by index
+    chrX_sex, chrY_sex = chrX_sex_values.align(chrY_sex_values, join="inner")
+
+    # Initialize with empty string
+    predicted_sex_syndrome = pd.Series(
+        data=[""] * len(chrX_sex),
+        index=chrX_sex.index,
+        dtype=pd.CategoricalDtype(
+            categories=[
+                "",
+                "Klinefelter syndrome (XXY)",
+                "XX with IBD / mosaicism or Turner syndrome (X0)",
+            ]
+        ),
+    )
+
+    # Apply conditions
+    predicted_sex_syndrome[(chrX_sex == "M") & (chrY_sex == "F")] = (
+        "XX with IBD / mosaicism or Turner syndrome (X0)"
+    )
+    predicted_sex_syndrome[(chrX_sex == "F") & (chrY_sex == "M")] = "Klinefelter syndrome (XXY)"
+
+    return predicted_sex_syndrome
 
 
 def _read_imiss(filename: Path, Sample_IDs: pd.Index, col_name: str) -> pd.Series:

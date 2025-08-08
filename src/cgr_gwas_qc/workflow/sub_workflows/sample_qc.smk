@@ -98,13 +98,41 @@ module grafpop:
         cfg.modules("grafpop")
 
 
+module bcf:
+    snakefile:
+        cfg.modules("bcf")
+    config:
+        {}
+
+
 ################################################################################
 # Workflow Rules
 ################################################################################
 # -------------------------------------------------------------------------------
 # Call Rate Filters
 # -------------------------------------------------------------------------------
-sex_chr_included = cfg.config.workflow_params.sex_chr_included
+
+if cfg.config.reference_files.illumina_csv_bpm:
+    sex_chr_included = cfg.config.reference_files.illumina_csv_bpm.chromosome_x_included
+else:
+    sex_chr_included = cfg.config.workflow_params.sex_chr_included
+
+
+if cfg.config.reference_files.illumina_csv_bpm.chromosome_y_included:
+    if config.get("cluster_mode", False) and len(cfg.cluster_groups) > 2:
+
+        use rule predict_sex_based_on_chromsome_y from bcf as sex_based_on_chrY with:
+            input:
+                zarr_ds=expand(
+                    "sample_level/{cluster_group}/samples.zarr", cluster_group=cfg.cluster_groups
+                ),
+
+    else:
+
+        use rule predict_sex_based_on_chromsome_y from bcf as sex_based_on_chrY with:
+            input:
+                zarr_ds=["sample_level/samples.zarr"],
+
 
 if sex_chr_included:
 
@@ -496,6 +524,7 @@ if cfg.config.workflow_params.ancestry_snps_included:
             "sample_level/ancestry/grafpop_populations.txt",
         resources:
             mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
+            time_hr=4,
         log:
             "sample_level/ancestry/grafpop_populations.log",
 
@@ -565,7 +594,7 @@ rule snp_qc_table:
 #### i212 ####
 # create empty table if sex chromosome is not inicluded
 
-if sex_chr_included:
+if sex_chr_included or cfg.config.reference_files.illumina_csv_bpm.chromosome_x_included:
     print("sex_chr_included ", sex_chr_included)
 
     use rule sexcheck from plink as sample_level_sexcheck with:
@@ -618,6 +647,16 @@ def _concordance_check(wildcards):
         return []
 
 
+def _chrY_sex_check(wildcards):
+    if (
+        cfg.config.reference_files.illumina_csv_bpm.chromosome_y_included
+        and cfg.config.workflow_params.convert_gtc2bcf
+    ):
+        return "sample_level/samples.chrY_sex.csv"
+    else:
+        return []
+
+
 rule sample_qc_table:
     input:
         sample_sheet_csv="cgr_sample_sheet.csv",
@@ -629,6 +668,7 @@ rule sample_qc_table:
         sample_concordance_csv=_concordance_check,
         contam=_contam,
         intensity=_intensity,
+        chrY_sex=_chrY_sex_check,
     params:
         remove_contam=cfg.config.workflow_params.remove_contam,
         remove_rep_discordant=cfg.config.workflow_params.remove_rep_discordant,
