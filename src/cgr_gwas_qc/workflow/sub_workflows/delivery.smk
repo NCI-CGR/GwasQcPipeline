@@ -258,6 +258,8 @@ rule qc_report:
         hwe_png_dir="subject_level/hwe_plots",
     output:
         "delivery/qc_report.md",
+    conda:
+        cfg.conda("qc_report_markdown")
     script:
         "../scripts/qc_report.py"
 
