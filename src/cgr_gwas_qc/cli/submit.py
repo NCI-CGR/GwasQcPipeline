@@ -83,6 +83,10 @@ def main(
         None,
         help="The maximum number of threads a rule can request. If pipeline is executed in `cluster_mode`, this will scale down the threads to `cores`.",
     ),
+    use_mamba: bool = typer.Option(
+        False,
+        help="Whether to use mamba as the conda frontend. Passed to snakemake with `--conda-frontend mamba` if True.",
+    ),
 ):
     """Submit the CGR GwasQcPipeline to a cluster for execution.
 
@@ -140,7 +144,10 @@ def main(
     }
     snake_config = {"cluster_mode": True, "notemp": False}
 
-    payload["added_options"] += "--conda-frontend conda "  # type: ignore
+    if use_mamba:
+        payload["added_options"] += "--conda-frontend mamba "  # type: ignore
+    else:
+        payload["added_options"] += "--conda-frontend conda "  # type: ignore
 
     if notemp:
         payload["added_options"] += "--notemp "  # type: ignore
