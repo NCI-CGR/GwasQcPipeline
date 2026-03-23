@@ -109,8 +109,11 @@ rule gtc_to_bcf:
         time_hr=lambda wc, attempt: ceil(((len(cfg.ss) + 1) * (cfg.config.num_snps * 3e-6)) / 3600)
         * attempt
         + 1,
-        mem_mb=ceil((len(cfg.ss) * (cfg.config.num_snps * 1.06e-6)) + (cfg.config.num_snps * 2e-3))
-        + 200,
+        mem_mb=lambda wc, attempt: (
+            ceil((len(cfg.ss) * (cfg.config.num_snps * 1.06e-6)) + (cfg.config.num_snps * 2e-3))
+            + 200
+        )
+        * attempt,
     shell:
         """
         bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ou --check-ref x -f {params.reference_fasta} --multiallelics -any |
