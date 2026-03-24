@@ -44,7 +44,7 @@ def main(
         readable=True,
     ),
     batch_size: int = typer.Option(
-        100,
+        50,
         help="Number of samples to process in a batch. More samples per batch will use more memory.",
     ),
     threads: int = typer.Argument(

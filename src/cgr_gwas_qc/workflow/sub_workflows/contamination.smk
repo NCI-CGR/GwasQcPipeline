@@ -88,7 +88,7 @@ if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
                 abf=rules.pull_b_allele_freq_from_1kg.output.abf_file,
             params:
                 adpc=None,
-                batch_size=100,
+                batch_size=50,
             conda:
                 cfg.conda("bio2zarr")
             output:
@@ -128,7 +128,7 @@ if cfg.config.user_files.bcf or cfg.config.workflow_params.convert_gtc2bcf:
                 abf=rules.pull_b_allele_freq_from_1kg.output.abf_file,
             params:
                 adpc=None,
-                batch_size=100,
+                batch_size=50,
             conda:
                 cfg.conda("bio2zarr")
             output:
