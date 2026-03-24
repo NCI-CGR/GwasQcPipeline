@@ -42,7 +42,7 @@ rule convert_bcf_to_plink_bed:
         "benchmarks/convert_bcf_to_plink_bed." + str(len(cfg.ss)) + ".tsv"
     threads: workflow.cores
     resources:
-        mem_mb=ceil((0.07 * len(cfg.ss))) + 1024,
+        mem_mb=lambda wc, attempt: (ceil((0.07 * len(cfg.ss))) + 1024) * attempt,
         time_hr=lambda wc, attempt: ceil(
             ((0.22 * len(cfg.ss)) + (9e-4 * cfg.config.num_snps)) / 3600
         )

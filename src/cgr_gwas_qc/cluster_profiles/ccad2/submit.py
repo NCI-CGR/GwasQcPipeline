@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import grp
 from dataclasses import dataclass, field
+from math import ceil
 from typing import Set
 
 from snakemake.utils import read_job_properties
@@ -48,7 +49,7 @@ class Ccad2Options(ClusterOptions):
 
         return cmd.format(
             queue=",".join(self.queue),
-            mem_gb=self.mem_gb,
+            mem_gb=ceil(self.mem_gb),
             time=formatted_time,
             threads=self.threads,
             rulename=self.rulename,
