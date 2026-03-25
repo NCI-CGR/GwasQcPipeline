@@ -494,7 +494,7 @@ rule sample_concordance_summary:
     output:
         "sample_level/concordance/summary.csv",
     resources:
-        mem_mb=lambda wc, attempt, input: max((attempt + 1) * input.size_mb, 1024),
+        mem_mb=lambda wc, attempt: ceil(max(4096, 2048 + 0.65 * len(cfg.ss)) * attempt),
         time_hr=lambda wildcards, attempt: BIG_TIME[attempt],
     script:
         "../scripts/sample_concordance.py"

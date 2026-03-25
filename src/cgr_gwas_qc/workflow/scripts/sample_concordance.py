@@ -141,37 +141,18 @@ def _add_expected_replicates(df: pd.DataFrame, ss: pd.DataFrame) -> pd.DataFrame
     pair.
     """
     known_replicates = _get_known_replicates(ss)
-    df["is_expected_replicate"] = False
-    for pair in known_replicates:
-        if pair in df.index:
-            df.loc[pair, "is_expected_replicate"] = True
-        else:
-            # issue 234 fix ####
-            d = {"is_expected_replicate": True}
-            record_df = pd.DataFrame(d, index=pd.MultiIndex.from_tuples([pair]))
-            record_df = record_df.rename_axis(["Sample_ID1", "Sample_ID2"])
-            df = pd.concat([df, record_df], axis=0)
+    known_idx = pd.MultiIndex.from_tuples(known_replicates, names=df.index.names).unique()
+    missing_idx = known_idx[~known_idx.isin(df.index)]
+    if len(missing_idx):
+        df = pd.concat([df, pd.DataFrame(index=missing_idx)], axis=0, copy=False)
+    df["is_expected_replicate"] = df.index.isin(known_idx)
     return df
 
 
-def _discordant_logic(sr: pd.Series) -> bool:
-    if not sr.is_expected_replicate:
-        # not an expected replicate
-        return False
-
-    if pd.isna(sr.PLINK_is_ge_concordance):
-        # Issue 210: If someone is an expected replicates but has no PLINK then these should be flagged as an discordant replicate (True). Before was returning False
-        return True
-
-    if pd.notna(sr.PLINK_is_ge_concordance):
-        # plink call: Mark as discordant (True) if expected replicate and < concordance threshold
-        return not sr.PLINK_is_ge_concordance
-
-    return False
-
-
 def _add_discordant_replicates(df: pd.DataFrame) -> pd.DataFrame:
-    df["is_discordant_replicate"] = df.apply(_discordant_logic, axis=1)
+    df["is_discordant_replicate"] = df["is_expected_replicate"] & ~df[
+        "PLINK_is_ge_concordance"
+    ].fillna(False)
     return df
 
 
