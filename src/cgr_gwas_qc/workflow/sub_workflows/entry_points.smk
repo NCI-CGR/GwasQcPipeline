@@ -121,6 +121,7 @@ if cfg.config.workflow_params.convert_idat2gtc and cfg.config.user_files.idat_pa
                 grp=cfg.cluster_groups,
             output:
                 temp("sample_level/{grp}/gtc.tsv"),
+                temp("sample_level/{grp}/gtc2bcf_renames.tsv"),
 
     else:
 
@@ -296,10 +297,12 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                         grp=cfg.cluster_groups,
                     output:
                         temp("sample_level/{grp}/gtc.tsv"),
+                        temp("sample_level/{grp}/gtc2bcf_renames.tsv"),
 
             use rule gtc_to_bcf from bcf_module with:
                 input:
                     gtcs=rules.write_gtc_pathlist.output[0],
+                    renames=rules.write_gtc_pathlist.output[1],
                 benchmark:
                     "benchmarks/gtc_to_bcf.{grp}" + ".tsv"
                 resources:
@@ -381,10 +384,12 @@ if cfg.config.user_files.gtc_pattern or cfg.config.workflow_params.convert_idat2
                         pattern=lambda wc: cfg.config.user_files.gtc_pattern,
                     output:
                         "sample_level/gtc.tsv",
+                        "sample_level/gtc2bcf_renames.tsv",
 
             use rule gtc_to_bcf from bcf_module with:
                 input:
                     gtcs=rules.write_gtc_pathlist.output[0],
+                    renames=rules.write_gtc_pathlist.output[1],
                 output:
                     bcf="sample_level/samples.bcf",
 

@@ -62,17 +62,27 @@ rule write_gtc_pathlist:
         pattern=lambda wc: cfg.config.user_files.gtc_pattern,
     output:
         "sample_level/gtc.tsv",
+        "sample_level/gtc2bcf_renames.tsv",
     run:
         if params.grp == "":
-            gtcList = cfg.expand(params.pattern, query="is_missing_gtc==False")
+            pattern = params.pattern
+            query = "is_missing_gtc==False"
         else:
-            params.pattern = expand(params.pattern, grp=wildcards.grp, allow_missing=True)
-            gtcList = cfg.expand(
-                params.pattern,
-                query='cluster_group=="{grp}"&is_missing_gtc==False'.format(grp=wildcards.grp),
-            )
+            pattern = expand(params.pattern, grp=wildcards.grp, allow_missing=True)
+            query = 'cluster_group=="{grp}"&is_missing_gtc==False'.format(grp=wildcards.grp)
+        gtcList = cfg.expand(
+            pattern,
+            query=query,
+        )
         with open(output[0], "w") as f:
             for line in gtcList:
+                f.write(f"{line}\n")
+        renames = cfg.expand(
+            "{SentrixBarcode_A}_{SentrixPosition_A} {Sample_ID}",
+            query=query,
+        )
+        with open(output[1], "w") as f:
+            for line in renames:
                 f.write(f"{line}\n")
 
 
@@ -93,6 +103,7 @@ rule gtc_to_bcf:
     """
     input:
         gtcs="sample_level/gtc.tsv",
+        renames="sample_level/gtc2bcf_renames.tsv",
     params:
         additional_params=_get_add_params_for_gtc2bcf,
         bpm=cfg.config.reference_files.illumina_manifest_file,
@@ -116,7 +127,10 @@ rule gtc_to_bcf:
         * attempt,
     shell:
         """
-        bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou | bcftools sort -Ou -T ./bcftools. | bcftools norm --no-version -Ou --check-ref x -f {params.reference_fasta} --multiallelics -any |
+        bcftools +{params.gtc2vcf_location} --threads {threads} --gtcs {input.gtcs} --bpm {params.bpm} --fasta-ref {params.reference_fasta} {params.additional_params} -Ou |
+        bcftools reheader --samples {input.renames} |
+        bcftools sort -Ou -T ./bcftools. |
+        bcftools norm --no-version -Ou --check-ref x -f {params.reference_fasta} --multiallelics -any |
         bcftools filter --exclude 'REF==ALT|INFO/INTENSITY_ONLY=1' --soft-filter 'int_only' -Ob --write-index --output {output.bcf}
         """
 
