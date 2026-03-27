@@ -426,7 +426,7 @@ rule sample_concordance_plink:
     output:
         "sample_level/concordance/plink.csv",
     resources:
-        mem_mb=2000,
+        mem_mb=lambda wc, attempt: 4000 * attempt,
         time_hr=4,
     script:
         "../scripts/concordance_table.py"
